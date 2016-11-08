@@ -58,10 +58,11 @@ set(SH_INCLUDE_DIR          ${SH_DIR}/include)
 set(SH_INCLUDE_FILES        ${SH_INCLUDE_DIR}/Shader.h
                             ${SH_INCLUDE_DIR}/Mesh.h
                             ${SH_INCLUDE_DIR}/Model.h
-                            ${SH_INCLUDE_DIR}/SuperimposeHandCADThread.h
+                            ${SH_INCLUDE_DIR}/SuperImpose.h
+                            ${SH_INCLUDE_DIR}/SICAD.h
+                            ${SH_INCLUDE_DIR}/CADSuperimposer.h
                             ${SH_INCLUDE_DIR}/ThreadControllerSHC.h
-                            ${SH_INCLUDE_DIR}/SuperimposeHandSkeletonThread.h
-                            ${SH_INCLUDE_DIR}/SuperimposeHand.h)
+                            ${SH_INCLUDE_DIR}/SuperimposerFactory.h)
 
 LIST(APPEND INCLUDE_DIRS    ${SH_INCLUDE_DIR})
 LIST(APPEND INCLUDE_FILES   ${SH_INCLUDE_FILES})
@@ -70,10 +71,10 @@ set(SH_SOURCE_DIR           ${SH_DIR}/src)
 set(SH_SOURCE_FILES         ${SH_SOURCE_DIR}/Shader.cpp
                             ${SH_SOURCE_DIR}/Mesh.cpp
                             ${SH_SOURCE_DIR}/Model.cpp
-                            ${SH_SOURCE_DIR}/SuperimposeHandCADThread.cpp
+                            ${SH_SOURCE_DIR}/SICAD.cpp
+                            ${SH_SOURCE_DIR}/CADSuperimposer.cpp
                             ${SH_SOURCE_DIR}/ThreadControllerSHC.cpp
-                            ${SH_SOURCE_DIR}/SuperimposeHandSkeletonThread.cpp
-                            ${SH_SOURCE_DIR}/SuperimposeHand.cpp)
+                            ${SH_SOURCE_DIR}/SuperimposerFactory.cpp)
 
 LIST(APPEND SOURCE_DIRS     ${SH_SOURCE_DIR})
 LIST(APPEND SOURCE_FILES    ${SH_SOURCE_FILES})
@@ -113,7 +114,7 @@ set(HT_SOURCE_FILES         ${HT_SOURCE_DIR}/main.cpp)
 LIST(APPEND SOURCE_DIRS     ${HT_SOURCE_DIR})
 LIST(APPEND SOURCE_FILES    ${HT_SOURCE_FILES})
 
-set(IMAGE_DIR               ${CMAKE_CURRENT_SOURCE_DIR}/img)
+set(IMAGE_DIR               ${CMAKE_CURRENT_SOURCE_DIR}/resource/img)
 file(GLOB   IMAGE_FILES
      FOLLOW_SYMLINKS        ${IMAGE_DIR}/*.ppm)
 
