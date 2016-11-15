@@ -8,6 +8,7 @@ set(SOURCE_DIRS)
 set(SOURCE_FILES)
 set(INCLUDE_DIRS)
 set(INCLUDE_FILES)
+set(RESOURCE_FILES)
 set(LIBS)
 ### --- FILES::BayesFiltersLib --- ###
 set(BFL_DIR                 ${CMAKE_CURRENT_SOURCE_DIR}/../BayesFiltersLib)
@@ -60,8 +61,9 @@ set(SH_INCLUDE_FILES        ${SH_INCLUDE_DIR}/Shader.h
                             ${SH_INCLUDE_DIR}/Model.h
                             ${SH_INCLUDE_DIR}/SuperImpose.h
                             ${SH_INCLUDE_DIR}/SICAD.h
+                            ${SH_INCLUDE_DIR}/SISkeleton.h
                             ${SH_INCLUDE_DIR}/CADSuperimposer.h
-                            ${SH_INCLUDE_DIR}/ThreadControllerSHC.h
+                            ${SH_INCLUDE_DIR}/SkeletonSuperimposer.h
                             ${SH_INCLUDE_DIR}/SuperimposerFactory.h)
 
 LIST(APPEND INCLUDE_DIRS    ${SH_INCLUDE_DIR})
@@ -72,8 +74,9 @@ set(SH_SOURCE_FILES         ${SH_SOURCE_DIR}/Shader.cpp
                             ${SH_SOURCE_DIR}/Mesh.cpp
                             ${SH_SOURCE_DIR}/Model.cpp
                             ${SH_SOURCE_DIR}/SICAD.cpp
+                            ${SH_SOURCE_DIR}/SISkeleton.cpp
                             ${SH_SOURCE_DIR}/CADSuperimposer.cpp
-                            ${SH_SOURCE_DIR}/ThreadControllerSHC.cpp
+                            ${SH_SOURCE_DIR}/SkeletonSuperimposer.cpp
                             ${SH_SOURCE_DIR}/SuperimposerFactory.cpp)
 
 LIST(APPEND SOURCE_DIRS     ${SH_SOURCE_DIR})
@@ -105,18 +108,33 @@ set(ICUB_HAND_FILES         ${ICUB_HAND_DIR}/r_palm.${ICUB_MESH_EXT}
                             ${ICUB_HAND_DIR}/r_tl3.${ICUB_MESH_EXT}
                             ${ICUB_HAND_DIR}/r_tl4.${ICUB_MESH_EXT})
 
+LIST(APPEND RESOURCE_FILES  ${ICUB_HAND_FILES}
+                            ${SHADERS_VERT_FILES}
+                            ${SHADERS_FRAG_FILES})
+
 
 ### --- FILES::hand-tracking --- ###
-set(HT_SOURCE_DIR           ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(HT_INCLUDE_DIR          ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(HT_INCLUDE_FILES        ${HT_INCLUDE_DIR}/AutoCanny.h)
 
+LIST(APPEND INCLUDE_DIRS    ${HT_INCLUDE_DIR})
+LIST(APPEND INCLUDE_FILES   ${HT_INCLUDE_FILES})
+
+
+set(HT_SOURCE_DIR           ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(HT_SOURCE_FILES         ${HT_SOURCE_DIR}/main.cpp)
 
 LIST(APPEND SOURCE_DIRS     ${HT_SOURCE_DIR})
 LIST(APPEND SOURCE_FILES    ${HT_SOURCE_FILES})
 
+
 set(IMAGE_DIR               ${CMAKE_CURRENT_SOURCE_DIR}/resource/img)
 file(GLOB   IMAGE_FILES
      FOLLOW_SYMLINKS        ${IMAGE_DIR}/*.ppm)
+
+# --- Thirft files need to be in the current source dir --- #
+# --- At the moment, idl_rfm.thrift is copied from SH to HT folder --- #
+set(THIRFT_FILES            ${HT_SOURCE_DIR}/idl_rfm.thrift)
 
 
 ### --- FILES::packages --- ###
@@ -140,6 +158,8 @@ include(ICUBcontribOptions)
 
 icubcontrib_set_default_prefix()
 
+yarp_add_idl(IDL_GEN_SOURCE     ${THIRFT_FILES})
+
 LIST(APPEND INCLUDE_DIRS        ${YARP_INCLUDE_DIRS}
                                 ${ICUB_INCLUDE_DIRS}
                                 ${OPENGL_INCLUDE_DIR}
@@ -155,7 +175,9 @@ LIST(APPEND LIBS                ${YARP_LIBRARIES}
                                 glew
                                 glm
                                 glfw
-                                ${ASSIMP_LIBRARIES}) #-L${ASSIMP_LIBRARY_DIRS}
+                                ${ASSIMP_LIBRARIES} -L${ASSIMP_LIBRARY_DIRS})
+
+LIST(APPEND SOURCE_FILES ${IDL_GEN_SOURCE})
 
 
 ### --- OPTIONS --- ###
@@ -197,3 +219,6 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_nullptr cxx_constexpr)
 
 
 ### --- CUSTOM --- ###
+add_custom_command(TARGET  ${PROJECT_NAME} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E make_directory                       $<TARGET_FILE_DIR:${PROJECT_NAME}>
+                   COMMAND ${CMAKE_COMMAND} -E copy             ${RESOURCE_FILES}   $<TARGET_FILE_DIR:${PROJECT_NAME}>)
