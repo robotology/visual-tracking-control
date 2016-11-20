@@ -103,8 +103,8 @@ public:
     virtual bool Configure()
     {
         _state_cov.resize(2, 1);
-        _state_cov <<              0.005,
-                      0.5 * (M_PI/180.0);
+        _state_cov <<              0.01,
+                      1.0 * (M_PI/180.0);
 
         generator           = new std::mt19937_64(1);
         distribution_pos    = new std::normal_distribution<float>(0.0, _state_cov(0));
@@ -162,7 +162,7 @@ public:
         StateModel(prev_state, pred_state);
 
         pred_state.head(3) += VectorXf::NullaryExpr(3, gaussian_random_pos);
-//        pred_state.tail(3) += VectorXf::NullaryExpr(3, gaussian_random_ang);
+        pred_state.tail(3) += VectorXf::NullaryExpr(3, gaussian_random_ang);
     }
 
 
@@ -188,15 +188,8 @@ public:
         si_cad_->Superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
         AutoCanny(hand_ogl, hand_edge);
 
-        hand_edge = max(hand_edge, img_back_edge_);
-
-        distanceTransform(Scalar(255, 255, 255)-hand_edge, edge, DIST_L2, DIST_MASK_PRECISE);
-        imshow(cvwin, edge);
-        normalize(edge, edge, 0.0, 1.0, NORM_MINMAX);
-
-
-        MatrixXf m(edge.rows, edge.cols);
-        cv2eigen(edge, m);
+        MatrixXf m(hand_edge.rows, hand_edge.cols);
+        cv2eigen(hand_edge, m);
 
         return m;
     }
@@ -204,14 +197,18 @@ public:
 
     virtual void Correction(const Ref<const VectorXf> & pred_particles, const Ref<const MatrixXf> & measurements, Ref<VectorXf> cor_state)
     {
-        MatrixXf innovation = ObservationModel(pred_particles);
+        MatrixXf hand_edge = ObservationModel(pred_particles);
 
-        innovation.array() -= measurements.array();
-        innovation.array() = innovation.cwiseAbs();
+        Mat hand_edge_cv;
+        Mat meas_cv;
+        eigen2cv(hand_edge, hand_edge_cv);
+        MatrixXf meas = measurements;
+        eigen2cv(meas, meas_cv);
 
-        std::cout << "Sum: " << exp(-innovation.sum()) << std::endl;
+        Mat result;
+        matchTemplate(meas_cv, hand_edge_cv, result, CV_TM_CCOEFF_NORMED);
 
-        cor_state << exp(-innovation.sum()) + std::numeric_limits<float>::epsilon();
+        cor_state << abs(result.at<float>(0, 0));
     }
 
 
@@ -219,6 +216,17 @@ public:
     {
         particle = (particles.array().rowwise() * weights.array().transpose()).rowwise().sum();
     }
+
+
+    void Mode(const Ref<const MatrixXf> & particles, const Ref<const VectorXf> & weights, Ref<MatrixXf> particle)
+    {
+        MatrixXf::Index maxRow, maxCol;
+        weights.maxCoeff(&maxRow, &maxCol);
+//        std::cout << weights << std::endl;
+//        std::cout << maxRow << " " << maxCol << std::endl;
+        particle = particles.col(maxRow);
+    }
+
 
     void Superimpose(const SuperImpose::ObjPoseMap & obj2pos_map, cv::Mat & img)
     {
@@ -419,7 +427,6 @@ public:
                 MatrixXf measurement;
                 Mat img_back = cvarrToMat(imgout.getIplImage());
                 Mat img_back_edge;
-                Mat img_back_dist;
 
                 Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readHead("left"));
                 cam_x_[0] = eye_pose(0); cam_x_[1] = eye_pose(1); cam_x_[2] = eye_pose(2);
@@ -435,33 +442,32 @@ public:
                 //        Snapshot();
 
                 AutoCanny(img_back, img_back_edge);
-                distanceTransform(Scalar(255, 255, 255)-img_back_edge, img_back_dist, DIST_L2, DIST_MASK_PRECISE);
-                normalize(img_back_dist, img_back_dist, 0.0, 1.0, NORM_MINMAX);
 
-                MatrixXf img_back_dist_eigen(img_back_dist.rows, img_back_dist.cols);
-                cv2eigen(img_back_dist, img_back_dist_eigen);
+                MatrixXf img_back_edge_eigen(img_back_edge.rows, img_back_edge.cols);
+                cv2eigen(img_back_edge, img_back_edge_eigen);
 
                 ht_pf_f_->setImgBackEdge(img_back_edge);
                 ht_pf_f_->setCamXO(cam_x_, cam_o_);
                 for (int i = 0; i < num_particle; ++i)
                 {
-                    ht_pf_f_->Correction(init_particle_.col(i), img_back_dist_eigen, init_weight_.row(i));
+                    ht_pf_f_->Correction(init_particle_.col(i), img_back_edge_eigen, init_weight_.row(i));
                 }
 
                 init_weight_ = init_weight_ / init_weight_.sum();
 
                 //        Snapshot();
 
+                MatrixXf out_particle(6, 1);
+                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
+//                ht_pf_f_->Mode(init_particle_, init_weight_, out_particle);
+
 //                if (ht_pf_f_->Neff(init_weight_) < num_particle/3)
 //                {
                     ht_pf_f_->Resampling(init_particle_, init_weight_, temp_particle, temp_weight, temp_parent);
-                    
+
                     init_particle_ = temp_particle;
                     init_weight_   = temp_weight;
 //                }
-
-                MatrixXf out_particle(6, 1);
-                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
 
                 SuperImpose::ObjPoseMap hand_pose;
                 SuperImpose::ObjPose    pose;
