@@ -196,6 +196,11 @@ public:
         MatrixXf m(hand_edge.rows, hand_edge.cols);
         cv2eigen(hand_edge, m);
 
+        /* Debug Only */
+        hand_edge = max(hand_edge, img_back_edge_);
+        imshow(cvwin, hand_edge);
+        /* ********** */
+
         return m;
     }
 
@@ -211,7 +216,8 @@ public:
         eigen2cv(meas, meas_cv);
 
         Mat result;
-        matchTemplate(meas_cv, hand_edge_cv, result, CV_TM_CCOEFF_NORMED);
+//        matchTemplate(meas_cv, hand_edge_cv, result, TM_CCOEFF_NORMED);
+        matchTemplate(meas_cv, hand_edge_cv, result, TM_CCORR_NORMED);
 
         cor_state << abs(result.at<float>(0, 0));
     }
@@ -227,8 +233,6 @@ public:
     {
         MatrixXf::Index maxRow, maxCol;
         weights.maxCoeff(&maxRow, &maxCol);
-//        std::cout << weights << std::endl;
-//        std::cout << maxRow << " " << maxCol << std::endl;
         particle = particles.col(maxRow);
     }
 
