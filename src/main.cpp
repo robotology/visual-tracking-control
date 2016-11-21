@@ -104,7 +104,7 @@ public:
     {
         _state_cov.resize(2, 1);
         _state_cov <<               0.01,
-                      1.0 * (M_PI/180.0);
+                      0.5 * (M_PI/180.0);
 
         generator           = new std::mt19937_64(1);
         distribution_pos    = new std::normal_distribution<float>(0.0, _state_cov(0));
@@ -209,39 +209,49 @@ public:
         eigen2cv(hand_edge, hand_edge_cv);
         std::vector<Point> points;
         for (auto it = hand_edge_cv.begin<float>(); it != hand_edge_cv.end<float>(); ++it) if (*it) points.push_back(it.pos());
-        Rect cad_crop_roi = boundingRect(Mat(points));
-        Mat cad_edge_crop = hand_edge_cv(cad_crop_roi);
-        /* ************** */
+
+        if (points.size() > 20)
+        {
+            Rect cad_crop_roi = boundingRect(Mat(points));
+            Mat cad_edge_crop = hand_edge_cv(cad_crop_roi);
+            /* ************** */
 
 
-        /* CAM image crop */
-        Mat meas_cv;
-        eigen2cv(MatrixXf(measurements), meas_cv);
-        Rect cam_crop_roi;
-        float crop_ratio = 0.35;
-        cam_crop_roi.x      = static_cast<int>(cad_crop_roi.x      - crop_ratio/2.0 * cad_crop_roi.width);
-        cam_crop_roi.y      = static_cast<int>(cad_crop_roi.y      - crop_ratio/2.0 * cad_crop_roi.height);
-        cam_crop_roi.width  = static_cast<int>(cad_crop_roi.width  + crop_ratio     * cad_crop_roi.width);
-        cam_crop_roi.height = static_cast<int>(cad_crop_roi.height + crop_ratio     * cad_crop_roi.height);
-        cam_crop_roi = cam_crop_roi & cv::Rect(0, 0, meas_cv.cols, meas_cv.rows);
-        Mat cam_edge_crop = meas_cv(cam_crop_roi);
-        /* ************** */
+            /* CAM image crop */
+            Mat meas_cv;
+            eigen2cv(MatrixXf(measurements), meas_cv);
+            Rect cam_crop_roi;
+            float crop_ratio = 0.75;
+            cam_crop_roi.x      = static_cast<int>(cad_crop_roi.x      - crop_ratio/2.0 * cad_crop_roi.width);
+            cam_crop_roi.y      = static_cast<int>(cad_crop_roi.y      - crop_ratio/2.0 * cad_crop_roi.height);
+            cam_crop_roi.width  = static_cast<int>(cad_crop_roi.width  + crop_ratio     * cad_crop_roi.width);
+            cam_crop_roi.height = static_cast<int>(cad_crop_roi.height + crop_ratio     * cad_crop_roi.height);
+            cam_crop_roi = cam_crop_roi & cv::Rect(0, 0, meas_cv.cols, meas_cv.rows);
+            Mat cam_edge_crop = meas_cv(cam_crop_roi);
+            /* ************** */
 
-        /* Debug Only */
-        Mat edge_to_plot = max(meas_cv, hand_edge_cv);
-        edge_to_plot = edge_to_plot(cam_crop_roi);
-        imshow(cvwin, edge_to_plot);
-        /* ********** */
+            /* Debug Only */
+            Mat edge_to_plot = max(meas_cv, hand_edge_cv);
+            edge_to_plot = edge_to_plot(cam_crop_roi);
+            imshow(cvwin, edge_to_plot);
+            /* ********** */
 
-        Mat result;
-//        matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCOEFF_NORMED);
-        matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCORR_NORMED);
+            Mat result;
+            normalize(cam_edge_crop, cam_edge_crop, 0.0, 1.0, NORM_MINMAX);
+            normalize(cad_edge_crop, cad_edge_crop, 0.0, 1.0, NORM_MINMAX);
+            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCOEFF_NORMED);
+    //        matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCORR_NORMED);
 
-        double min_val;
-        double max_val;
-        minMaxLoc(result, &min_val, &max_val);
+            double min_val;
+            double max_val;
+            minMaxLoc(result, &min_val, &max_val);
 
-        cor_state << (max_val < 0? std::numeric_limits<float>::epsilon() : exp(-static_cast<float>(max_val)));
+            cor_state << (max_val < 0? std::numeric_limits<float>::min() : exp(-static_cast<float>(max_val)));
+        }
+        else
+        {
+            cor_state << std::numeric_limits<float>::min();
+        }
     }
 
 
@@ -481,8 +491,8 @@ public:
                 //        Snapshot();
 
                 MatrixXf out_particle(6, 1);
-//                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
-                ht_pf_f_->Mode(init_particle_, init_weight_, out_particle);
+                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
+//                ht_pf_f_->Mode(init_particle_, init_weight_, out_particle);
 
 //                if (ht_pf_f_->Neff(init_weight_) < num_particle/3)
 //                {
