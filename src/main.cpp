@@ -450,6 +450,9 @@ public:
 
                 init_weight_ = init_weight_ / init_weight_.sum();
 
+                MatrixXf out_particle(6, 1);
+                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
+
                 //        Snapshot();
 
 //                if (ht_pf_f_->Neff(init_weight_) < num_particle/3)
@@ -459,9 +462,6 @@ public:
                     init_particle_ = temp_particle;
                     init_weight_   = temp_weight;
 //                }
-
-                MatrixXf out_particle(6, 1);
-                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
 
                 SuperImpose::ObjPoseMap hand_pose;
                 SuperImpose::ObjPose    pose;
