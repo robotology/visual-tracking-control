@@ -162,7 +162,7 @@ public:
         StateModel(prev_state, pred_state);
 
         pred_state.head(3) += VectorXf::NullaryExpr(3, gaussian_random_pos);
-//        pred_state.tail(3) += VectorXf::NullaryExpr(3, gaussian_random_ang);
+        pred_state.tail(3) += VectorXf::NullaryExpr(3, gaussian_random_ang);
     }
 
 
@@ -208,8 +208,6 @@ public:
 
         innovation.array() -= measurements.array();
         innovation.array() = innovation.cwiseAbs();
-
-        std::cout << "Sum: " << exp(-innovation.sum()) << std::endl;
 
         cor_state << exp(-innovation.sum()) + std::numeric_limits<float>::epsilon();
     }
