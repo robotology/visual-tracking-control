@@ -103,8 +103,8 @@ public:
     virtual bool Configure()
     {
         _state_cov.resize(2, 1);
-        _state_cov <<              0.01,
-                      1.0 * (M_PI/180.0);
+        _state_cov <<              0.005,
+                      0.5 * (M_PI/180.0);
 
         generator           = new std::mt19937_64(1);
         distribution_pos    = new std::normal_distribution<float>(0.0, _state_cov(0));
@@ -161,8 +161,12 @@ public:
     {
         StateModel(prev_state, pred_state);
 
+        VectorXf ang(1);
+        ang << pred_state.tail(3).norm();
+        ang += VectorXf::NullaryExpr(1, gaussian_random_ang);
+
         pred_state.head(3) += VectorXf::NullaryExpr(3, gaussian_random_pos);
-        pred_state.tail(3) += VectorXf::NullaryExpr(3, gaussian_random_ang);
+        pred_state.tail(3) *= (ang / pred_state.tail(3).norm());
     }
 
 
@@ -176,11 +180,12 @@ public:
         SuperImpose::ObjPose    pose;
         pose.assign(pred_state.data(), pred_state.data()+3);
 
-        Vector rpy(3);
-        rpy(0) = pred_state(3);
-        rpy(1) = pred_state(4);
-        rpy(2) = pred_state(5);
-        Vector a_a = dcm2axis(rpy2dcm(-1.0*rpy));
+        Vector a_a(4);
+        float ang = pred_state.tail(3).norm();
+        a_a(0) = pred_state(3) / ang;
+        a_a(1) = pred_state(4) / ang;
+        a_a(2) = pred_state(5) / ang;
+        a_a(3) = ang;
         pose.insert(pose.end(), a_a.data(), a_a.data()+4);
 
         hand_pose.emplace("palm", pose);
@@ -389,21 +394,10 @@ public:
         init_particle_.resize(6, num_particle);
 
         Vector q = readArm();
-        Vector ee_pose = icub_kin_arm_->EndEffPose(CTRL_DEG2RAD * q, false);
+        Vector ee_pose = icub_kin_arm_->EndEffPose(CTRL_DEG2RAD * q);
 
-        Vector rpy = ee_pose.subVector(3, 5);
-//        std::cout <<"RPY:\n" << rpy.toString() << std::endl << std::endl;
-//        std::cout <<"DCM RPY:\n" << rpy2dcm(rpy).toString() << std::endl << std::endl;
-//        std::cout <<"RPY2AA RPY:\n" << dcm2axis(rpy2dcm(-1.0*rpy)).toString() << std::endl << std::endl << std::endl;
-//
-//        Vector ee_pose_aa = icub_kin_arm_->EndEffPose(CTRL_DEG2RAD * q, true);
-//        Vector aa = ee_pose_aa.subVector(3, 6);
-//        std::cout <<"AA:\n" << aa.toString() << std::endl << std::endl;
-//        std::cout <<"DCM AA:\n" << axis2dcm(aa).toString() << std::endl << std::endl;
-//        std::cout <<"AA2RPY:\n" << (-1.0*dcm2rpy(axis2dcm(aa))).toString() << std::endl << std::endl;
-//        std::cout <<"AA:\n" << dcm2axis(rpy2dcm(dcm2rpy(axis2dcm(aa)))).toString() << std::endl << std::endl;
-
-        Map<VectorXd> q_arm(ee_pose.data(), ee_pose.size());
+        Map<VectorXd> q_arm(ee_pose.data(), 6, 1);
+        q_arm.tail(3) *= ee_pose(6);
         for (int i = 0; i < num_particle; ++i)
         {
             init_particle_.col(i) = q_arm.cast<float>();
@@ -469,15 +463,17 @@ public:
                     init_weight_   = temp_weight;
 //                }
 
+                // FIXME: out_particle is treatead as a Vector, but it's a Matrix.
                 SuperImpose::ObjPoseMap hand_pose;
                 SuperImpose::ObjPose    pose;
                 pose.assign(out_particle.data(), out_particle.data()+3);
 
-                Vector rpy(3);
-                rpy(0) = out_particle(3);
-                rpy(1) = out_particle(4);
-                rpy(2) = out_particle(5);
-                Vector a_a = dcm2axis(rpy2dcm(-1.0*rpy));
+                Vector a_a(4);
+                float ang = out_particle.col(0).tail(3).norm();
+                a_a(0) = out_particle(3) / ang;
+                a_a(1) = out_particle(4) / ang;
+                a_a(2) = out_particle(5) / ang;
+                a_a(3) = ang;
                 pose.insert(pose.end(), a_a.data(), a_a.data()+4);
 
                 hand_pose.emplace("palm", pose);
