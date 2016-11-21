@@ -229,10 +229,13 @@ public:
     }
 
 
-    void Mode(const Ref<const MatrixXf> & particles, const Ref<const VectorXf> & weights, Ref<MatrixXf> particle)
+    virtual void Mode(const Ref<const MatrixXf> & particles, const Ref<const VectorXf> & weights, Ref<MatrixXf> particle)
     {
-        MatrixXf::Index maxRow, maxCol;
+        MatrixXf::Index maxRow;
+        MatrixXf::Index maxCol;
+
         weights.maxCoeff(&maxRow, &maxCol);
+
         particle = particles.col(maxRow);
     }
 
@@ -456,8 +459,8 @@ public:
                 //        Snapshot();
 
                 MatrixXf out_particle(6, 1);
-                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
-//                ht_pf_f_->Mode(init_particle_, init_weight_, out_particle);
+//                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
+                ht_pf_f_->Mode(init_particle_, init_weight_, out_particle);
 
 //                if (ht_pf_f_->Neff(init_weight_) < num_particle/3)
 //                {
