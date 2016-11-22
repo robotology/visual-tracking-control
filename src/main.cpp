@@ -103,7 +103,7 @@ public:
     virtual bool Configure()
     {
         _state_cov.resize(2, 1);
-        _state_cov <<              0.005,
+        _state_cov <<              0.01,
                       0.5 * (M_PI/180.0);
 
         generator           = new std::mt19937_64(1);
@@ -216,10 +216,11 @@ public:
         eigen2cv(meas, meas_cv);
 
         Mat result;
-//        matchTemplate(meas_cv, hand_edge_cv, result, TM_CCOEFF_NORMED);
+        normalize(meas_cv, meas_cv, 0.0, 1.0, NORM_MINMAX);
+        normalize(hand_edge_cv, hand_edge_cv, 0.0, 1.0, NORM_MINMAX);
         matchTemplate(meas_cv, hand_edge_cv, result, TM_CCORR_NORMED);
 
-        cor_state << abs(result.at<float>(0, 0));
+        cor_state << (result.at<float>(0, 0) < 0? std::numeric_limits<float>::min() : exp(-result.at<float>(0, 0)));
     }
 
 
@@ -459,8 +460,8 @@ public:
                 //        Snapshot();
 
                 MatrixXf out_particle(6, 1);
-//                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
-                ht_pf_f_->Mode(init_particle_, init_weight_, out_particle);
+                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
+//                ht_pf_f_->Mode(init_particle_, init_weight_, out_particle);
 
 //                if (ht_pf_f_->Neff(init_weight_) < num_particle/3)
 //                {
