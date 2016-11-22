@@ -1,157 +1,734 @@
 #include <algorithm>
 #include <cmath>
+#include <cstring>
+#include <dirent.h>
 #include <iostream>
 #include <numeric>
-
 #include <sys/types.h>
-#include <dirent.h>
+#include <limits>
+#include <thread>
 
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui/highgui.hpp"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
+#include <Eigen/Dense>
+#include <opencv2/core/eigen.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+#include <yarp/os/LogStream.h>
+#include <yarp/os/Network.h>
+#include <yarp/os/ResourceFinder.h>
+#include <yarp/sig/Image.h>
+#include <yarp/math/Math.h>
+#include <iCub/iKin/iKinFwd.h>
+#include <iCub/ctrl/math.h>
 
 #include "FilteringContext.h"
 #include "SIRParticleFilter.h"
+#include "ParticleFilteringFunction.h"
+#include "AutoCanny.h"
+#include "SICAD.h"
+
+#define WINDOW_WIDTH  320
+#define WINDOW_HEIGHT 240
 
 using namespace cv;
-
-const double percent_of_pixels_not_edges = 0.7;     // MATLAB: Used for selecting thresholds
-const double threshold_ratio             = 0.4;     // MATLAB: Low threshold is this fraction of the high one
-const double sigma                       = 1.4142;  // MATLAB: 1-D Gaussian filter standard deviation
-
-const char* window_autocanny = "AutoCanny Edge Map";
-const char* window_autodist  = "Distance Transform for AutoCanny";
-
-void CumSum(const Mat& histogram, Mat& cumsum);
-
-void AutoCanny(const Mat &src) {
-    int filter_length = 8 * static_cast<int>(ceil(sigma));
-    int n             = (filter_length - 1)/2;
-    Mat GX;
-    Mat GY;
-    Mat gauss_filter_transpose;
-    Mat gradient_gauss_filter_transpose;
-    Mat mag_gradient;
-    Mat mag_hist_3c;
-    Mat mag_hist_cumsum_3c;
-    const int channels[]      = {2};
-    const float range[]       = {0.0, 1.01};
-    const int hist_size[]     = {64};
-    const float* hist_range[] = {range};
-    double percentile = percent_of_pixels_not_edges * src.cols * src.rows;
-    double high_threshold;
-    double low_threshold;
-    Mat edge;
-    Mat dist;
+using namespace Eigen;
+using namespace yarp::os;
+using namespace yarp::sig;
+using namespace yarp::math;
+using namespace iCub::iKin;
+using namespace iCub::ctrl;
 
 
-    Mat gauss_filter = getGaussianKernel(filter_length, sigma);
-    normalize(gauss_filter, gauss_filter, 1.0, 0.0, NORM_L1);
+cv::String cvwin = "Superimposed Edges";
 
-    Mat gradient_gauss_filter(gauss_filter.size(), gauss_filter.type());
-    gradient_gauss_filter.at<double>(0)               = gauss_filter.at<double>(1) - gauss_filter.at<double>(0);
-    gradient_gauss_filter.at<double>(filter_length-1) = -gradient_gauss_filter.at<double>(0);
-    for (size_t i = 1; i < filter_length/2; ++i) {
-        gradient_gauss_filter.at<double>(i)                 = (gauss_filter.at<double>(i+1) - gauss_filter.at<double>(i-1))/2.0;
-        gradient_gauss_filter.at<double>(filter_length-1-i) = -gradient_gauss_filter.at<double>(i);
+bool FileFound (const ConstString & file)
+{
+    if (file.empty()) {
+        yError() << "File not found!";
+        return false;
     }
-    normalize(gradient_gauss_filter, gradient_gauss_filter, 2.0, 0.0, NORM_L1);
-
-    flip(gauss_filter,          gauss_filter,          0);
-    flip(gradient_gauss_filter, gradient_gauss_filter, 0);
-
-    transpose(gauss_filter,          gauss_filter_transpose);
-    transpose(gradient_gauss_filter, gradient_gauss_filter_transpose);
-
-    filter2D(src, GX, CV_32F, gauss_filter,                    Point(0, n), 0, BORDER_REPLICATE);
-    filter2D(GX,  GX, CV_32F, gradient_gauss_filter_transpose, Point(n, 0), 0, BORDER_REPLICATE);
-
-    filter2D(src, GY, CV_32F, gauss_filter_transpose,          Point(n, 0), 0, BORDER_REPLICATE);
-    filter2D(GY,  GY, CV_32F, gradient_gauss_filter ,          Point(0, n), 0, BORDER_REPLICATE);
-
-    Mat GX_abs = abs(GX);
-    Mat GY_abs = abs(GY);
-    Mat G_t = min(GX_abs, GY_abs);
-    Mat G_x = max(GX_abs, GY_abs);
-
-    divide(G_t, G_x, G_t);
-    pow(G_t, 2.0, G_t);
-    sqrt(Scalar(1.0, 1.0, 1.0) + G_t, mag_gradient);
-    multiply(G_x, mag_gradient, mag_gradient);
-
-    GX.convertTo(GX, CV_16SC3);
-    GY.convertTo(GY, CV_16SC3);
-
-    //???: indagare accuratamente il calcolo dell'istogramma su più canali e come vengono calcolati i threshold
-    double min;
-    double max;
-    minMaxLoc(mag_gradient, &min, &max);
-    mag_gradient /= max;
-    calcHist(&mag_gradient, 1, channels, Mat(), mag_hist_3c, 1, hist_size, hist_range);
-    CumSum(mag_hist_3c, mag_hist_cumsum_3c);
-    MatIterator_<float> up_bgr;
-    up_bgr = std::upper_bound(mag_hist_cumsum_3c.begin<float>(), mag_hist_cumsum_3c.end<float>(), percentile);
-    high_threshold = (static_cast<double>(up_bgr.lpos()) + 1.0) / static_cast<double>(hist_size[0]) * 255.0;
-    low_threshold  = threshold_ratio * high_threshold;
-
-    Canny(GX, GY, edge, low_threshold, high_threshold, true);
-    distanceTransform(Scalar(255, 255, 255)-edge, dist, DIST_L2, DIST_MASK_5); //DIST_MASK_PRECISE
-
-
-    /* ------------ PLOT ONLY ------------ */
-    Mat edge_show;
-    Mat dist_show;
-    Mat edge_tmp;
-    edge_tmp = Mat::zeros(edge.size(), edge.type());
-    src.copyTo(edge_tmp, edge);
-    normalize(dist, dist, 0.0, 1.0, NORM_MINMAX);
-
-    edge_show = edge_tmp;
-    dist_show = dist;
-
-    imshow(window_autocanny, edge_show);
-    imshow(window_autodist,  dist_show);
+    return true;
 }
 
 
-int main()
+class HTParticleFilteringFunction : public ParticleFilteringFunction
 {
-    namedWindow(window_autocanny, WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
-    namedWindow(window_autodist,  WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
+private:
+    std::normal_distribution<float>  * distribution_ang = nullptr;
+    std::function<float (float)>       gaussian_random_ang;
 
-    while (waitKey(0) != 103);
+    GLFWwindow                       * window_ = nullptr;
 
-    Mat src;
-    const std::string img_dir("../../img/");
-    DIR * dir = opendir(img_dir.c_str());
-    if (dir!= nullptr)
+    SICAD                            * si_cad_;
+    SuperImpose::ObjFileMap            cad_hand_;
+    double                             cam_x_[3];
+    double                             cam_o_[4];
+    Mat                                img_back_edge_;
+
+public:
+
+    HTParticleFilteringFunction() {}
+
+
+    ~HTParticleFilteringFunction()
     {
-        while (struct dirent * ent = readdir(dir))
+        delete distribution_ang;
+        delete si_cad_;
+    }
+
+
+    void setOGLWindow(GLFWwindow *& window)
+    {
+        window_ = window;
+    }
+
+
+    void setCamXO(double * cam_x, double * cam_o)
+    {
+        memcpy(cam_x_, cam_x, 3 * sizeof(double));
+        memcpy(cam_o_, cam_o, 4 * sizeof(double));
+    }
+
+
+    void setImgBackEdge(const Mat & img_back_edge)
+    {
+        img_back_edge_ = img_back_edge;
+    }
+
+
+    virtual bool Configure()
+    {
+        _state_cov.resize(2, 1);
+        _state_cov <<               0.01,
+                      0.5 * (M_PI/180.0);
+
+        generator           = new std::mt19937_64(1);
+        distribution_pos    = new std::normal_distribution<float>(0.0, _state_cov(0));
+        distribution_ang    = new std::normal_distribution<float>(0.0, _state_cov(1));
+        gaussian_random_pos = [&] (int) { return (*distribution_pos)(*generator); };
+        gaussian_random_ang = [&] (int) { return (*distribution_ang)(*generator); };
+
+        ResourceFinder rf;
+        cad_hand_["palm"] = rf.findFileByName("r_palm.obj");
+        if (!FileFound(cad_hand_["palm"])) return false;
+//        cad_hand_["thumb1"] = rf.findFileByName("r_tl0.obj");
+//        if (!FileFound(cad_hand_["thumb1"])) return false;
+//        cad_hand_["thumb2"] = rf.findFileByName("r_tl1.obj");
+//        if (!FileFound(cad_hand_["thumb2"])) return false;
+//        cad_hand_["thumb3"] = rf.findFileByName("r_tl2.obj");
+//        if (!FileFound(cad_hand_["thumb3"])) return false;
+//        cad_hand_["thumb4"] = rf.findFileByName("r_tl3.obj");
+//        if (!FileFound(cad_hand_["thumb4"])) return false;
+//        cad_hand_["thumb5"] = rf.findFileByName("r_tl4.obj");
+//        if (!FileFound(cad_hand_["thumb5"])) return false;
+//        cad_hand_["index0"] = rf.findFileByName("r_indexbase.obj");
+//        if (!FileFound(cad_hand_["index0"])) return false;
+//        cad_hand_["index1"] = rf.findFileByName("r_ail0.obj");
+//        if (!FileFound(cad_hand_["index1"])) return false;
+//        cad_hand_["index2"] = rf.findFileByName("r_ail1.obj");
+//        if (!FileFound(cad_hand_["index2"])) return false;
+//        cad_hand_["index3"] = rf.findFileByName("r_ail2.obj");
+//        if (!FileFound(cad_hand_["index3"])) return false;
+//        cad_hand_["index4"] = rf.findFileByName("r_ail3.obj");
+//        if (!FileFound(cad_hand_["index4"])) return false;
+//        cad_hand_["medium0"] = rf.findFileByName("r_ml0.obj");
+//        if (!FileFound(cad_hand_["medium0"])) return false;
+//        cad_hand_["medium1"] = rf.findFileByName("r_ml1.obj");
+//        if (!FileFound(cad_hand_["medium1"])) return false;
+//        cad_hand_["medium2"] = rf.findFileByName("r_ml2.obj");
+//        if (!FileFound(cad_hand_["medium2"])) return false;
+//        cad_hand_["medium3"] = rf.findFileByName("r_ml3.obj");
+//        if (!FileFound(cad_hand_["medium3"])) return false;
+
+        si_cad_ = new SICAD();
+        si_cad_->Configure(window_, cad_hand_, 232.921, 232.43, 162.202, 125.738);
+
+        return true;
+    }
+
+    virtual void StateModel(const Ref<const VectorXf> & prev_state, Ref<VectorXf> prop_state)
+    {
+        MatrixXf A = MatrixXf::Identity(6, 6);
+        prop_state = A * prev_state;
+    }
+
+
+    virtual void Prediction(const Ref<const VectorXf> & prev_state, Ref<VectorXf> pred_state)
+    {
+        StateModel(prev_state, pred_state);
+
+        VectorXf ang(1);
+        ang << pred_state.tail(3).norm();
+        ang += VectorXf::NullaryExpr(1, gaussian_random_ang);
+
+        pred_state.head(3) += VectorXf::NullaryExpr(3, gaussian_random_pos);
+        pred_state.tail(3) *= (ang / pred_state.tail(3).norm());
+    }
+
+
+    virtual Ref<MatrixXf> ObservationModel(const Ref<const VectorXf> & pred_state)
+    {
+        Mat hand_ogl = Mat::zeros(img_back_edge_.rows, img_back_edge_.cols, img_back_edge_.type());
+        Mat hand_edge;
+        Mat edge;
+
+        SuperImpose::ObjPoseMap hand_pose;
+        SuperImpose::ObjPose    pose;
+        pose.assign(pred_state.data(), pred_state.data()+3);
+
+        Vector a_a(4);
+        float ang = pred_state.tail(3).norm();
+        a_a(0) = pred_state(3) / ang;
+        a_a(1) = pred_state(4) / ang;
+        a_a(2) = pred_state(5) / ang;
+        a_a(3) = ang;
+        pose.insert(pose.end(), a_a.data(), a_a.data()+4);
+
+        hand_pose.emplace("palm", pose);
+
+        si_cad_->Superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
+        AutoCanny(hand_ogl, hand_edge);
+
+        MatrixXf m(hand_edge.rows, hand_edge.cols);
+        cv2eigen(hand_edge, m);
+
+        return m;
+    }
+
+
+    virtual void Correction(const Ref<const VectorXf> & pred_particles, const Ref<const MatrixXf> & measurements, Ref<VectorXf> cor_state)
+    {
+        MatrixXf hand_edge = ObservationModel(pred_particles);
+
+        /* OGL image crop */
+        Mat hand_edge_cv;
+        eigen2cv(hand_edge, hand_edge_cv);
+        std::vector<Point> points;
+        for (auto it = hand_edge_cv.begin<float>(); it != hand_edge_cv.end<float>(); ++it) if (*it) points.push_back(it.pos());
+
+        if (points.size() > 20)
         {
-            size_t len = strlen(ent->d_name);
+            Rect cad_crop_roi = boundingRect(Mat(points));
+            Mat cad_edge_crop = hand_edge_cv(cad_crop_roi);
+            /* ************** */
 
-            if (strcmp(ent->d_name, ".")  != 0 &&
-                strcmp(ent->d_name, "..") != 0 &&
-                len > 4 && strcmp(ent->d_name + len - 4, ".ppm") == 0)
+
+            /* CAM image crop */
+            Mat meas_cv;
+            eigen2cv(MatrixXf(measurements), meas_cv);
+            Rect cam_crop_roi;
+            float crop_ratio = 0.75;
+            cam_crop_roi.x      = static_cast<int>(cad_crop_roi.x      - crop_ratio/2.0 * cad_crop_roi.width);
+            cam_crop_roi.y      = static_cast<int>(cad_crop_roi.y      - crop_ratio/2.0 * cad_crop_roi.height);
+            cam_crop_roi.width  = static_cast<int>(cad_crop_roi.width  + crop_ratio     * cad_crop_roi.width);
+            cam_crop_roi.height = static_cast<int>(cad_crop_roi.height + crop_ratio     * cad_crop_roi.height);
+            cam_crop_roi = cam_crop_roi & cv::Rect(0, 0, meas_cv.cols, meas_cv.rows);
+            Mat cam_edge_crop = meas_cv(cam_crop_roi);
+            /* ************** */
+
+            /* Debug Only */
+            Mat edge_to_plot = max(meas_cv, hand_edge_cv);
+            edge_to_plot = edge_to_plot(cam_crop_roi);
+            imshow(cvwin, edge_to_plot);
+            /* ********** */
+
+            Mat result;
+            normalize(cam_edge_crop, cam_edge_crop, 0.0, 1.0, NORM_MINMAX);
+            normalize(cad_edge_crop, cad_edge_crop, 0.0, 1.0, NORM_MINMAX);
+            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCOEFF_NORMED);
+    //        matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCORR_NORMED);
+
+            double min_val;
+            double max_val;
+            minMaxLoc(result, &min_val, &max_val);
+
+            cor_state << (max_val < 0? std::numeric_limits<float>::min() : exp(-static_cast<float>(max_val)));
+        }
+        else
+        {
+            cor_state << std::numeric_limits<float>::min();
+        }
+    }
+
+
+    virtual void WeightedSum(const Ref<const MatrixXf> & particles, const Ref<const VectorXf> & weights, Ref<MatrixXf> particle)
+    {
+        particle = (particles.array().rowwise() * weights.array().transpose()).rowwise().sum();
+    }
+
+
+    virtual void Mode(const Ref<const MatrixXf> & particles, const Ref<const VectorXf> & weights, Ref<MatrixXf> particle)
+    {
+        MatrixXf::Index maxRow;
+        MatrixXf::Index maxCol;
+
+        weights.maxCoeff(&maxRow, &maxCol);
+
+        particle = particles.col(maxRow);
+    }
+
+
+    void Superimpose(const SuperImpose::ObjPoseMap & obj2pos_map, cv::Mat & img)
+    {
+        si_cad_->setBackgroundOpt(true);
+        si_cad_->Superimpose(obj2pos_map, cam_x_, cam_o_, img);
+        si_cad_->setBackgroundOpt(false);
+    }
+};
+
+
+class HTSIRParticleFilter : public FilteringAlgorithm
+{
+protected:
+    HTParticleFilteringFunction      * ht_pf_f_;
+
+    Network                            yarp;
+    iCubEye                          * icub_kin_eye_;
+    iCubArm                          * icub_kin_arm_;
+//    iCubFinger                       * icub_kin_finger_;
+    BufferedPort<ImageOf<PixelRgb>>    port_image_in_;
+    BufferedPort<Bottle>               port_head_enc;
+    BufferedPort<Bottle>               port_torso_enc;
+    BufferedPort<Bottle>               port_arm_enc;
+    BufferedPort<ImageOf<PixelRgb>>    port_image_out_;
+
+    MatrixXf                           init_particle_;
+    VectorXf                           init_weight_;
+
+    GLFWwindow                       * window_;
+
+    double                             cam_x_[3];
+    double                             cam_o_[4];
+
+    bool                               is_running_;
+
+private:
+    Vector readTorso()
+    {
+        Bottle * b = port_torso_enc.read();
+        Vector torso_enc(3);
+
+        torso_enc(0) = b->get(2).asDouble();
+        torso_enc(1) = b->get(1).asDouble();
+        torso_enc(2) = b->get(0).asDouble();
+
+        return torso_enc;
+    }
+
+
+    Vector readHead(const ConstString eye)
+    {
+        Bottle * b = port_head_enc.read();
+        Vector head_enc(8);
+
+        head_enc.setSubvector(0, readTorso());
+        for (unsigned int i = 0; i < 4; ++i)
+        {
+            head_enc(i+3) = b->get(i).asDouble();
+        }
+        if (eye == "left")  head_enc(7) = b->get(4).asDouble() + b->get(5).asDouble()/2.0;
+        if (eye == "right") head_enc(7) = b->get(4).asDouble() - b->get(5).asDouble()/2.0;
+
+        return head_enc;
+    }
+
+
+    Vector readArm()
+    {
+        Bottle * b = port_arm_enc.read();
+        Vector arm_enc(10);
+
+        arm_enc.setSubvector(0, readTorso());
+        for (unsigned int i = 0; i < 7; ++i)
+        {
+            arm_enc(i+3) = b->get(i).asDouble();
+        }
+
+        return arm_enc;
+    }
+
+
+public:
+    HTSIRParticleFilter()
+    {
+        is_running_ = false;
+
+        icub_kin_eye_    = nullptr;
+        icub_kin_arm_    = nullptr;
+//        icub_kin_finger_ = nullptr;
+    }
+
+
+    virtual ~HTSIRParticleFilter()
+    {
+        delete ht_pf_f_;
+        delete icub_kin_eye_;
+        delete icub_kin_arm_;
+//        delete icub_kin_finger_;
+    }
+
+
+    void setOGLWindow(GLFWwindow *& window)
+    {
+        window_ = window;
+    }
+
+
+    bool Configure()
+    {
+        ht_pf_f_ = new HTParticleFilteringFunction;
+        ht_pf_f_->setOGLWindow(window_);
+        ht_pf_f_->Configure();
+
+        if (!yarp.checkNetwork(3.0))
+        {
+            yError() << "YARP seems unavailable.";
+            return false;
+        }
+
+        icub_kin_eye_ = new iCubEye("left_v2");
+        icub_kin_eye_->setAllConstraints(false);
+        icub_kin_eye_->releaseLink(0);
+        icub_kin_eye_->releaseLink(1);
+        icub_kin_eye_->releaseLink(2);
+
+        icub_kin_arm_ = new iCubArm("right_v2");
+        icub_kin_arm_->setAllConstraints(false);
+        icub_kin_arm_->releaseLink(0);
+        icub_kin_arm_->releaseLink(1);
+        icub_kin_arm_->releaseLink(2);
+//        icub_kin_finger_ = new iCubFinger();
+
+        /* Images:         /icub/camcalib/left/out
+           Head encoders:  /icub/head/state:o
+           Arm encoders:   /icub/right_arm/state:o
+           Torso encoders: /icub/torso/state:o     */
+        port_image_in_.open ("/left_img:i");
+        port_head_enc.open  ("/head");
+        port_arm_enc.open   ("/right_arm");
+        port_torso_enc.open ("/torso");
+        port_image_out_.open("/left_img:o");
+
+        if (!yarp.connect("/icub/camcalib/left/out", "/left_img:i")) return false;
+        if (!yarp.connect("/icub/head/state:o",      "/head"))       return false;
+        if (!yarp.connect("/icub/right_arm/state:o", "/right_arm"))  return false;
+        if (!yarp.connect("/icub/torso/state:o",     "/torso"))      return false;
+
+        return true;
+    }
+
+
+    void runFilter()
+    {
+        /* INITIALIZATION */
+        int num_particle = 50;
+
+        init_weight_.resize(num_particle, 1);
+        init_weight_.setConstant(1.0/num_particle);
+
+        init_particle_.resize(6, num_particle);
+
+        Vector q = readArm();
+        Vector ee_pose = icub_kin_arm_->EndEffPose(CTRL_DEG2RAD * q);
+
+        Map<VectorXd> q_arm(ee_pose.data(), 6, 1);
+        q_arm.tail(3) *= ee_pose(6);
+        for (int i = 0; i < num_particle; ++i)
+        {
+            init_particle_.col(i) = q_arm.cast<float>();
+        }
+
+        /* FILTERING */
+        ImageOf<PixelRgb> * imgin = NULL;
+        while(is_running_)
+        {
+            if (imgin == NULL) imgin = port_image_in_.read(true);
+//            imgin = port_image_in_.read(true);
+            if (imgin != NULL)
             {
+                ImageOf<PixelRgb> & imgout = port_image_out_.prepare();
+                imgout = *imgin;
 
-                src = imread(img_dir + std::string(ent->d_name), IMREAD_COLOR);
+                MatrixXf temp_particle(6, num_particle);
+                VectorXf temp_weight(num_particle, 1);
+                VectorXf temp_parent(num_particle, 1);
 
-                AutoCanny(src);
+                MatrixXf measurement;
+                Mat img_back = cvarrToMat(imgout.getIplImage());
+                Mat img_back_edge;
 
-                waitKey(1);
+                Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readHead("left"));
+                cam_x_[0] = eye_pose(0); cam_x_[1] = eye_pose(1); cam_x_[2] = eye_pose(2);
+                cam_o_[0] = eye_pose(3); cam_o_[1] = eye_pose(4); cam_o_[2] = eye_pose(5); cam_o_[3] = eye_pose(6);
+
+                //        Snapshot();
+
+                for (int i = 0; i < num_particle; ++i)
+                {
+                    ht_pf_f_->Prediction(init_particle_.col(i), init_particle_.col(i));
+                }
+
+                //        Snapshot();
+
+                AutoCanny(img_back, img_back_edge);
+
+                MatrixXf img_back_edge_eigen(img_back_edge.rows, img_back_edge.cols);
+                cv2eigen(img_back_edge, img_back_edge_eigen);
+
+                ht_pf_f_->setImgBackEdge(img_back_edge);
+                ht_pf_f_->setCamXO(cam_x_, cam_o_);
+                for (int i = 0; i < num_particle; ++i)
+                {
+                    ht_pf_f_->Correction(init_particle_.col(i), img_back_edge_eigen, init_weight_.row(i));
+                }
+
+                init_weight_ = init_weight_ / init_weight_.sum();
+
+                //        Snapshot();
+
+                MatrixXf out_particle(6, 1);
+                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
+//                ht_pf_f_->Mode(init_particle_, init_weight_, out_particle);
+
+//                if (ht_pf_f_->Neff(init_weight_) < num_particle/3)
+//                {
+                    ht_pf_f_->Resampling(init_particle_, init_weight_, temp_particle, temp_weight, temp_parent);
+
+                    init_particle_ = temp_particle;
+                    init_weight_   = temp_weight;
+//                }
+
+                // FIXME: out_particle is treatead as a Vector, but it's a Matrix.
+                SuperImpose::ObjPoseMap hand_pose;
+                SuperImpose::ObjPose    pose;
+                pose.assign(out_particle.data(), out_particle.data()+3);
+
+                Vector a_a(4);
+                float ang = out_particle.col(0).tail(3).norm();
+                a_a(0) = out_particle(3) / ang;
+                a_a(1) = out_particle(4) / ang;
+                a_a(2) = out_particle(5) / ang;
+                a_a(3) = ang;
+                pose.insert(pose.end(), a_a.data(), a_a.data()+4);
+
+                hand_pose.emplace("palm", pose);
+                
+                ht_pf_f_->Superimpose(hand_pose, img_back);
+
+                port_image_out_.write();
             }
         }
-        closedir(dir);
     }
-    else
+
+
+    void getResult() {}
+
+
+    std::thread spawn()
     {
-        perror("Could not open directory.");
-        return EXIT_FAILURE;
+        is_running_ = true;
+        return std::thread(&HTSIRParticleFilter::runFilter, this);
     }
+
+
+    bool isRunning()
+    {
+        return is_running_;
+    }
+
+
+    void stopThread()
+    {
+        is_running_ = false;
+    }
+};
+
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+    /* When a user presses the escape key, we set the WindowShouldClose property to true, closing the application. */
+    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+}
+
+
+bool openglSetUp(GLFWwindow *& window, const int width, const int height)
+{
+    ConstString log_ID = "[OpenGL]";
+    yInfo() << log_ID << "Start setting up...";
+
+    /* Initialize GLFW. */
+    if (glfwInit() == GL_FALSE)
+    {
+        yError() << log_ID << "Failed to initialize GLFW.";
+        return false;
+    }
+
+    /* Set context properties by "hinting" specific (property, value) pairs. */
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE,        GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE,             GL_FALSE);
+    glfwWindowHint(GLFW_VISIBLE,               GL_TRUE);
+#ifdef GLFW_MAC
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+    /* Create a window. */
+    window = glfwCreateWindow(width, height, "OpenGL Window", nullptr, nullptr);
+    if (window == nullptr)
+    {
+        yError() << log_ID << "Failed to create GLFW window.";
+        glfwTerminate();
+        return false;
+    }
+    /* Make the OpenGL context of window the current one handled by this thread. */
+    glfwMakeContextCurrent(window);
+
+    /* Set window callback functions. */
+    glfwSetKeyCallback(window, key_callback);
+
+    /* Initialize GLEW to use the OpenGL implementation provided by the videocard manufacturer. */
+    /* Note: remember that the OpenGL are only specifications, the implementation is provided by the manufacturers. */
+    glewExperimental = GL_TRUE;
+    if (glewInit() != GLEW_OK)
+    {
+        yError() << log_ID << "Failed to initialize GLEW.";
+        return false;
+    }
+
+    /* Set OpenGL rendering frame for the current window. */
+    /* Note that the real monitor width and height may differ w.r.t. the choosen one in hdpi monitors. */
+    int hdpi_width;
+    int hdpi_height;
+    glfwGetFramebufferSize(window, &hdpi_width, &hdpi_height);
+    glViewport(0, 0, hdpi_width, hdpi_height);
+    yInfo() << log_ID << "Viewport set to "+std::to_string(hdpi_width)+"x"+std::to_string(hdpi_height)+".";
+
+    /* Set GL property. */
+    glEnable(GL_DEPTH_TEST);
+
+    glfwPollEvents();
+
+    yInfo() << log_ID << "Succesfully set up!";
+    
+    return true;
+}
+
+
+int main(int argc, char const *argv[])
+{
+    ConstString log_ID = "[Main]";
+    yInfo() << log_ID << "Configuring and starting module...";
+
+    namedWindow(cvwin, WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
+
+//    ResourceFinder rf;
+//    rf.setVerbose(true);
+//    rf.setDefaultConfigFile("superimpose-hand_config.ini");
+//    rf.setDefaultContext("superimpose-hand");
+//    rf.configure(argc, argv);
+
+    /* Initialize OpenGL context */
+    GLFWwindow * window = nullptr;
+    if (!openglSetUp(window, WINDOW_WIDTH, WINDOW_HEIGHT)) return EXIT_FAILURE;
+
+    /* SuperimposeHand, derived from RFModule, must be declared by the main thread (thread_0). */
+//    SuperimposerFactory sh;
+//
+//    sh.setWindow(window);
+//    if (sh.runModuleThreaded(rf) == 0)
+//    {
+//        while (!sh.isStopping())
+//        {
+//            glfwPollEvents();
+//        }
+//    }
+//
+//    sh.joinModule();
+
+    HTSIRParticleFilter ht_sir_pf;
+    ht_sir_pf.setOGLWindow(window);
+    if (!ht_sir_pf.Configure()) return EXIT_FAILURE;
+
+    std::thread t = ht_sir_pf.spawn();
+    while (ht_sir_pf.isRunning())
+    {
+        if (glfwWindowShouldClose(window)) ht_sir_pf.stopThread();
+        glfwPollEvents();
+    }
+//    t.join();
+
+    glfwMakeContextCurrent(NULL);
+    glfwTerminate();
+
+    yInfo() << log_ID << "Main returning.";
+    yInfo() << log_ID << "Application closed.";
 
     return EXIT_SUCCESS;
 }
+
+//const char* window_autocanny = "AutoCanny Edge Map";
+//const char* window_autodist  = "Distance Transform for AutoCanny";
+//
+//int main()
+//{
+//    namedWindow(window_autocanny, WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
+//    namedWindow(window_autodist,  WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
+//
+//    while (waitKey(0) != 103);
+//
+//    Mat src;
+//    Mat edge;
+//    Mat dist;
+//
+//    const std::string img_dir("../../../resource/log/camera/left/");
+//    DIR * dir = opendir(img_dir.c_str());
+//    if (dir!= nullptr)
+//    {
+//        while (struct dirent * ent = readdir(dir))
+//        {
+//            size_t len = strlen(ent->d_name);
+//
+//            if (strcmp(ent->d_name, ".")  != 0 &&
+//                strcmp(ent->d_name, "..") != 0 &&
+//                len > 4 && strcmp(ent->d_name + len - 4, ".ppm") == 0)
+//            {
+//
+//                src = imread(img_dir + std::string(ent->d_name), IMREAD_COLOR);
+//
+//                AutoCanny(src, edge);
+//
+////                distanceTransform(Scalar(255, 255, 255)-edge, dist, DIST_L2, DIST_MASK_5);
+//                distanceTransform(Scalar(255, 255, 255)-edge, dist, DIST_L2, DIST_MASK_PRECISE);
+//
+//
+//                /* ------------ PLOT ONLY ------------ */
+//                Mat edge_colored(edge.size(), edge.type(), Scalar(0));
+//                src.copyTo(edge_colored, edge);
+//                normalize(dist, dist, 0.0, 1.0, NORM_MINMAX);
+//
+//                imshow(window_autocanny, edge_colored);
+//                imshow(window_autodist,  dist);
+//
+//                waitKey(1);
+//            }
+//        }
+//        closedir(dir);
+//    }
+//    else
+//    {
+//        perror("Could not open directory.");
+//        return EXIT_FAILURE;
+//    }
+//
+//    return EXIT_SUCCESS;
+//}
 
 //int main()
 //{
@@ -160,17 +737,6 @@ int main()
 //    fc.run();
 //
 //    fc.saveResult();
-//    
+//
 //    return EXIT_SUCCESS;
 //}
-
-void CumSum(const Mat& histogram, Mat& cumsum)
-{
-    cumsum = Mat::zeros(histogram.rows, histogram.cols, histogram.type());
-    
-    cumsum.at<float>(0) = histogram.at<float>(0);
-    for (int i = 1; i < histogram.total(); ++i)
-    {
-        cumsum.at<float>(i) = cumsum.at<float>(i - 1) + histogram.at<float>(i);
-    }
-}
