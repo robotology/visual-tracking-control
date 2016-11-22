@@ -12,6 +12,8 @@
 #include <GLFW/glfw3.h>
 
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
+
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -58,16 +60,18 @@ bool FileFound (const ConstString & file)
 class HTParticleFilteringFunction : public ParticleFilteringFunction
 {
 private:
-    std::normal_distribution<float>  * distribution_ang = nullptr;
-    std::function<float (float)>       gaussian_random_ang;
+    std::normal_distribution<float>        * distribution_theta = nullptr;
+    std::uniform_real_distribution<float>  * distribution_phi_z = nullptr;
+    std::function<float (float)>             gaussian_random_theta;
+    std::function<float (float)>             gaussian_random_phi_z;
 
-    GLFWwindow                       * window_ = nullptr;
+    GLFWwindow                             * window_ = nullptr;
 
-    SICAD                            * si_cad_;
-    SuperImpose::ObjFileMap            cad_hand_;
-    double                             cam_x_[3];
-    double                             cam_o_[4];
-    Mat                                img_back_edge_;
+    SICAD                                  * si_cad_;
+    SuperImpose::ObjFileMap                  cad_hand_;
+    double                                   cam_x_[3];
+    double                                   cam_o_[4];
+    Mat                                      img_back_edge_;
 
 public:
 
@@ -76,7 +80,8 @@ public:
 
     ~HTParticleFilteringFunction()
     {
-        delete distribution_ang;
+        delete distribution_theta;
+        delete distribution_phi_z;
         delete si_cad_;
     }
 
@@ -102,15 +107,18 @@ public:
 
     virtual bool Configure()
     {
-        _state_cov.resize(2, 1);
-        _state_cov <<              0.01,
-                      0.5 * (M_PI/180.0);
+        _state_cov.resize(3, 1);
+        _state_cov <<                0.01,
+                      0.5 * (M_PI /180.0),
+                      3.0 * (M_PI /180.0);
 
-        generator           = new std::mt19937_64(1);
-        distribution_pos    = new std::normal_distribution<float>(0.0, _state_cov(0));
-        distribution_ang    = new std::normal_distribution<float>(0.0, _state_cov(1));
-        gaussian_random_pos = [&] (int) { return (*distribution_pos)(*generator); };
-        gaussian_random_ang = [&] (int) { return (*distribution_ang)(*generator); };
+        generator             = new std::mt19937_64(1);
+        distribution_pos      = new std::normal_distribution<float>(0.0, _state_cov(0));
+        distribution_theta    = new std::normal_distribution<float>(0.0, _state_cov(1));
+        distribution_phi_z    = new std::uniform_real_distribution<float>(0.0, 1.0);
+        gaussian_random_pos   = [&] (int) { return (*distribution_pos)  (*generator); };
+        gaussian_random_theta = [&] (int) { return (*distribution_theta)(*generator); };
+        gaussian_random_phi_z = [&] (int) { return (*distribution_phi_z)(*generator); };
 
         ResourceFinder rf;
         cad_hand_["palm"] = rf.findFileByName("r_palm.obj");
@@ -161,12 +169,43 @@ public:
     {
         StateModel(prev_state, pred_state);
 
-        VectorXf ang(1);
-        ang << pred_state.tail(3).norm();
-        ang += VectorXf::NullaryExpr(1, gaussian_random_ang);
-
         pred_state.head(3) += VectorXf::NullaryExpr(3, gaussian_random_pos);
-        pred_state.tail(3) *= (ang / pred_state.tail(3).norm());
+
+        /* FROM MATLAB */
+        float coneAngle = _state_cov(2);
+
+        /* Generate points on the spherical cap around the north pole [1]. */
+        /* [1] http://math.stackexchange.com/a/205589/81266 */
+        float z   = gaussian_random_phi_z(0) * (1 - cos(coneAngle)) + cos(coneAngle);
+        float phi = gaussian_random_phi_z(0) * (2 * M_PI);
+        float x   = sqrt(1 - (z * z)) * cos(phi);
+        float y   = sqrt(1 - (z * z)) * sin(phi);
+
+        /* Find the rotation axis 'u' and rotation angle 'rot' [1] */
+        Vector3f def_dir(0, 0, 1);
+        Vector3f cone_dir = pred_state.tail(3).normalized();
+        Vector3f u = def_dir.cross(cone_dir).normalized();
+        float rot = static_cast<float>(acos(cone_dir.dot(def_dir)));
+
+        /* Convert rotation axis and angle to 3x3 rotation matrix [2] */
+        /* [2] https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle */
+        Matrix3f cross_matrix;
+        cross_matrix <<     0,  -u(2),   u(1),
+                         u(2),      0,  -u(0),
+                        -u(1),   u(0),      0;
+        Matrix3f R = cos(rot) * Matrix3f::Identity() + sin(rot) * cross_matrix + (1 - cos(rot)) * (u * u.transpose());
+                                                                                         
+        /* Rotate [x y z]' from north pole to 'cone_dir' */
+        Vector3f r_to_rotate(x, y, z);
+        Vector3f r = R * r_to_rotate;
+
+        /* *********** */
+
+        VectorXf ang(1);
+        ang << pred_state.tail(3).norm() + gaussian_random_theta(0);
+
+        pred_state.tail(3) = r;
+        pred_state.tail(3) *= ang;
     }
 
 
@@ -394,7 +433,7 @@ public:
     void runFilter()
     {
         /* INITIALIZATION */
-        int num_particle = 25;
+        int num_particle = 50;
 
         init_weight_.resize(num_particle, 1);
         init_weight_.setConstant(1.0/num_particle);
