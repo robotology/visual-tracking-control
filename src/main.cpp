@@ -269,23 +269,25 @@ public:
             Mat cam_edge_crop = meas_cv(cam_crop_roi);
             /* ************** */
 
-            /* Debug Only */
-            Mat edge_to_plot = max(meas_cv, hand_edge_cv);
-            edge_to_plot = edge_to_plot(cam_crop_roi);
-            imshow(cvwin, edge_to_plot);
-            /* ********** */
-
             Mat result;
             normalize(cam_edge_crop, cam_edge_crop, 0.0, 1.0, NORM_MINMAX);
             normalize(cad_edge_crop, cad_edge_crop, 0.0, 1.0, NORM_MINMAX);
-            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCOEFF_NORMED);
-    //        matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCORR_NORMED);
+            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCORR_NORMED);
+//            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCOEFF_NORMED);
 
             double min_val;
             double max_val;
             minMaxLoc(result, &min_val, &max_val);
 
-            cor_state << (max_val < 0? std::numeric_limits<float>::min() : exp(-static_cast<float>(max_val)));
+            cor_state << (max_val < 0? 0 : static_cast<float>(max_val)) + std::numeric_limits<float>::min();
+
+            /* Debug Only */
+            Mat edge_to_plot = max(meas_cv, hand_edge_cv);
+            edge_to_plot = edge_to_plot(cam_crop_roi);
+//            std::cout << cor_state << std::endl;
+            imshow(cvwin, edge_to_plot);
+//            waitKey(100);
+            /* ********** */
         }
         else
         {
