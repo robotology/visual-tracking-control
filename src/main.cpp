@@ -259,7 +259,7 @@ public:
         normalize(hand_edge_cv, hand_edge_cv, 0.0, 1.0, NORM_MINMAX);
         matchTemplate(meas_cv, hand_edge_cv, result, TM_CCORR_NORMED);
 
-        cor_state << (result.at<float>(0, 0) < 0? std::numeric_limits<float>::min() : exp(-result.at<float>(0, 0)));
+        cor_state << (result.at<float>(0, 0) < 0? 0 : exp(-result.at<float>(0, 0))) + std::numeric_limits<float>::min();
     }
 
 
