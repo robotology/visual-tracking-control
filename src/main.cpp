@@ -335,13 +335,7 @@ protected:
     BufferedPort<Bottle>               port_arm_enc;
     BufferedPort<ImageOf<PixelRgb>>    port_image_out_;
 
-    MatrixXf                           init_particle_;
-    VectorXf                           init_weight_;
-
     GLFWwindow                       * window_;
-
-    double                             cam_x_[3];
-    double                             cam_o_[4];
 
     bool                               is_running_;
 
@@ -464,12 +458,16 @@ public:
     void runFilter()
     {
         /* INITIALIZATION */
+        MatrixXf init_particle;
+        VectorXf init_weight;
+        double cam_x[3];
+        double cam_o[4];
         int num_particle = 50;
 
-        init_weight_.resize(num_particle, 1);
-        init_weight_.setConstant(1.0/num_particle);
+        init_weight.resize(num_particle, 1);
+        init_weight.setConstant(1.0/num_particle);
 
-        init_particle_.resize(6, num_particle);
+        init_particle.resize(6, num_particle);
 
         Vector q = readArm();
         Vector ee_pose = icub_kin_arm_->EndEffPose(CTRL_DEG2RAD * q);
@@ -478,7 +476,7 @@ public:
         q_arm.tail(3) *= ee_pose(6);
         for (int i = 0; i < num_particle; ++i)
         {
-            init_particle_.col(i) = q_arm.cast<float>();
+            init_particle.col(i) = q_arm.cast<float>();
         }
 
         /* FILTERING */
@@ -501,14 +499,14 @@ public:
                 Mat img_back_edge;
 
                 Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readHead("left"));
-                cam_x_[0] = eye_pose(0); cam_x_[1] = eye_pose(1); cam_x_[2] = eye_pose(2);
-                cam_o_[0] = eye_pose(3); cam_o_[1] = eye_pose(4); cam_o_[2] = eye_pose(5); cam_o_[3] = eye_pose(6);
+                cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
+                cam_o[0] = eye_pose(3); cam_o[1] = eye_pose(4); cam_o[2] = eye_pose(5); cam_o[3] = eye_pose(6);
 
                 //        Snapshot();
 
                 for (int i = 0; i < num_particle; ++i)
                 {
-                    ht_pf_f_->Prediction(init_particle_.col(i), init_particle_.col(i));
+                    ht_pf_f_->Prediction(init_particle.col(i), init_particle.col(i));
                 }
 
                 //        Snapshot();
@@ -519,26 +517,26 @@ public:
                 cv2eigen(img_back_edge, img_back_edge_eigen);
 
                 ht_pf_f_->setImgBackEdge(img_back_edge);
-                ht_pf_f_->setCamXO(cam_x_, cam_o_);
+                ht_pf_f_->setCamXO(cam_x, cam_o);
                 for (int i = 0; i < num_particle; ++i)
                 {
-                    ht_pf_f_->Correction(init_particle_.col(i), img_back_edge_eigen, init_weight_.row(i));
+                    ht_pf_f_->Correction(init_particle.col(i), img_back_edge_eigen, init_weight.row(i));
                 }
 
-                init_weight_ = init_weight_ / init_weight_.sum();
+                init_weight = init_weight / init_weight.sum();
 
                 //        Snapshot();
 
                 MatrixXf out_particle(6, 1);
-                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
-//                ht_pf_f_->Mode(init_particle_, init_weight_, out_particle);
+                ht_pf_f_->WeightedSum(init_particle, init_weight, out_particle);
+//                ht_pf_f_->Mode(init_particle, init_weight, out_particle);
 
-//                if (ht_pf_f_->Neff(init_weight_) < num_particle/3)
+//                if (ht_pf_f_->Neff(init_weight) < num_particle/3)
 //                {
-                    ht_pf_f_->Resampling(init_particle_, init_weight_, temp_particle, temp_weight, temp_parent);
+                    ht_pf_f_->Resampling(init_particle, init_weight, temp_particle, temp_weight, temp_parent);
 
-                    init_particle_ = temp_particle;
-                    init_weight_   = temp_weight;
+                    init_particle = temp_particle;
+                    init_weight   = temp_weight;
 //                }
 
                 // FIXME: out_particle is treatead as a Vector, but it's a Matrix.
