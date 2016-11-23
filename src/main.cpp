@@ -12,6 +12,8 @@
 #include <GLFW/glfw3.h>
 
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
+
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -58,16 +60,18 @@ bool FileFound (const ConstString & file)
 class HTParticleFilteringFunction : public ParticleFilteringFunction
 {
 private:
-    std::normal_distribution<float>  * distribution_ang = nullptr;
-    std::function<float (float)>       gaussian_random_ang;
+    std::normal_distribution<float>        * distribution_theta = nullptr;
+    std::uniform_real_distribution<float>  * distribution_phi_z = nullptr;
+    std::function<float (float)>             gaussian_random_theta;
+    std::function<float (float)>             gaussian_random_phi_z;
 
-    GLFWwindow                       * window_ = nullptr;
+    GLFWwindow                             * window_ = nullptr;
 
-    SICAD                            * si_cad_;
-    SuperImpose::ObjFileMap            cad_hand_;
-    double                             cam_x_[3];
-    double                             cam_o_[4];
-    Mat                                img_back_edge_;
+    SICAD                                  * si_cad_;
+    SuperImpose::ObjFileMap                  cad_hand_;
+    double                                   cam_x_[3];
+    double                                   cam_o_[4];
+    Mat                                      img_back_edge_;
 
 public:
 
@@ -76,7 +80,8 @@ public:
 
     ~HTParticleFilteringFunction()
     {
-        delete distribution_ang;
+        delete distribution_theta;
+        delete distribution_phi_z;
         delete si_cad_;
     }
 
@@ -102,15 +107,18 @@ public:
 
     virtual bool Configure()
     {
-        _state_cov.resize(2, 1);
-        _state_cov <<               0.01,
-                      0.5 * (M_PI/180.0);
+        _state_cov.resize(3, 1);
+        _state_cov <<                0.01,
+                      0.5 * (M_PI /180.0),
+                      3.0 * (M_PI /180.0);
 
-        generator           = new std::mt19937_64(1);
-        distribution_pos    = new std::normal_distribution<float>(0.0, _state_cov(0));
-        distribution_ang    = new std::normal_distribution<float>(0.0, _state_cov(1));
-        gaussian_random_pos = [&] (int) { return (*distribution_pos)(*generator); };
-        gaussian_random_ang = [&] (int) { return (*distribution_ang)(*generator); };
+        generator             = new std::mt19937_64(1);
+        distribution_pos      = new std::normal_distribution<float>(0.0, _state_cov(0));
+        distribution_theta    = new std::normal_distribution<float>(0.0, _state_cov(1));
+        distribution_phi_z    = new std::uniform_real_distribution<float>(0.0, 1.0);
+        gaussian_random_pos   = [&] (int) { return (*distribution_pos)  (*generator); };
+        gaussian_random_theta = [&] (int) { return (*distribution_theta)(*generator); };
+        gaussian_random_phi_z = [&] (int) { return (*distribution_phi_z)(*generator); };
 
         ResourceFinder rf;
         cad_hand_["palm"] = rf.findFileByName("r_palm.obj");
@@ -161,12 +169,43 @@ public:
     {
         StateModel(prev_state, pred_state);
 
-        VectorXf ang(1);
-        ang << pred_state.tail(3).norm();
-        ang += VectorXf::NullaryExpr(1, gaussian_random_ang);
-
         pred_state.head(3) += VectorXf::NullaryExpr(3, gaussian_random_pos);
-        pred_state.tail(3) *= (ang / pred_state.tail(3).norm());
+
+        /* FROM MATLAB */
+        float coneAngle = _state_cov(2);
+
+        /* Generate points on the spherical cap around the north pole [1]. */
+        /* [1] http://math.stackexchange.com/a/205589/81266 */
+        float z   = gaussian_random_phi_z(0) * (1 - cos(coneAngle)) + cos(coneAngle);
+        float phi = gaussian_random_phi_z(0) * (2 * M_PI);
+        float x   = sqrt(1 - (z * z)) * cos(phi);
+        float y   = sqrt(1 - (z * z)) * sin(phi);
+
+        /* Find the rotation axis 'u' and rotation angle 'rot' [1] */
+        Vector3f def_dir(0, 0, 1);
+        Vector3f cone_dir = pred_state.tail(3).normalized();
+        Vector3f u = def_dir.cross(cone_dir).normalized();
+        float rot = static_cast<float>(acos(cone_dir.dot(def_dir)));
+
+        /* Convert rotation axis and angle to 3x3 rotation matrix [2] */
+        /* [2] https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle */
+        Matrix3f cross_matrix;
+        cross_matrix <<     0,  -u(2),   u(1),
+                         u(2),      0,  -u(0),
+                        -u(1),   u(0),      0;
+        Matrix3f R = cos(rot) * Matrix3f::Identity() + sin(rot) * cross_matrix + (1 - cos(rot)) * (u * u.transpose());
+                                                                                         
+        /* Rotate [x y z]' from north pole to 'cone_dir' */
+        Vector3f r_to_rotate(x, y, z);
+        Vector3f r = R * r_to_rotate;
+
+        /* *********** */
+
+        VectorXf ang(1);
+        ang << pred_state.tail(3).norm() + gaussian_random_theta(0);
+
+        pred_state.tail(3) = r;
+        pred_state.tail(3) *= ang;
     }
 
 
@@ -230,23 +269,25 @@ public:
             Mat cam_edge_crop = meas_cv(cam_crop_roi);
             /* ************** */
 
-            /* Debug Only */
-            Mat edge_to_plot = max(meas_cv, hand_edge_cv);
-            edge_to_plot = edge_to_plot(cam_crop_roi);
-            imshow(cvwin, edge_to_plot);
-            /* ********** */
-
             Mat result;
             normalize(cam_edge_crop, cam_edge_crop, 0.0, 1.0, NORM_MINMAX);
             normalize(cad_edge_crop, cad_edge_crop, 0.0, 1.0, NORM_MINMAX);
-            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCOEFF_NORMED);
-    //        matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCORR_NORMED);
+            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCORR_NORMED);
+//            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCOEFF_NORMED);
 
             double min_val;
             double max_val;
             minMaxLoc(result, &min_val, &max_val);
 
-            cor_state << (max_val < 0? std::numeric_limits<float>::min() : exp(-static_cast<float>(max_val)));
+            cor_state << (max_val < 0? 0 : static_cast<float>(max_val)) + std::numeric_limits<float>::min();
+
+            /* Debug Only */
+            Mat edge_to_plot = max(meas_cv, hand_edge_cv);
+            edge_to_plot = edge_to_plot(cam_crop_roi);
+//            std::cout << cor_state << std::endl;
+            imshow(cvwin, edge_to_plot);
+//            waitKey(100);
+            /* ********** */
         }
         else
         {
@@ -296,13 +337,7 @@ protected:
     BufferedPort<Bottle>               port_arm_enc;
     BufferedPort<ImageOf<PixelRgb>>    port_image_out_;
 
-    MatrixXf                           init_particle_;
-    VectorXf                           init_weight_;
-
     GLFWwindow                       * window_;
-
-    double                             cam_x_[3];
-    double                             cam_o_[4];
 
     bool                               is_running_;
 
@@ -425,12 +460,16 @@ public:
     void runFilter()
     {
         /* INITIALIZATION */
+        MatrixXf init_particle;
+        VectorXf init_weight;
+        double cam_x[3];
+        double cam_o[4];
         int num_particle = 50;
 
-        init_weight_.resize(num_particle, 1);
-        init_weight_.setConstant(1.0/num_particle);
+        init_weight.resize(num_particle, 1);
+        init_weight.setConstant(1.0/num_particle);
 
-        init_particle_.resize(6, num_particle);
+        init_particle.resize(6, num_particle);
 
         Vector q = readArm();
         Vector ee_pose = icub_kin_arm_->EndEffPose(CTRL_DEG2RAD * q);
@@ -439,7 +478,7 @@ public:
         q_arm.tail(3) *= ee_pose(6);
         for (int i = 0; i < num_particle; ++i)
         {
-            init_particle_.col(i) = q_arm.cast<float>();
+            init_particle.col(i) = q_arm.cast<float>();
         }
 
         /* FILTERING */
@@ -462,14 +501,14 @@ public:
                 Mat img_back_edge;
 
                 Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readHead("left"));
-                cam_x_[0] = eye_pose(0); cam_x_[1] = eye_pose(1); cam_x_[2] = eye_pose(2);
-                cam_o_[0] = eye_pose(3); cam_o_[1] = eye_pose(4); cam_o_[2] = eye_pose(5); cam_o_[3] = eye_pose(6);
+                cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
+                cam_o[0] = eye_pose(3); cam_o[1] = eye_pose(4); cam_o[2] = eye_pose(5); cam_o[3] = eye_pose(6);
 
                 //        Snapshot();
 
                 for (int i = 0; i < num_particle; ++i)
                 {
-                    ht_pf_f_->Prediction(init_particle_.col(i), init_particle_.col(i));
+                    ht_pf_f_->Prediction(init_particle.col(i), init_particle.col(i));
                 }
 
                 //        Snapshot();
@@ -480,26 +519,26 @@ public:
                 cv2eigen(img_back_edge, img_back_edge_eigen);
 
                 ht_pf_f_->setImgBackEdge(img_back_edge);
-                ht_pf_f_->setCamXO(cam_x_, cam_o_);
+                ht_pf_f_->setCamXO(cam_x, cam_o);
                 for (int i = 0; i < num_particle; ++i)
                 {
-                    ht_pf_f_->Correction(init_particle_.col(i), img_back_edge_eigen, init_weight_.row(i));
+                    ht_pf_f_->Correction(init_particle.col(i), img_back_edge_eigen, init_weight.row(i));
                 }
 
-                init_weight_ = init_weight_ / init_weight_.sum();
+                init_weight = init_weight / init_weight.sum();
 
                 //        Snapshot();
 
                 MatrixXf out_particle(6, 1);
-                ht_pf_f_->WeightedSum(init_particle_, init_weight_, out_particle);
-//                ht_pf_f_->Mode(init_particle_, init_weight_, out_particle);
+                ht_pf_f_->WeightedSum(init_particle, init_weight, out_particle);
+//                ht_pf_f_->Mode(init_particle, init_weight, out_particle);
 
-//                if (ht_pf_f_->Neff(init_weight_) < num_particle/3)
+//                if (ht_pf_f_->Neff(init_weight) < num_particle/3)
 //                {
-                    ht_pf_f_->Resampling(init_particle_, init_weight_, temp_particle, temp_weight, temp_parent);
+                    ht_pf_f_->Resampling(init_particle, init_weight, temp_particle, temp_weight, temp_parent);
 
-                    init_particle_ = temp_particle;
-                    init_weight_   = temp_weight;
+                    init_particle = temp_particle;
+                    init_weight   = temp_weight;
 //                }
 
                 // FIXME: out_particle is treatead as a Vector, but it's a Matrix.
