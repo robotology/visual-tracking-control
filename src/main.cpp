@@ -272,14 +272,21 @@ public:
             Mat result;
             normalize(cam_edge_crop, cam_edge_crop, 0.0, 1.0, NORM_MINMAX);
             normalize(cad_edge_crop, cad_edge_crop, 0.0, 1.0, NORM_MINMAX);
+
+            /* matchTemplate compares template inside the source image, never going out of bound */
             matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCORR_NORMED);
 //            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCOEFF_NORMED);
+
+            /* filter2D compares the template everywhere inside the source image, going out of bound */
+//            filter2D(cam_edge_crop, result, -1, cad_edge_crop, Point(-1, -1), 0, BORDER_CONSTANT);
+//            normalize(result, result, 0.0, 1.0, NORM_MINMAX);
 
             double min_val;
             double max_val;
             minMaxLoc(result, &min_val, &max_val);
 
             cor_state << (max_val < 0? 0 : static_cast<float>(max_val)) + std::numeric_limits<float>::min();
+//            cor_state << (max_val < 0? 0 : exp(-0.5*(1-static_cast<float>(max_val))*(1-static_cast<float>(max_val))/(pow(0.01, 2.0)))) + std::numeric_limits<float>::min();
 
             /* Debug Only */
             Mat edge_to_plot = max(meas_cv, hand_edge_cv);
