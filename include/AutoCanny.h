@@ -62,7 +62,7 @@ void AutoThreshold(const Mat & GX, const Mat & GY, double & high, double & low)
     Mat              mag_gradient;
     Mat              mag_hist;
     Mat              mag_hist_cumsum;
-    const int        channels[]   = {2};
+    const int        channels[]   = {0, 1, 2};
     const int        hist_size[]  = {64};
     const float      range[]      = {0.0, 1.01};
     const float    * hist_range[] = {range};
