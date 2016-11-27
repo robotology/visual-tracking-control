@@ -6,6 +6,8 @@
 using namespace cv;
 
 
+//#include <fstream>
+
 const double percent_of_pixels_not_edges = 0.7;     // MATLAB: Used for selecting thresholds
 const double threshold_ratio             = 0.4;     // MATLAB: Low threshold is this fraction of the high one
 const double sigma                       = 1.4142;  // MATLAB: 1-D Gaussian filter standard deviation
@@ -148,10 +150,12 @@ void AutoDirCanny(const Mat & src, Mat & dst)
 
     /* OpenCV Canny directed edge of an image using custom image gradient [1] */
     /* [1] http://docs.opencv.org/master/dd/d1a/group__imgproc__feature.html#ga2a671611e104c093843d7b7fc46d24af */
+    Mat GX_avg(GX.rows, GX.cols, CV_32FC1);
+    Mat GY_avg(GY.rows, GY.cols, CV_32FC1);
     if (GX.channels() > 1)
     {
-        Mat GX_avg(GX.rows, GX.cols, CV_32FC1);
-        Mat GY_avg(GY.rows, GY.cols, CV_32FC1);
+//        Mat GX_avg(GX.rows, GX.cols, CV_32FC1);
+//        Mat GY_avg(GY.rows, GY.cols, CV_32FC1);
         for (size_t i = 0; i < GX.rows; ++i)
         {
             for (size_t j = 0; j < GX.cols; ++j)
@@ -168,8 +172,46 @@ void AutoDirCanny(const Mat & src, Mat & dst)
     GY.convertTo(GY, CV_16SC3);
     Canny(GX, GY, dst_cart, low_threshold, high_threshold, true);
 
-    normalize(dst_cart, dst_cart, 0.0, 1.0, NORM_MINMAX);
+    GaussianBlur(dst_cart, dst_cart, Size(3, 3), 1, 0, BORDER_CONSTANT);
+
+//    normalize(dst_cart, dst_cart, 0.0, 1.0, NORM_MINMAX);
     dir.copyTo(dst, dst_cart);
+
+//    std::ofstream file_src;
+//    std::ofstream file_GX;
+//    std::ofstream file_GY;
+//    std::ofstream file_GX_avg;
+//    std::ofstream file_GY_avg;
+//    std::ofstream file_dir;
+//    std::ofstream file_edge;
+//    std::ofstream file_edgedir;
+//
+//    file_src.open("./src.m");
+//    file_GX.open("./gx.m");
+//    file_GY.open("./gy.m");
+//    file_GX_avg.open("./gx_avg.m");
+//    file_GY_avg.open("./gy_avg.m");
+//    file_dir.open("./dirang.m");
+//    file_edge.open("./edge.m");
+//    file_edgedir.open("./edgedir.m");
+//
+//    file_src << "src = " << src << ";";
+//    file_GX << "GX = " << GX << ";";
+//    file_GY << "GY = " << GY << ";";
+//    file_GX_avg << "GX_avg = " << GX_avg << ";";
+//    file_GY_avg << "GY_avg = " << GY_avg << ";";
+//    file_dir << "dir_ang = " << dir << ";";
+//    file_edge << "EC = " << dst_cart << ";";
+//    file_edgedir << "ECDIR = " << dst << ";";
+//
+//    file_src.close();
+//    file_GX.close();
+//    file_GY.close();
+//    file_GX_avg.close();
+//    file_GY_avg.close();
+//    file_dir.close();
+//    file_edge.close();
+//    file_edgedir.close();
 }
 
 #endif /* AUTOCANNY_H */
