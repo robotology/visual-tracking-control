@@ -260,23 +260,14 @@ public:
         eigen2cv(hand_edge_ogl, hand_edge_ogl_cv);
         eigen2cv(meas,          hand_edge_cam_cv);
 
-//        normalize(hand_edge_cam_cv,     hand_edge_cam_cv, 0.0, 1.0, NORM_MINMAX);
-//        normalize(hand_edge_ogl_cv,     hand_edge_ogl_cv, 0.0, 1.0, NORM_MINMAX);
-//        matchTemplate(hand_edge_cam_cv, hand_edge_ogl_cv, lik_cart, TM_CCORR_NORMED);
+        matchTemplate(hand_edge_cam_cv, hand_edge_ogl_cv, lik_cart, TM_CCORR_NORMED);
 
-//        cor_state << (lik_cart.at<float>(0, 0) < 0? 0 : lik_cart.at<float>(0, 0)) + std::numeric_limits<float>::min();
-//        cor_state << (lik_cart.at<float>(0, 0) < 0? 0 : exp(-0.5 * pow(1 - lik_cart.at<float>(0, 0), 2.0) / (pow(0.3, 2.0)))) + std::numeric_limits<float>::min();
+//        cor_state << (lik_cart.at<float>(0, 0) > 0? lik_cart.at<float>(0, 0) : 0) + std::numeric_limits<float>::min();
+//        cor_state << (lik_cart.at<float>(0, 0) > 0? exp( -0.5 * pow(1 - lik_cart.at<float>(0, 0), 2.0) / pow(0.1, 2.0) ) : 0) + std::numeric_limits<float>::min();
 
-        hand_edge_ogl_cv.convertTo(mask, CV_8U);
-        hand_edge_cam_cv.copyTo(lik_cart, mask);
-
-        int non_zero_render = countNonZero(hand_edge_ogl_cv);
-        if (non_zero_render > 0)
-        {
-            Mat dirang_diff = abs(lik_cart - hand_edge_ogl_cv);
-            cor_state << (countNonZero(hand_edge_cam_cv) / non_zero_render) * (exp(-0.1 * sum(dirang_diff)(0))) + std::numeric_limits<float>::min();
-        }
-        else cor_state << std::numeric_limits<float>::min();
+//        cor_state(0) *= lik_cart.at<float>(0, 0);
+        cor_state(0) *= ( exp( -0.5 * pow(1 - lik_cart.at<float>(0, 0), 2.0) / pow(0.1, 2.0) ) );
+        if (cor_state(0) <= 0) cor_state(0) = std::numeric_limits<float>::min();
     }
 
 
@@ -488,14 +479,10 @@ public:
                 cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
                 cam_o[0] = eye_pose(3); cam_o[1] = eye_pose(4); cam_o[2] = eye_pose(5); cam_o[3] = eye_pose(6);
 
-                //        Snapshot();
-
                 for (int i = 0; i < num_particle; ++i)
                 {
                     ht_pf_f_->Prediction(init_particle.col(i), init_particle.col(i));
                 }
-
-                //        Snapshot();
 
 //                AutoCanny(img_back, img_back_edge);
                 AutoDirCanny(img_back, img_back_edge);
@@ -512,19 +499,23 @@ public:
 
                 init_weight = init_weight / init_weight.sum();
 
-                //        Snapshot();
-
                 MatrixXf out_particle(6, 1);
                 ht_pf_f_->WeightedSum(init_particle, init_weight, out_particle);
 //                ht_pf_f_->Mode(init_particle, init_weight, out_particle);
 
-//                if (ht_pf_f_->Neff(init_weight) < num_particle/3)
-//                {
+                VectorXf sorted = init_weight;
+                std::sort(sorted.data(), sorted.data() + sorted.size());
+                std::cout <<  sorted << std::endl;
+                std::cout << "Neff: " << ht_pf_f_->Neff(init_weight) << std::endl;
+                if (ht_pf_f_->Neff(init_weight) < num_particle/50)
+                {
+                    std::cout << "Resampling!" << std::endl;
+
                     ht_pf_f_->Resampling(init_particle, init_weight, temp_particle, temp_weight, temp_parent);
 
                     init_particle = temp_particle;
                     init_weight   = temp_weight;
-//                }
+                }
 
                 // FIXME: out_particle is treatead as a Vector, but it's a Matrix.
                 SuperImpose::ObjPoseMap hand_pose;

@@ -172,7 +172,7 @@ void AutoDirCanny(const Mat & src, Mat & dst)
     GY.convertTo(GY, CV_16SC3);
     Canny(GX, GY, dst_cart, low_threshold, high_threshold, true);
 
-    GaussianBlur(dst_cart, dst_cart, Size(3, 3), 1, 0, BORDER_CONSTANT);
+//    GaussianBlur(dst_cart, dst_cart, Size(3, 3), 1, 0, BORDER_CONSTANT);
 
 //    normalize(dst_cart, dst_cart, 0.0, 1.0, NORM_MINMAX);
     dir.copyTo(dst, dst_cart);
