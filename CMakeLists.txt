@@ -138,15 +138,16 @@ set(THIRFT_FILES            ${HT_SOURCE_DIR}/idl_rfm.thrift)
 
 
 ### --- FILES::packages --- ###
-find_package(YARP               REQUIRED)
+find_package(assimp             REQUIRED)
+find_package(EIGEN3             REQUIRED)
+find_package(GLEW               REQUIRED)
+find_package(GLFW3              REQUIRED)
+find_package(glm                REQUIRED)
 find_package(ICUB               REQUIRED)
 find_package(ICUBcontrib        REQUIRED)
 find_package(OpenCV             REQUIRED)
 find_package(OpenGL             REQUIRED)
-find_package(GLEW               REQUIRED)
-find_package(GLFW3              REQUIRED)
-find_package(glm                REQUIRED)
-find_package(assimp             REQUIRED)
+find_package(YARP               REQUIRED)
 
 LIST(APPEND CMAKE_MODULE_PATH   ${YARP_MODULE_PATH}
                                 ${ICUB_MODULE_PATH}
@@ -164,7 +165,7 @@ LIST(APPEND INCLUDE_DIRS        ${YARP_INCLUDE_DIRS}
                                 ${ICUB_INCLUDE_DIRS}
                                 ${OPENGL_INCLUDE_DIR}
                                 ${ASSIMP_INCLUDE_DIRS}
-                                $ENV{EIGEN3_INCLUDE_DIR})
+                                ${EIGEN3_INCLUDE_DIR})
 
 LIST(APPEND LIBS                ${YARP_LIBRARIES}
                                 ${ICUB_LIBRARIES}
