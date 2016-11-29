@@ -248,60 +248,58 @@ public:
 
     virtual void Correction(const Ref<const VectorXf> & pred_particles, const Ref<const MatrixXf> & measurements, Ref<VectorXf> cor_state)
     {
-        MatrixXf hand_edge = ObservationModel(pred_particles);
+        Mat hand_edge_ogl_cv;
+        std::vector<Point> points;
+
+        MatrixXf hand_edge_ogl = ObservationModel(pred_particles);
 
         /* OGL image crop */
-        Mat hand_edge_cv;
-        eigen2cv(hand_edge, hand_edge_cv);
-        std::vector<Point> points;
-        for (auto it = hand_edge_cv.begin<float>(); it != hand_edge_cv.end<float>(); ++it) if (*it) points.push_back(it.pos());
+        eigen2cv(hand_edge_ogl, hand_edge_ogl_cv);
+        for (auto it = hand_edge_ogl_cv.begin<float>(); it != hand_edge_ogl_cv.end<float>(); ++it) if (*it) points.push_back(it.pos());
 
         if (points.size() > 20)
         {
-            Rect cad_crop_roi = boundingRect(Mat(points));
-            Mat cad_edge_crop = hand_edge_cv(cad_crop_roi);
-            /* ************** */
+            Mat    hand_edge_cam_cv;
+            Mat    lik_cart;
+            Rect   cam_crop_roi;
+            float  crop_ratio = 0.75;
+            double max_val;
+            eigen2cv(MatrixXf(measurements), hand_edge_cam_cv);
 
+            Rect cad_crop_roi = boundingRect(Mat(points));
+            Mat cad_edge_crop = hand_edge_ogl_cv(cad_crop_roi);
 
             /* CAM image crop */
-            Mat meas_cv;
-            eigen2cv(MatrixXf(measurements), meas_cv);
-            Rect cam_crop_roi;
-            float crop_ratio = 0.75;
             cam_crop_roi.x      = static_cast<int>(cad_crop_roi.x      - crop_ratio/2.0 * cad_crop_roi.width);
             cam_crop_roi.y      = static_cast<int>(cad_crop_roi.y      - crop_ratio/2.0 * cad_crop_roi.height);
             cam_crop_roi.width  = static_cast<int>(cad_crop_roi.width  + crop_ratio     * cad_crop_roi.width);
             cam_crop_roi.height = static_cast<int>(cad_crop_roi.height + crop_ratio     * cad_crop_roi.height);
-            cam_crop_roi = cam_crop_roi & cv::Rect(0, 0, meas_cv.cols, meas_cv.rows);
-            Mat cam_edge_crop = meas_cv(cam_crop_roi);
-            /* ************** */
+            cam_crop_roi = cam_crop_roi & cv::Rect(0, 0, hand_edge_cam_cv.cols, hand_edge_cam_cv.rows);
+            Mat cam_edge_crop = hand_edge_cam_cv(cam_crop_roi);
 
-            Mat result;
             normalize(cam_edge_crop, cam_edge_crop, 0.0, 1.0, NORM_MINMAX);
             normalize(cad_edge_crop, cad_edge_crop, 0.0, 1.0, NORM_MINMAX);
 
             /* matchTemplate compares template inside the source image, never going out of bound */
-            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCORR_NORMED);
-//            matchTemplate(cam_edge_crop, cad_edge_crop, result, TM_CCOEFF_NORMED);
+            matchTemplate(cam_edge_crop, cad_edge_crop, lik_cart, TM_CCORR_NORMED);
+//            matchTemplate(cam_edge_crop, cad_edge_crop, lik_cart, TM_CCOEFF_NORMED);
 
             /* filter2D compares the template everywhere inside the source image, going out of bound */
-//            filter2D(cam_edge_crop, result, -1, cad_edge_crop, Point(-1, -1), 0, BORDER_CONSTANT);
-//            normalize(result, result, 0.0, 1.0, NORM_MINMAX);
+//            filter2D(cam_edge_crop, lik_cart, -1, cad_edge_crop, Point(-1, -1), 0, BORDER_CONSTANT);
+//            normalize(lik_cart, lik_cart, 0.0, 1.0, NORM_MINMAX);
 
-            double min_val;
-            double max_val;
-            minMaxLoc(result, &min_val, &max_val);
+            minMaxLoc(lik_cart, 0, &max_val);
 
-            cor_state << (max_val < 0? 0 : static_cast<float>(max_val)) + std::numeric_limits<float>::min();
-//            cor_state << (max_val < 0? 0 : exp(-0.5*(1-static_cast<float>(max_val))*(1-static_cast<float>(max_val))/(pow(0.01, 2.0)))) + std::numeric_limits<float>::min();
+//            cor_state << (max_val > 0? static_cast<float>(max_val) : 0) + std::numeric_limits<float>::min();
+//            cor_state << (max_val > 0? exp(-0.5*(1-static_cast<float>(max_val))*(1-static_cast<float>(max_val))/(pow(0.01, 2.0))) : 0) + std::numeric_limits<float>::min();
 
-            /* Debug Only */
-            Mat edge_to_plot = max(meas_cv, hand_edge_cv);
-            edge_to_plot = edge_to_plot(cam_crop_roi);
-//            std::cout << cor_state << std::endl;
-            imshow(cvwin, edge_to_plot);
-//            waitKey(100);
-            /* ********** */
+            Mat count_nz;
+            hand_edge_ogl_cv.convertTo(hand_edge_ogl_cv, CV_8U);
+            hand_edge_cam_cv.copyTo(count_nz, hand_edge_ogl_cv);
+            cor_state(0) *= countNonZero(count_nz) * max_val;
+//            cor_state(0) *= max_val;
+//            cor_state(0) *= ( exp( -0.5 * pow(1 - max_val, 2.0) / pow(0.1, 2.0) ) );
+            if (cor_state(0) <= 0) cor_state(0) = std::numeric_limits<float>::min();
         }
         else
         {
@@ -546,7 +544,7 @@ public:
                 std::sort(sorted.data(), sorted.data() + sorted.size());
                 std::cout <<  sorted << std::endl;
                 std::cout << "Neff: " << ht_pf_f_->Neff(init_weight) << std::endl;
-                if (ht_pf_f_->Neff(init_weight) < num_particle/50)
+                if (ht_pf_f_->Neff(init_weight) < num_particle/25)
                 {
                     std::cout << "Resampling!" << std::endl;
 
