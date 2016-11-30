@@ -372,6 +372,7 @@ protected:
     Network                            yarp;
     iCubEye                          * icub_kin_eye_;
     iCubArm                          * icub_kin_arm_;
+    iCubFinger                       * icub_kin_finger_[3];
     BufferedPort<ImageOf<PixelRgb>>    port_image_in_;
     BufferedPort<Bottle>               port_head_enc;
     BufferedPort<Bottle>               port_torso_enc;
@@ -494,6 +495,13 @@ public:
         icub_kin_arm_->releaseLink(1);
         icub_kin_arm_->releaseLink(2);
 
+        icub_kin_finger_[0] = new iCubFinger("right_thumb");
+        icub_kin_finger_[1] = new iCubFinger("right_index");
+        icub_kin_finger_[2] = new iCubFinger("right_middle");
+        icub_kin_finger_[0]->setAllConstraints(false);
+        icub_kin_finger_[1]->setAllConstraints(false);
+        icub_kin_finger_[2]->setAllConstraints(false);
+
         /* Images:         /icub/camcalib/left/out
            Head encoders:  /icub/head/state:o
            Arm encoders:   /icub/right_arm/state:o
@@ -516,6 +524,7 @@ public:
     void runFilter()
     {
         /* INITIALIZATION */
+        unsigned int k = 0;
         MatrixXf init_particle;
         VectorXf init_weight;
         double cam_x[3];
@@ -590,9 +599,10 @@ public:
                 ht_pf_f_->WeightedSum(init_particle, init_weight, out_particle);
 //                ht_pf_f_->Mode(init_particle, init_weight, out_particle);
 
-                VectorXf sorted = init_weight;
-                std::sort(sorted.data(), sorted.data() + sorted.size());
-                std::cout <<  sorted << std::endl;
+//                VectorXf sorted = init_weight;
+//                std::sort(sorted.data(), sorted.data() + sorted.size());
+//                std::cout <<  sorted << std::endl;
+                std::cout << "Step: " << ++k << std::endl;
                 std::cout << "Neff: " << ht_pf_f_->Neff(init_weight) << std::endl;
                 if (ht_pf_f_->Neff(init_weight) < num_particle/25)
                 {
@@ -604,20 +614,58 @@ public:
                     init_weight   = temp_weight;
                 }
 
+                /* DEBUG ONLY */
                 // FIXME: out_particle is treatead as a Vector, but it's a Matrix.
                 SuperImpose::ObjPoseMap hand_pose;
                 SuperImpose::ObjPose    pose;
-                pose.assign(out_particle.data(), out_particle.data()+3);
-
                 Vector ee_o(4);
-                float ang = out_particle.col(0).tail(3).norm();
+                float ang;
+
+                ang = out_particle.col(0).tail(3).norm();
                 ee_o(0)   = out_particle(3) / ang;
                 ee_o(1)   = out_particle(4) / ang;
                 ee_o(2)   = out_particle(5) / ang;
                 ee_o(3)   = ang;
-                pose.insert(pose.end(), ee_o.data(), ee_o.data()+4);
 
+                pose.assign(out_particle.data(), out_particle.data()+3);
+                pose.insert(pose.end(), ee_o.data(), ee_o.data()+4);
                 hand_pose.emplace("palm", pose);
+
+                Vector ee_t(3, pose.data());
+                ee_t.push_back(1.0);
+                YMatrix Ha = axis2dcm(ee_o);
+                Ha.setCol(3, ee_t);
+                for (size_t fng = 0; fng < 3; ++fng)
+                {
+                    std::string finger_s;
+                    pose.clear();
+                    if (fng != 0)
+                    {
+                        Vector j_x = (Ha * (icub_kin_finger_[fng]->getH0().getCol(3))).subVector(0, 2);
+                        Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng]->getH0());
+
+                        if      (fng == 1) { finger_s = "index0"; }
+                        else if (fng == 2) { finger_s = "medium0"; }
+
+                        pose.assign(j_x.data(), j_x.data()+3);
+                        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                        hand_pose.emplace(finger_s, pose);
+                    }
+
+                    for (size_t i = 0; i < icub_kin_finger_[fng]->getN(); ++i)
+                    {
+                        Vector j_x = (Ha * (icub_kin_finger_[fng]->getH(i, true).getCol(3))).subVector(0, 2);
+                        Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng]->getH(i, true));
+
+                        if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
+                        else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
+                        else if (fng == 2) { finger_s = "medium"+std::to_string(i+1); }
+                        
+                        pose.assign(j_x.data(), j_x.data()+3);
+                        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                        hand_pose.emplace(finger_s, pose);
+                    }
+                }
                 
                 ht_pf_f_->Superimpose(hand_pose, img_back);
 
