@@ -333,7 +333,9 @@ public:
 //        cor_state << (lik_cart.at<float>(0, 0) > 0? exp( -0.5 * pow(1 - lik_cart.at<float>(0, 0), 2.0) / pow(0.1, 2.0) ) : 0) + std::numeric_limits<float>::min();
 
 //        cor_state(0) *= lik_cart.at<float>(0, 0);
+
         cor_state(0) *= ( exp( -0.5 * pow(1 - lik_cart.at<float>(0, 0), 2.0) / pow(0.1, 2.0) ) );
+
         if (cor_state(0) <= 0) cor_state(0) = std::numeric_limits<float>::min();
     }
 
