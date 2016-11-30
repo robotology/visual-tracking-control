@@ -8,7 +8,7 @@ using namespace cv;
 
 //#include <fstream>
 
-const double percent_of_pixels_not_edges = 0.9;     // MATLAB: Used for selecting thresholds (only best 1-p edges)
+const double percent_of_pixels_not_edges = 0.8;     // MATLAB: Used for selecting thresholds (only best 1-p edges)
 const double threshold_ratio             = 0.4;     // MATLAB: Low threshold is this fraction of the high one
 const double sigma                       = 1.4142;  // MATLAB: 1-D Gaussian filter standard deviation
 
