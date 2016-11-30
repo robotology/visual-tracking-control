@@ -8,7 +8,7 @@ using namespace cv;
 
 //#include <fstream>
 
-const double percent_of_pixels_not_edges = 0.7;     // MATLAB: Used for selecting thresholds
+const double percent_of_pixels_not_edges = 0.9;     // MATLAB: Used for selecting thresholds (only best 1-p edges)
 const double threshold_ratio             = 0.4;     // MATLAB: Low threshold is this fraction of the high one
 const double sigma                       = 1.4142;  // MATLAB: 1-D Gaussian filter standard deviation
 
@@ -66,9 +66,12 @@ void AutoThreshold(const Mat & GX, const Mat & GY, double & high, double & low)
     Mat              mag_hist_cumsum;
     const int        channels[]   = {0, 1, 2};
     const int        hist_size[]  = {64};
-    const float      range[]      = {0.0, 1.01};
-    const float    * hist_range[] = {range};
+    const float      range_r[]    = {0.0, 255.01};
+    const float      range_g[]    = {0.0, 255.01};
+    const float      range_b[]    = {0.0, 255.01};
+    const float    * hist_range[] = {range_r, range_g, range_b};
     const double     percentile   = percent_of_pixels_not_edges * GX.cols * GX.rows;
+
 
     /* Hypot intensity gradient computation [1] */
     /* [1] https://en.wikipedia.org/wiki/Hypot  */
@@ -81,32 +84,10 @@ void AutoThreshold(const Mat & GX, const Mat & GY, double & high, double & low)
     sqrt(Scalar(1.0, 1.0, 1.0) + G_t, mag_gradient);
     multiply(G_x, mag_gradient, mag_gradient);
 
-    /* Histogram-based automatic threashold computation using image intensity gradient */
-    if (mag_gradient.channels() > 1)
-    {
-        MatIterator_<Vec3f> it   = mag_gradient.begin<Vec3f>();
-        MatIterator_<Vec3f> last = mag_gradient.end<Vec3f>();
-        Scalar max_values = *it;
-
-        while (++it!=last)
-        {
-            Scalar max_cart = *it;
-            if (max_values(0) < max_cart(0)) max_values(0) = max_cart(0);
-            if (max_values(1) < max_cart(1)) max_values(1) = max_cart(1);
-            if (max_values(2) < max_cart(2)) max_values(2) = max_cart(2);
-        }
-        divide(mag_gradient, max_values, mag_gradient);
-    }
-    else
-    {
-        double min_gradient;
-        double max_gradient;
-
-        minMaxLoc(mag_gradient, &min_gradient, &max_gradient);
-        mag_gradient /= max_gradient;
-    }
     calcHist(&mag_gradient, 1, channels, Mat(), mag_hist, 1, hist_size, hist_range);
+
     CumSum(mag_hist, mag_hist_cumsum);
+    
     MatIterator_<float> up_bgr;
     up_bgr = std::upper_bound(mag_hist_cumsum.begin<float>(), mag_hist_cumsum.end<float>(), percentile);
     high = (static_cast<double>(up_bgr.lpos()) + 1.0) / static_cast<double>(hist_size[0]) * 255.0;
