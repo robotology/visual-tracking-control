@@ -130,9 +130,9 @@ public:
     virtual bool Configure()
     {
         _state_cov.resize(3, 1);
-        _state_cov <<                0.03,
-                      1.0 * (M_PI /180.0),
-                      3.0 * (M_PI /180.0);
+        _state_cov <<                 0.03,
+                       2.0 * (M_PI /180.0),
+                      15.0 * (M_PI /180.0);
 
         generator             = new std::mt19937_64(1);
         distribution_pos      = new std::normal_distribution<float>(0.0, _state_cov(0));
@@ -319,6 +319,8 @@ public:
         Mat hand_edge_ogl_cv;
         Mat hand_edge_cam_cv;
         Mat lik_cart;
+        Mat lik_dist_cam;
+        Mat lik_dist_ogl;
         Mat mask;
 
         MatrixXf meas          = measurements;
@@ -329,12 +331,23 @@ public:
 
         matchTemplate(hand_edge_cam_cv, hand_edge_ogl_cv, lik_cart, TM_CCORR_NORMED);
 
-//        cor_state << (lik_cart.at<float>(0, 0) > 0? lik_cart.at<float>(0, 0) : 0) + std::numeric_limits<float>::min();
-//        cor_state << (lik_cart.at<float>(0, 0) > 0? exp( -0.5 * pow(1 - lik_cart.at<float>(0, 0), 2.0) / pow(0.1, 2.0) ) : 0) + std::numeric_limits<float>::min();
-
 //        cor_state(0) *= lik_cart.at<float>(0, 0);
 
         cor_state(0) *= ( exp( -0.5 * pow(1 - lik_cart.at<float>(0, 0), 2.0) / pow(0.1, 2.0) ) );
+
+        hand_edge_cam_cv.convertTo(hand_edge_cam_cv, CV_8UC1);
+        hand_edge_ogl_cv.convertTo(hand_edge_ogl_cv, CV_8UC1);
+        threshold(hand_edge_cam_cv, hand_edge_cam_cv, 0.0, 255, THRESH_BINARY);
+        threshold(hand_edge_ogl_cv, hand_edge_ogl_cv, 0.0, 255, THRESH_BINARY);
+        hand_edge_ogl_cv = max(hand_edge_cam_cv, hand_edge_ogl_cv);
+        bitwise_not(hand_edge_cam_cv, hand_edge_cam_cv);
+        bitwise_not(hand_edge_ogl_cv, hand_edge_ogl_cv);
+        distanceTransform(hand_edge_cam_cv, lik_dist_cam, DIST_L2, DIST_MASK_PRECISE);
+        distanceTransform(hand_edge_ogl_cv, lik_dist_ogl, DIST_L2, DIST_MASK_PRECISE);
+
+        absdiff(lik_dist_cam, lik_dist_ogl, lik_cart);
+
+        cor_state(0) *= ( exp( -0.5 * sum(lik_cart)(0) / pow(50, 2.0) ) );
 
         if (cor_state(0) <= 0) cor_state(0) = std::numeric_limits<float>::min();
     }
