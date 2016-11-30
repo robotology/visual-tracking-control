@@ -44,6 +44,7 @@ using namespace yarp::sig;
 using namespace yarp::math;
 using namespace iCub::iKin;
 using namespace iCub::ctrl;
+typedef typename yarp::sig::Matrix YMatrix;
 
 
 cv::String cvwin = "Superimposed Edges";
@@ -61,14 +62,15 @@ bool FileFound (const ConstString & file)
 class HTParticleFilteringFunction : public ParticleFilteringFunction
 {
 private:
-    std::normal_distribution<float>        * distribution_theta = nullptr;
-    std::uniform_real_distribution<float>  * distribution_phi_z = nullptr;
+    std::normal_distribution<float>        * distribution_theta;
+    std::uniform_real_distribution<float>  * distribution_phi_z;
     std::function<float (float)>             gaussian_random_theta;
     std::function<float (float)>             gaussian_random_phi_z;
 
-    GLFWwindow                             * window_ = nullptr;
+    GLFWwindow                             * window_;
 
     SICAD                                  * si_cad_;
+    iCubFinger                             * icub_kin_finger_[3];
     SuperImpose::ObjFileMap                  cad_hand_;
     double                                   cam_x_[3];
     double                                   cam_o_[4];
@@ -76,7 +78,14 @@ private:
 
 public:
 
-    HTParticleFilteringFunction() {}
+    HTParticleFilteringFunction()
+    {
+        distribution_theta = nullptr;
+        distribution_phi_z = nullptr;
+        window_            = nullptr;
+        si_cad_            = nullptr;
+        for (size_t i = 0; i < 3; ++i) icub_kin_finger_[i] = nullptr;
+    }
 
 
     ~HTParticleFilteringFunction()
@@ -84,6 +93,7 @@ public:
         delete distribution_theta;
         delete distribution_phi_z;
         delete si_cad_;
+        for (size_t i = 0; i < 3; ++i) delete icub_kin_finger_[i];
     }
 
 
@@ -106,6 +116,17 @@ public:
     }
 
 
+    void setArmJoints(const Vector & q)
+    {
+        Vector chainjoints;
+        for (size_t i = 0; i < 3; ++i)
+        {
+            icub_kin_finger_[i]->getChainJoints(q, chainjoints);
+            icub_kin_finger_[i]->setAng(CTRL_DEG2RAD * chainjoints);
+        }
+    }
+
+
     virtual bool Configure()
     {
         _state_cov.resize(3, 1);
@@ -124,37 +145,44 @@ public:
         ResourceFinder rf;
         cad_hand_["palm"] = rf.findFileByName("r_palm.obj");
         if (!FileFound(cad_hand_["palm"])) return false;
-//        cad_hand_["thumb1"] = rf.findFileByName("r_tl0.obj");
-//        if (!FileFound(cad_hand_["thumb1"])) return false;
-//        cad_hand_["thumb2"] = rf.findFileByName("r_tl1.obj");
-//        if (!FileFound(cad_hand_["thumb2"])) return false;
-//        cad_hand_["thumb3"] = rf.findFileByName("r_tl2.obj");
-//        if (!FileFound(cad_hand_["thumb3"])) return false;
-//        cad_hand_["thumb4"] = rf.findFileByName("r_tl3.obj");
-//        if (!FileFound(cad_hand_["thumb4"])) return false;
-//        cad_hand_["thumb5"] = rf.findFileByName("r_tl4.obj");
-//        if (!FileFound(cad_hand_["thumb5"])) return false;
-//        cad_hand_["index0"] = rf.findFileByName("r_indexbase.obj");
-//        if (!FileFound(cad_hand_["index0"])) return false;
-//        cad_hand_["index1"] = rf.findFileByName("r_ail0.obj");
-//        if (!FileFound(cad_hand_["index1"])) return false;
-//        cad_hand_["index2"] = rf.findFileByName("r_ail1.obj");
-//        if (!FileFound(cad_hand_["index2"])) return false;
-//        cad_hand_["index3"] = rf.findFileByName("r_ail2.obj");
-//        if (!FileFound(cad_hand_["index3"])) return false;
-//        cad_hand_["index4"] = rf.findFileByName("r_ail3.obj");
-//        if (!FileFound(cad_hand_["index4"])) return false;
-//        cad_hand_["medium0"] = rf.findFileByName("r_ml0.obj");
-//        if (!FileFound(cad_hand_["medium0"])) return false;
-//        cad_hand_["medium1"] = rf.findFileByName("r_ml1.obj");
-//        if (!FileFound(cad_hand_["medium1"])) return false;
-//        cad_hand_["medium2"] = rf.findFileByName("r_ml2.obj");
-//        if (!FileFound(cad_hand_["medium2"])) return false;
-//        cad_hand_["medium3"] = rf.findFileByName("r_ml3.obj");
-//        if (!FileFound(cad_hand_["medium3"])) return false;
+        cad_hand_["thumb1"] = rf.findFileByName("r_tl0.obj");
+        if (!FileFound(cad_hand_["thumb1"])) return false;
+        cad_hand_["thumb2"] = rf.findFileByName("r_tl1.obj");
+        if (!FileFound(cad_hand_["thumb2"])) return false;
+        cad_hand_["thumb3"] = rf.findFileByName("r_tl2.obj");
+        if (!FileFound(cad_hand_["thumb3"])) return false;
+        cad_hand_["thumb4"] = rf.findFileByName("r_tl3.obj");
+        if (!FileFound(cad_hand_["thumb4"])) return false;
+        cad_hand_["thumb5"] = rf.findFileByName("r_tl4.obj");
+        if (!FileFound(cad_hand_["thumb5"])) return false;
+        cad_hand_["index0"] = rf.findFileByName("r_indexbase.obj");
+        if (!FileFound(cad_hand_["index0"])) return false;
+        cad_hand_["index1"] = rf.findFileByName("r_ail0.obj");
+        if (!FileFound(cad_hand_["index1"])) return false;
+        cad_hand_["index2"] = rf.findFileByName("r_ail1.obj");
+        if (!FileFound(cad_hand_["index2"])) return false;
+        cad_hand_["index3"] = rf.findFileByName("r_ail2.obj");
+        if (!FileFound(cad_hand_["index3"])) return false;
+        cad_hand_["index4"] = rf.findFileByName("r_ail3.obj");
+        if (!FileFound(cad_hand_["index4"])) return false;
+        cad_hand_["medium0"] = rf.findFileByName("r_ml0.obj");
+        if (!FileFound(cad_hand_["medium0"])) return false;
+        cad_hand_["medium1"] = rf.findFileByName("r_ml1.obj");
+        if (!FileFound(cad_hand_["medium1"])) return false;
+        cad_hand_["medium2"] = rf.findFileByName("r_ml2.obj");
+        if (!FileFound(cad_hand_["medium2"])) return false;
+        cad_hand_["medium3"] = rf.findFileByName("r_ml3.obj");
+        if (!FileFound(cad_hand_["medium3"])) return false;
 
         si_cad_ = new SICAD();
         si_cad_->Configure(window_, cad_hand_, 232.921, 232.43, 162.202, 125.738);
+
+        icub_kin_finger_[0] = new iCubFinger("right_thumb");
+        icub_kin_finger_[1] = new iCubFinger("right_index");
+        icub_kin_finger_[2] = new iCubFinger("right_middle");
+        icub_kin_finger_[0]->setAllConstraints(false);
+        icub_kin_finger_[1]->setAllConstraints(false);
+        icub_kin_finger_[2]->setAllConstraints(false);
 
         return true;
     }
@@ -212,23 +240,62 @@ public:
 
     virtual Ref<MatrixXf> ObservationModel(const Ref<const VectorXf> & pred_state)
     {
-        Mat hand_ogl = Mat::zeros(img_back_edge_.rows, img_back_edge_.cols, img_back_edge_.type());
-        Mat hand_edge;
-        Mat edge;
-
+        Mat                     hand_ogl = Mat::zeros(img_back_edge_.rows, img_back_edge_.cols, img_back_edge_.type());
+        Mat                     hand_edge;
+        Mat                     edge;
         SuperImpose::ObjPoseMap hand_pose;
         SuperImpose::ObjPose    pose;
-        pose.assign(pred_state.data(), pred_state.data()+3);
+        Vector                  ee_o(4);
+        float                   ang;
 
-        Vector a_a(4);
-        float ang = pred_state.tail(3).norm();
-        a_a(0) = pred_state(3) / ang;
-        a_a(1) = pred_state(4) / ang;
-        a_a(2) = pred_state(5) / ang;
-        a_a(3) = ang;
-        pose.insert(pose.end(), a_a.data(), a_a.data()+4);
+
+        ang     = pred_state.tail(3).norm();
+        ee_o(0) = pred_state(3) / ang;
+        ee_o(1) = pred_state(4) / ang;
+        ee_o(2) = pred_state(5) / ang;
+        ee_o(3) = ang;
+
+        pose.assign(pred_state.data(), pred_state.data()+3);
+        pose.insert(pose.end(), ee_o.data(), ee_o.data()+4);
 
         hand_pose.emplace("palm", pose);
+
+        Vector ee_t(3, pose.data());
+        ee_t.push_back(1.0);
+        YMatrix Ha = axis2dcm(ee_o);
+        Ha.setCol(3, ee_t);
+
+        for (size_t fng = 0; fng < 3; ++fng)
+        {
+            std::string finger_s;
+            pose.clear();
+            if (fng != 0)
+            {
+                Vector j_x = (Ha * (icub_kin_finger_[fng]->getH0().getCol(3))).subVector(0, 2);
+                Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng]->getH0());
+
+                if      (fng == 1) { finger_s = "index0"; }
+                else if (fng == 2) { finger_s = "medium0"; }
+
+                pose.assign(j_x.data(), j_x.data()+3);
+                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                hand_pose.emplace(finger_s, pose);
+            }
+
+            for (size_t i = 0; i < icub_kin_finger_[fng]->getN(); ++i)
+            {
+                Vector j_x = (Ha * (icub_kin_finger_[fng]->getH(i, true).getCol(3))).subVector(0, 2);
+                Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng]->getH(i, true));
+
+                if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
+                else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
+                else if (fng == 2) { finger_s = "medium"+std::to_string(i+1); }
+
+                pose.assign(j_x.data(), j_x.data()+3);
+                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                hand_pose.emplace(finger_s, pose);
+            }
+        }
 
         si_cad_->Superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
 //        AutoCanny(hand_ogl, hand_edge);
@@ -305,7 +372,6 @@ protected:
     Network                            yarp;
     iCubEye                          * icub_kin_eye_;
     iCubArm                          * icub_kin_arm_;
-//    iCubFinger                       * icub_kin_finger_;
     BufferedPort<ImageOf<PixelRgb>>    port_image_in_;
     BufferedPort<Bottle>               port_head_enc;
     BufferedPort<Bottle>               port_torso_enc;
@@ -322,6 +388,8 @@ private:
         Bottle * b = port_torso_enc.read();
         Vector torso_enc(3);
 
+        yAssert(b->size() == 3);
+
         torso_enc(0) = b->get(2).asDouble();
         torso_enc(1) = b->get(1).asDouble();
         torso_enc(2) = b->get(0).asDouble();
@@ -330,35 +398,51 @@ private:
     }
 
 
-    Vector readHead(const ConstString eye)
-    {
-        Bottle * b = port_head_enc.read();
-        Vector head_enc(8);
-
-        head_enc.setSubvector(0, readTorso());
-        for (unsigned int i = 0; i < 4; ++i)
-        {
-            head_enc(i+3) = b->get(i).asDouble();
-        }
-        if (eye == "left")  head_enc(7) = b->get(4).asDouble() + b->get(5).asDouble()/2.0;
-        if (eye == "right") head_enc(7) = b->get(4).asDouble() - b->get(5).asDouble()/2.0;
-
-        return head_enc;
-    }
-
-
     Vector readArm()
     {
         Bottle * b = port_arm_enc.read();
-        Vector arm_enc(10);
+        Vector arm_enc(16);
 
-        arm_enc.setSubvector(0, readTorso());
-        for (unsigned int i = 0; i < 7; ++i)
+        yAssert(b->size() == 16);
+
+        for (size_t i = 0; i < 16; ++i)
         {
-            arm_enc(i+3) = b->get(i).asDouble();
+            arm_enc(i) = b->get(i).asDouble();
         }
 
         return arm_enc;
+    }
+
+
+    Vector readRootToEye(const ConstString eye)
+    {
+        Bottle * b = port_head_enc.read();
+        Vector root_eye_enc(8);
+
+        root_eye_enc.setSubvector(0, readTorso());
+        for (size_t i = 0; i < 4; ++i)
+        {
+            root_eye_enc(i+3) = b->get(i).asDouble();
+        }
+        if (eye == "left")  root_eye_enc(7) = b->get(4).asDouble() + b->get(5).asDouble()/2.0;
+        if (eye == "right") root_eye_enc(7) = b->get(4).asDouble() - b->get(5).asDouble()/2.0;
+
+        return root_eye_enc;
+    }
+
+
+    Vector readRootToEE()
+    {
+        Bottle * b = port_arm_enc.read();
+        Vector root_ee_enc(10);
+
+        root_ee_enc.setSubvector(0, readTorso());
+        for (size_t i = 0; i < 7; ++i)
+        {
+            root_ee_enc(i+3) = b->get(i).asDouble();
+        }
+
+        return root_ee_enc;
     }
 
 
@@ -369,7 +453,6 @@ public:
 
         icub_kin_eye_    = nullptr;
         icub_kin_arm_    = nullptr;
-//        icub_kin_finger_ = nullptr;
     }
 
 
@@ -378,7 +461,6 @@ public:
         delete ht_pf_f_;
         delete icub_kin_eye_;
         delete icub_kin_arm_;
-//        delete icub_kin_finger_;
     }
 
 
@@ -411,7 +493,6 @@ public:
         icub_kin_arm_->releaseLink(0);
         icub_kin_arm_->releaseLink(1);
         icub_kin_arm_->releaseLink(2);
-//        icub_kin_finger_ = new iCubFinger();
 
         /* Images:         /icub/camcalib/left/out
            Head encoders:  /icub/head/state:o
@@ -446,7 +527,7 @@ public:
 
         init_particle.resize(6, num_particle);
 
-        Vector q = readArm();
+        Vector q = readRootToEE();
         Vector ee_pose = icub_kin_arm_->EndEffPose(CTRL_DEG2RAD * q);
 
         Map<VectorXd> q_arm(ee_pose.data(), 6, 1);
@@ -475,7 +556,7 @@ public:
                 Mat img_back = cvarrToMat(imgout.getIplImage());
                 Mat img_back_edge;
 
-                Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readHead("left"));
+                Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
                 cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
                 cam_o[0] = eye_pose(3); cam_o[1] = eye_pose(4); cam_o[2] = eye_pose(5); cam_o[3] = eye_pose(6);
 
@@ -490,8 +571,14 @@ public:
                 MatrixXf img_back_edge_eigen(img_back_edge.rows, img_back_edge.cols);
                 cv2eigen(img_back_edge, img_back_edge_eigen);
 
-                ht_pf_f_->setImgBackEdge(img_back_edge);
+                /* Set parameters */
+                // FIXME: da decidere come sistemare
+                Vector q = readArm();
+                ht_pf_f_->setArmJoints(q);
                 ht_pf_f_->setCamXO(cam_x, cam_o);
+                ht_pf_f_->setImgBackEdge(img_back_edge);
+                /* ************** */
+
                 for (int i = 0; i < num_particle; ++i)
                 {
                     ht_pf_f_->Correction(init_particle.col(i), img_back_edge_eigen, init_weight.row(i));
@@ -507,7 +594,7 @@ public:
                 std::sort(sorted.data(), sorted.data() + sorted.size());
                 std::cout <<  sorted << std::endl;
                 std::cout << "Neff: " << ht_pf_f_->Neff(init_weight) << std::endl;
-                if (ht_pf_f_->Neff(init_weight) < num_particle/50)
+                if (ht_pf_f_->Neff(init_weight) < num_particle/25)
                 {
                     std::cout << "Resampling!" << std::endl;
 
@@ -522,13 +609,13 @@ public:
                 SuperImpose::ObjPose    pose;
                 pose.assign(out_particle.data(), out_particle.data()+3);
 
-                Vector a_a(4);
+                Vector ee_o(4);
                 float ang = out_particle.col(0).tail(3).norm();
-                a_a(0) = out_particle(3) / ang;
-                a_a(1) = out_particle(4) / ang;
-                a_a(2) = out_particle(5) / ang;
-                a_a(3) = ang;
-                pose.insert(pose.end(), a_a.data(), a_a.data()+4);
+                ee_o(0)   = out_particle(3) / ang;
+                ee_o(1)   = out_particle(4) / ang;
+                ee_o(2)   = out_particle(5) / ang;
+                ee_o(3)   = ang;
+                pose.insert(pose.end(), ee_o.data(), ee_o.data()+4);
 
                 hand_pose.emplace("palm", pose);
                 
