@@ -793,29 +793,9 @@ int main(int argc, char const *argv[])
 
     namedWindow(cvwin, WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
 
-//    ResourceFinder rf;
-//    rf.setVerbose(true);
-//    rf.setDefaultConfigFile("superimpose-hand_config.ini");
-//    rf.setDefaultContext("superimpose-hand");
-//    rf.configure(argc, argv);
-
     /* Initialize OpenGL context */
     GLFWwindow * window = nullptr;
     if (!openglSetUp(window, WINDOW_WIDTH, WINDOW_HEIGHT)) return EXIT_FAILURE;
-
-    /* SuperimposeHand, derived from RFModule, must be declared by the main thread (thread_0). */
-//    SuperimposerFactory sh;
-//
-//    sh.setWindow(window);
-//    if (sh.runModuleThreaded(rf) == 0)
-//    {
-//        while (!sh.isStopping())
-//        {
-//            glfwPollEvents();
-//        }
-//    }
-//
-//    sh.joinModule();
 
     HTSIRParticleFilter ht_sir_pf;
     ht_sir_pf.setOGLWindow(window);
@@ -827,7 +807,6 @@ int main(int argc, char const *argv[])
         if (glfwWindowShouldClose(window)) ht_sir_pf.stopThread();
         glfwPollEvents();
     }
-//    t.join();
 
     glfwMakeContextCurrent(NULL);
     glfwTerminate();
@@ -837,71 +816,3 @@ int main(int argc, char const *argv[])
 
     return EXIT_SUCCESS;
 }
-
-//const char* window_autocanny = "AutoCanny Edge Map";
-//const char* window_autodist  = "Distance Transform for AutoCanny";
-//
-//int main()
-//{
-//    namedWindow(window_autocanny, WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
-//    namedWindow(window_autodist,  WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
-//
-//    while (waitKey(0) != 103);
-//
-//    Mat src;
-//    Mat edge;
-//    Mat dist;
-//
-//    const std::string img_dir("../../../resource/log/camera/left/");
-//    DIR * dir = opendir(img_dir.c_str());
-//    if (dir!= nullptr)
-//    {
-//        while (struct dirent * ent = readdir(dir))
-//        {
-//            size_t len = strlen(ent->d_name);
-//
-//            if (strcmp(ent->d_name, ".")  != 0 &&
-//                strcmp(ent->d_name, "..") != 0 &&
-//                len > 4 && strcmp(ent->d_name + len - 4, ".ppm") == 0)
-//            {
-//
-//                src = imread(img_dir + std::string(ent->d_name), IMREAD_COLOR);
-//
-//                AutoCanny(src, edge);
-//
-////                distanceTransform(Scalar(255, 255, 255)-edge, dist, DIST_L2, DIST_MASK_5);
-//                distanceTransform(Scalar(255, 255, 255)-edge, dist, DIST_L2, DIST_MASK_PRECISE);
-//
-//
-//                /* ------------ PLOT ONLY ------------ */
-//                Mat edge_colored(edge.size(), edge.type(), Scalar(0));
-//                src.copyTo(edge_colored, edge);
-//                normalize(dist, dist, 0.0, 1.0, NORM_MINMAX);
-//
-//                imshow(window_autocanny, edge_colored);
-//                imshow(window_autodist,  dist);
-//
-//                waitKey(1);
-//            }
-//        }
-//        closedir(dir);
-//    }
-//    else
-//    {
-//        perror("Could not open directory.");
-//        return EXIT_FAILURE;
-//    }
-//
-//    return EXIT_SUCCESS;
-//}
-
-//int main()
-//{
-//    FilteringContext fc(new SIRParticleFilter);
-//
-//    fc.run();
-//
-//    fc.saveResult();
-//
-//    return EXIT_SUCCESS;
-//}
