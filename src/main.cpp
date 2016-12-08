@@ -1,12 +1,11 @@
 #include <algorithm>
 #include <cmath>
+#include <chrono>
 #include <cstring>
-#include <dirent.h>
+#include <future>
 #include <iostream>
 #include <numeric>
-#include <sys/types.h>
 #include <limits>
-#include <thread>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -789,11 +788,11 @@ public:
                 Vector ee_o(4);
                 float ang;
 
-                ang = out_particle.col(0).tail(3).norm();
-                ee_o(0)   = out_particle(3) / ang;
-                ee_o(1)   = out_particle(4) / ang;
-                ee_o(2)   = out_particle(5) / ang;
-                ee_o(3)   = ang;
+                ang     = out_particle.col(0).tail(3).norm();
+                ee_o(0) = out_particle(3) / ang;
+                ee_o(1) = out_particle(4) / ang;
+                ee_o(2) = out_particle(5) / ang;
+                ee_o(3) = ang;
 
                 pose.assign(out_particle.data(), out_particle.data()+3);
                 pose.insert(pose.end(), ee_o.data(), ee_o.data()+4);
@@ -847,10 +846,10 @@ public:
     void getResult() {}
 
 
-    std::thread spawn()
+    std::future<void> spawn()
     {
         is_running_ = true;
-        return std::thread(&HTSIRParticleFilter::runFilter, this);
+        return std::async(std::launch::async, &HTSIRParticleFilter::runFilter, this);
     }
 
 
@@ -870,9 +869,7 @@ public:
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     /* When a user presses the escape key, we set the WindowShouldClose property to true, closing the application. */
-    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    }
+    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
 
@@ -955,11 +952,17 @@ int main(int argc, char const *argv[])
     ht_sir_pf.setOGLWindow(window);
     if (!ht_sir_pf.Configure()) return EXIT_FAILURE;
 
-    std::thread t = ht_sir_pf.spawn();
+    std::future<void> thr_filter = ht_sir_pf.spawn();
     while (ht_sir_pf.isRunning())
     {
-        if (glfwWindowShouldClose(window)) ht_sir_pf.stopThread();
-        glfwPollEvents();
+        if (glfwWindowShouldClose(window))
+        {
+            std::chrono::milliseconds span(1);
+            ht_sir_pf.stopThread();
+            yInfo() << log_ID << "Joining filthering thread...";
+            while (thr_filter.wait_for(span) == std::future_status::timeout) glfwPollEvents();
+        }
+        else glfwPollEvents();
     }
 
     glfwMakeContextCurrent(NULL);
