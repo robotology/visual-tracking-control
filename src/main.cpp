@@ -388,7 +388,7 @@ public:
 
     virtual void Correction(const Ref<const VectorXf> & pred_particles, const Ref<const MatrixXf> & measurements, Ref<VectorXf> cor_state)
     {
-        int cell_size = 10;
+        int block_size = 16;
         Mat hand_edge_ogl_cv;
         std::vector<Point> points;
 
@@ -411,18 +411,18 @@ public:
             int                rem_not_mult;
 
             Rect cad_crop_roi   = boundingRect(points);
-            rem_not_mult = div(cad_crop_roi.width,  cell_size).rem;
-            if (rem_not_mult > 0) cad_crop_roi.width  = cad_crop_roi.width  + (cell_size - rem_not_mult);
-            rem_not_mult = div(cad_crop_roi.height, cell_size).rem;
-            if (rem_not_mult > 0) cad_crop_roi.height = cad_crop_roi.height + (cell_size - rem_not_mult);
+            rem_not_mult = div(cad_crop_roi.width,  block_size).rem;
+            if (rem_not_mult > 0) cad_crop_roi.width  = cad_crop_roi.width  + (block_size - rem_not_mult);
+            rem_not_mult = div(cad_crop_roi.height, block_size).rem;
+            if (rem_not_mult > 0) cad_crop_roi.height = cad_crop_roi.height + (block_size - rem_not_mult);
             if (cad_crop_roi.x + cad_crop_roi.width  > hand_edge_ogl_cv.cols) cad_crop_roi.x -= (cad_crop_roi.x + cad_crop_roi.width ) - hand_edge_ogl_cv.cols;
             if (cad_crop_roi.y + cad_crop_roi.height > hand_edge_ogl_cv.rows) cad_crop_roi.y -= (cad_crop_roi.y + cad_crop_roi.height) - hand_edge_ogl_cv.rows;
             hand_edge_ogl_cv(cad_crop_roi).convertTo(cad_edge_crop, CV_8U);
             hand_edge_cam_cv(cad_crop_roi).convertTo(cam_edge_crop, CV_8U);
 
             /* In-crop HOG between camera and render edges */
-            HOGDescriptor hog(Size(cad_crop_roi.width, cad_crop_roi.height), Size(cell_size, cell_size), Size(cell_size/2, cell_size/2), Size(cell_size/2, cell_size/2), 21,
-                              1, -1, HOGDescriptor::L2Hys, 0.2, false, HOGDescriptor::DEFAULT_NLEVELS, false);
+            HOGDescriptor hog(Size(cad_crop_roi.width, cad_crop_roi.height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), 12,
+                              1, -1, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false);
 
             locations.push_back(Point(0, 0));
 
@@ -448,7 +448,7 @@ public:
     // FIXME: new function using cv::mat measurement instead of eigen::MatrixXf
     void Correction(const Ref<const VectorXf> & pred_particles, const Mat & measurements, Ref<VectorXf> cor_state)
     {
-        int cell_size = 10;
+        int block_size = 16;
         Mat hand_edge_ogl_cv;
         std::vector<Point> points;
 
@@ -469,18 +469,18 @@ public:
             int                rem_not_mult;
 
             Rect cad_crop_roi   = boundingRect(points);
-            rem_not_mult = div(cad_crop_roi.width,  cell_size).rem;
-            if (rem_not_mult > 0) cad_crop_roi.width  = cad_crop_roi.width  + (cell_size - rem_not_mult);
-            rem_not_mult = div(cad_crop_roi.height, cell_size).rem;
-            if (rem_not_mult > 0) cad_crop_roi.height = cad_crop_roi.height + (cell_size - rem_not_mult);
+            rem_not_mult = div(cad_crop_roi.width,  block_size).rem;
+            if (rem_not_mult > 0) cad_crop_roi.width  = cad_crop_roi.width  + (block_size - rem_not_mult);
+            rem_not_mult = div(cad_crop_roi.height, block_size).rem;
+            if (rem_not_mult > 0) cad_crop_roi.height = cad_crop_roi.height + (block_size - rem_not_mult);
             if (cad_crop_roi.x + cad_crop_roi.width  > hand_edge_ogl_cv.cols) cad_crop_roi.x -= (cad_crop_roi.x + cad_crop_roi.width ) - hand_edge_ogl_cv.cols;
             if (cad_crop_roi.y + cad_crop_roi.height > hand_edge_ogl_cv.rows) cad_crop_roi.y -= (cad_crop_roi.y + cad_crop_roi.height) - hand_edge_ogl_cv.rows;
             hand_edge_ogl_cv(cad_crop_roi).convertTo(cad_edge_crop, CV_8U);
             hand_edge_cam_cv(cad_crop_roi).convertTo(cam_edge_crop, CV_8U);
 
             /* In-crop HOG between camera and render edges */
-            HOGDescriptor hog(Size(cad_crop_roi.width, cad_crop_roi.height), Size(cell_size, cell_size), Size(cell_size/2, cell_size/2), Size(cell_size/2, cell_size/2), 21,
-                              1, -1, HOGDescriptor::L2Hys, 0.2, false, HOGDescriptor::DEFAULT_NLEVELS, false);
+            HOGDescriptor hog(Size(cad_crop_roi.width, cad_crop_roi.height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), 12,
+                              1, -1, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false);
 
             locations.push_back(Point(0, 0));
 
@@ -711,12 +711,12 @@ public:
         }
 
         /* FILTERING */
-        ImageOf<PixelRgb> * imgin = NULL;
+        ImageOf<PixelRgb> * imgin = YARP_NULLPTR;
         while(is_running_)
         {
-            if (imgin == NULL) imgin = port_image_in_.read(true);
+            if (imgin == YARP_NULLPTR) imgin = port_image_in_.read(true);
 //            imgin = port_image_in_.read(true);
-            if (imgin != NULL)
+            if (imgin != YARP_NULLPTR)
             {
                 ImageOf<PixelRgb> & imgout = port_image_out_.prepare();
                 imgout = *imgin;
@@ -771,7 +771,7 @@ public:
 //                std::cout <<  sorted << std::endl;
                 std::cout << "Step: " << ++k << std::endl;
                 std::cout << "Neff: " << ht_pf_f_->Neff(init_weight) << std::endl;
-                if (ht_pf_f_->Neff(init_weight) < 5)
+                if (ht_pf_f_->Neff(init_weight) < 15)
                 {
                     std::cout << "Resampling!" << std::endl;
 
@@ -840,6 +840,12 @@ public:
                 port_image_out_.write();
             }
         }
+        // FIXME: queste close devono andare da un'altra parte. Simil RFModule.
+        port_image_in_.close();
+        port_head_enc.close();
+        port_arm_enc.close();
+        port_torso_enc.close();
+        port_image_out_.close();
     }
 
 
