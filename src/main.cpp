@@ -239,7 +239,6 @@ public:
     }
 
 
-    // FIXME: Needs to be properly included as ObservationModel
     virtual Ref<MatrixXf> ObservationModel(const Ref<const VectorXf> & pred_state)
     {
         Mat                     hand_ogl = Mat::zeros(img_back_edge_.rows, img_back_edge_.cols, img_back_edge_.type());
@@ -615,7 +614,6 @@ public:
                 ht_pf_f_->setImgBackEdge(img_back);
                 /* ************** */
 
-                // FIXME: Wathc out for the proper correction function to be used!
                 for (int i = 0; i < num_particle; ++i)
                 {
                     ht_pf_f_->Correction(init_particle.col(i), img_back, init_weight.row(i));
