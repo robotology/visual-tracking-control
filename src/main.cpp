@@ -30,7 +30,6 @@
 #include "FilteringContext.h"
 #include "SIRParticleFilter.h"
 #include "ParticleFilteringFunction.h"
-#include "AutoCanny.h"
 #include "SICAD.h"
 
 #define WINDOW_WIDTH  320
@@ -242,7 +241,7 @@ public:
     virtual Ref<MatrixXf> ObservationModel(const Ref<const VectorXf> & pred_state)
     {
         Mat                     hand_ogl = Mat::zeros(img_back_edge_.rows, img_back_edge_.cols, img_back_edge_.type());
-        Mat                     hand_edge;
+        Mat                     hand_ogl_gray;
         SuperImpose::ObjPoseMap hand_pose;
         SuperImpose::ObjPose    pose;
         Vector                  ee_o(4);
@@ -298,161 +297,27 @@ public:
         }
 
         si_cad_->Superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
-        AutoCanny(hand_ogl, hand_edge);
-//        AutoDirCanny(hand_ogl, hand_edge);
+        cvtColor(hand_ogl, hand_ogl_gray, CV_RGB2GRAY);
 
-        MatrixXf m(hand_edge.rows, hand_edge.cols);
-        cv2eigen(hand_edge, m);
-
-        /* Debug Only */
-        hand_edge = Scalar(255, 0, 0) - max(hand_edge, img_back_edge_);
-        imshow(cvwin, hand_edge);
-        /* ********** */
-
-        return m;
-    }
-
-    // FIXME: Needs to be properly included as ObservationModel
-    Ref<MatrixXf> ObservationModel2(const Ref<const VectorXf> & pred_state)
-    {
-        Mat                     hand_ogl = Mat::zeros(img_back_edge_.rows, img_back_edge_.cols, img_back_edge_.type());
-        Mat                     hand_edge;
-        SuperImpose::ObjPoseMap hand_pose;
-        SuperImpose::ObjPose    pose;
-        Vector                  ee_o(4);
-        float                   ang;
-
-
-        ang     = pred_state.tail(3).norm();
-        ee_o(0) = pred_state(3) / ang;
-        ee_o(1) = pred_state(4) / ang;
-        ee_o(2) = pred_state(5) / ang;
-        ee_o(3) = ang;
-
-        pose.assign(pred_state.data(), pred_state.data()+3);
-        pose.insert(pose.end(), ee_o.data(), ee_o.data()+4);
-
-        hand_pose.emplace("palm", pose);
-
-        Vector ee_t(3, pose.data());
-        ee_t.push_back(1.0);
-        YMatrix Ha = axis2dcm(ee_o);
-        Ha.setCol(3, ee_t);
-        // FIXME: middle finger only!
-        for (size_t fng = 2; fng < 3; ++fng)
-        {
-            std::string finger_s;
-            pose.clear();
-            if (fng != 0)
-            {
-                Vector j_x = (Ha * (icub_kin_finger_[fng]->getH0().getCol(3))).subVector(0, 2);
-                Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng]->getH0());
-
-                if      (fng == 1) { finger_s = "index0"; }
-                else if (fng == 2) { finger_s = "medium0"; }
-
-                pose.assign(j_x.data(), j_x.data()+3);
-                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-                hand_pose.emplace(finger_s, pose);
-            }
-
-            for (size_t i = 0; i < icub_kin_finger_[fng]->getN(); ++i)
-            {
-                Vector j_x = (Ha * (icub_kin_finger_[fng]->getH(i, true).getCol(3))).subVector(0, 2);
-                Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng]->getH(i, true));
-
-                if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
-                else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
-                else if (fng == 2) { finger_s = "medium"+std::to_string(i+1); }
-
-                pose.assign(j_x.data(), j_x.data()+3);
-                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-                hand_pose.emplace(finger_s, pose);
-            }
-        }
-
-        si_cad_->Superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
-        cvtColor(hand_ogl, hand_edge, CV_RGB2GRAY);
-
-        MatrixXf m(hand_edge.rows, hand_edge.cols);
-        cv2eigen(hand_edge, m);
+        MatrixXf m(hand_ogl_gray.rows, hand_ogl_gray.cols);
+        cv2eigen(hand_ogl_gray, m);
 
         /* Debug Only */
-        hand_edge = Scalar(255, 0, 0) - max(hand_edge, img_back_edge_);
-        imshow(cvwin, hand_edge);
+        imshow(cvwin, max(hand_ogl, img_back_edge_));
         /* ********** */
         
         return m;
     }
 
 
-    virtual void Correction(const Ref<const VectorXf> & pred_particles, const Ref<const MatrixXf> & measurements, Ref<VectorXf> cor_state)
+    // FIXME: new function using cv::mat measurement instead of eigen::MatrixXf
+    virtual void Correction(const Ref<const VectorXf> & pred_particles, const Mat & measurements, Ref<VectorXf> cor_state)
     {
-        int cell_size = 10;
+        int block_size = 16;
         Mat hand_edge_ogl_cv;
         std::vector<Point> points;
 
         MatrixXf hand_edge_ogl = ObservationModel(pred_particles);
-
-        /* OGL image crop */
-        eigen2cv(hand_edge_ogl, hand_edge_ogl_cv);
-        for (auto it = hand_edge_ogl_cv.begin<float>(); it != hand_edge_ogl_cv.end<float>(); ++it) if (*it) points.push_back(it.pos());
-
-        if (points.size() > 0)
-        {
-            Mat                hand_edge_cam_cv;
-            eigen2cv          (MatrixXf(measurements),
-                               hand_edge_cam_cv);
-            Mat                cad_edge_crop;
-            Mat                cam_edge_crop;
-            std::vector<float> descriptors_cam;
-            std::vector<float> descriptors_cad;
-            std::vector<Point> locations;
-            int                rem_not_mult;
-
-            Rect cad_crop_roi   = boundingRect(points);
-            rem_not_mult = div(cad_crop_roi.width,  cell_size).rem;
-            if (rem_not_mult > 0) cad_crop_roi.width  = cad_crop_roi.width  + (cell_size - rem_not_mult);
-            rem_not_mult = div(cad_crop_roi.height, cell_size).rem;
-            if (rem_not_mult > 0) cad_crop_roi.height = cad_crop_roi.height + (cell_size - rem_not_mult);
-            if (cad_crop_roi.x + cad_crop_roi.width  > hand_edge_ogl_cv.cols) cad_crop_roi.x -= (cad_crop_roi.x + cad_crop_roi.width ) - hand_edge_ogl_cv.cols;
-            if (cad_crop_roi.y + cad_crop_roi.height > hand_edge_ogl_cv.rows) cad_crop_roi.y -= (cad_crop_roi.y + cad_crop_roi.height) - hand_edge_ogl_cv.rows;
-            hand_edge_ogl_cv(cad_crop_roi).convertTo(cad_edge_crop, CV_8U);
-            hand_edge_cam_cv(cad_crop_roi).convertTo(cam_edge_crop, CV_8U);
-
-            /* In-crop HOG between camera and render edges */
-            HOGDescriptor hog(Size(cad_crop_roi.width, cad_crop_roi.height), Size(cell_size, cell_size), Size(cell_size/2, cell_size/2), Size(cell_size/2, cell_size/2), 21,
-                              1, -1, HOGDescriptor::L2Hys, 0.2, false, HOGDescriptor::DEFAULT_NLEVELS, false);
-
-            locations.push_back(Point(0, 0));
-
-            hog.compute(cam_edge_crop, descriptors_cam, Size(), Size(), locations);
-            hog.compute(cad_edge_crop, descriptors_cad, Size(), Size(), locations);
-
-            auto it_cad = descriptors_cad.begin();
-            auto it_cam = descriptors_cam.begin();
-            float sum_diff = 0;
-            for (; it_cad < descriptors_cad.end(); ++it_cad, ++it_cam) sum_diff += abs((*it_cad) - (*it_cam));
-
-            // FIXME: Kernel likelihood need to be tuned!
-            cor_state(0) *= ( exp( -0.001 * sum_diff /* / pow(1, 2.0) */ ) );
-            if (cor_state(0) <= 0) cor_state(0) = std::numeric_limits<float>::min();
-        }
-        else
-        {
-            cor_state << std::numeric_limits<float>::min();
-        }
-    }
-
-
-    // FIXME: new function using cv::mat measurement instead of eigen::MatrixXf
-    void Correction(const Ref<const VectorXf> & pred_particles, const Mat & measurements, Ref<VectorXf> cor_state)
-    {
-        int cell_size = 10;
-        Mat hand_edge_ogl_cv;
-        std::vector<Point> points;
-
-        MatrixXf hand_edge_ogl = ObservationModel2(pred_particles);
 
         /* OGL image crop */
         eigen2cv(hand_edge_ogl, hand_edge_ogl_cv);
@@ -469,18 +334,18 @@ public:
             int                rem_not_mult;
 
             Rect cad_crop_roi   = boundingRect(points);
-            rem_not_mult = div(cad_crop_roi.width,  cell_size).rem;
-            if (rem_not_mult > 0) cad_crop_roi.width  = cad_crop_roi.width  + (cell_size - rem_not_mult);
-            rem_not_mult = div(cad_crop_roi.height, cell_size).rem;
-            if (rem_not_mult > 0) cad_crop_roi.height = cad_crop_roi.height + (cell_size - rem_not_mult);
+            rem_not_mult = div(cad_crop_roi.width,  block_size).rem;
+            if (rem_not_mult > 0) cad_crop_roi.width  = cad_crop_roi.width  + (block_size - rem_not_mult);
+            rem_not_mult = div(cad_crop_roi.height, block_size).rem;
+            if (rem_not_mult > 0) cad_crop_roi.height = cad_crop_roi.height + (block_size - rem_not_mult);
             if (cad_crop_roi.x + cad_crop_roi.width  > hand_edge_ogl_cv.cols) cad_crop_roi.x -= (cad_crop_roi.x + cad_crop_roi.width ) - hand_edge_ogl_cv.cols;
             if (cad_crop_roi.y + cad_crop_roi.height > hand_edge_ogl_cv.rows) cad_crop_roi.y -= (cad_crop_roi.y + cad_crop_roi.height) - hand_edge_ogl_cv.rows;
             hand_edge_ogl_cv(cad_crop_roi).convertTo(cad_edge_crop, CV_8U);
             hand_edge_cam_cv(cad_crop_roi).convertTo(cam_edge_crop, CV_8U);
 
             /* In-crop HOG between camera and render edges */
-            HOGDescriptor hog(Size(cad_crop_roi.width, cad_crop_roi.height), Size(cell_size, cell_size), Size(cell_size/2, cell_size/2), Size(cell_size/2, cell_size/2), 21,
-                              1, -1, HOGDescriptor::L2Hys, 0.2, false, HOGDescriptor::DEFAULT_NLEVELS, false);
+            HOGDescriptor hog(Size(cad_crop_roi.width, cad_crop_roi.height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), 12,
+                              1, -1, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false);
 
             locations.push_back(Point(0, 0));
 
@@ -711,12 +576,12 @@ public:
         }
 
         /* FILTERING */
-        ImageOf<PixelRgb> * imgin = NULL;
+        ImageOf<PixelRgb> * imgin = YARP_NULLPTR;
         while(is_running_)
         {
-            if (imgin == NULL) imgin = port_image_in_.read(true);
+            if (imgin == YARP_NULLPTR) imgin = port_image_in_.read(true);
 //            imgin = port_image_in_.read(true);
-            if (imgin != NULL)
+            if (imgin != YARP_NULLPTR)
             {
                 ImageOf<PixelRgb> & imgout = port_image_out_.prepare();
                 imgout = *imgin;
@@ -727,7 +592,6 @@ public:
 
                 MatrixXf measurement;
                 Mat img_back = cvarrToMat(imgout.getIplImage());
-                Mat img_back_edge;
 
                 Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
                 cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
@@ -741,22 +605,16 @@ public:
                     if(init_weight(i) <= threshold) ht_pf_f_->Prediction(init_particle.col(i), init_particle.col(i));
                 }
 
-                AutoCanny(img_back, img_back_edge);
-                MatrixXf img_back_edge_eigen(img_back_edge.rows, img_back_edge.cols);
-                cv2eigen(img_back_edge, img_back_edge_eigen);
-
                 /* Set parameters */
                 // FIXME: da decidere come sistemare
                 Vector q = readArm();
                 ht_pf_f_->setArmJoints(q);
                 ht_pf_f_->setCamXO(cam_x, cam_o);
-                ht_pf_f_->setImgBackEdge(img_back_edge);
+                ht_pf_f_->setImgBackEdge(img_back);
                 /* ************** */
 
-                // FIXME: Wathc out for the proper correction function to be used!
                 for (int i = 0; i < num_particle; ++i)
                 {
-//                    ht_pf_f_->Correction(init_particle.col(i), img_back_edge_eigen, init_weight.row(i));
                     ht_pf_f_->Correction(init_particle.col(i), img_back, init_weight.row(i));
                 }
 
@@ -771,7 +629,7 @@ public:
 //                std::cout <<  sorted << std::endl;
                 std::cout << "Step: " << ++k << std::endl;
                 std::cout << "Neff: " << ht_pf_f_->Neff(init_weight) << std::endl;
-                if (ht_pf_f_->Neff(init_weight) < 5)
+                if (ht_pf_f_->Neff(init_weight) < 15)
                 {
                     std::cout << "Resampling!" << std::endl;
 
@@ -840,6 +698,12 @@ public:
                 port_image_out_.write();
             }
         }
+        // FIXME: queste close devono andare da un'altra parte. Simil RFModule.
+        port_image_in_.close();
+        port_head_enc.close();
+        port_arm_enc.close();
+        port_torso_enc.close();
+        port_image_out_.close();
     }
 
 
