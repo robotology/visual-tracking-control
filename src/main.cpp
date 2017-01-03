@@ -30,7 +30,6 @@
 #include "FilteringContext.h"
 #include "SIRParticleFilter.h"
 #include "ParticleFilteringFunction.h"
-#include "AutoCanny.h"
 #include "SICAD.h"
 
 #define WINDOW_WIDTH  320
