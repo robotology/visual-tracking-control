@@ -1,7 +1,18 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.0)
 
 project(hand-tracking)
 
+### --- FILES::packages --- ###
+find_package(assimp             REQUIRED)
+find_package(EIGEN3             REQUIRED)
+find_package(GLEW               REQUIRED)
+find_package(GLFW3              REQUIRED)
+find_package(glm                REQUIRED)
+find_package(ICUB               REQUIRED)
+find_package(ICUBcontrib        REQUIRED)
+find_package(OpenCV             REQUIRED)
+find_package(OPENGL             REQUIRED)
+find_package(YARP               REQUIRED)
 
 ### --- FILES --- ###
 set(SOURCE_DIRS)
@@ -10,47 +21,9 @@ set(INCLUDE_DIRS)
 set(INCLUDE_FILES)
 set(RESOURCE_FILES)
 set(LIBS)
+
 ### --- FILES::BayesFiltersLib --- ###
-set(BFL_DIR                 ${CMAKE_CURRENT_SOURCE_DIR}/../BayesFiltersLib)
-
-set(BFL_INCLUDE_DIR         ${BFL_DIR}/include)
-set(FC_INCLUDE_FILES        ${BFL_INCLUDE_DIR}/FilteringContext/FilteringContext.h)
-set(FA_INCLUDE_FILES        ${BFL_INCLUDE_DIR}/FilteringAlgorithm/FilteringAlgorithm.h
-                            ${BFL_INCLUDE_DIR}/FilteringAlgorithm/KalmanFilter.h
-                            ${BFL_INCLUDE_DIR}/FilteringAlgorithm/UnscentedKalmanFilter.h
-                            ${BFL_INCLUDE_DIR}/FilteringAlgorithm/SIRParticleFilter.h
-                            ${BFL_INCLUDE_DIR}/FilteringAlgorithm/ASIRParticleFilter.h)
-set(FF_INCLUDE_FILES        ${BFL_INCLUDE_DIR}/FilteringFunction/BayesianFilteringFunction.h
-                            ${BFL_INCLUDE_DIR}/FilteringFunction/KalmanFilteringFunction.h
-                            ${BFL_INCLUDE_DIR}/FilteringFunction/UnscentedKalmanFilteringFunction.h
-                            ${BFL_INCLUDE_DIR}/FilteringFunction/ParticleFilteringFunction.h
-                            ${BFL_INCLUDE_DIR}/FilteringFunction/AuxiliaryParticleFilteringFunction.h
-                            ${BFL_INCLUDE_DIR}/FilteringFunction/MultiObjectsFilteringFunction.h)
-
-LIST(APPEND INCLUDE_DIRS    ${BFL_INCLUDE_DIR}
-                            ${BFL_INCLUDE_DIR}/FilteringContext
-                            ${BFL_INCLUDE_DIR}/FilteringAlgorithm
-                            ${BFL_INCLUDE_DIR}/FilteringFunction)
-LIST(APPEND INCLUDE_FILES   ${FC_INCLUDE_FILES}
-                            ${FA_INCLUDE_FILES}
-                            ${FF_INCLUDE_FILES})
-
-set(BFL_SOURCE_DIR          ${BFL_DIR}/src)
-set(FC_SOURCE_FILES         ${BFL_SOURCE_DIR}/FilteringContext/FilteringContext.cpp)
-set(FA_SOURCE_FILES         ${BFL_SOURCE_DIR}/FilteringAlgorithm/KalmanFilter.cpp
-                            ${BFL_SOURCE_DIR}/FilteringAlgorithm/UnscentedKalmanFilter.cpp
-                            ${BFL_SOURCE_DIR}/FilteringAlgorithm/SIRParticleFilter.cpp
-                            ${BFL_SOURCE_DIR}/FilteringAlgorithm/ASIRParticleFilter.cpp)
-set(FF_SOURCE_FILES         ${BFL_SOURCE_DIR}/FilteringFunction/KalmanFilteringFunction.cpp
-                            ${BFL_SOURCE_DIR}/FilteringFunction/UnscentedKalmanFilteringFunction.cpp
-                            ${BFL_SOURCE_DIR}/FilteringFunction/ParticleFilteringFunction.cpp
-                            ${BFL_SOURCE_DIR}/FilteringFunction/AuxiliaryParticleFilteringFunction.cpp)
-
-LIST(APPEND SOURCE_DIRS     ${BFL_SOURCE_DIR})
-LIST(APPEND SOURCE_FILES    ${FC_SOURCE_FILES}
-                            ${FA_SOURCE_FILES}
-                            ${FF_SOURCE_FILES})
-
+find_package(BayesFiltersLib REQUIRED)
 
 ### --- FILES::superimpose-hand --- ###
 set(SH_DIR                  ${CMAKE_CURRENT_SOURCE_DIR}/../superimpose-hand)
@@ -68,6 +41,7 @@ set(SH_INCLUDE_FILES        ${SH_INCLUDE_DIR}/Shader.h
 
 LIST(APPEND INCLUDE_DIRS    ${SH_INCLUDE_DIR})
 LIST(APPEND INCLUDE_FILES   ${SH_INCLUDE_FILES})
+
 
 set(SH_SOURCE_DIR           ${SH_DIR}/src)
 set(SH_SOURCE_FILES         ${SH_SOURCE_DIR}/Shader.cpp
@@ -89,8 +63,33 @@ set(SHADERS_FRAG_FILES      ${SHADERS_DIR}/shader_model.frag
                             ${SHADERS_DIR}/shader_model_simple.frag
                             ${SHADERS_DIR}/shader_background.frag)
 
+LIST(APPEND RESOURCE_FILES  ${SHADERS_VERT_FILES}
+                            ${SHADERS_FRAG_FILES})
+
+### --- FILES::hand-tracking --- ###
+set(HT_INCLUDE_DIR          ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(HT_INCLUDE_FILES        ${HT_INCLUDE_DIR}/BrownianMotion.h
+                            ${HT_INCLUDE_DIR}/Proprioception.h
+                            ${HT_INCLUDE_DIR}/VisualParticleFilterCorrection.h
+                            ${HT_INCLUDE_DIR}/VisualSIRParticleFilter.h)
+
+LIST(APPEND INCLUDE_DIRS    ${HT_INCLUDE_DIR})
+LIST(APPEND INCLUDE_FILES   ${HT_INCLUDE_FILES})
+
+
+set(HT_SOURCE_DIR           ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(HT_SOURCE_FILES         ${HT_SOURCE_DIR}/main.cpp
+                            ${HT_SOURCE_DIR}/BrownianMotion.cpp
+                            ${HT_SOURCE_DIR}/Proprioception.cpp
+                            ${HT_SOURCE_DIR}/VisualParticleFilterCorrection.cpp
+                            ${HT_SOURCE_DIR}/VisualSIRParticleFilter.cpp)
+
+LIST(APPEND SOURCE_DIRS     ${HT_SOURCE_DIR})
+LIST(APPEND SOURCE_FILES    ${HT_SOURCE_FILES})
+
+
 set(ICUB_MESH_EXT           obj)
-set(ICUB_HAND_DIR           ${SH_DIR}/icub_right_hand/${ICUB_MESH_EXT})
+set(ICUB_HAND_DIR           resource/icub_right_hand/${ICUB_MESH_EXT})
 set(ICUB_HAND_FILES         ${ICUB_HAND_DIR}/r_palm.${ICUB_MESH_EXT}
                             ${ICUB_HAND_DIR}/r_ail0.${ICUB_MESH_EXT}
                             ${ICUB_HAND_DIR}/r_ail1.${ICUB_MESH_EXT}
@@ -108,46 +107,14 @@ set(ICUB_HAND_FILES         ${ICUB_HAND_DIR}/r_palm.${ICUB_MESH_EXT}
                             ${ICUB_HAND_DIR}/r_tl3.${ICUB_MESH_EXT}
                             ${ICUB_HAND_DIR}/r_tl4.${ICUB_MESH_EXT})
 
-LIST(APPEND RESOURCE_FILES  ${ICUB_HAND_FILES}
-                            ${SHADERS_VERT_FILES}
-                            ${SHADERS_FRAG_FILES})
+LIST(APPEND RESOURCE_FILES  ${ICUB_HAND_FILES})
 
-
-### --- FILES::hand-tracking --- ###
-set(HT_INCLUDE_DIR          ${CMAKE_CURRENT_SOURCE_DIR}/include)
-set(HT_INCLUDE_FILES        )
-
-LIST(APPEND INCLUDE_DIRS    ${HT_INCLUDE_DIR})
-LIST(APPEND INCLUDE_FILES   ${HT_INCLUDE_FILES})
-
-
-set(HT_SOURCE_DIR           ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(HT_SOURCE_FILES         ${HT_SOURCE_DIR}/main.cpp)
-
-LIST(APPEND SOURCE_DIRS     ${HT_SOURCE_DIR})
-LIST(APPEND SOURCE_FILES    ${HT_SOURCE_FILES})
-
-
-set(IMAGE_DIR               ${CMAKE_CURRENT_SOURCE_DIR}/resource/img)
-file(GLOB   IMAGE_FILES
-     FOLLOW_SYMLINKS        ${IMAGE_DIR}/*.ppm)
+set(IMAGE_DIR               ${CMAKE_CURRENT_SOURCE_DIR}/resource/log/camera/left)
+file(GLOB   IMAGE_FILES     ${IMAGE_DIR}/*.ppm)
 
 # --- Thirft files need to be in the current source dir --- #
 # --- At the moment, idl_rfm.thrift is copied from SH to HT folder --- #
 set(THIRFT_FILES            ${HT_SOURCE_DIR}/idl_rfm.thrift)
-
-
-### --- FILES::packages --- ###
-find_package(assimp             REQUIRED)
-find_package(EIGEN3             REQUIRED)
-find_package(GLEW               REQUIRED)
-find_package(GLFW3              REQUIRED)
-find_package(glm                REQUIRED)
-find_package(ICUB               REQUIRED)
-find_package(ICUBcontrib        REQUIRED)
-find_package(OpenCV             REQUIRED)
-find_package(OpenGL             REQUIRED)
-find_package(YARP               REQUIRED)
 
 LIST(APPEND CMAKE_MODULE_PATH   ${YARP_MODULE_PATH}
                                 ${ICUB_MODULE_PATH}
@@ -165,7 +132,7 @@ LIST(APPEND INCLUDE_DIRS        ${YARP_INCLUDE_DIRS}
                                 ${ICUB_INCLUDE_DIRS}
                                 ${OPENGL_INCLUDE_DIR}
                                 ${ASSIMP_INCLUDE_DIRS}
-                                ${EIGEN3_INCLUDE_DIR})
+                                ${EIGEN3_INCLUDE_DIRS})
 
 LIST(APPEND LIBS                ${YARP_LIBRARIES}
                                 ${ICUB_LIBRARIES}
@@ -176,7 +143,8 @@ LIST(APPEND LIBS                ${YARP_LIBRARIES}
                                 glew
                                 glm
                                 glfw
-                                ${ASSIMP_LIBRARIES} -L${ASSIMP_LIBRARY_DIRS})
+                                ${ASSIMP_LIBRARIES} -L${ASSIMP_LIBRARY_DIRS}
+                                BayesFiltersLib)
 
 LIST(APPEND SOURCE_FILES ${IDL_GEN_SOURCE})
 
@@ -192,13 +160,11 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 ### --- MAIN --- ###
-include_directories(${INCLUDE_DIRS})
-
 if(${CMAKE_GENERATOR} MATCHES "Xcode")
-    add_executable(${PROJECT_NAME}                  ${SOURCE_FILES} ${INCLUDE_FILES}
-                                                    ${SHADERS_VERT_FILES} ${SHADERS_FRAG_FILES}
-                                                    ${ICUB_HAND_FILES}
-                                                    ${IMAGE_FILES})
+    add_executable(${PROJECT_NAME}                        ${SOURCE_FILES} ${INCLUDE_FILES}
+                                                          ${SHADERS_VERT_FILES} ${SHADERS_FRAG_FILES}
+                                                          ${ICUB_HAND_FILES}
+                                                          ${IMAGE_FILES})
 
     source_group("Source Files\\FilteringContext"   FILES ${FC_SOURCE_FILES})
     source_group("Source Files\\FilteringAlgorithm" FILES ${FA_SOURCE_FILES})
@@ -210,9 +176,11 @@ if(${CMAKE_GENERATOR} MATCHES "Xcode")
     source_group("Resource\\CAD Files"              FILES ${ICUB_HAND_FILES})
     source_group("Resource\\Image"                  FILES ${IMAGE_FILES})
 else()
-    add_executable(${PROJECT_NAME}          ${SOURCE_FILES}
-                                            ${INCLUDE_FILES})
+    add_executable(${PROJECT_NAME}                        ${SOURCE_FILES}
+                                                          ${INCLUDE_FILES})
 endif()
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME}   ${LIBS})
 

@@ -2,6 +2,7 @@
 #include <cmath>
 #include <chrono>
 #include <cstring>
+#include <exception>
 #include <future>
 #include <iostream>
 #include <numeric>
@@ -13,6 +14,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
+#include <opencv2/core/core.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -27,14 +29,21 @@
 #include <iCub/iKin/iKinFwd.h>
 #include <iCub/ctrl/math.h>
 
-#include "FilteringContext.h"
-#include "SIRParticleFilter.h"
-#include "ParticleFilteringFunction.h"
+#include <BayesFiltersLib/FilteringContext.h>
+#include <BayesFiltersLib/FilteringFunction.h>
+#include <BayesFiltersLib/SIRParticleFilter.h>
+
+#include "BrownianMotion.h"
+#include "Proprioception.h"
+#include "VisualParticleFilterCorrection.h"
+#include "VisualSIRParticleFilter.h"
+
 #include "SICAD.h"
 
 #define WINDOW_WIDTH  320
 #define WINDOW_HEIGHT 240
 
+using namespace bfl;
 using namespace cv;
 using namespace Eigen;
 using namespace yarp::os;
@@ -48,6 +57,8 @@ typedef typename yarp::sig::Matrix YMatrix;
 cv::String cvwin = "Superimposed Edges";
 
 
+#ifdef HT_DEPRECATED
+
 bool FileFound (const ConstString & file)
 {
     if (file.empty()) {
@@ -58,8 +69,7 @@ bool FileFound (const ConstString & file)
 }
 
 
-class HTParticleFilteringFunction : public ParticleFilteringFunction
-{
+class HTParticleFilteringFunction : public ParticleFilteringFunction {
 private:
     std::normal_distribution<float>        * distribution_theta;
     std::uniform_real_distribution<float>  * distribution_phi_z;
@@ -76,7 +86,7 @@ private:
     Mat                                      img_back_edge_;
 
 public:
-
+    /* C/D-tors */
     HTParticleFilteringFunction()
     {
         distribution_theta = nullptr;
@@ -96,6 +106,7 @@ public:
     }
 
 
+    /* Extras */
     void setOGLWindow(GLFWwindow *& window)
     {
         window_ = window;
@@ -187,6 +198,16 @@ public:
         return true;
     }
 
+
+    void Superimpose(const SuperImpose::ObjPoseMap & obj2pos_map, cv::Mat & img)
+    {
+        si_cad_->setBackgroundOpt(true);
+        si_cad_->Superimpose(obj2pos_map, cam_x_, cam_o_, img);
+        si_cad_->setBackgroundOpt(false);
+    }
+
+
+    /* Filtering */
     virtual void StateModel(const Ref<const VectorXf> & prev_state, Ref<VectorXf> prop_state)
     {
         MatrixXf A = MatrixXf::Identity(6, 6);
@@ -383,19 +404,10 @@ public:
 
         particle = particles.col(maxRow);
     }
-
-
-    void Superimpose(const SuperImpose::ObjPoseMap & obj2pos_map, cv::Mat & img)
-    {
-        si_cad_->setBackgroundOpt(true);
-        si_cad_->Superimpose(obj2pos_map, cam_x_, cam_o_, img);
-        si_cad_->setBackgroundOpt(false);
-    }
 };
 
 
-class HTSIRParticleFilter : public FilteringAlgorithm
-{
+class HTSIRParticleFilter : public FilteringAlgorithm {
 protected:
     HTParticleFilteringFunction      * ht_pf_f_;
 
@@ -475,7 +487,6 @@ private:
 
         return root_ee_enc;
     }
-
 
 public:
     HTSIRParticleFilter()
@@ -729,6 +740,7 @@ public:
     }
 };
 
+#endif
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
@@ -812,19 +824,39 @@ int main(int argc, char const *argv[])
     GLFWwindow * window = nullptr;
     if (!openglSetUp(window, WINDOW_WIDTH, WINDOW_HEIGHT)) return EXIT_FAILURE;
 
-    HTSIRParticleFilter ht_sir_pf;
-    ht_sir_pf.setOGLWindow(window);
-    if (!ht_sir_pf.Configure()) return EXIT_FAILURE;
+//    HTSIRParticleFilter ht_sir_pf;
+//    ht_sir_pf.setOGLWindow(window);
+//    if (!ht_sir_pf.Configure()) return EXIT_FAILURE;
+//
+//    std::future<void> thr_vpf = ht_sir_pf.spawn();
+//    while (ht_sir_pf.isRunning())
+//    {
+//        if (glfwWindowShouldClose(window))
+//        {
+//            std::chrono::milliseconds span(1);
+//            ht_sir_pf.stopThread();
+//            yInfo() << log_ID << "Joining filthering thread...";
+//            while (thr_vpf.wait_for(span) == std::future_status::timeout) glfwPollEvents();
+//        }
+//        else glfwPollEvents();
+//    }
 
-    std::future<void> thr_filter = ht_sir_pf.spawn();
-    while (ht_sir_pf.isRunning())
+    std::shared_ptr<BrownianMotion> brown(new BrownianMotion());
+    std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
+    std::shared_ptr<Proprioception> proprio(new Proprioception(window));
+    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio));
+    std::shared_ptr<Resampling> resampling(new Resampling());
+    VisualSIRParticleFilter vsir_pf(brown, pf_prediction, proprio, vpf_correction, resampling);
+
+    std::future<void> thr_vpf = vsir_pf.spawn();
+    while (vsir_pf.isRunning())
     {
         if (glfwWindowShouldClose(window))
         {
             std::chrono::milliseconds span(1);
-            ht_sir_pf.stopThread();
+            vsir_pf.stopThread();
             yInfo() << log_ID << "Joining filthering thread...";
-            while (thr_filter.wait_for(span) == std::future_status::timeout) glfwPollEvents();
+            while (thr_vpf.wait_for(span) == std::future_status::timeout) glfwPollEvents();
         }
         else glfwPollEvents();
     }
