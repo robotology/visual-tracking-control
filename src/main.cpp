@@ -51,10 +51,9 @@ using namespace yarp::sig;
 using namespace yarp::math;
 using namespace iCub::iKin;
 using namespace iCub::ctrl;
-typedef typename yarp::sig::Matrix YMatrix;
+//typedef typename yarp::sig::Matrix YMatrix;
 
-
-cv::String cvwin = "Superimposed Edges";
+//cv::String cvwin = "Superimposed Edges";
 
 
 #ifdef HT_DEPRECATED
@@ -818,7 +817,7 @@ int main(int argc, char const *argv[])
     ConstString log_ID = "[Main]";
     yInfo() << log_ID << "Configuring and starting module...";
 
-    namedWindow(cvwin, WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
+    namedWindow("Superimposed Edges", WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
 
     /* Initialize OpenGL context */
     GLFWwindow * window = nullptr;

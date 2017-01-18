@@ -20,8 +20,6 @@ using namespace yarp::sig;
 // FIXME: sistemare tutte queste matrici e capire cosa è meglio usare!
 typedef typename yarp::sig::Matrix YMatrix;
 
-cv::String cvwin = "Superimposed Edges";
-
 
 Proprioception::Proprioception(GLFWwindow* window) :
     window_(window)
@@ -250,7 +248,7 @@ void Proprioception::observe(const Eigen::Ref<const Eigen::VectorXf>& cur_state,
     observation = m;
 
     /* Debug Only */
-    imshow(cvwin, max(hand_ogl, img_back_edge_));
+    imshow("Superimposed Edges", max(hand_ogl, img_back_edge_));
     /* ********** */
 }
 

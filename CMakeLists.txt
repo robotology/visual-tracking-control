@@ -89,7 +89,7 @@ LIST(APPEND SOURCE_FILES    ${HT_SOURCE_FILES})
 
 
 set(ICUB_MESH_EXT           obj)
-set(ICUB_HAND_DIR           resource/icub_right_hand/${ICUB_MESH_EXT})
+set(ICUB_HAND_DIR           ${CMAKE_CURRENT_SOURCE_DIR}/resource/icub_right_hand/${ICUB_MESH_EXT})
 set(ICUB_HAND_FILES         ${ICUB_HAND_DIR}/r_palm.${ICUB_MESH_EXT}
                             ${ICUB_HAND_DIR}/r_ail0.${ICUB_MESH_EXT}
                             ${ICUB_HAND_DIR}/r_ail1.${ICUB_MESH_EXT}
