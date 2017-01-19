@@ -108,7 +108,7 @@ void VisualSIRParticleFilter::runFilter()
     while(is_running_)
     {
         if (imgin == YARP_NULLPTR) imgin = port_image_in_.read(true);
-        //            imgin = port_image_in_.read(true);
+//        imgin = port_image_in_.read(true);
         if (imgin != YARP_NULLPTR)
         {
             ImageOf<PixelRgb>& imgout = port_image_out_.prepare();
@@ -118,10 +118,6 @@ void VisualSIRParticleFilter::runFilter()
             VectorXf temp_weight(num_particle, 1);
             VectorXf temp_parent(num_particle, 1);
 
-//            MatrixXf measurement;
-//            Mat img_back = cvarrToMat(imgout.getIplImage());
-//            cvtColor(img_back, img_back, CV_BGR2GRAY);
-//            cv2eigen(img_back, measurement);
             Mat measurement = cvarrToMat(imgout.getIplImage());
 
             Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
@@ -132,35 +128,26 @@ void VisualSIRParticleFilter::runFilter()
             std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
             float threshold = sorted_pred.tail(6)(0);
             for (int i = 0; i < num_particle; ++i)
-            {
-//                if(init_weight(i) <= threshold) ht_pf_f_->Prediction(init_particle.col(i), init_particle.col(i));
                 if(init_weight(i) <= threshold) prediction_->predict(init_particle.col(i), init_particle.col(i));
-            }
 
             /* Set parameters */
             // FIXME: da decidere come sistemare
             Vector q = readArm();
-//            ht_pf_f_->setArmJoints(q);
-//            ht_pf_f_->setCamXO(cam_x, cam_o);
-//            ht_pf_f_->setImgBackEdge(img_back);
             std::dynamic_pointer_cast<Proprioception>(observation_model_)->setArmJoints(q);
             std::dynamic_pointer_cast<Proprioception>(observation_model_)->setCamXO(cam_x, cam_o);
             std::dynamic_pointer_cast<Proprioception>(observation_model_)->setImgBackEdge(measurement);
             /* ************** */
 
             for (int i = 0; i < num_particle; ++i)
-            {
-//                ht_pf_f_->Correction(init_particle.col(i), img_back, init_weight.row(i));
                 correction_->correct(init_particle.col(i), measurement, init_weight.row(i));
-            }
 
             init_weight = init_weight / init_weight.sum();
 
             MatrixXf out_particle(6, 1);
-//            ht_pf_f_->WeightedSum(init_particle, init_weight, out_particle);
+            /* Weighted sum */
             out_particle = (init_particle.array().rowwise() * init_weight.array().transpose()).rowwise().sum();
 
-//            ht_pf_f_->Mode(init_particle, init_weight, out_particle);
+            /* Mode */
 //            MatrixXf::Index maxRow;
 //            MatrixXf::Index maxCol;
 //            init_weight.maxCoeff(&maxRow, &maxCol);
@@ -173,12 +160,10 @@ void VisualSIRParticleFilter::runFilter()
 //            std::cout << "Neff: " << ht_pf_f_->Neff(init_weight) << std::endl;
             std::cout << "Neff: " << resampling_->neff(init_weight) << std::endl;
 
-            //            if (ht_pf_f_->Neff(init_weight) < 15)
             if (resampling_->neff(init_weight) < 15)
             {
                 std::cout << "Resampling!" << std::endl;
 
-//                ht_pf_f_->Resampling(init_particle, init_weight, temp_particle, temp_weight, temp_parent);
                 resampling_->resample(init_particle, init_weight, temp_particle, temp_weight, temp_parent);
 
                 init_particle = temp_particle;
@@ -239,7 +224,6 @@ void VisualSIRParticleFilter::runFilter()
                 }
             }
 
-//            ht_pf_f_->Superimpose(hand_pose, img_back);
             std::dynamic_pointer_cast<Proprioception>(observation_model_)->superimpose(hand_pose, measurement);
 
             port_image_out_.write();

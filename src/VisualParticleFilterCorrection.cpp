@@ -62,9 +62,6 @@ void VisualParticleFilterCorrection::innovation(const Eigen::Ref<const Eigen::Ve
     Mat hand_edge_ogl_cv;
     std::vector<Point> points;
 
-//    MatrixXf hand_edge_ogl;
-//    measurement_model_->observe(pred_state, hand_edge_ogl);
-//    eigen2cv(hand_edge_ogl, hand_edge_ogl_cv);
     measurement_model_->observe(pred_state, hand_edge_ogl_cv);
 
     /* OGL image crop */
@@ -77,9 +74,6 @@ void VisualParticleFilterCorrection::innovation(const Eigen::Ref<const Eigen::Ve
         std::vector<float> descriptors_cad;
         std::vector<Point> locations;
         int                rem_not_mult;
-
-//        Mat                hand_edge_cam_cv;
-//        eigen2cv(MatrixXf(measurements), hand_edge_cam_cv);
 
         Rect cad_crop_roi = boundingRect(points);
 
@@ -94,7 +88,6 @@ void VisualParticleFilterCorrection::innovation(const Eigen::Ref<const Eigen::Ve
         if (cad_crop_roi.y + cad_crop_roi.height > hand_edge_ogl_cv.rows) cad_crop_roi.y -= (cad_crop_roi.y + cad_crop_roi.height) - hand_edge_ogl_cv.rows;
 
         hand_edge_ogl_cv(cad_crop_roi).convertTo(cad_edge_crop, CV_8U);
-//        hand_edge_cam_cv(cad_crop_roi).convertTo(cam_edge_crop, CV_8U);
         measurements.getMat()(cad_crop_roi).convertTo(cam_edge_crop, CV_8U);
 
         /* In-crop HOG between camera and render edges */
