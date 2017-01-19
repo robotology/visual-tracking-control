@@ -8,6 +8,7 @@
 #include <iCub/ctrl/math.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/eigen.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <yarp/math/Math.h>
 
 #include "Proprioception.h"
@@ -24,7 +25,7 @@ using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
 
-VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction, std::shared_ptr<ObservationModel> observation_model, std::shared_ptr<Correction> correction, std::shared_ptr<Resampling> resampling) noexcept :
+VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction, std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction, std::shared_ptr<Resampling> resampling) noexcept :
     state_model_(state_model), prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling)
 {
     if (!yarp_.checkNetwork(3.0)) throw std::runtime_error("Runtime error: YARP seems unavailable!");
@@ -56,12 +57,15 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> sta
     port_head_enc_.open ("/head");
     port_arm_enc_.open  ("/right_arm");
     port_torso_enc_.open("/torso");
-    port_image_out_.open("/left_img:o");
 
     if (!yarp_.connect("/icub/camcalib/left/out", "/left_img:i")) throw std::runtime_error("Runtime error: /icub/camcalib/left/out seems unavailable!");
     if (!yarp_.connect("/icub/head/state:o",      "/head"))       throw std::runtime_error("Runtime error: /icub/head/state:o seems unavailable!");
     if (!yarp_.connect("/icub/right_arm/state:o", "/right_arm"))  throw std::runtime_error("Runtime error: /icub/right_arm/state:o seems unavailable!");
     if (!yarp_.connect("/icub/torso/state:o",     "/torso"))      throw std::runtime_error("Runtime error: /icub/torso/state:o seems unavailable!");
+
+    /* DEBUG ONLY */
+    port_image_out_.open("/left_img:o");
+    /* ********** */
 
     is_running_ = false;
 }
@@ -107,16 +111,18 @@ void VisualSIRParticleFilter::runFilter()
         //            imgin = port_image_in_.read(true);
         if (imgin != YARP_NULLPTR)
         {
-            ImageOf<PixelRgb> & imgout = port_image_out_.prepare();
+            ImageOf<PixelRgb>& imgout = port_image_out_.prepare();
             imgout = *imgin;
 
             MatrixXf temp_particle(6, num_particle);
             VectorXf temp_weight(num_particle, 1);
             VectorXf temp_parent(num_particle, 1);
 
-            MatrixXf measurement;
-            Mat img_back = cvarrToMat(imgout.getIplImage());
-            cv2eigen(img_back, measurement);
+//            MatrixXf measurement;
+//            Mat img_back = cvarrToMat(imgout.getIplImage());
+//            cvtColor(img_back, img_back, CV_BGR2GRAY);
+//            cv2eigen(img_back, measurement);
+            Mat measurement = cvarrToMat(imgout.getIplImage());
 
             Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
             cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
@@ -137,9 +143,9 @@ void VisualSIRParticleFilter::runFilter()
 //            ht_pf_f_->setArmJoints(q);
 //            ht_pf_f_->setCamXO(cam_x, cam_o);
 //            ht_pf_f_->setImgBackEdge(img_back);
-            std::dynamic_pointer_cast<Proprioception>(state_model_)->setArmJoints(q);
-            std::dynamic_pointer_cast<Proprioception>(state_model_)->setCamXO(cam_x, cam_o);
-            std::dynamic_pointer_cast<Proprioception>(state_model_)->setImgBackEdge(img_back);
+            std::dynamic_pointer_cast<Proprioception>(observation_model_)->setArmJoints(q);
+            std::dynamic_pointer_cast<Proprioception>(observation_model_)->setCamXO(cam_x, cam_o);
+            std::dynamic_pointer_cast<Proprioception>(observation_model_)->setImgBackEdge(measurement);
             /* ************** */
 
             for (int i = 0; i < num_particle; ++i)
@@ -234,7 +240,7 @@ void VisualSIRParticleFilter::runFilter()
             }
 
 //            ht_pf_f_->Superimpose(hand_pose, img_back);
-            std::dynamic_pointer_cast<Proprioception>(state_model_)->superimpose(hand_pose, img_back);
+            std::dynamic_pointer_cast<Proprioception>(observation_model_)->superimpose(hand_pose, measurement);
 
             port_image_out_.write();
             /* ********** */

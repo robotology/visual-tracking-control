@@ -14,7 +14,7 @@ using namespace cv;
 using namespace Eigen;
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<ObservationModel> measurement_model) noexcept :
+VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualObservationModel> measurement_model) noexcept :
     measurement_model_(measurement_model) { }
 
 
@@ -48,7 +48,7 @@ VisualParticleFilterCorrection& VisualParticleFilterCorrection::operator=(Visual
 }
 
 
-void VisualParticleFilterCorrection::correct(const Eigen::Ref<const Eigen::VectorXf>& pred_state, const Eigen::Ref<const Eigen::MatrixXf>& measurements, Eigen::Ref<Eigen::VectorXf> cor_state)
+void VisualParticleFilterCorrection::correct(const Eigen::Ref<const Eigen::VectorXf>& pred_state, cv::InputArray measurements, Eigen::Ref<Eigen::VectorXf> cor_state)
 {
     VectorXf innovate(1);
     innovation(pred_state, measurements, innovate);
@@ -56,23 +56,21 @@ void VisualParticleFilterCorrection::correct(const Eigen::Ref<const Eigen::Vecto
 }
 
 
-void VisualParticleFilterCorrection::innovation(const Eigen::Ref<const Eigen::VectorXf>& pred_state, const Eigen::Ref<const Eigen::MatrixXf>& measurements, Eigen::Ref<Eigen::MatrixXf> innovation)
+void VisualParticleFilterCorrection::innovation(const Eigen::Ref<const Eigen::VectorXf>& pred_state, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> innovation)
 {
     int block_size = 16;
     Mat hand_edge_ogl_cv;
     std::vector<Point> points;
 
-    MatrixXf hand_edge_ogl;
-    measurement_model_->observe(pred_state, hand_edge_ogl);
+//    MatrixXf hand_edge_ogl;
+//    measurement_model_->observe(pred_state, hand_edge_ogl);
+//    eigen2cv(hand_edge_ogl, hand_edge_ogl_cv);
+    measurement_model_->observe(pred_state, hand_edge_ogl_cv);
 
     /* OGL image crop */
-    eigen2cv(hand_edge_ogl, hand_edge_ogl_cv);
     for (auto it = hand_edge_ogl_cv.begin<float>(); it != hand_edge_ogl_cv.end<float>(); ++it) if (*it) points.push_back(it.pos());
-
     if (points.size() > 0)
     {
-//        Mat                hand_edge_cam_cv = measurements;
-        Mat                hand_edge_cam_cv;
         Mat                cad_edge_crop;
         Mat                cam_edge_crop;
         std::vector<float> descriptors_cam;
@@ -80,7 +78,8 @@ void VisualParticleFilterCorrection::innovation(const Eigen::Ref<const Eigen::Ve
         std::vector<Point> locations;
         int                rem_not_mult;
 
-        eigen2cv(MatrixXf(measurements), hand_edge_cam_cv);
+//        Mat                hand_edge_cam_cv;
+//        eigen2cv(MatrixXf(measurements), hand_edge_cam_cv);
 
         Rect cad_crop_roi = boundingRect(points);
 
@@ -95,7 +94,8 @@ void VisualParticleFilterCorrection::innovation(const Eigen::Ref<const Eigen::Ve
         if (cad_crop_roi.y + cad_crop_roi.height > hand_edge_ogl_cv.rows) cad_crop_roi.y -= (cad_crop_roi.y + cad_crop_roi.height) - hand_edge_ogl_cv.rows;
 
         hand_edge_ogl_cv(cad_crop_roi).convertTo(cad_edge_crop, CV_8U);
-        hand_edge_cam_cv(cad_crop_roi).convertTo(cam_edge_crop, CV_8U);
+//        hand_edge_cam_cv(cad_crop_roi).convertTo(cam_edge_crop, CV_8U);
+        measurements.getMat()(cad_crop_roi).convertTo(cam_edge_crop, CV_8U);
 
         /* In-crop HOG between camera and render edges */
         HOGDescriptor hog(Size(cad_crop_roi.width, cad_crop_roi.height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), 12, 1, -1, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false);

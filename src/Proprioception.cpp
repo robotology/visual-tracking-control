@@ -180,9 +180,12 @@ Proprioception& Proprioception::operator=(Proprioception&& proprio) noexcept
 }
 
 
-void Proprioception::observe(const Eigen::Ref<const Eigen::VectorXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> observation)
+void Proprioception::observe(const Ref<const VectorXf>& cur_state, OutputArray observation)
 {
-    Mat                     hand_ogl = Mat::zeros(img_back_edge_.rows, img_back_edge_.cols, img_back_edge_.type());
+//    Mat                     hand_ogl = Mat::zeros(img_back_edge_.rows, img_back_edge_.cols, img_back_edge_.type());
+    observation.create(img_back_edge_.size(), img_back_edge_.type());
+    Mat                     hand_ogl = observation.getMat();
+
     Mat                     hand_ogl_gray;
     SuperImpose::ObjPoseMap hand_pose;
     SuperImpose::ObjPose    pose;
@@ -238,36 +241,18 @@ void Proprioception::observe(const Eigen::Ref<const Eigen::VectorXf>& cur_state,
         }
     }
 
+//    si_cad_->Superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
     si_cad_->Superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
-    cvtColor(hand_ogl, hand_ogl_gray, CV_RGB2GRAY);
 
-    MatrixXf m(hand_ogl_gray.rows, hand_ogl_gray.cols);
     // FIXME: remove conversion as it copies data. Use Map as reported here: http://stackoverflow.com/questions/14783329/opencv-cvmat-and-eigenmatrix#17454309
-    cv2eigen(hand_ogl_gray, m);
-
-    observation = m;
+//    cvtColor(hand_ogl, hand_ogl_gray, CV_RGB2GRAY);
+//    MatrixXf m(hand_ogl_gray.rows, hand_ogl_gray.cols);
+//    cv2eigen(hand_ogl_gray, m);
+//    observation = m;
 
     /* Debug Only */
     imshow("Superimposed Edges", max(hand_ogl, img_back_edge_));
     /* ********** */
-}
-
-
-void Proprioception::noiseSample(Eigen::Ref<Eigen::VectorXf> sample)
-{
-    sample = VectorXf::Zero(sample.rows(), sample.cols());
-}
-
-
-void Proprioception::measure(const Eigen::Ref<const Eigen::VectorXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> measurement)
-{
-    observe(cur_state, measurement);
-}
-
-
-Eigen::MatrixXf Proprioception::noiseCovariance()
-{
-    return MatrixXf::Zero(1, 1);
 }
 
 

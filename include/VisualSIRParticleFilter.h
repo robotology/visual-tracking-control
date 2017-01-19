@@ -17,8 +17,8 @@
 #include <BayesFiltersLib/FilteringAlgorithm.h>
 #include <BayesFiltersLib/StateModel.h>
 #include <BayesFiltersLib/Prediction.h>
-#include <BayesFiltersLib/ObservationModel.h>
-#include <BayesFiltersLib/Correction.h>
+#include <BayesFiltersLib/VisualObservationModel.h>
+#include <BayesFiltersLib/VisualCorrection.h>
 #include <BayesFiltersLib/Resampling.h>
 
 
@@ -29,7 +29,7 @@ public:
     VisualSIRParticleFilter() = delete;
 
     /* VisualSIR complete constructor */
-    VisualSIRParticleFilter(std::shared_ptr<bfl::StateModel> state_model, std::shared_ptr<bfl::Prediction> prediction, std::shared_ptr<bfl::ObservationModel> observation_model, std::shared_ptr<bfl::Correction> correction, std::shared_ptr<bfl::Resampling> resampling) noexcept;
+    VisualSIRParticleFilter(std::shared_ptr<bfl::StateModel> state_model, std::shared_ptr<bfl::Prediction> prediction, std::shared_ptr<bfl::VisualObservationModel> observation_model, std::shared_ptr<bfl::VisualCorrection> correction, std::shared_ptr<bfl::Resampling> resampling) noexcept;
 
     /* Destructor */
     ~VisualSIRParticleFilter() noexcept override;
@@ -57,20 +57,20 @@ public:
     void stopThread();
 
 protected:
-    std::shared_ptr<bfl::StateModel>       state_model_;
-    std::shared_ptr<bfl::Prediction>       prediction_;
-    std::shared_ptr<bfl::ObservationModel> observation_model_;
-    std::shared_ptr<bfl::Correction>       correction_;
-    std::shared_ptr<bfl::Resampling>       resampling_;
+    std::shared_ptr<bfl::StateModel>                                 state_model_;
+    std::shared_ptr<bfl::Prediction>                                 prediction_;
+    std::shared_ptr<bfl::VisualObservationModel>                     observation_model_;
+    std::shared_ptr<bfl::VisualCorrection>                           correction_;
+    std::shared_ptr<bfl::Resampling>                                 resampling_;
 
-    Eigen::MatrixXf                        object_;
-    Eigen::MatrixXf                        measurement_;
+    Eigen::MatrixXf                                                  object_;
+    Eigen::MatrixXf                                                  measurement_;
 
-    Eigen::MatrixXf                        init_particle_;
-    Eigen::VectorXf                        init_weight_;
+    Eigen::MatrixXf                                                  init_particle_;
+    Eigen::VectorXf                                                  init_weight_;
     
-    std::vector<Eigen::MatrixXf>           result_particle_;
-    std::vector<Eigen::VectorXf>           result_weight_;
+    std::vector<Eigen::MatrixXf>                                     result_particle_;
+    std::vector<Eigen::VectorXf>                                     result_weight_;
 
     yarp::os::Network                                                yarp_;
     iCub::iKin::iCubEye                                            * icub_kin_eye_;
