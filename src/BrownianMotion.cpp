@@ -1,24 +1,14 @@
+#include "BrownianMotion.h"
+
 #include <cmath>
 #include <utility>
-
-#include "BrownianMotion.h"
 
 using namespace Eigen;
 
 
 BrownianMotion::BrownianMotion(float q, float theta, float cone_angle, unsigned int seed) noexcept :
     F_(MatrixXf::Identity(6, 6)), q_(q), theta_(theta * (M_PI/180.0)), cone_angle_(cone_angle * (M_PI/180.0)),
-    generator_(std::mt19937_64(seed)), distribution_pos_(std::normal_distribution<float>(0.0, q_)), distribution_theta_(std::normal_distribution<float>(0.0, theta_)), distribution_cone_(std::uniform_real_distribution<float>(0.0, 1.0)), gaussian_random_pos_([&] { return (distribution_pos_)(generator_); }), gaussian_random_theta_([&] { return (distribution_theta_)(generator_); }), gaussian_random_cone_([&] { return (distribution_cone_)(generator_); })
-{
-    q *= q;
-    Q_ <<   q, 0.0, 0.0,
-          0.0,   q, 0.0,
-          0.0, 0.0,   q;
-
-    sqrt_Q_ <<  q_, 0.0, 0.0,
-               0.0,  q_, 0.0,
-               0.0, 0.0,  q_;
-}
+    generator_(std::mt19937_64(seed)), distribution_pos_(std::normal_distribution<float>(0.0, q_)), distribution_theta_(std::normal_distribution<float>(0.0, theta_)), distribution_cone_(std::uniform_real_distribution<float>(0.0, 1.0)), gaussian_random_pos_([&] { return (distribution_pos_)(generator_); }), gaussian_random_theta_([&] { return (distribution_theta_)(generator_); }), gaussian_random_cone_([&] { return (distribution_cone_)(generator_); }) { }
 
 
 BrownianMotion::BrownianMotion(float q, float theta, float cone_angle) noexcept :
@@ -33,13 +23,13 @@ BrownianMotion::~BrownianMotion() noexcept { }
 
 
 BrownianMotion::BrownianMotion(const BrownianMotion& wna) :
-    F_(wna.F_), Q_(wna.Q_), q_(wna.q_), theta_(wna.theta_), cone_angle_(wna.cone_angle_),
-    sqrt_Q_(wna.sqrt_Q_), generator_(wna.generator_), distribution_pos_(wna.distribution_pos_), distribution_theta_(wna.distribution_theta_), distribution_cone_(wna.distribution_cone_), gaussian_random_pos_(wna.gaussian_random_pos_), gaussian_random_theta_(wna.gaussian_random_theta_), gaussian_random_cone_(wna.gaussian_random_cone_) { }
+    F_(wna.F_), q_(wna.q_), theta_(wna.theta_), cone_angle_(wna.cone_angle_),
+    generator_(wna.generator_), distribution_pos_(wna.distribution_pos_), distribution_theta_(wna.distribution_theta_), distribution_cone_(wna.distribution_cone_), gaussian_random_pos_(wna.gaussian_random_pos_), gaussian_random_theta_(wna.gaussian_random_theta_), gaussian_random_cone_(wna.gaussian_random_cone_) { }
 
 
 BrownianMotion::BrownianMotion(BrownianMotion&& wna) noexcept :
-    F_(std::move(wna.F_)), Q_(std::move(wna.Q_)), q_(wna.q_), theta_(wna.theta_), cone_angle_(wna.cone_angle_),
-    sqrt_Q_(std::move(wna.sqrt_Q_)), generator_(std::move(wna.generator_)), distribution_pos_(std::move(wna.distribution_pos_)), distribution_theta_(std::move(wna.distribution_theta_)), distribution_cone_(std::move(wna.distribution_cone_)), gaussian_random_pos_(std::move(wna.gaussian_random_pos_)), gaussian_random_theta_(std::move(wna.gaussian_random_theta_)), gaussian_random_cone_(std::move(wna.gaussian_random_cone_))
+    F_(std::move(wna.F_)), q_(wna.q_), theta_(wna.theta_), cone_angle_(wna.cone_angle_),
+    generator_(std::move(wna.generator_)), distribution_pos_(std::move(wna.distribution_pos_)), distribution_theta_(std::move(wna.distribution_theta_)), distribution_cone_(std::move(wna.distribution_cone_)), gaussian_random_pos_(std::move(wna.gaussian_random_pos_)), gaussian_random_theta_(std::move(wna.gaussian_random_theta_)), gaussian_random_cone_(std::move(wna.gaussian_random_cone_))
 {
     wna.q_          = 0.0;
     wna.theta_      = 0.0;
@@ -59,12 +49,10 @@ BrownianMotion& BrownianMotion::operator=(const BrownianMotion& wna)
 BrownianMotion& BrownianMotion::operator=(BrownianMotion&& wna) noexcept
 {
     F_          = std::move(wna.F_);
-    Q_          = std::move(wna.Q_);
     q_          = wna.q_;
     theta_      = wna.theta_;
     cone_angle_ = wna.cone_angle_;
 
-    sqrt_Q_                = std::move(wna.sqrt_Q_);
     generator_             = std::move(wna.generator_);
     distribution_pos_      = std::move(wna.distribution_pos_);
     distribution_theta_    = std::move(wna.distribution_theta_);
@@ -91,7 +79,7 @@ void BrownianMotion::propagate(const Ref<const VectorXf> & cur_state, Ref<Vector
 void BrownianMotion::noiseSample(Ref<VectorXf> sample)
 {
     /* Position */
-    sample.head(3) = sqrt_Q_ * VectorXf::NullaryExpr(3, gaussian_random_pos_);
+    sample.head(3) = VectorXf::NullaryExpr(3, gaussian_random_pos_);
 
     /* Axis-angle */
     /* Generate points on the spherical cap around the north pole [1]. */
@@ -133,8 +121,10 @@ void BrownianMotion::motion(const Ref<const VectorXf>& cur_state, Ref<VectorXf> 
 {
     propagate(cur_state, next_state);
 
-    VectorXf sample(6);
+    VectorXf sample(VectorXf::Zero(6, 1));
     sample.tail(3) = next_state.tail(3);
     noiseSample(sample);
-    next_state += sample;
+
+    next_state.head(3) += sample.head(3);
+    next_state.tail(3) =  sample.tail(3);
 }

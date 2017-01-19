@@ -41,12 +41,10 @@ public:
 
 protected:
     Eigen::MatrixXf                       F_;                /* State transition matrix */
-    Eigen::Matrix3f                       Q_;                /* Process white noise convariance matrix */
     float                                 q_;                /* Noise standard deviation for 3D position */
     float                                 theta_;                /* Noise standard deviation for axis-angle rotation */
     float                                 cone_angle_;                /* Noise standard deviation for axis-angle axis cone */
 
-    Eigen::Matrix3f                       sqrt_Q_;                /* Square root matrix of the process white noise convariance matrix */
     std::mt19937_64                       generator_;
     std::normal_distribution<float>       distribution_pos_;
     std::normal_distribution<float>       distribution_theta_;
