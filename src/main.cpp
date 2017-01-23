@@ -18,8 +18,6 @@
 #include "VisualParticleFilterCorrection.h"
 #include "VisualSIRParticleFilter.h"
 
-#include "SICAD.h"
-
 #define WINDOW_WIDTH  320
 #define WINDOW_HEIGHT 240
 
