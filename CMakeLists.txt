@@ -144,7 +144,7 @@ LIST(APPEND LIBS                ${YARP_LIBRARIES}
                                 glm
                                 glfw
                                 ${ASSIMP_LIBRARIES} -L${ASSIMP_LIBRARY_DIRS}
-                                BayesFiltersLib)
+                                BayesFiltersLib::BayesFiltersLib)
 
 LIST(APPEND SOURCE_FILES ${IDL_GEN_SOURCE})
 
