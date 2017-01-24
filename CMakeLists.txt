@@ -3,12 +3,10 @@ cmake_minimum_required(VERSION 3.0)
 project(hand-tracking)
 
 # Dependencies
-find_package(assimp          REQUIRED)
 find_package(BayesFiltersLib REQUIRED)
 find_package(EIGEN3          REQUIRED)
 find_package(GLEW            REQUIRED)
 find_package(GLFW3           REQUIRED)
-find_package(glm             REQUIRED)
 find_package(ICUB            REQUIRED)
 find_package(ICUBcontrib     REQUIRED)
 find_package(OpenCV          REQUIRED)
@@ -60,11 +58,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CU
                                                    ${OPENGL_INCLUDE_DIR}
                                                    ${YARP_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} ${ASSIMP_LIBRARIES} -L${ASSIMP_LIBRARY_DIRS}
-                                      BayesFiltersLib::BayesFiltersLib
+target_link_libraries(${PROJECT_NAME} BayesFiltersLib::BayesFiltersLib
                                       ctrlLib
-                                      glew
-                                      glm
+                                      ${GLEW_LIBRARIES}
                                       glfw
                                       ${ICUB_LIBRARIES}
                                       iKin
