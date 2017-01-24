@@ -11,8 +11,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <yarp/math/Math.h>
 
+#include <SuperImpose/SICAD.h>
+
 #include "Proprioception.h"
-#include "SICAD.h"
 
 using namespace bfl;
 using namespace cv;
@@ -28,8 +29,6 @@ typedef typename yarp::sig::Matrix YMatrix;
 VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction, std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction, std::shared_ptr<Resampling> resampling) noexcept :
     state_model_(state_model), prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling)
 {
-    if (!yarp_.checkNetwork(3.0)) throw std::runtime_error("Runtime error: YARP seems unavailable!");
-
     icub_kin_eye_ = new iCubEye("left_v2");
     icub_kin_eye_->setAllConstraints(false);
     icub_kin_eye_->releaseLink(0);
@@ -53,18 +52,13 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> sta
        Head encoders:  /icub/head/state:o
        Arm encoders:   /icub/right_arm/state:o
        Torso encoders: /icub/torso/state:o     */
-    port_image_in_.open ("/left_img:i");
-    port_head_enc_.open ("/head");
-    port_arm_enc_.open  ("/right_arm");
-    port_torso_enc_.open("/torso");
-
-    if (!yarp_.connect("/icub/camcalib/left/out", "/left_img:i")) throw std::runtime_error("Runtime error: /icub/camcalib/left/out seems unavailable!");
-    if (!yarp_.connect("/icub/head/state:o",      "/head"))       throw std::runtime_error("Runtime error: /icub/head/state:o seems unavailable!");
-    if (!yarp_.connect("/icub/right_arm/state:o", "/right_arm"))  throw std::runtime_error("Runtime error: /icub/right_arm/state:o seems unavailable!");
-    if (!yarp_.connect("/icub/torso/state:o",     "/torso"))      throw std::runtime_error("Runtime error: /icub/torso/state:o seems unavailable!");
+    port_image_in_.open ("/hand-tracking/left_img:i");
+    port_head_enc_.open ("/hand-tracking/head:i");
+    port_arm_enc_.open  ("/hand-tracking/right_arm:i");
+    port_torso_enc_.open("/hand-tracking/torso:i");
 
     /* DEBUG ONLY */
-    port_image_out_.open("/left_img:o");
+    port_image_out_.open("/hand-tracking/result:o");
     /* ********** */
 
     is_running_ = false;

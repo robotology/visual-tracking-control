@@ -9,7 +9,6 @@
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/ConstString.h>
-#include <yarp/os/Network.h>
 #include <yarp/os/BufferedPort.h>
 #include <yarp/sig/Image.h>
 #include <yarp/sig/Vector.h>
@@ -72,7 +71,6 @@ protected:
     std::vector<Eigen::MatrixXf>                                     result_particle_;
     std::vector<Eigen::VectorXf>                                     result_weight_;
 
-    yarp::os::Network                                                yarp_;
     iCub::iKin::iCubEye                                            * icub_kin_eye_;
     iCub::iKin::iCubArm                                            * icub_kin_arm_;
     iCub::iKin::iCubFinger                                         * icub_kin_finger_[3];

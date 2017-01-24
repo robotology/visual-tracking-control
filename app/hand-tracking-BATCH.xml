@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+<application>
+
+    <!-- GENERIC INFORMATION -->
+    <name>hand-tracking-BATCH</name>
+    <description>Visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
+    <version>0.1.0</version>
+
+    <authors>
+        <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
+    </authors>
+
+
+    <!-- REQUIRED MODULES -->
+    <module>
+        <name>hand-tracking</name>
+        <node>yarprun</node>
+    </module>
+
+    <module>
+        <name>yarpdataplayer</name>
+        <parameters>--withExtraTimeCol 2</parameters>
+        <node>yarprun</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/result --x 20 --y 0 --RefreshTime 30</parameters>
+        <node>yarprun</node>
+    </module>
+
+
+    <!-- REQUIRED CONNECTIONS -->
+    <connection persist="true">
+        <from>/icub/camcalib/left/out</from>
+        <to>/hand-tracking/left_img:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/icub/head/state:o</from>
+        <to>/hand-tracking/head:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/hand-tracking/result:o</from>
+        <to>/view/result</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+</application>

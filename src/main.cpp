@@ -5,9 +5,9 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include <yarp/os/LogStream.h>
 #include <yarp/os/ConstString.h>
+#include <yarp/os/LogStream.h>
+#include <yarp/os/Network.h>
 
 #include <BayesFiltersLib/FilteringContext.h>
 #include <BayesFiltersLib/FilteringFunction.h>
@@ -29,6 +29,65 @@ using namespace yarp::os;
 #include <opencv2/highgui/highgui.hpp>
 using namespace cv;
 /* ********** */
+
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+
+bool openglSetUp(GLFWwindow *& window, const int width, const int height);
+
+
+int main(int argc, char const *argv[])
+{
+    ConstString log_ID = "[Main]";
+    yInfo() << log_ID << "Configuring and starting module...";
+
+    Network yarp;
+    if (!yarp.checkNetwork(3.0))
+    {
+        yError() << "YARP seems unavailable!";
+        return EXIT_FAILURE;
+    }
+
+    /* DEBUG ONLY */
+    namedWindow("Superimposed Edges", WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
+    /* ********** */
+
+    /* Initialize OpenGL context */
+    GLFWwindow * window = nullptr;
+    if (!openglSetUp(window, WINDOW_WIDTH, WINDOW_HEIGHT)) return EXIT_FAILURE;
+
+    std::shared_ptr<BrownianMotion> brown(new BrownianMotion());
+    std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
+    std::shared_ptr<Proprioception> proprio(new Proprioception(window));
+    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio));
+    std::shared_ptr<Resampling> resampling(new Resampling());
+    VisualSIRParticleFilter vsir_pf(brown, pf_prediction, proprio, vpf_correction, resampling);
+
+    std::future<void> thr_vpf = vsir_pf.spawn();
+    while (vsir_pf.isRunning())
+    {
+        if (glfwWindowShouldClose(window))
+        {
+            std::chrono::milliseconds span(1);
+            vsir_pf.stopThread();
+            yInfo() << log_ID << "Joining filthering thread...";
+            while (thr_vpf.wait_for(span) == std::future_status::timeout) glfwPollEvents();
+        }
+        else glfwPollEvents();
+    }
+
+    glfwMakeContextCurrent(NULL);
+    glfwTerminate();
+
+    /* DEBUG ONLY */
+    destroyWindow("Superimposed Edges");
+    /* ********** */
+
+    yInfo() << log_ID << "Main returning.";
+    yInfo() << log_ID << "Application closed.";
+
+    return EXIT_SUCCESS;
+}
 
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -99,51 +158,4 @@ bool openglSetUp(GLFWwindow *& window, const int width, const int height)
     yInfo() << log_ID << "Succesfully set up!";
     
     return true;
-}
-
-
-int main(int argc, char const *argv[])
-{
-    ConstString log_ID = "[Main]";
-    yInfo() << log_ID << "Configuring and starting module...";
-
-    /* DEBUG ONLY */
-    namedWindow("Superimposed Edges", WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
-    /* ********** */
-
-    /* Initialize OpenGL context */
-    GLFWwindow * window = nullptr;
-    if (!openglSetUp(window, WINDOW_WIDTH, WINDOW_HEIGHT)) return EXIT_FAILURE;
-
-    std::shared_ptr<BrownianMotion> brown(new BrownianMotion());
-    std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
-    std::shared_ptr<Proprioception> proprio(new Proprioception(window));
-    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio));
-    std::shared_ptr<Resampling> resampling(new Resampling());
-    VisualSIRParticleFilter vsir_pf(brown, pf_prediction, proprio, vpf_correction, resampling);
-
-    std::future<void> thr_vpf = vsir_pf.spawn();
-    while (vsir_pf.isRunning())
-    {
-        if (glfwWindowShouldClose(window))
-        {
-            std::chrono::milliseconds span(1);
-            vsir_pf.stopThread();
-            yInfo() << log_ID << "Joining filthering thread...";
-            while (thr_vpf.wait_for(span) == std::future_status::timeout) glfwPollEvents();
-        }
-        else glfwPollEvents();
-    }
-
-    glfwMakeContextCurrent(NULL);
-    glfwTerminate();
-
-    /* DEBUG ONLY */
-    destroyWindow("Superimposed Edges");
-    /* ********** */
-
-    yInfo() << log_ID << "Main returning.";
-    yInfo() << log_ID << "Application closed.";
-
-    return EXIT_SUCCESS;
 }

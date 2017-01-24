@@ -13,8 +13,8 @@
 #include <yarp/sig/Vector.h>
 
 #include <BayesFiltersLib/VisualObservationModel.h>
+#include <SuperImpose/SICAD.h>
 
-#include "SICAD.h"
 
 
 class Proprioception : public bfl::VisualObservationModel {
