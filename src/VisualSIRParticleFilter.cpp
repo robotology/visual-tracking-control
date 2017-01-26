@@ -98,7 +98,7 @@ void VisualSIRParticleFilter::runFilter()
     }
 
     /* FILTERING */
-    ImageOf<PixelRgb> * imgin = YARP_NULLPTR;
+    ImageOf<PixelRgb>* imgin = YARP_NULLPTR;
     while(is_running_)
     {
         if (imgin == YARP_NULLPTR) imgin = port_image_in_.read(true);
@@ -126,10 +126,10 @@ void VisualSIRParticleFilter::runFilter()
 
             /* Set parameters */
             // FIXME: da decidere come sistemare
-            Vector q = readArm();
+            Vector q = readRootToFingers();
             std::dynamic_pointer_cast<Proprioception>(observation_model_)->setArmJoints(q);
             std::dynamic_pointer_cast<Proprioception>(observation_model_)->setCamXO(cam_x, cam_o);
-            std::dynamic_pointer_cast<Proprioception>(observation_model_)->setImgBackEdge(measurement);
+            std::dynamic_pointer_cast<Proprioception>(observation_model_)->setImgBack(measurement);
             /* ************** */
 
             for (int i = 0; i < num_particle; ++i)
@@ -257,7 +257,7 @@ void VisualSIRParticleFilter::stopThread()
 
 Vector VisualSIRParticleFilter::readTorso()
 {
-    Bottle * b = port_torso_enc_.read();
+    Bottle* b = port_torso_enc_.read();
     Vector torso_enc(3);
 
     yAssert(b->size() == 3);
@@ -270,31 +270,34 @@ Vector VisualSIRParticleFilter::readTorso()
 }
 
 
-Vector VisualSIRParticleFilter::readArm()
+Vector VisualSIRParticleFilter::readRootToFingers()
 {
-    Bottle * b = port_arm_enc_.read();
-    Vector arm_enc(16);
+    Bottle* b = port_arm_enc_.read();
 
     yAssert(b->size() == 16);
 
+    Vector root_fingers_enc(19);
+    root_fingers_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 16; ++i)
     {
-        arm_enc(i) = b->get(i).asDouble();
+        root_fingers_enc(3+i) = b->get(i).asDouble();
     }
 
-    return arm_enc;
+    return root_fingers_enc;
 }
 
 
 Vector VisualSIRParticleFilter::readRootToEye(const ConstString eye)
 {
-    Bottle * b = port_head_enc_.read();
-    Vector root_eye_enc(8);
+    Bottle* b = port_head_enc_.read();
 
+    yAssert(b->size() == 6);
+
+    Vector root_eye_enc(8);
     root_eye_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 4; ++i)
     {
-        root_eye_enc(i+3) = b->get(i).asDouble();
+        root_eye_enc(3+i) = b->get(i).asDouble();
     }
     if (eye == "left")  root_eye_enc(7) = b->get(4).asDouble() + b->get(5).asDouble()/2.0;
     if (eye == "right") root_eye_enc(7) = b->get(4).asDouble() - b->get(5).asDouble()/2.0;
@@ -305,9 +308,11 @@ Vector VisualSIRParticleFilter::readRootToEye(const ConstString eye)
 
 Vector VisualSIRParticleFilter::readRootToEE()
 {
-    Bottle * b = port_arm_enc_.read();
-    Vector root_ee_enc(10);
+    Bottle* b = port_arm_enc_.read();
 
+    yAssert(b->size() == 16);
+
+    Vector root_ee_enc(10);
     root_ee_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 7; ++i)
     {
