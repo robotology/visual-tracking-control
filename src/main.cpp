@@ -24,11 +24,6 @@ using namespace bfl;
 using namespace Eigen;
 using namespace yarp::os;
 
-/* DEBUG ONLY */
-#include <opencv2/highgui/highgui.hpp>
-using namespace cv;
-/* ********** */
-
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
@@ -46,10 +41,6 @@ int main(int argc, char const *argv[])
         yError() << "YARP seems unavailable!";
         return EXIT_FAILURE;
     }
-
-    /* DEBUG ONLY */
-    namedWindow("Superimposed Edges", WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
-    /* ********** */
 
     /* Initialize OpenGL context */
     GLFWwindow * window = nullptr;
@@ -77,10 +68,6 @@ int main(int argc, char const *argv[])
 
     glfwMakeContextCurrent(NULL);
     glfwTerminate();
-
-    /* DEBUG ONLY */
-    destroyWindow("Superimposed Edges");
-    /* ********** */
 
     yInfo() << log_ID << "Main returning.";
     yInfo() << log_ID << "Application closed.";

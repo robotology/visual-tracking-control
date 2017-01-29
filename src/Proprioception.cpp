@@ -11,6 +11,8 @@
 #include <yarp/math/Math.h>
 #include <yarp/sig/Vector.h>
 
+#define WINDOW_WIDTH  320
+#define WINDOW_HEIGHT 240
 
 using namespace cv;
 using namespace Eigen;
@@ -66,28 +68,19 @@ Proprioception::Proprioception(GLFWwindow* window) :
     if (!file_found(cad_hand_["medium2"])) throw std::runtime_error("Runtime error: file r_ml2.obj not found!");
     cad_hand_["medium3"] = rf.findFileByName("r_ml3.obj");
     if (!file_found(cad_hand_["medium3"])) throw std::runtime_error("Runtime error: file r_ml3.obj not found!");
-//    cad_hand_["forearm"] = rf.findFileByName("r_forearm.obj");
-//    if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
+    cad_hand_["forearm"] = rf.findFileByName("r_forearm_new_origin.obj");
+    if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
 
     si_cad_ = new SICAD();
     si_cad_->Configure(window_, cad_hand_, 232.921, 232.43, 162.202, 125.738);
 
     // FIXME: non ha senso che siano dei puntatori
     icub_kin_finger_[0] = new iCubFinger("right_thumb");
-    icub_kin_finger_[0]->setAllConstraints(false);
-    icub_kin_finger_[0]->releaseLink(0);
-    icub_kin_finger_[0]->releaseLink(1);
-    icub_kin_finger_[0]->releaseLink(2);
     icub_kin_finger_[1] = new iCubFinger("right_index");
-    icub_kin_finger_[1]->setAllConstraints(false);
-    icub_kin_finger_[1]->releaseLink(0);
-    icub_kin_finger_[1]->releaseLink(1);
-    icub_kin_finger_[1]->releaseLink(2);
     icub_kin_finger_[2] = new iCubFinger("right_middle");
+    icub_kin_finger_[0]->setAllConstraints(false);
+    icub_kin_finger_[1]->setAllConstraints(false);
     icub_kin_finger_[2]->setAllConstraints(false);
-    icub_kin_finger_[2]->releaseLink(0);
-    icub_kin_finger_[2]->releaseLink(1);
-    icub_kin_finger_[2]->releaseLink(2);
 
     icub_arm_ = new iCubArm("right_v2");
     icub_arm_->setAllConstraints(false);
@@ -104,7 +97,7 @@ Proprioception::~Proprioception() noexcept
 
 
 Proprioception::Proprioception(const Proprioception& proprio) :
-    window_(proprio.window_), si_cad_(proprio.si_cad_), cad_hand_(proprio.cad_hand_), img_back_edge_(proprio.img_back_edge_)
+    window_(proprio.window_), si_cad_(proprio.si_cad_), cad_hand_(proprio.cad_hand_)
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -124,7 +117,7 @@ Proprioception::Proprioception(const Proprioception& proprio) :
 
 
 Proprioception::Proprioception(Proprioception&& proprio) noexcept :
-    window_(std::move(proprio.window_)), si_cad_(std::move(proprio.si_cad_)), cad_hand_(std::move(proprio.cad_hand_)), img_back_edge_(std::move(proprio.img_back_edge_))
+    window_(std::move(proprio.window_)), si_cad_(std::move(proprio.si_cad_)), cad_hand_(std::move(proprio.cad_hand_))
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -172,7 +165,6 @@ Proprioception& Proprioception::operator=(Proprioception&& proprio) noexcept
     window_        = std::move(proprio.window_);
     si_cad_        = std::move(proprio.si_cad_);
     cad_hand_      = std::move(proprio.cad_hand_);
-    img_back_edge_ = std::move(proprio.img_back_edge_);
 
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -210,7 +202,7 @@ Proprioception& Proprioception::operator=(Proprioception&& proprio) noexcept
 
 void Proprioception::observe(const Ref<const VectorXf>& cur_state, OutputArray observation)
 {
-    observation.create(img_back_edge_.size(), img_back_edge_.type());
+    observation.create(WINDOW_HEIGHT, WINDOW_WIDTH, CV_8UC3);
     Mat hand_ogl = observation.getMat();
 
     Mat                     hand_ogl_gray;
@@ -270,35 +262,17 @@ void Proprioception::observe(const Ref<const VectorXf>& cur_state, OutputArray o
         }
     }
 
-    /** Table of the DH parameters for the right arm V2.
-     *  Link i  Ai (mm)     d_i (mm)    alpha_i (rad)   theta_i (deg)
-     *  i = 0	32          0           pi/2               0 + (-22 ->    84)
-     *  i = 1	0           -5.5        pi/2             -90 + (-39 ->    39)
-     *  i = 2	-23.3647	-143.3      pi/2            -105 + (-59 ->    59)
-     *  i = 3	0           -107.74     pi/2             -90 + (  5 ->   -95)
-     *  i = 4	0           0           -pi/2            -90 + (  0 -> 160.8)
-     *  i = 5	-15.0       -152.28     -pi/2           -105 + (-37 ->   100)
-     *  i = 6	15.0        0           pi/2               0 + (5.5 ->   106)
-     *  i = 7	0           -141.3      pi/2             -90 + (-50 ->    50)
-     *  i = 8	0           0           pi/2              90 + ( 10 ->   -65)
-     *  i = 9	62.5        25.98       0                180 + (-25 ->    25)
-     **/
-//    YMatrix invH6 = Ha *
-//                    getInvertedH(  -0.0625, -0.02598,       0,              -M_PI, -icub_arm_->getAng(9)) *
-//                    getInvertedH(        0,        0, -M_PI_2,            -M_PI_2, -icub_arm_->getAng(8)) *
-//                    getInvertedH(        0,   0.1413, -M_PI_2,             M_PI_2, -icub_arm_->getAng(7));
-//    Vector j_x = invH6.getCol(3).subVector(0, 2);
-//    Vector j_o = dcm2axis(invH6);
-//    pose.clear();
-//    pose.assign(j_x.data(), j_x.data()+3);
-//    pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-//    hand_pose.emplace("forearm", pose);
+    YMatrix invH6 = Ha *
+                    getInvertedH(-0.0625, -0.02598,       0,              -M_PI, -icub_arm_->getAng(9)) *
+                    getInvertedH(      0,        0, -M_PI_2,            -M_PI_2, -icub_arm_->getAng(8));
+    Vector j_x = invH6.getCol(3).subVector(0, 2);
+    Vector j_o = dcm2axis(invH6);
+    pose.clear();
+    pose.assign(j_x.data(), j_x.data()+3);
+    pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+    hand_pose.emplace("forearm", pose);
 
     si_cad_->Superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
-
-    /* Debug Only */
-    imshow("Superimposed Edges", max(hand_ogl, img_back_edge_));
-    /* ********** */
 }
 
 
@@ -306,12 +280,6 @@ void Proprioception::setCamXO(double* cam_x, double* cam_o)
 {
     memcpy(cam_x_, cam_x, 3 * sizeof(double));
     memcpy(cam_o_, cam_o, 4 * sizeof(double));
-}
-
-
-void Proprioception::setImgBack(const Mat& img_back_edge)
-{
-    img_back_edge_ = img_back_edge;
 }
 
 
@@ -331,8 +299,10 @@ void Proprioception::setArmJoints(const Vector& q)
 void Proprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, Mat& img)
 {
     si_cad_->setBackgroundOpt(true);
+    si_cad_->setWireframeOpt(true);
     si_cad_->Superimpose(obj2pos_map, cam_x_, cam_o_, img);
     si_cad_->setBackgroundOpt(false);
+    si_cad_->setWireframeOpt(false);
 }
 
 
@@ -345,6 +315,20 @@ bool Proprioception::file_found(const ConstString & file)
 
 YMatrix Proprioception::getInvertedH(double a, double d, double alpha, double offset, double q)
 {
+    /** Table of the DH parameters for the right arm V2.
+     *  Link i  Ai (mm)     d_i (mm)    alpha_i (rad)   theta_i (deg)
+     *  i = 0	32          0           pi/2               0 + (-22 ->    84)
+     *  i = 1	0           -5.5        pi/2             -90 + (-39 ->    39)
+     *  i = 2	-23.3647	-143.3      pi/2            -105 + (-59 ->    59)
+     *  i = 3	0           -107.74     pi/2             -90 + (  5 ->   -95)
+     *  i = 4	0           0           -pi/2            -90 + (  0 -> 160.8)
+     *  i = 5	-15.0       -152.28     -pi/2           -105 + (-37 ->   100)
+     *  i = 6	15.0        0           pi/2               0 + (5.5 ->   106)
+     *  i = 7	0           -141.3      pi/2             -90 + (-50 ->    50)
+     *  i = 8	0           0           pi/2              90 + ( 10 ->   -65)
+     *  i = 9	62.5        25.98       0                180 + (-25 ->    25)
+     **/
+    
     YMatrix H(4, 4);
 
     double theta = offset + q;

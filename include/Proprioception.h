@@ -44,8 +44,6 @@ public:
 
     void setCamXO(double* cam_x, double* cam_o);
 
-    void setImgBack(const cv::Mat& img_back_edge);
-
     void setArmJoints(const yarp::sig::Vector & q);
 
     void superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, cv::Mat& img);
@@ -59,8 +57,6 @@ protected:
     iCub::iKin::iCubArm    * icub_arm_;
     SICAD                  * si_cad_;
     SuperImpose::ObjFileMap  cad_hand_;
-
-    cv::Mat                  img_back_edge_;
 
     bool file_found(const yarp::os::ConstString& file);
 
