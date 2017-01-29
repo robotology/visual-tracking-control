@@ -68,7 +68,7 @@ Proprioception::Proprioception(GLFWwindow* window) :
     if (!file_found(cad_hand_["medium2"])) throw std::runtime_error("Runtime error: file r_ml2.obj not found!");
     cad_hand_["medium3"] = rf.findFileByName("r_ml3.obj");
     if (!file_found(cad_hand_["medium3"])) throw std::runtime_error("Runtime error: file r_ml3.obj not found!");
-    cad_hand_["forearm"] = rf.findFileByName("r_forearm_new_origin.obj");
+    cad_hand_["forearm"] = rf.findFileByName("r_forearm.obj");
     if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
 
     si_cad_ = new SICAD();

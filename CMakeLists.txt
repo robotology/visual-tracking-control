@@ -86,11 +86,6 @@ set(ICUB_HAND_FILES         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_p
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail3.obj
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm.obj
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_full.obj
-                            ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_full_new_origin.obj
-                            ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_new_origin.obj
-                            ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_rn90.obj
-                            ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_rp90.obj
-                            ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_scaled.obj
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_indexbase.obj
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml0.obj
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml1.obj
