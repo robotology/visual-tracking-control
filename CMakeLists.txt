@@ -27,13 +27,13 @@ icubcontrib_add_uninstall_target()
 
 # Project source and header files
 set(${PROJECT_NAME}_HDR     include/BrownianMotion.h
-                            include/Proprioception.h
+                            include/VisualProprioception.h
                             include/VisualParticleFilterCorrection.h
                             include/VisualSIRParticleFilter.h)
 
 set(${PROJECT_NAME}_SRC     src/main.cpp
                             src/BrownianMotion.cpp
-                            src/Proprioception.cpp
+                            src/VisualProprioception.cpp
                             src/VisualParticleFilterCorrection.cpp
                             src/VisualSIRParticleFilter.cpp)
 

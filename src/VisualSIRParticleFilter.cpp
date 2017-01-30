@@ -13,7 +13,7 @@
 
 #include <SuperImpose/SICAD.h>
 
-#include "Proprioception.h"
+#include "VisualProprioception.h"
 
 using namespace bfl;
 using namespace cv;
@@ -137,8 +137,8 @@ void VisualSIRParticleFilter::runFilter()
             /* Set parameters */
             // FIXME: da decidere come sistemare
 //            Vector q = readRootToFingers();
-            std::dynamic_pointer_cast<Proprioception>(observation_model_)->setArmJoints(q);
-            std::dynamic_pointer_cast<Proprioception>(observation_model_)->setCamXO(cam_x, cam_o);
+            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q);
+            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(cam_x, cam_o);
             /* ************** */
 
             for (int i = 0; i < num_particle; ++i)
@@ -243,7 +243,7 @@ void VisualSIRParticleFilter::runFilter()
             pose.insert(pose.end(), j_o.data(), j_o.data()+4);
             hand_pose.emplace("forearm", pose);
 
-            std::dynamic_pointer_cast<Proprioception>(observation_model_)->superimpose(hand_pose, measurement);
+            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement);
 
             port_image_out_.write();
             /* ********** */

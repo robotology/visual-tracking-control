@@ -1,5 +1,5 @@
-#ifndef PROPRIOCEPTION_H
-#define PROPRIOCEPTION_H
+#ifndef VISUALPROPRIOCEPTION_H
+#define VISUALPROPRIOCEPTION_H
 
 #include <exception>
 #include <functional>
@@ -17,28 +17,28 @@
 #include <SuperImpose/SICAD.h>
 
 
-class Proprioception : public bfl::VisualObservationModel {
+class VisualProprioception : public bfl::VisualObservationModel {
 public:
-    /* Proprioception complete constructor */
-    Proprioception(GLFWwindow* window);
+    /* VisualProprioception complete constructor */
+    VisualProprioception(GLFWwindow* window);
 
     /* Default constructor */
-    Proprioception() = delete;
+    VisualProprioception() = delete;
 
     /* Destructor */
-    ~Proprioception() noexcept override;
+    ~VisualProprioception() noexcept override;
 
     /* Copy constructor */
-    Proprioception(const Proprioception& proprio);
+    VisualProprioception(const VisualProprioception& proprio);
 
     /* Move constructor */
-    Proprioception(Proprioception&& proprio) noexcept;
+    VisualProprioception(VisualProprioception&& proprio) noexcept;
 
     /* Copy assignment operator */
-    Proprioception& operator=(const Proprioception& proprio);
+    VisualProprioception& operator=(const VisualProprioception& proprio);
 
     /* Move assignment operator */
-    Proprioception& operator=(Proprioception&& proprio) noexcept;
+    VisualProprioception& operator=(VisualProprioception&& proprio) noexcept;
 
     void observe(const Eigen::Ref<const Eigen::VectorXf>& cur_state, cv::OutputArray observation) override;
 
@@ -63,4 +63,4 @@ protected:
     yarp::sig::Matrix getInvertedH(double a, double d, double alpha, double offset, double q);
 };
 
-#endif /* PROPRIOCEPTION_H */
+#endif /* VISUALPROPRIOCEPTION_H */

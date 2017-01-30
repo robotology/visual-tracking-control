@@ -1,4 +1,4 @@
-#include "Proprioception.h"
+#include "VisualProprioception.h"
 
 #include <cmath>
 #include <iostream>
@@ -24,7 +24,7 @@ using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
 
-Proprioception::Proprioception(GLFWwindow* window) :
+VisualProprioception::VisualProprioception(GLFWwindow* window) :
     window_(window)
 {
     cam_x_[0] = 0.0;
@@ -89,14 +89,14 @@ Proprioception::Proprioception(GLFWwindow* window) :
     icub_arm_->releaseLink(2);
 }
 
-Proprioception::~Proprioception() noexcept
+VisualProprioception::~VisualProprioception() noexcept
 {
     delete si_cad_;
     for (size_t i = 0; i < 3; ++i) delete icub_kin_finger_[i];
 }
 
 
-Proprioception::Proprioception(const Proprioception& proprio) :
+VisualProprioception::VisualProprioception(const VisualProprioception& proprio) :
     window_(proprio.window_), si_cad_(proprio.si_cad_), cad_hand_(proprio.cad_hand_)
 {
     cam_x_[0] = proprio.cam_x_[0];
@@ -116,7 +116,7 @@ Proprioception::Proprioception(const Proprioception& proprio) :
 }
 
 
-Proprioception::Proprioception(Proprioception&& proprio) noexcept :
+VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexcept :
     window_(std::move(proprio.window_)), si_cad_(std::move(proprio.si_cad_)), cad_hand_(std::move(proprio.cad_hand_))
 {
     cam_x_[0] = proprio.cam_x_[0];
@@ -151,16 +151,16 @@ Proprioception::Proprioception(Proprioception&& proprio) noexcept :
 }
 
 
-Proprioception& Proprioception::operator=(const Proprioception& proprio)
+VisualProprioception& VisualProprioception::operator=(const VisualProprioception& proprio)
 {
-    Proprioception tmp(proprio);
+    VisualProprioception tmp(proprio);
     *this = std::move(tmp);
 
     return *this;
 }
 
 
-Proprioception& Proprioception::operator=(Proprioception&& proprio) noexcept
+VisualProprioception& VisualProprioception::operator=(VisualProprioception&& proprio) noexcept
 {
     window_        = std::move(proprio.window_);
     si_cad_        = std::move(proprio.si_cad_);
@@ -200,7 +200,7 @@ Proprioception& Proprioception::operator=(Proprioception&& proprio) noexcept
 }
 
 
-void Proprioception::observe(const Ref<const VectorXf>& cur_state, OutputArray observation)
+void VisualProprioception::observe(const Ref<const VectorXf>& cur_state, OutputArray observation)
 {
     observation.create(WINDOW_HEIGHT, WINDOW_WIDTH, CV_8UC3);
     Mat hand_ogl = observation.getMat();
@@ -276,14 +276,14 @@ void Proprioception::observe(const Ref<const VectorXf>& cur_state, OutputArray o
 }
 
 
-void Proprioception::setCamXO(double* cam_x, double* cam_o)
+void VisualProprioception::setCamXO(double* cam_x, double* cam_o)
 {
     memcpy(cam_x_, cam_x, 3 * sizeof(double));
     memcpy(cam_o_, cam_o, 4 * sizeof(double));
 }
 
 
-void Proprioception::setArmJoints(const Vector& q)
+void VisualProprioception::setArmJoints(const Vector& q)
 {
     icub_arm_->setAng(q.subVector(0, 9) * (M_PI/180.0));
 
@@ -296,7 +296,7 @@ void Proprioception::setArmJoints(const Vector& q)
 }
 
 
-void Proprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, Mat& img)
+void VisualProprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, Mat& img)
 {
     si_cad_->setBackgroundOpt(true);
     si_cad_->setWireframeOpt(true);
@@ -306,14 +306,14 @@ void Proprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, Mat
 }
 
 
-bool Proprioception::file_found(const ConstString & file)
+bool VisualProprioception::file_found(const ConstString & file)
 {
     if (file.empty())
         return false;
     return true;
 }
 
-YMatrix Proprioception::getInvertedH(double a, double d, double alpha, double offset, double q)
+YMatrix VisualProprioception::getInvertedH(double a, double d, double alpha, double offset, double q)
 {
     /** Table of the DH parameters for the right arm V2.
      *  Link i  Ai (mm)     d_i (mm)    alpha_i (rad)   theta_i (deg)

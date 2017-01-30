@@ -13,7 +13,7 @@
 #include <BayesFiltersLib/SIRParticleFilter.h>
 
 #include "BrownianMotion.h"
-#include "Proprioception.h"
+#include "VisualProprioception.h"
 #include "VisualParticleFilterCorrection.h"
 #include "VisualSIRParticleFilter.h"
 
@@ -48,7 +48,7 @@ int main(int argc, char const *argv[])
 
     std::shared_ptr<BrownianMotion> brown(new BrownianMotion());
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
-    std::shared_ptr<Proprioception> proprio(new Proprioception(window));
+    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(window));
     std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio));
     std::shared_ptr<Resampling> resampling(new Resampling());
     VisualSIRParticleFilter vsir_pf(brown, pf_prediction, proprio, vpf_correction, resampling);
