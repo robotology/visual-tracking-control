@@ -71,8 +71,7 @@ VisualProprioception::VisualProprioception(GLFWwindow* window) :
     cad_hand_["forearm"] = rf.findFileByName("r_forearm_scaled.obj");
     if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
 
-    si_cad_ = new SICAD();
-    si_cad_->Configure(window_, cad_hand_, 232.921, 232.43, 162.202, 125.738);
+    si_cad_ = new SICAD(window_, cad_hand_, 232.921, 232.43, 162.202, 125.738);
 
     // FIXME: non ha senso che siano dei puntatori
     icub_kin_finger_[0] = new iCubFinger("right_thumb");
@@ -272,7 +271,7 @@ void VisualProprioception::observe(const Ref<const VectorXf>& cur_state, OutputA
     pose.insert(pose.end(), j_o.data(), j_o.data()+4);
     hand_pose.emplace("forearm", pose);
 
-    si_cad_->Superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
+    si_cad_->superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
 }
 
 
@@ -300,7 +299,7 @@ void VisualProprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_ma
 {
     si_cad_->setBackgroundOpt(true);
     si_cad_->setWireframeOpt(true);
-    si_cad_->Superimpose(obj2pos_map, cam_x_, cam_o_, img);
+    si_cad_->superimpose(obj2pos_map, cam_x_, cam_o_, img);
     si_cad_->setBackgroundOpt(false);
     si_cad_->setWireframeOpt(false);
 }
