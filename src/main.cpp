@@ -27,7 +27,7 @@ using namespace yarp::os;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-bool openglSetUp(GLFWwindow *& window, const int width, const int height);
+bool openglSetUp(const int width, const int height, GLFWwindow *& window);
 
 
 int main(int argc, char const *argv[])
@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
 
     /* Initialize OpenGL context */
     GLFWwindow * window = nullptr;
-    if (!openglSetUp(window, WINDOW_WIDTH, WINDOW_HEIGHT)) return EXIT_FAILURE;
+    if (!openglSetUp(WINDOW_WIDTH, WINDOW_HEIGHT, window)) return EXIT_FAILURE;
 
     std::shared_ptr<BrownianMotion> brown(new BrownianMotion());
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
@@ -83,7 +83,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 
-bool openglSetUp(GLFWwindow *& window, const int width, const int height)
+bool openglSetUp(const int width, const int height, GLFWwindow *& window)
 {
     ConstString log_ID = "[OpenGL]";
     yInfo() << log_ID << "Start setting up...";
