@@ -13,7 +13,7 @@
 #include <BayesFiltersLib/SIRParticleFilter.h>
 
 #include "BrownianMotion.h"
-#include "Proprioception.h"
+#include "VisualProprioception.h"
 #include "VisualParticleFilterCorrection.h"
 #include "VisualSIRParticleFilter.h"
 
@@ -23,11 +23,6 @@
 using namespace bfl;
 using namespace Eigen;
 using namespace yarp::os;
-
-/* DEBUG ONLY */
-#include <opencv2/highgui/highgui.hpp>
-using namespace cv;
-/* ********** */
 
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -47,17 +42,13 @@ int main(int argc, char const *argv[])
         return EXIT_FAILURE;
     }
 
-    /* DEBUG ONLY */
-    namedWindow("Superimposed Edges", WINDOW_NORMAL | WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
-    /* ********** */
-
     /* Initialize OpenGL context */
     GLFWwindow * window = nullptr;
     if (!openglSetUp(window, WINDOW_WIDTH, WINDOW_HEIGHT)) return EXIT_FAILURE;
 
     std::shared_ptr<BrownianMotion> brown(new BrownianMotion());
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
-    std::shared_ptr<Proprioception> proprio(new Proprioception(window));
+    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(window));
     std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio));
     std::shared_ptr<Resampling> resampling(new Resampling());
     VisualSIRParticleFilter vsir_pf(brown, pf_prediction, proprio, vpf_correction, resampling);
@@ -77,10 +68,6 @@ int main(int argc, char const *argv[])
 
     glfwMakeContextCurrent(NULL);
     glfwTerminate();
-
-    /* DEBUG ONLY */
-    destroyWindow("Superimposed Edges");
-    /* ********** */
 
     yInfo() << log_ID << "Main returning.";
     yInfo() << log_ID << "Application closed.";
