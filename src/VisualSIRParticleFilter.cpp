@@ -13,7 +13,7 @@
 
 #include <SuperImpose/SICAD.h>
 
-#include "Proprioception.h"
+#include "VisualProprioception.h"
 
 using namespace bfl;
 using namespace cv;
@@ -24,6 +24,8 @@ using namespace yarp::math;
 using namespace yarp::os;
 using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
+
+YMatrix getInvertedH(double a, double d, double alpha, double offset, double q);
 
 
 VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction, std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction, std::shared_ptr<Resampling> resampling) noexcept :
@@ -87,8 +89,7 @@ void VisualSIRParticleFilter::runFilter()
 
     init_particle.resize(6, num_particle);
 
-    Vector q = readRootToEE();
-    Vector ee_pose = icub_kin_arm_->EndEffPose(CTRL_DEG2RAD * q);
+    Vector ee_pose = icub_kin_arm_->EndEffPose(CTRL_DEG2RAD * readRootToEE());
 
     Map<VectorXd> q_arm(ee_pose.data(), 6, 1);
     q_arm.tail(3) *= ee_pose(6);
@@ -98,10 +99,19 @@ void VisualSIRParticleFilter::runFilter()
     }
 
     /* FILTERING */
-    ImageOf<PixelRgb> * imgin = YARP_NULLPTR;
+    ImageOf<PixelRgb>* imgin = YARP_NULLPTR;
     while(is_running_)
     {
-        if (imgin == YARP_NULLPTR) imgin = port_image_in_.read(true);
+        Vector q;
+        Vector eye_pose;
+        if (imgin == YARP_NULLPTR)
+        {
+            imgin = port_image_in_.read(true);
+            q = readRootToFingers();
+            eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
+            cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
+            cam_o[0] = eye_pose(3); cam_o[1] = eye_pose(4); cam_o[2] = eye_pose(5); cam_o[3] = eye_pose(6);
+        }
 //        imgin = port_image_in_.read(true);
         if (imgin != YARP_NULLPTR)
         {
@@ -114,9 +124,9 @@ void VisualSIRParticleFilter::runFilter()
 
             Mat measurement = cvarrToMat(imgout.getIplImage());
 
-            Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
-            cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
-            cam_o[0] = eye_pose(3); cam_o[1] = eye_pose(4); cam_o[2] = eye_pose(5); cam_o[3] = eye_pose(6);
+//            Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
+//            cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
+//            cam_o[0] = eye_pose(3); cam_o[1] = eye_pose(4); cam_o[2] = eye_pose(5); cam_o[3] = eye_pose(6);
 
             VectorXf sorted_pred = init_weight;
             std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
@@ -126,10 +136,9 @@ void VisualSIRParticleFilter::runFilter()
 
             /* Set parameters */
             // FIXME: da decidere come sistemare
-            Vector q = readArm();
-            std::dynamic_pointer_cast<Proprioception>(observation_model_)->setArmJoints(q);
-            std::dynamic_pointer_cast<Proprioception>(observation_model_)->setCamXO(cam_x, cam_o);
-            std::dynamic_pointer_cast<Proprioception>(observation_model_)->setImgBackEdge(measurement);
+//            Vector q = readRootToFingers();
+            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q);
+            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(cam_x, cam_o);
             /* ************** */
 
             for (int i = 0; i < num_particle; ++i)
@@ -137,7 +146,7 @@ void VisualSIRParticleFilter::runFilter()
 
             init_weight = init_weight / init_weight.sum();
 
-            MatrixXf out_particle(6, 1);
+            VectorXf out_particle(6, 1);
             /* Weighted sum */
             out_particle = (init_particle.array().rowwise() * init_weight.array().transpose()).rowwise().sum();
 
@@ -164,25 +173,32 @@ void VisualSIRParticleFilter::runFilter()
                 init_weight   = temp_weight;
             }
 
+
+
             /* DEBUG ONLY */
             // FIXME: out_particle is treatead as a Vector, but it's a Matrix.
             SuperImpose::ObjPoseMap hand_pose;
             SuperImpose::ObjPose    pose;
+            Vector ee_t(4);
             Vector ee_o(4);
             float ang;
 
-            ang     = out_particle.col(0).tail(3).norm();
+            icub_kin_arm_->setAng(q.subVector(0, 9) * (M_PI/180.0));
+
+            ee_t(0) = out_particle(0);
+            ee_t(1) = out_particle(1);
+            ee_t(2) = out_particle(2);
+            ee_t(3) =             1.0;
+            ang     = out_particle.tail(3).norm();
             ee_o(0) = out_particle(3) / ang;
             ee_o(1) = out_particle(4) / ang;
             ee_o(2) = out_particle(5) / ang;
             ee_o(3) = ang;
 
-            pose.assign(out_particle.data(), out_particle.data()+3);
-            pose.insert(pose.end(), ee_o.data(), ee_o.data()+4);
+            pose.assign(ee_t.data(), ee_t.data()+3);
+            pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
             hand_pose.emplace("palm", pose);
-
-            Vector ee_t(3, pose.data());
-            ee_t.push_back(1.0);
+            
             YMatrix Ha = axis2dcm(ee_o);
             Ha.setCol(3, ee_t);
             // FIXME: middle finger only!
@@ -217,8 +233,17 @@ void VisualSIRParticleFilter::runFilter()
                     hand_pose.emplace(finger_s, pose);
                 }
             }
+            YMatrix invH6 = Ha *
+                            getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_->getAng(9)) *
+                            getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_->getAng(8));
+            Vector j_x = invH6.getCol(3).subVector(0, 2);
+            Vector j_o = dcm2axis(invH6);
+            pose.clear();
+            pose.assign(j_x.data(), j_x.data()+3);
+            pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+            hand_pose.emplace("forearm", pose);
 
-            std::dynamic_pointer_cast<Proprioception>(observation_model_)->superimpose(hand_pose, measurement);
+            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement);
 
             port_image_out_.write();
             /* ********** */
@@ -257,7 +282,7 @@ void VisualSIRParticleFilter::stopThread()
 
 Vector VisualSIRParticleFilter::readTorso()
 {
-    Bottle * b = port_torso_enc_.read();
+    Bottle* b = port_torso_enc_.read();
     Vector torso_enc(3);
 
     yAssert(b->size() == 3);
@@ -270,31 +295,34 @@ Vector VisualSIRParticleFilter::readTorso()
 }
 
 
-Vector VisualSIRParticleFilter::readArm()
+Vector VisualSIRParticleFilter::readRootToFingers()
 {
-    Bottle * b = port_arm_enc_.read();
-    Vector arm_enc(16);
+    Bottle* b = port_arm_enc_.read();
 
     yAssert(b->size() == 16);
 
+    Vector root_fingers_enc(19);
+    root_fingers_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 16; ++i)
     {
-        arm_enc(i) = b->get(i).asDouble();
+        root_fingers_enc(3+i) = b->get(i).asDouble();
     }
 
-    return arm_enc;
+    return root_fingers_enc;
 }
 
 
 Vector VisualSIRParticleFilter::readRootToEye(const ConstString eye)
 {
-    Bottle * b = port_head_enc_.read();
-    Vector root_eye_enc(8);
+    Bottle* b = port_head_enc_.read();
 
+    yAssert(b->size() == 6);
+
+    Vector root_eye_enc(8);
     root_eye_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 4; ++i)
     {
-        root_eye_enc(i+3) = b->get(i).asDouble();
+        root_eye_enc(3+i) = b->get(i).asDouble();
     }
     if (eye == "left")  root_eye_enc(7) = b->get(4).asDouble() + b->get(5).asDouble()/2.0;
     if (eye == "right") root_eye_enc(7) = b->get(4).asDouble() - b->get(5).asDouble()/2.0;
@@ -305,9 +333,11 @@ Vector VisualSIRParticleFilter::readRootToEye(const ConstString eye)
 
 Vector VisualSIRParticleFilter::readRootToEE()
 {
-    Bottle * b = port_arm_enc_.read();
-    Vector root_ee_enc(10);
+    Bottle* b = port_arm_enc_.read();
 
+    yAssert(b->size() == 16);
+
+    Vector root_ee_enc(10);
     root_ee_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 7; ++i)
     {
@@ -315,4 +345,38 @@ Vector VisualSIRParticleFilter::readRootToEE()
     }
 
     return root_ee_enc;
+}
+
+
+YMatrix getInvertedH(double a, double d, double alpha, double offset, double q)
+{
+    YMatrix H(4, 4);
+
+    double theta = offset + q;
+    double c_th  = cos(theta);
+    double s_th  = sin(theta);
+    double c_al  = cos(alpha);
+    double s_al  = sin(alpha);
+
+    H(0,0) =        c_th;
+    H(0,1) =       -s_th;
+    H(0,2) =           0;
+    H(0,3) =           a;
+
+    H(1,0) = s_th * c_al;
+    H(1,1) = c_th * c_al;
+    H(1,2) =       -s_al;
+    H(1,3) =   -d * s_al;
+
+    H(2,0) = s_th * s_al;
+    H(2,1) = c_th * s_al;
+    H(2,2) =        c_al;
+    H(2,3) =    d * c_al;
+
+    H(3,0) =           0;
+    H(3,1) =           0;
+    H(3,2) =           0;
+    H(3,3) =           1;
+    
+    return H;
 }

@@ -27,13 +27,13 @@ icubcontrib_add_uninstall_target()
 
 # Project source and header files
 set(${PROJECT_NAME}_HDR     include/BrownianMotion.h
-                            include/Proprioception.h
+                            include/VisualProprioception.h
                             include/VisualParticleFilterCorrection.h
                             include/VisualSIRParticleFilter.h)
 
 set(${PROJECT_NAME}_SRC     src/main.cpp
                             src/BrownianMotion.cpp
-                            src/Proprioception.cpp
+                            src/VisualProprioception.cpp
                             src/VisualParticleFilterCorrection.cpp
                             src/VisualSIRParticleFilter.cpp)
 
@@ -52,7 +52,6 @@ endif()
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_HDR} ${${PROJECT_NAME}_SRC})
 
 target_include_directories(${PROJECT_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                                                   ${ASSIMP_INCLUDE_DIRS}
                                                    ${EIGEN3_INCLUDE_DIRS}
                                                    ${ICUB_INCLUDE_DIRS}
                                                    ${OPENGL_INCLUDE_DIR}
@@ -85,6 +84,9 @@ set(ICUB_HAND_FILES         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_p
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail1.obj
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail2.obj
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail3.obj
+                            ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm.obj
+                            ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_full.obj
+                            ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_scaled.obj
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_indexbase.obj
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml0.obj
                             ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml1.obj

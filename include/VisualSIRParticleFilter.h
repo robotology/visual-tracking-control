@@ -85,11 +85,15 @@ protected:
 private:
     yarp::sig::Vector readTorso();
 
-    yarp::sig::Vector readArm();
+    yarp::sig::Vector readRootToFingers();
 
     yarp::sig::Vector readRootToEye(const yarp::os::ConstString eye);
 
     yarp::sig::Vector readRootToEE();
+
+    /* DEBUG ONLY */
+    void setArmJoints(const yarp::sig::Vector& q);
+    /* ********** */
 };
 
 #endif /* VISUALSIRPARTICLEFILTER_H */
