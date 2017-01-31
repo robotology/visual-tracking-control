@@ -25,7 +25,7 @@ typedef typename yarp::sig::Matrix YMatrix;
 
 
 VisualProprioception::VisualProprioception(GLFWwindow*& window) :
-    window_(window)
+    window_(window), icub_kin_finger_{iCubFinger("right_thumb"), iCubFinger("right_index"), iCubFinger("right_middle")}, icub_arm_(iCubArm("right_v2"))
 {
     cam_x_[0] = 0.0;
     cam_x_[1] = 0.0;
@@ -73,25 +73,19 @@ VisualProprioception::VisualProprioception(GLFWwindow*& window) :
 
     si_cad_ = new SICAD(window_, cad_hand_, 232.921, 232.43, 162.202, 125.738);
 
-    // FIXME: non ha senso che siano dei puntatori
-    icub_kin_finger_[0] = new iCubFinger("right_thumb");
-    icub_kin_finger_[1] = new iCubFinger("right_index");
-    icub_kin_finger_[2] = new iCubFinger("right_middle");
-    icub_kin_finger_[0]->setAllConstraints(false);
-    icub_kin_finger_[1]->setAllConstraints(false);
-    icub_kin_finger_[2]->setAllConstraints(false);
+    icub_kin_finger_[0].setAllConstraints(false);
+    icub_kin_finger_[1].setAllConstraints(false);
+    icub_kin_finger_[2].setAllConstraints(false);
 
-    icub_arm_ = new iCubArm("right_v2");
-    icub_arm_->setAllConstraints(false);
-    icub_arm_->releaseLink(0);
-    icub_arm_->releaseLink(1);
-    icub_arm_->releaseLink(2);
+    icub_arm_.setAllConstraints(false);
+    icub_arm_.releaseLink(0);
+    icub_arm_.releaseLink(1);
+    icub_arm_.releaseLink(2);
 }
 
 VisualProprioception::~VisualProprioception() noexcept
 {
     delete si_cad_;
-    for (size_t i = 0; i < 3; ++i) delete icub_kin_finger_[i];
 }
 
 
@@ -116,7 +110,7 @@ VisualProprioception::VisualProprioception(const VisualProprioception& proprio) 
 
 
 VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexcept :
-    window_(proprio.window_), si_cad_(std::move(proprio.si_cad_)), cad_hand_(std::move(proprio.cad_hand_))
+    window_(proprio.window_), icub_arm_(std::move(proprio.icub_arm_)), si_cad_(std::move(proprio.si_cad_)), cad_hand_(std::move(proprio.cad_hand_))
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -127,11 +121,9 @@ VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexc
     cam_o_[2] = proprio.cam_o_[2];
     cam_o_[3] = proprio.cam_o_[3];
 
-    icub_kin_finger_[0] = proprio.icub_kin_finger_[0];
-    icub_kin_finger_[1] = proprio.icub_kin_finger_[1];
-    icub_kin_finger_[2] = proprio.icub_kin_finger_[2];
-
-    icub_arm_ = proprio.icub_arm_;
+    icub_kin_finger_[0] = std::move(proprio.icub_kin_finger_[0]);
+    icub_kin_finger_[1] = std::move(proprio.icub_kin_finger_[1]);
+    icub_kin_finger_[2] = std::move(proprio.icub_kin_finger_[2]);
 
     proprio.cam_x_[0] = 0.0;
     proprio.cam_x_[1] = 0.0;
@@ -141,12 +133,6 @@ VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexc
     proprio.cam_o_[1] = 0.0;
     proprio.cam_o_[2] = 0.0;
     proprio.cam_o_[3] = 0.0;
-
-    proprio.icub_kin_finger_[0] = nullptr;
-    proprio.icub_kin_finger_[1] = nullptr;
-    proprio.icub_kin_finger_[2] = nullptr;
-
-    proprio.icub_arm_ = nullptr;
 }
 
 
@@ -161,9 +147,9 @@ VisualProprioception& VisualProprioception::operator=(const VisualProprioception
 
 VisualProprioception& VisualProprioception::operator=(VisualProprioception&& proprio) noexcept
 {
-    window_        = std::move(proprio.window_);
-    si_cad_        = std::move(proprio.si_cad_);
-    cad_hand_      = std::move(proprio.cad_hand_);
+    window_   = std::move(proprio.window_);
+    si_cad_   = std::move(proprio.si_cad_);
+    cad_hand_ = std::move(proprio.cad_hand_);
 
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -174,11 +160,11 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
     cam_o_[2] = proprio.cam_o_[2];
     cam_o_[3] = proprio.cam_o_[3];
 
-    icub_kin_finger_[0] = proprio.icub_kin_finger_[0];
-    icub_kin_finger_[1] = proprio.icub_kin_finger_[1];
-    icub_kin_finger_[2] = proprio.icub_kin_finger_[2];
+    icub_kin_finger_[0] = std::move(proprio.icub_kin_finger_[0]);
+    icub_kin_finger_[1] = std::move(proprio.icub_kin_finger_[1]);
+    icub_kin_finger_[2] = std::move(proprio.icub_kin_finger_[2]);
 
-    icub_arm_ = proprio.icub_arm_;
+    icub_arm_ = std::move(proprio.icub_arm_);
 
     proprio.cam_x_[0] = 0.0;
     proprio.cam_x_[1] = 0.0;
@@ -188,12 +174,6 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
     proprio.cam_o_[1] = 0.0;
     proprio.cam_o_[2] = 0.0;
     proprio.cam_o_[3] = 0.0;
-
-    proprio.icub_kin_finger_[0] = nullptr;
-    proprio.icub_kin_finger_[1] = nullptr;
-    proprio.icub_kin_finger_[2] = nullptr;
-
-    icub_arm_ = nullptr;
 
     return *this;
 }
@@ -235,8 +215,8 @@ void VisualProprioception::observe(const Ref<const VectorXf>& cur_state, OutputA
         pose.clear();
         if (fng != 0)
         {
-            Vector j_x = (Ha * (icub_kin_finger_[fng]->getH0().getCol(3))).subVector(0, 2);
-            Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng]->getH0());
+            Vector j_x = (Ha * (icub_kin_finger_[fng].getH0().getCol(3))).subVector(0, 2);
+            Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH0());
 
             if      (fng == 1) { finger_s = "index0"; }
             else if (fng == 2) { finger_s = "medium0"; }
@@ -246,10 +226,10 @@ void VisualProprioception::observe(const Ref<const VectorXf>& cur_state, OutputA
             hand_pose.emplace(finger_s, pose);
         }
 
-        for (size_t i = 0; i < icub_kin_finger_[fng]->getN(); ++i)
+        for (size_t i = 0; i < icub_kin_finger_[fng].getN(); ++i)
         {
-            Vector j_x = (Ha * (icub_kin_finger_[fng]->getH(i, true).getCol(3))).subVector(0, 2);
-            Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng]->getH(i, true));
+            Vector j_x = (Ha * (icub_kin_finger_[fng].getH(i, true).getCol(3))).subVector(0, 2);
+            Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH(i, true));
 
             if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
             else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
@@ -262,8 +242,8 @@ void VisualProprioception::observe(const Ref<const VectorXf>& cur_state, OutputA
     }
 
     YMatrix invH6 = Ha *
-                    getInvertedH(-0.0625, -0.02598,       0,              -M_PI, -icub_arm_->getAng(9)) *
-                    getInvertedH(      0,        0, -M_PI_2,            -M_PI_2, -icub_arm_->getAng(8));
+                    getInvertedH(-0.0625, -0.02598,       0,              -M_PI, -icub_arm_.getAng(9)) *
+                    getInvertedH(      0,        0, -M_PI_2,            -M_PI_2, -icub_arm_.getAng(8));
     Vector j_x = invH6.getCol(3).subVector(0, 2);
     Vector j_o = dcm2axis(invH6);
     pose.clear();
@@ -285,13 +265,13 @@ void VisualProprioception::setCamXO(double* cam_x, double* cam_o)
 
 void VisualProprioception::setArmJoints(const Vector& q)
 {
-    icub_arm_->setAng(q.subVector(0, 9) * (M_PI/180.0));
+    icub_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
 
     Vector chainjoints;
     for (size_t i = 0; i < 3; ++i)
     {
-        icub_kin_finger_[i]->getChainJoints(q.subVector(3, 18), chainjoints);
-        icub_kin_finger_[i]->setAng(chainjoints * (M_PI/180.0));
+        icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), chainjoints);
+        icub_kin_finger_[i].setAng(chainjoints * (M_PI/180.0));
     }
 }
 

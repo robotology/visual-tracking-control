@@ -29,26 +29,22 @@ YMatrix getInvertedH(double a, double d, double alpha, double offset, double q);
 
 
 VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction, std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction, std::shared_ptr<Resampling> resampling) noexcept :
-    state_model_(state_model), prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling)
+    state_model_(state_model), prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling),
+icub_kin_eye_(iCubEye("left_v2")), icub_kin_arm_(iCubArm("right_v2")), icub_kin_finger_{iCubFinger("right_thumb"), iCubFinger("right_index"), iCubFinger("right_middle")}
 {
-    icub_kin_eye_ = new iCubEye("left_v2");
-    icub_kin_eye_->setAllConstraints(false);
-    icub_kin_eye_->releaseLink(0);
-    icub_kin_eye_->releaseLink(1);
-    icub_kin_eye_->releaseLink(2);
+    icub_kin_eye_.setAllConstraints(false);
+    icub_kin_eye_.releaseLink(0);
+    icub_kin_eye_.releaseLink(1);
+    icub_kin_eye_.releaseLink(2);
 
-    icub_kin_arm_ = new iCubArm("right_v2");
-    icub_kin_arm_->setAllConstraints(false);
-    icub_kin_arm_->releaseLink(0);
-    icub_kin_arm_->releaseLink(1);
-    icub_kin_arm_->releaseLink(2);
+    icub_kin_arm_.setAllConstraints(false);
+    icub_kin_arm_.releaseLink(0);
+    icub_kin_arm_.releaseLink(1);
+    icub_kin_arm_.releaseLink(2);
 
-    icub_kin_finger_[0] = new iCubFinger("right_thumb");
-    icub_kin_finger_[1] = new iCubFinger("right_index");
-    icub_kin_finger_[2] = new iCubFinger("right_middle");
-    icub_kin_finger_[0]->setAllConstraints(false);
-    icub_kin_finger_[1]->setAllConstraints(false);
-    icub_kin_finger_[2]->setAllConstraints(false);
+    icub_kin_finger_[0].setAllConstraints(false);
+    icub_kin_finger_[1].setAllConstraints(false);
+    icub_kin_finger_[2].setAllConstraints(false);
 
     /* Images:         /icub/camcalib/left/out
        Head encoders:  /icub/head/state:o
@@ -67,11 +63,7 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> sta
 }
 
 
-VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
-{
-    delete icub_kin_eye_;
-    delete icub_kin_arm_;
-}
+VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept { }
 
 
 void VisualSIRParticleFilter::runFilter()
@@ -89,7 +81,7 @@ void VisualSIRParticleFilter::runFilter()
 
     init_particle.resize(6, num_particle);
 
-    Vector ee_pose = icub_kin_arm_->EndEffPose(CTRL_DEG2RAD * readRootToEE());
+    Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
 
     Map<VectorXd> q_arm(ee_pose.data(), 6, 1);
     q_arm.tail(3) *= ee_pose(6);
@@ -108,7 +100,7 @@ void VisualSIRParticleFilter::runFilter()
         {
             imgin = port_image_in_.read(true);
             q = readRootToFingers();
-            eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
+            eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
             cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
             cam_o[0] = eye_pose(3); cam_o[1] = eye_pose(4); cam_o[2] = eye_pose(5); cam_o[3] = eye_pose(6);
         }
@@ -124,7 +116,7 @@ void VisualSIRParticleFilter::runFilter()
 
             Mat measurement = cvarrToMat(imgout.getIplImage());
 
-//            Vector eye_pose = icub_kin_eye_->EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
+//            Vector eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
 //            cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
 //            cam_o[0] = eye_pose(3); cam_o[1] = eye_pose(4); cam_o[2] = eye_pose(5); cam_o[3] = eye_pose(6);
 
@@ -183,7 +175,7 @@ void VisualSIRParticleFilter::runFilter()
             Vector ee_o(4);
             float ang;
 
-            icub_kin_arm_->setAng(q.subVector(0, 9) * (M_PI/180.0));
+            icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
 
             ee_t(0) = out_particle(0);
             ee_t(1) = out_particle(1);
@@ -208,8 +200,8 @@ void VisualSIRParticleFilter::runFilter()
                 pose.clear();
                 if (fng != 0)
                 {
-                    Vector j_x = (Ha * (icub_kin_finger_[fng]->getH0().getCol(3))).subVector(0, 2);
-                    Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng]->getH0());
+                    Vector j_x = (Ha * (icub_kin_finger_[fng].getH0().getCol(3))).subVector(0, 2);
+                    Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH0());
 
                     if      (fng == 1) { finger_s = "index0"; }
                     else if (fng == 2) { finger_s = "medium0"; }
@@ -219,10 +211,10 @@ void VisualSIRParticleFilter::runFilter()
                     hand_pose.emplace(finger_s, pose);
                 }
 
-                for (size_t i = 0; i < icub_kin_finger_[fng]->getN(); ++i)
+                for (size_t i = 0; i < icub_kin_finger_[fng].getN(); ++i)
                 {
-                    Vector j_x = (Ha * (icub_kin_finger_[fng]->getH(i, true).getCol(3))).subVector(0, 2);
-                    Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng]->getH(i, true));
+                    Vector j_x = (Ha * (icub_kin_finger_[fng].getH(i, true).getCol(3))).subVector(0, 2);
+                    Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH(i, true));
 
                     if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
                     else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
@@ -234,8 +226,8 @@ void VisualSIRParticleFilter::runFilter()
                 }
             }
             YMatrix invH6 = Ha *
-                            getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_->getAng(9)) *
-                            getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_->getAng(8));
+                            getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
+                            getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
             Vector j_x = invH6.getCol(3).subVector(0, 2);
             Vector j_o = dcm2axis(invH6);
             pose.clear();

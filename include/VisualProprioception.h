@@ -53,8 +53,8 @@ protected:
     double                    cam_x_[3];
     double                    cam_o_[4];
     GLFWwindow             *& window_;
-    iCub::iKin::iCubFinger *  icub_kin_finger_[3];
-    iCub::iKin::iCubArm    *  icub_arm_;
+    iCub::iKin::iCubFinger    icub_kin_finger_[3];
+    iCub::iKin::iCubArm       icub_arm_;
     SICAD                  *  si_cad_;
     SuperImpose::ObjFileMap   cad_hand_;
 

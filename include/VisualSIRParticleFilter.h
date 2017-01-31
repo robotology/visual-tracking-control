@@ -56,31 +56,31 @@ public:
     void stopThread();
 
 protected:
-    std::shared_ptr<bfl::StateModel>                                 state_model_;
-    std::shared_ptr<bfl::Prediction>                                 prediction_;
-    std::shared_ptr<bfl::VisualObservationModel>                     observation_model_;
-    std::shared_ptr<bfl::VisualCorrection>                           correction_;
-    std::shared_ptr<bfl::Resampling>                                 resampling_;
+    std::shared_ptr<bfl::StateModel>                                state_model_;
+    std::shared_ptr<bfl::Prediction>                                prediction_;
+    std::shared_ptr<bfl::VisualObservationModel>                    observation_model_;
+    std::shared_ptr<bfl::VisualCorrection>                          correction_;
+    std::shared_ptr<bfl::Resampling>                                resampling_;
 
-    Eigen::MatrixXf                                                  object_;
-    Eigen::MatrixXf                                                  measurement_;
+    Eigen::MatrixXf                                                 object_;
+    Eigen::MatrixXf                                                 measurement_;
 
-    Eigen::MatrixXf                                                  init_particle_;
-    Eigen::VectorXf                                                  init_weight_;
+    Eigen::MatrixXf                                                 init_particle_;
+    Eigen::VectorXf                                                 init_weight_;
     
-    std::vector<Eigen::MatrixXf>                                     result_particle_;
-    std::vector<Eigen::VectorXf>                                     result_weight_;
+    std::vector<Eigen::MatrixXf>                                    result_particle_;
+    std::vector<Eigen::VectorXf>                                    result_weight_;
 
-    iCub::iKin::iCubEye                                            * icub_kin_eye_;
-    iCub::iKin::iCubArm                                            * icub_kin_arm_;
-    iCub::iKin::iCubFinger                                         * icub_kin_finger_[3];
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_;
-    yarp::os::BufferedPort<yarp::os::Bottle>                         port_head_enc_;
-    yarp::os::BufferedPort<yarp::os::Bottle>                         port_torso_enc_;
-    yarp::os::BufferedPort<yarp::os::Bottle>                         port_arm_enc_;
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_out_;
+    iCub::iKin::iCubEye                                             icub_kin_eye_;
+    iCub::iKin::iCubArm                                             icub_kin_arm_;
+    iCub::iKin::iCubFinger                                          icub_kin_finger_[3];
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_;
+    yarp::os::BufferedPort<yarp::os::Bottle>                        port_head_enc_;
+    yarp::os::BufferedPort<yarp::os::Bottle>                        port_torso_enc_;
+    yarp::os::BufferedPort<yarp::os::Bottle>                        port_arm_enc_;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_;
 
-    bool                                                             is_running_;
+    bool                                                            is_running_;
 
 private:
     yarp::sig::Vector readTorso();
