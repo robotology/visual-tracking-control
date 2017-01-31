@@ -24,7 +24,7 @@ using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
 
-VisualProprioception::VisualProprioception(GLFWwindow* window) :
+VisualProprioception::VisualProprioception(GLFWwindow*& window) :
     window_(window)
 {
     cam_x_[0] = 0.0;
@@ -116,7 +116,7 @@ VisualProprioception::VisualProprioception(const VisualProprioception& proprio) 
 
 
 VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexcept :
-    window_(std::move(proprio.window_)), si_cad_(std::move(proprio.si_cad_)), cad_hand_(std::move(proprio.cad_hand_))
+    window_(proprio.window_), si_cad_(std::move(proprio.si_cad_)), cad_hand_(std::move(proprio.cad_hand_))
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];

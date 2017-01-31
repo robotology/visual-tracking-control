@@ -20,7 +20,7 @@
 class VisualProprioception : public bfl::VisualObservationModel {
 public:
     /* VisualProprioception complete constructor */
-    VisualProprioception(GLFWwindow* window);
+    VisualProprioception(GLFWwindow*& window);
 
     /* Default constructor */
     VisualProprioception() = delete;
@@ -50,13 +50,13 @@ public:
 
 protected:
     // FIXME: non ha senso che siano dei puntatori
-    double                   cam_x_[3];
-    double                   cam_o_[4];
-    GLFWwindow             * window_;
-    iCub::iKin::iCubFinger * icub_kin_finger_[3];
-    iCub::iKin::iCubArm    * icub_arm_;
-    SICAD                  * si_cad_;
-    SuperImpose::ObjFileMap  cad_hand_;
+    double                    cam_x_[3];
+    double                    cam_o_[4];
+    GLFWwindow             *& window_;
+    iCub::iKin::iCubFinger *  icub_kin_finger_[3];
+    iCub::iKin::iCubArm    *  icub_arm_;
+    SICAD                  *  si_cad_;
+    SuperImpose::ObjFileMap   cad_hand_;
 
     bool file_found(const yarp::os::ConstString& file);
 
