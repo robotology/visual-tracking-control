@@ -244,6 +244,7 @@ void VisualSIRParticleFilter::runFilter()
             hand_pose.emplace("forearm", pose);
 
             std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement);
+            glfwPostEmptyEvent();
 
             port_image_out_.write();
             /* ********** */

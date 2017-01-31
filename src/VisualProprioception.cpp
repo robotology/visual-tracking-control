@@ -272,6 +272,7 @@ void VisualProprioception::observe(const Ref<const VectorXf>& cur_state, OutputA
     hand_pose.emplace("forearm", pose);
 
     si_cad_->superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
+    glfwPostEmptyEvent();
 }
 
 
@@ -300,6 +301,7 @@ void VisualProprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_ma
     si_cad_->setBackgroundOpt(true);
     si_cad_->setWireframeOpt(true);
     si_cad_->superimpose(obj2pos_map, cam_x_, cam_o_, img);
+    glfwPostEmptyEvent();
     si_cad_->setBackgroundOpt(false);
     si_cad_->setWireframeOpt(false);
 }

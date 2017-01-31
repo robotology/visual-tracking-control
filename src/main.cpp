@@ -61,9 +61,9 @@ int main(int argc, char const *argv[])
             std::chrono::milliseconds span(1);
             vsir_pf.stopThread();
             yInfo() << log_ID << "Joining filthering thread...";
-            while (thr_vpf.wait_for(span) == std::future_status::timeout) glfwPollEvents();
+            while (thr_vpf.wait_for(span) == std::future_status::timeout) glfwWaitEvents();
         }
-        else glfwPollEvents();
+        else glfwWaitEvents();
     }
 
     glfwMakeContextCurrent(NULL);
