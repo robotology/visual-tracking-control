@@ -58,10 +58,9 @@ int main(int argc, char const *argv[])
     {
         if (glfwWindowShouldClose(window))
         {
-            std::chrono::milliseconds span(1);
             vsir_pf.stopThread();
             yInfo() << log_ID << "Joining filthering thread...";
-            while (thr_vpf.wait_for(span) == std::future_status::timeout) glfwWaitEvents();
+            while (thr_vpf.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) glfwPollEvents();
         }
         else glfwWaitEvents();
     }
