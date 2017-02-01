@@ -3,6 +3,7 @@
 
 #include <BayesFiltersLib/VisualCorrection.h>
 #include <BayesFiltersLib/VisualObservationModel.h>
+#include <opencv2/objdetect/objdetect.hpp>
 
 
 class VisualParticleFilterCorrection : public bfl::VisualCorrection {
@@ -36,6 +37,11 @@ public:
 
 protected:
     std::shared_ptr<bfl::VisualObservationModel> measurement_model_;
+
+    const int                                    block_size = 16;
+    const int                                    img_width  = 320;
+    const int                                    img_height = 240;
+    cv::HOGDescriptor                            hog_;
 };
 
 #endif /* VISUALPARTICLEFILTERCORRECTION_H */

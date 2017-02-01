@@ -9,6 +9,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/objdetect/objdetect.hpp>
 #include <yarp/math/Math.h>
 
 #include <SuperImpose/SICAD.h>
@@ -69,26 +70,27 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept { }
 void VisualSIRParticleFilter::runFilter()
 {
     /* INITIALIZATION */
-    unsigned int k = 0;
-    MatrixXf init_particle;
-    VectorXf init_weight;
-    double cam_x[3];
-    double cam_o[4];
-    int num_particle = 50;
+    unsigned int  k = 0;
+    int           num_particle = 50;
 
-    init_weight.resize(num_particle, 1);
-    init_weight.setConstant(1.0/num_particle);
+    double        cam_x[3];
+    double        cam_o[4];
 
-    init_particle.resize(6, num_particle);
-
-    Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
-
+    Vector        ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     Map<VectorXd> q_arm(ee_pose.data(), 6, 1);
     q_arm.tail(3) *= ee_pose(6);
+
+    MatrixXf      init_particle(6, num_particle);
     for (int i = 0; i < num_particle; ++i)
-    {
         init_particle.col(i) = q_arm.cast<float>();
-    }
+
+    VectorXf      init_weight(num_particle, 1);
+    init_weight.setConstant(1.0/num_particle);
+
+    const int     block_size = 16;
+    const int     img_width  = 320;
+    const int     img_height = 240;
+    HOGDescriptor hog(Size(img_width, img_height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), 9, 1, -1, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false);
 
     /* FILTERING */
     ImageOf<PixelRgb>* imgin = YARP_NULLPTR;
@@ -96,6 +98,7 @@ void VisualSIRParticleFilter::runFilter()
     {
         Vector q;
         Vector eye_pose;
+        std::vector<float> descriptors_cam;
         if (imgin == YARP_NULLPTR)
         {
             imgin = port_image_in_.read(true);
@@ -115,6 +118,7 @@ void VisualSIRParticleFilter::runFilter()
             VectorXf temp_parent(num_particle, 1);
 
             Mat measurement = cvarrToMat(imgout.getIplImage());
+            hog.compute(measurement, descriptors_cam);
 
 //            Vector eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
 //            cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
@@ -134,7 +138,7 @@ void VisualSIRParticleFilter::runFilter()
             /* ************** */
 
             for (int i = 0; i < num_particle; ++i)
-                correction_->correct(init_particle.col(i), measurement, init_weight.row(i));
+                correction_->correct(init_particle.col(i), descriptors_cam, init_weight.row(i));
 
             init_weight = init_weight / init_weight.sum();
 
