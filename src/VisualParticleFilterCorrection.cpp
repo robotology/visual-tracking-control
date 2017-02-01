@@ -1,6 +1,7 @@
 #include "VisualParticleFilterCorrection.h"
 
 #include <cmath>
+#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -8,6 +9,7 @@
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 using namespace bfl;
 using namespace cv;
@@ -61,55 +63,25 @@ void VisualParticleFilterCorrection::innovation(const Eigen::Ref<const Eigen::Ve
     int block_size = 16;
     Mat hand_edge_ogl_cv;
     std::vector<Point> points;
+    std::vector<float> descriptors_cam;
+    std::vector<float> descriptors_cad;
 
     measurement_model_->observe(pred_state, hand_edge_ogl_cv);
 
-    /* OGL image crop */
-    for (auto it = hand_edge_ogl_cv.begin<float>(); it != hand_edge_ogl_cv.end<float>(); ++it) if (*it) points.push_back(it.pos());
-    if (points.size() > 0)
+    /* In-crop HOG between camera and render edges */
+    HOGDescriptor hog(hand_edge_ogl_cv.size(), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), 9, 1, -1, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false);
+
+    hog.compute(hand_edge_ogl_cv, descriptors_cam);
+    hog.compute(measurements,     descriptors_cad);
+
+    float sum_diff = 0;
     {
-        Mat                cad_edge_crop;
-        Mat                cam_edge_crop;
-        std::vector<float> descriptors_cam;
-        std::vector<float> descriptors_cad;
-        std::vector<Point> locations;
-        int                rem_not_mult;
-
-        Rect cad_crop_roi = boundingRect(points);
-
-        rem_not_mult = div(cad_crop_roi.width,  block_size).rem;
-        if (rem_not_mult > 0) cad_crop_roi.width  = cad_crop_roi.width  + (block_size - rem_not_mult);
-
-        rem_not_mult = div(cad_crop_roi.height, block_size).rem;
-        if (rem_not_mult > 0) cad_crop_roi.height = cad_crop_roi.height + (block_size - rem_not_mult);
-
-        if (cad_crop_roi.x + cad_crop_roi.width  > hand_edge_ogl_cv.cols) cad_crop_roi.x -= (cad_crop_roi.x + cad_crop_roi.width ) - hand_edge_ogl_cv.cols;
-
-        if (cad_crop_roi.y + cad_crop_roi.height > hand_edge_ogl_cv.rows) cad_crop_roi.y -= (cad_crop_roi.y + cad_crop_roi.height) - hand_edge_ogl_cv.rows;
-
-        hand_edge_ogl_cv(cad_crop_roi).convertTo(cad_edge_crop, CV_8U);
-        measurements.getMat()(cad_crop_roi).convertTo(cam_edge_crop, CV_8U);
-
-        /* In-crop HOG between camera and render edges */
-        HOGDescriptor hog(Size(cad_crop_roi.width, cad_crop_roi.height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), 12, 1, -1, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false);
-
-        // FIXME: may not be needed. See default value.
-        locations.push_back(Point(0, 0));
-
-        hog.compute(cam_edge_crop, descriptors_cam, Size(), Size(), locations);
-        hog.compute(cad_edge_crop, descriptors_cad, Size(), Size(), locations);
-
-        auto it_cad = descriptors_cad.begin();
-        auto it_cam = descriptors_cam.begin();
-        float sum_diff = 0;
-        for (; it_cad < descriptors_cad.end(); ++it_cad, ++it_cam) sum_diff += abs((*it_cad) - (*it_cam));
-
-        innovation(0, 0) = sum_diff;
+    auto it_cad = descriptors_cad.begin();
+    auto it_cam = descriptors_cam.begin();
+        for (; it_cad < descriptors_cad.end(); ++it_cad, ++it_cam) sum_diff += abs((*it_cam) - (*it_cad));
     }
-    else
-    {
-        innovation(0, 0) = NAN;
-    }
+
+    innovation(0, 0) = sum_diff;
 }
 
 

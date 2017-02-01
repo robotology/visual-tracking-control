@@ -242,8 +242,8 @@ void VisualProprioception::observe(const Ref<const VectorXf>& cur_state, OutputA
     }
 
     YMatrix invH6 = Ha *
-                    getInvertedH(-0.0625, -0.02598,       0,              -M_PI, -icub_arm_.getAng(9)) *
-                    getInvertedH(      0,        0, -M_PI_2,            -M_PI_2, -icub_arm_.getAng(8));
+                    getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
+                    getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
     Vector j_x = invH6.getCol(3).subVector(0, 2);
     Vector j_o = dcm2axis(invH6);
     pose.clear();
