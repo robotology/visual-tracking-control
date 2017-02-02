@@ -55,15 +55,15 @@ VisualParticleFilterCorrection& VisualParticleFilterCorrection::operator=(Visual
 }
 
 
-void VisualParticleFilterCorrection::correct(const Ref<const VectorXf>& pred_state, cv::InputArray measurements, Ref<VectorXf> cor_state)
+void VisualParticleFilterCorrection::correct(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> cor_state)
 {
-    VectorXf innovate(1);
+    VectorXf innovate(pred_state.cols());
     innovation(pred_state, measurements, innovate);
     likelihood(innovate, cor_state);
 }
 
 
-void VisualParticleFilterCorrection::innovation(const Ref<const VectorXf>& pred_state, cv::InputArray measurements, Ref<MatrixXf> innovation)
+void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> innovation)
 {
     Mat          hand_ogl_cv;
     cuda::GpuMat cuda_img;
@@ -92,7 +92,7 @@ void VisualParticleFilterCorrection::innovation(const Ref<const VectorXf>& pred_
 }
 
 
-void VisualParticleFilterCorrection::likelihood(const Ref<const MatrixXf>& innovation, Ref<VectorXf> cor_state)
+void VisualParticleFilterCorrection::likelihood(const Ref<const MatrixXf>& innovation, Ref<MatrixXf> cor_state)
 {
     // FIXME: Kernel likelihood need to be tuned!
     cor_state(0, 0) *= ( exp( -0.001 * innovation(0, 0) /* / pow(1, 2.0) */ ) );
