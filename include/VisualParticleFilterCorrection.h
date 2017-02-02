@@ -3,6 +3,7 @@
 
 #include <BayesFiltersLib/VisualCorrection.h>
 #include <BayesFiltersLib/VisualObservationModel.h>
+#include <opencv2/cudaobjdetect.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 
 
@@ -38,10 +39,11 @@ public:
 protected:
     std::shared_ptr<bfl::VisualObservationModel> measurement_model_;
 
-    const int                                    block_size = 16;
-    const int                                    img_width  = 320;
-    const int                                    img_height = 240;
+    const int                                    block_size_ = 16;
+    const int                                    img_width_  = 320;
+    const int                                    img_height_ = 240;
     cv::HOGDescriptor                            hog_;
+    cv::Ptr<cv::cuda::HOG>                       cuda_hog_;
 };
 
 #endif /* VISUALPARTICLEFILTERCORRECTION_H */
