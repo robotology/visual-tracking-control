@@ -20,6 +20,7 @@ VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<V
     measurement_model_(measurement_model), hog_(HOGDescriptor(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), 9, 1, -1, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false))
 {
     cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), 9);
+    cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
     cuda_hog_->setGammaCorrection(true);
     cuda_hog_->setWinStride(Size(img_width_, img_height_));
 }

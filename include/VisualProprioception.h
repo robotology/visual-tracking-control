@@ -3,7 +3,6 @@
 
 #include <exception>
 #include <functional>
-#include <random>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -50,13 +49,13 @@ public:
 
 protected:
     // FIXME: non ha senso che siano dei puntatori
+    GLFWwindow             *& window_;
     double                    cam_x_[3];
     double                    cam_o_[4];
-    GLFWwindow             *& window_;
     iCub::iKin::iCubFinger    icub_kin_finger_[3];
     iCub::iKin::iCubArm       icub_arm_;
-    SICAD                  *  si_cad_;
     SuperImpose::ObjFileMap   cad_hand_;
+    SICAD                  *  si_cad_;
 
     bool file_found(const yarp::os::ConstString& file);
 

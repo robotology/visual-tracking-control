@@ -90,7 +90,7 @@ VisualProprioception::~VisualProprioception() noexcept
 
 
 VisualProprioception::VisualProprioception(const VisualProprioception& proprio) :
-    window_(proprio.window_), si_cad_(proprio.si_cad_), cad_hand_(proprio.cad_hand_)
+    window_(proprio.window_), cad_hand_(proprio.cad_hand_), si_cad_(proprio.si_cad_)
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -110,7 +110,7 @@ VisualProprioception::VisualProprioception(const VisualProprioception& proprio) 
 
 
 VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexcept :
-    window_(proprio.window_), icub_arm_(std::move(proprio.icub_arm_)), si_cad_(std::move(proprio.si_cad_)), cad_hand_(std::move(proprio.cad_hand_))
+    window_(proprio.window_), icub_arm_(std::move(proprio.icub_arm_)), cad_hand_(std::move(proprio.cad_hand_)), si_cad_(std::move(proprio.si_cad_))
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
