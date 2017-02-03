@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
     std::shared_ptr<BrownianMotion> brown(new BrownianMotion());
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
     std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(window));
-    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio));
+    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, 50, 10));
     std::shared_ptr<Resampling> resampling(new Resampling());
     VisualSIRParticleFilter vsir_pf(brown, pf_prediction, proprio, vpf_correction, resampling);
 
@@ -99,7 +99,7 @@ bool openglSetUp(const int width, const int height, GLFWwindow *& window)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE,        GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE,             GL_FALSE);
-    glfwWindowHint(GLFW_VISIBLE,               GL_TRUE);
+    glfwWindowHint(GLFW_VISIBLE,               GL_FALSE);
 #ifdef GLFW_MAC
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif

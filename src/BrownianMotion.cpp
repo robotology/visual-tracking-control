@@ -16,7 +16,7 @@ BrownianMotion::BrownianMotion(float q, float theta, float cone_angle) noexcept 
 
 
 BrownianMotion::BrownianMotion() noexcept :
-    BrownianMotion(0.005, 2.0, 5.0, 1) { }
+    BrownianMotion(0.005, 3.0, 2.5, 1) { }
 
 
 BrownianMotion::~BrownianMotion() noexcept { }

@@ -137,8 +137,7 @@ void VisualSIRParticleFilter::runFilter()
             std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(cam_x, cam_o);
             /* ************** */
 
-            for (int i = 0; i < num_particle; ++i)
-                correction_->correct(init_particle.col(i), descriptors_cam, init_weight.row(i));
+            correction_->correct(init_particle, descriptors_cam, init_weight);
 
             init_weight = init_weight / init_weight.sum();
 
@@ -229,15 +228,15 @@ void VisualSIRParticleFilter::runFilter()
                     hand_pose.emplace(finger_s, pose);
                 }
             }
-            YMatrix invH6 = Ha *
-                            getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
-                            getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
-            Vector j_x = invH6.getCol(3).subVector(0, 2);
-            Vector j_o = dcm2axis(invH6);
-            pose.clear();
-            pose.assign(j_x.data(), j_x.data()+3);
-            pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-            hand_pose.emplace("forearm", pose);
+//            YMatrix invH6 = Ha *
+//                            getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
+//                            getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
+//            Vector j_x = invH6.getCol(3).subVector(0, 2);
+//            Vector j_o = dcm2axis(invH6);
+//            pose.clear();
+//            pose.assign(j_x.data(), j_x.data()+3);
+//            pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+//            hand_pose.emplace("forearm", pose);
 
             std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement);
             glfwPostEmptyEvent();

@@ -3,6 +3,7 @@
 
 #include <BayesFiltersLib/VisualCorrection.h>
 #include <BayesFiltersLib/VisualObservationModel.h>
+#include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaobjdetect.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 
@@ -13,7 +14,10 @@ public:
     VisualParticleFilterCorrection() = delete;
 
     /* VPF correction constructor */
-    VisualParticleFilterCorrection(std::shared_ptr<bfl::VisualObservationModel> observation_model) noexcept;
+    VisualParticleFilterCorrection(std::shared_ptr<bfl::VisualObservationModel> observation_model, const int num_particle) noexcept;
+
+    /* Detailed VPF correction constructor */
+    VisualParticleFilterCorrection(std::shared_ptr<bfl::VisualObservationModel> observation_model, const int num_particle, const int num_cuda_stream = 10) noexcept;
 
     /* Destructor */
     ~VisualParticleFilterCorrection() noexcept override;
@@ -40,10 +44,18 @@ protected:
     std::shared_ptr<bfl::VisualObservationModel> measurement_model_;
 
     const int                                    block_size_ = 16;
+    const int                                    bin_number_ = 9;
     const int                                    img_width_  = 320;
     const int                                    img_height_ = 240;
     cv::HOGDescriptor                            hog_;
     cv::Ptr<cv::cuda::HOG>                       cuda_hog_;
+
+    const int                                    num_particle_;
+    const int                                    num_image_stream_;
+    std::vector<cv::cuda::Stream>                stream_;
+    std::vector<cv::cuda::GpuMat>                cuda_img_;
+    std::vector<cv::cuda::GpuMat>                cuda_img_alpha_;
+    std::vector<cv::cuda::GpuMat>                cuda_descriptors_;
 };
 
 #endif /* VISUALPARTICLEFILTERCORRECTION_H */
