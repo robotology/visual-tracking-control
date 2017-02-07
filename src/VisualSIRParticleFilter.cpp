@@ -10,7 +10,8 @@
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/cudaobjdetect.hpp>
+#include <opencv2/cudaimgproc.hpp>
 #include <yarp/math/Math.h>
 
 #include <SuperImpose/SICAD.h>
@@ -91,18 +92,27 @@ void VisualSIRParticleFilter::runFilter()
     VectorXf      init_weight(num_particle, 1);
     init_weight.setConstant(1.0/num_particle);
 
-    const int     block_size = 16;
-    const int     img_width  = 320;
-    const int     img_height = 240;
-    HOGDescriptor hog(Size(img_width, img_height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), 9, 1, -1, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false);
+    const int          block_size = 16;
+    const int          img_width  = 320;
+    const int          img_height = 240;
+    const int          bin_number = 9;
+    const unsigned int descriptor_length = (img_width/block_size*2-1) * (img_height/block_size*2-1) * bin_number * 4;
+    Ptr<cuda::HOG> cuda_hog = cuda::HOG::create(Size(img_width, img_height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), bin_number);
+    cuda_hog->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
+    cuda_hog->setGammaCorrection(true);
+    cuda_hog->setWinStride(Size(img_width, img_height));
 
     /* FILTERING */
     ImageOf<PixelRgb>* imgin = YARP_NULLPTR;
     while(is_running_)
     {
-        Vector q;
-        Vector eye_pose;
-        std::vector<float> descriptors_cam;
+        Vector             q;
+        Vector             eye_pose;
+        std::vector<float> descriptors_cam     (descriptor_length);
+        cuda::GpuMat       cuda_img            (Size(img_width, img_height), CV_8UC3);
+        cuda::GpuMat       cuda_img_alpha      (Size(img_width, img_height), CV_8UC4);
+        cuda::GpuMat       descriptors_cam_cuda(Size(descriptor_length, 1),  CV_32F );
+
         if (imgin == YARP_NULLPTR)
         {
             imgin = port_image_in_.read(true);
@@ -122,7 +132,11 @@ void VisualSIRParticleFilter::runFilter()
             VectorXf temp_parent(num_particle, 1);
 
             Mat measurement = cvarrToMat(imgout.getIplImage());
-            hog.compute(measurement, descriptors_cam);
+
+            cuda_img.upload(measurement);
+            cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);
+            cuda_hog->compute(cuda_img_alpha, descriptors_cam_cuda);
+            descriptors_cam_cuda.download(descriptors_cam);
 
 //            Vector eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
 //            cam_x[0] = eye_pose(0); cam_x[1] = eye_pose(1); cam_x[2] = eye_pose(2);
