@@ -7,6 +7,7 @@
 #include <Eigen/Dense>
 #include <iCub/ctrl/math.h>
 #include <opencv2/core/core.hpp>
+#include <opencv2/core/cuda.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
@@ -70,6 +71,9 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept { }
 void VisualSIRParticleFilter::runFilter()
 {
     /* INITIALIZATION */
+    // FIXME: potrebbe non essere questo il problema
+    Mat::setDefaultAllocator(cuda::HostMem::getAllocator(cuda::HostMem::PAGE_LOCKED));
+
     unsigned int  k = 0;
     int           num_particle = 50;
 
