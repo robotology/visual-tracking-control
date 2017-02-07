@@ -7,6 +7,7 @@
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
+#include <opencv2/core/cuda.hpp>
 
 #include <BayesFiltersLib/FilteringContext.h>
 #include <BayesFiltersLib/FilteringFunction.h>
@@ -21,6 +22,7 @@
 #define WINDOW_HEIGHT 240
 
 using namespace bfl;
+using namespace cv;
 using namespace Eigen;
 using namespace yarp::os;
 
@@ -29,11 +31,25 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 bool openglSetUp(const int width, const int height, GLFWwindow *& window);
 
+std::string engine_count_to_string(int engine_count)
+{
+    if (engine_count == 0) return "concurrency is unsupported on this device";
+    if (engine_count == 1) return "the device can concurrently copy memory between host and device while executing a kernel";
+    if (engine_count == 2) return "the device can concurrently copy memory between host and device in both directions and execute a kernel at the same time";
+    return "wrong argument...!";
+}
+
 
 int main(int argc, char const *argv[])
 {
     ConstString log_ID = "[Main]";
     yInfo() << log_ID << "Configuring and starting module...";
+
+    cuda::DeviceInfo gpu_dev;
+    yInfo() << log_ID << "[CUDA] Engine count:" << engine_count_to_string(gpu_dev.asyncEngineCount());
+    yInfo() << log_ID << "[CUDA] Concurrent kernel:" << gpu_dev.concurrentKernels();
+    yInfo() << log_ID << "[CUDA] Multiprocessor count:" << gpu_dev.multiProcessorCount();
+    yInfo() << log_ID << "[CUDA] Total memory:" << gpu_dev.totalMemory() << "B";
 
     Network yarp;
     if (!yarp.checkNetwork(3.0))
@@ -49,7 +65,7 @@ int main(int argc, char const *argv[])
     std::shared_ptr<BrownianMotion> brown(new BrownianMotion());
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
     std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(window));
-    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, 50, 10));
+    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, 50, 2));
     std::shared_ptr<Resampling> resampling(new Resampling());
     VisualSIRParticleFilter vsir_pf(brown, pf_prediction, proprio, vpf_correction, resampling);
 
