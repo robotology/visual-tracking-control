@@ -197,7 +197,7 @@ int VisualProprioception::oglWindowShouldClose()
 
 void VisualProprioception::observe(const Ref<const VectorXf>& cur_state, OutputArray observation)
 {
-    observation.create(cam_width_, cam_height_, CV_8UC3);
+    observation.create(cam_height_, cam_width_, CV_8UC3);
     Mat hand_ogl = observation.getMat();
 
     Mat                     hand_ogl_gray;
