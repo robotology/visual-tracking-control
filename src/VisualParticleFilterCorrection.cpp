@@ -18,14 +18,14 @@ using namespace Eigen;
 
 
 VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualObservationModel> measurement_model, const int num_particle) noexcept :
-    VisualParticleFilterCorrection(measurement_model, num_particle, 10) { };
+    VisualParticleFilterCorrection(measurement_model, num_particle, 2) { };
 
 
 
 VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualObservationModel> measurement_model, const int num_particle, const int num_cuda_stream) noexcept :
     measurement_model_(measurement_model),
     hog_(HOGDescriptor(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_, 1, -1, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false)),
-    num_particle_(num_particle), num_cuda_stream_(num_cuda_stream), num_img_stream_(5), cuda_stream_(num_cuda_stream)
+    num_particle_(num_particle), num_cuda_stream_(num_cuda_stream), num_img_stream_(25), cuda_stream_(num_cuda_stream)
 {
     cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
     cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
