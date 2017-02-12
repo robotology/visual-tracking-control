@@ -18,11 +18,8 @@
 
 class VisualProprioception : public bfl::VisualObservationModel {
 public:
-    /* VisualProprioception complete constructor */
-    VisualProprioception(GLFWwindow*& window);
-
-    /* Default constructor */
-    VisualProprioception() = delete;
+    /* VisualProprioception constructor */
+    VisualProprioception();
 
     /* Destructor */
     ~VisualProprioception() noexcept override;
@@ -39,6 +36,10 @@ public:
     /* Move assignment operator */
     VisualProprioception& operator=(VisualProprioception&& proprio) noexcept;
 
+    static bool initOGL(const GLsizei width, const GLsizei height, const GLint view = 1);
+
+    static int  oglWindowShouldClose();
+
     void observe(const Eigen::Ref<const Eigen::VectorXf>& cur_state, cv::OutputArray observation) override;
 
     void setCamXO(double* cam_x, double* cam_o);
@@ -49,7 +50,6 @@ public:
 
 protected:
     // FIXME: non ha senso che siano dei puntatori
-    GLFWwindow             *& window_;
     double                   cam_x_[3];
     double                   cam_o_[4];
     SuperImpose::ObjFileMap  cad_hand_;

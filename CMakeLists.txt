@@ -37,17 +37,6 @@ set(${PROJECT_NAME}_SRC     src/main.cpp
                             src/VisualParticleFilterCorrection.cpp
                             src/VisualSIRParticleFilter.cpp)
 
-
-# Is macOS with Retina display?
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    add_definitions(-D GLFW_MAC)
-    option(IS_APPLE_RETINA
-           "Select this option if the Apple machine has a Retina display" ON)
-    if(IS_APPLE_RETINA)
-        add_definitions(-D GLFW_RETINA)
-    endif()
-endif()
-
 # Project target calls
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_HDR} ${${PROJECT_NAME}_SRC})
 
