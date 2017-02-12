@@ -50,12 +50,18 @@ public:
 protected:
     // FIXME: non ha senso che siano dei puntatori
     GLFWwindow             *& window_;
-    double                    cam_x_[3];
-    double                    cam_o_[4];
-    iCub::iKin::iCubFinger    icub_kin_finger_[3];
-    iCub::iKin::iCubArm       icub_arm_;
-    SuperImpose::ObjFileMap   cad_hand_;
-    SICAD                  *  si_cad_;
+    double                   cam_x_[3];
+    double                   cam_o_[4];
+    SuperImpose::ObjFileMap  cad_hand_;
+    unsigned int             cam_width_;
+    unsigned int             cam_height_;
+    float                    eye_fx_;
+    float                    eye_cx_;
+    float                    eye_fy_;
+    float                    eye_cy_;
+    SICAD                  * si_cad_;
+    iCub::iKin::iCubFinger   icub_kin_finger_[3];
+    iCub::iKin::iCubArm      icub_arm_;
 
     bool file_found(const yarp::os::ConstString& file);
 

@@ -11,8 +11,6 @@
 #include <yarp/math/Math.h>
 #include <yarp/sig/Vector.h>
 
-#define WINDOW_WIDTH  320
-#define WINDOW_HEIGHT 240
 
 using namespace cv;
 using namespace Eigen;
@@ -71,7 +69,14 @@ VisualProprioception::VisualProprioception(GLFWwindow*& window) :
 //    cad_hand_["forearm"] = rf.findFileByName("r_forearm_scaled.obj");
 //    if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
 
-    si_cad_ = new SICAD(window_, cad_hand_, 232.921, 232.43, 162.202, 125.738);
+    // FIXME: get this parameters from the robot!
+    cam_width_  = 320;
+    cam_height_ = 240;
+    eye_fx_     = 232.921;
+    eye_cx_     = 232.43;
+    eye_fy_     = 162.202;
+    eye_cy_     = 125.738;
+    si_cad_     = new SICAD(cad_hand_, cam_width_, cam_height_, eye_fx_, eye_cx_, eye_fy_, eye_cy_);
 
     icub_kin_finger_[0].setAllConstraints(false);
     icub_kin_finger_[1].setAllConstraints(false);
@@ -181,7 +186,7 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 
 void VisualProprioception::observe(const Ref<const VectorXf>& cur_state, OutputArray observation)
 {
-    observation.create(WINDOW_HEIGHT, WINDOW_WIDTH, CV_8UC3);
+    observation.create(cam_width_, cam_height_, CV_8UC3);
     Mat hand_ogl = observation.getMat();
 
     Mat                     hand_ogl_gray;
