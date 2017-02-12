@@ -28,8 +28,6 @@ using namespace yarp::os;
 using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
-YMatrix getInvertedH(double a, double d, double alpha, double offset, double q);
-
 
 VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction, std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction, std::shared_ptr<Resampling> resampling) noexcept :
     state_model_(state_model), prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling),
@@ -159,22 +157,18 @@ void VisualSIRParticleFilter::runFilter()
 
             init_weight = init_weight / init_weight.sum();
 
-            VectorXf out_particle(6, 1);
-            /* Weighted sum */
-            out_particle = (init_particle.array().rowwise() * init_weight.array().transpose()).rowwise().sum();
+            /* Extracting state estimate: weighted sum */
+            VectorXf out_particle = mean(init_particle, init_weight);
+            /* Extracting state estimate: mode */
+//            VectorXf out_particle = mode(init_particle, init_weight);
 
-            /* Mode */
-//            MatrixXf::Index maxRow;
-//            MatrixXf::Index maxCol;
-//            init_weight.maxCoeff(&maxRow, &maxCol);
-//            out_particle = init_particle.col(maxRow);
-
+            /* DEBUG ONLY */
 //            VectorXf sorted = init_weight;
 //            std::sort(sorted.data(), sorted.data() + sorted.size());
 //            std::cout <<  sorted << std::endl;
             std::cout << "Step: " << ++k << std::endl;
-//            std::cout << "Neff: " << ht_pf_f_->Neff(init_weight) << std::endl;
             std::cout << "Neff: " << resampling_->neff(init_weight) << std::endl;
+            /* ********** */
 
             if (resampling_->neff(init_weight) < 15)
             {
@@ -211,7 +205,7 @@ void VisualSIRParticleFilter::runFilter()
             pose.assign(ee_t.data(), ee_t.data()+3);
             pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
             hand_pose.emplace("palm", pose);
-            
+
             YMatrix Ha = axis2dcm(ee_o);
             Ha.setCol(3, ee_t);
             // FIXME: middle finger only!
@@ -294,6 +288,21 @@ void VisualSIRParticleFilter::stopThread()
 }
 
 
+Eigen::MatrixXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
+{
+    return (particles.array().rowwise() * weights.array().transpose()).rowwise().sum();
+}
+
+
+Eigen::MatrixXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
+{
+    MatrixXf::Index maxRow;
+    MatrixXf::Index maxCol;
+    weights.maxCoeff(&maxRow, &maxCol);
+    return particles.col(maxRow);
+}
+
+
 Vector VisualSIRParticleFilter::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
@@ -362,7 +371,7 @@ Vector VisualSIRParticleFilter::readRootToEE()
 }
 
 
-YMatrix getInvertedH(double a, double d, double alpha, double offset, double q)
+YMatrix VisualSIRParticleFilter::getInvertedH(double a, double d, double alpha, double offset, double q)
 {
     YMatrix H(4, 4);
 

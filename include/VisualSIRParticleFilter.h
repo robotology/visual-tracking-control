@@ -11,6 +11,7 @@
 #include <yarp/os/ConstString.h>
 #include <yarp/os/BufferedPort.h>
 #include <yarp/sig/Image.h>
+#include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
 
 #include <BayesFiltersLib/FilteringAlgorithm.h>
@@ -83,6 +84,10 @@ protected:
     bool                                                            is_running_;
 
 private:
+    Eigen::MatrixXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
+
+    Eigen::MatrixXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
+    
     yarp::sig::Vector readTorso();
 
     yarp::sig::Vector readRootToFingers();
@@ -90,6 +95,8 @@ private:
     yarp::sig::Vector readRootToEye(const yarp::os::ConstString eye);
 
     yarp::sig::Vector readRootToEE();
+
+    yarp::sig::Matrix getInvertedH(double a, double d, double alpha, double offset, double q);
 };
 
 #endif /* VISUALSIRPARTICLEFILTER_H */
