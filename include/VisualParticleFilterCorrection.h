@@ -51,7 +51,6 @@ protected:
     const int                                     bin_number_ = 9;
     const int                                     img_width_  = 320;
     const int                                     img_height_ = 240;
-    cv::HOGDescriptor                             hog_; // FIXME: confront output before deleting
     cv::Ptr<cv::cuda::HOG>                        cuda_hog_;
 
     const int                                     num_particle_;
