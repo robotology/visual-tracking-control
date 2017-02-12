@@ -195,79 +195,84 @@ int VisualProprioception::oglWindowShouldClose()
 }
 
 
-void VisualProprioception::observe(const Ref<const VectorXf>& cur_state, OutputArray observation)
+void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputArray observation)
 {
-    observation.create(cam_height_, cam_width_, CV_8UC3);
-    Mat hand_ogl = observation.getMat();
-
-    Mat                     hand_ogl_gray;
-    SuperImpose::ObjPoseMap hand_pose;
-    SuperImpose::ObjPose    pose;
-    Vector                  ee_t(4);
-    Vector                  ee_o(4);
-    float                   ang;
-
-
-    ee_t(0) = cur_state(0);
-    ee_t(1) = cur_state(1);
-    ee_t(2) = cur_state(2);
-    ee_t(3) =          1.0;
-    ang     = cur_state.tail(3).norm();
-    ee_o(0) = cur_state(3) / ang;
-    ee_o(1) = cur_state(4) / ang;
-    ee_o(2) = cur_state(5) / ang;
-    ee_o(3) = ang;
-
-    pose.assign(ee_t.data(), ee_t.data()+3);
-    pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
-    hand_pose.emplace("palm", pose);
-
-    YMatrix Ha = axis2dcm(ee_o);
-    Ha.setCol(3, ee_t);
-    // FIXME: middle finger only!
-    for (size_t fng = 2; fng < 3; ++fng)
+    std::vector<SuperImpose::ObjPoseMap> hand_poses;
+    for (int j = 0; j < cur_state.cols(); ++j)
     {
-        std::string finger_s;
-        pose.clear();
-        if (fng != 0)
+        SuperImpose::ObjPoseMap hand_pose;
+        SuperImpose::ObjPose    pose;
+        Vector                  ee_t(4);
+        Vector                  ee_o(4);
+        float                   ang;
+
+
+        ee_t(0) = cur_state(0, j);
+        ee_t(1) = cur_state(1, j);
+        ee_t(2) = cur_state(2, j);
+        ee_t(3) =             1.0;
+        ang     = cur_state.col(j).tail(3).norm();
+        ee_o(0) = cur_state(3, j) / ang;
+        ee_o(1) = cur_state(4, j) / ang;
+        ee_o(2) = cur_state(5, j) / ang;
+        ee_o(3) = ang;
+
+        pose.assign(ee_t.data(), ee_t.data()+3);
+        pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
+        hand_pose.emplace("palm", pose);
+
+        YMatrix Ha = axis2dcm(ee_o);
+        Ha.setCol(3, ee_t);
+        // FIXME: middle finger only!
+        for (size_t fng = 2; fng < 3; ++fng)
         {
-            Vector j_x = (Ha * (icub_kin_finger_[fng].getH0().getCol(3))).subVector(0, 2);
-            Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH0());
+            std::string finger_s;
+            pose.clear();
+            if (fng != 0)
+            {
+                Vector j_x = (Ha * (icub_kin_finger_[fng].getH0().getCol(3))).subVector(0, 2);
+                Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH0());
 
-            if      (fng == 1) { finger_s = "index0"; }
-            else if (fng == 2) { finger_s = "medium0"; }
+                if      (fng == 1) { finger_s = "index0"; }
+                else if (fng == 2) { finger_s = "medium0"; }
 
-            pose.assign(j_x.data(), j_x.data()+3);
-            pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-            hand_pose.emplace(finger_s, pose);
+                pose.assign(j_x.data(), j_x.data()+3);
+                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                hand_pose.emplace(finger_s, pose);
+            }
+
+            for (size_t i = 0; i < icub_kin_finger_[fng].getN(); ++i)
+            {
+                Vector j_x = (Ha * (icub_kin_finger_[fng].getH(i, true).getCol(3))).subVector(0, 2);
+                Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH(i, true));
+
+                if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
+                else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
+                else if (fng == 2) { finger_s = "medium"+std::to_string(i+1); }
+
+                pose.assign(j_x.data(), j_x.data()+3);
+                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                hand_pose.emplace(finger_s, pose);
+            }
         }
 
-        for (size_t i = 0; i < icub_kin_finger_[fng].getN(); ++i)
-        {
-            Vector j_x = (Ha * (icub_kin_finger_[fng].getH(i, true).getCol(3))).subVector(0, 2);
-            Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH(i, true));
+//        YMatrix invH6 = Ha *
+//                        getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
+//                        getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
+//        Vector j_x = invH6.getCol(3).subVector(0, 2);
+//        Vector j_o = dcm2axis(invH6);
+//        pose.clear();
+//        pose.assign(j_x.data(), j_x.data()+3);
+//        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+//        hand_pose.emplace("forearm", pose);
 
-            if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
-            else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
-            else if (fng == 2) { finger_s = "medium"+std::to_string(i+1); }
-
-            pose.assign(j_x.data(), j_x.data()+3);
-            pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-            hand_pose.emplace(finger_s, pose);
-        }
+        hand_poses.push_back(hand_pose);
     }
 
-//    YMatrix invH6 = Ha *
-//                    getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
-//                    getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
-//    Vector j_x = invH6.getCol(3).subVector(0, 2);
-//    Vector j_o = dcm2axis(invH6);
-//    pose.clear();
-//    pose.assign(j_x.data(), j_x.data()+3);
-//    pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-//    hand_pose.emplace("forearm", pose);
+    observation.create(cam_height_, cam_width_ * cur_state.cols(), CV_8UC3);
+    Mat hand_ogl = observation.getMat();
 
-    si_cad_->superimpose(hand_pose, cam_x_, cam_o_, hand_ogl);
+    si_cad_->superimpose(hand_poses, cam_x_, cam_o_, hand_ogl);
     glfwPostEmptyEvent();
 }
 

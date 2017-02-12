@@ -23,8 +23,7 @@ VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<V
 
 
 VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualObservationModel> measurement_model, const int num_particle, const int num_cuda_stream) noexcept :
-    measurement_model_(measurement_model),
-    num_particle_(num_particle), num_cuda_stream_(num_cuda_stream), num_img_stream_(25), cuda_stream_(num_cuda_stream)
+    measurement_model_(measurement_model), num_particle_(num_particle), num_cuda_stream_(num_cuda_stream), num_img_stream_(25), cuda_stream_(num_cuda_stream)
 {
     cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
     cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
@@ -85,14 +84,9 @@ void VisualParticleFilterCorrection::correct(const Ref<const MatrixXf>& pred_sta
 
 void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> innovation)
 {
-    Rect roi(0, 0, img_width_, img_height_);
     for (int block = 0; block < num_particle_ / num_img_stream_; ++block)
     {
-        for (int i = 0; i < num_img_stream_; ++i)
-        {
-            roi.x = i * img_width_;
-            measurement_model_->observe(pred_state.col(block * num_img_stream_ + i), hand_rendered_[block](roi));
-        }
+        measurement_model_->observe(pred_state.block(0, block * num_img_stream_, 6, num_img_stream_), hand_rendered_[block]);
     }
 
     for (int block = 0; block < num_particle_ / num_img_stream_; ++block)

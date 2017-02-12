@@ -50,7 +50,7 @@ int main(int argc, char const *argv[])
     }
 
     /* Initialize OpenGL context */
-    if (!VisualProprioception::initOGL(320, 240, 1)) return EXIT_FAILURE;
+    if (!VisualProprioception::initOGL(320, 240, 25)) return EXIT_FAILURE;
 
     std::shared_ptr<BrownianMotion> brown(new BrownianMotion());
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));

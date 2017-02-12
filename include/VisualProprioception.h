@@ -40,7 +40,7 @@ public:
 
     static int  oglWindowShouldClose();
 
-    void observe(const Eigen::Ref<const Eigen::VectorXf>& cur_state, cv::OutputArray observation) override;
+    void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, cv::OutputArray observation) override;
 
     void setCamXO(double* cam_x, double* cam_o);
 
