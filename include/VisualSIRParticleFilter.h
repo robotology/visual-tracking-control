@@ -73,6 +73,7 @@ protected:
     std::vector<Eigen::MatrixXf>                                    result_particle_;
     std::vector<Eigen::VectorXf>                                    result_weight_;
 
+    /* DEBUG AND INIT ONLY */
     iCub::iKin::iCubEye                                             icub_kin_eye_;
     iCub::iKin::iCubArm                                             icub_kin_arm_;
     iCub::iKin::iCubFinger                                          icub_kin_finger_[3];
@@ -81,6 +82,7 @@ protected:
     yarp::os::BufferedPort<yarp::os::Bottle>                        port_torso_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle>                        port_arm_enc_;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_;
+    /* ******************* */
 
     bool                                                            is_running_;
 
@@ -88,7 +90,8 @@ private:
     Eigen::MatrixXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 
     Eigen::MatrixXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
-    
+
+    /* THIS CALL SHOULD BE IN OTHER CLASSES */
     yarp::sig::Vector readTorso();
 
     yarp::sig::Vector readRootToFingers();
@@ -98,6 +101,7 @@ private:
     yarp::sig::Vector readRootToEE();
 
     yarp::sig::Matrix getInvertedH(double a, double d, double alpha, double offset, double q);
+    /* ************************************ */
 };
 
 #endif /* VISUALSIRPARTICLEFILTER_H */

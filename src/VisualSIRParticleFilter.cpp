@@ -304,6 +304,8 @@ Eigen::MatrixXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particl
 }
 
 
+/* THIS CALL SHOULD BE IN OTHER CLASSES */
+
 Vector VisualSIRParticleFilter::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
@@ -404,3 +406,4 @@ YMatrix VisualSIRParticleFilter::getInvertedH(double a, double d, double alpha, 
     
     return H;
 }
+/* ************************************ */
