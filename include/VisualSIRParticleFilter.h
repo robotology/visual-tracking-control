@@ -29,7 +29,7 @@ public:
     VisualSIRParticleFilter() = delete;
 
     /* VisualSIR complete constructor */
-    VisualSIRParticleFilter(std::shared_ptr<bfl::StateModel> state_model, std::shared_ptr<bfl::Prediction> prediction, std::shared_ptr<bfl::VisualObservationModel> observation_model, std::shared_ptr<bfl::VisualCorrection> correction, std::shared_ptr<bfl::Resampling> resampling) noexcept;
+    VisualSIRParticleFilter(std::shared_ptr<bfl::StateModel> state_model, std::shared_ptr<bfl::Prediction> prediction, std::shared_ptr<bfl::VisualObservationModel> observation_model, std::shared_ptr<bfl::VisualCorrection> correction, std::shared_ptr<bfl::Resampling> resampling, const int num_particles) noexcept;
 
     /* Destructor */
     ~VisualSIRParticleFilter() noexcept override;
@@ -62,6 +62,7 @@ protected:
     std::shared_ptr<bfl::VisualObservationModel>                    observation_model_;
     std::shared_ptr<bfl::VisualCorrection>                          correction_;
     std::shared_ptr<bfl::Resampling>                                resampling_;
+    const int                                                       num_particles_;
 
     Eigen::MatrixXf                                                 object_;
     Eigen::MatrixXf                                                 measurement_;

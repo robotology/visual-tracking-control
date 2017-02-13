@@ -29,9 +29,9 @@ using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
 
-VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction, std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction, std::shared_ptr<Resampling> resampling) noexcept :
-    state_model_(state_model), prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling),
-icub_kin_eye_(iCubEye("left_v2")), icub_kin_arm_(iCubArm("right_v2")), icub_kin_finger_{iCubFinger("right_thumb"), iCubFinger("right_index"), iCubFinger("right_middle")}
+VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction, std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction, std::shared_ptr<Resampling> resampling, const int num_particles) noexcept :
+    state_model_(state_model), prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling), num_particles_(num_particles),
+    icub_kin_eye_(iCubEye("left_v2")), icub_kin_arm_(iCubArm("right_v2")), icub_kin_finger_{iCubFinger("right_thumb"), iCubFinger("right_index"), iCubFinger("right_middle")}
 {
     icub_kin_eye_.setAllConstraints(false);
     icub_kin_eye_.releaseLink(0);
@@ -74,7 +74,6 @@ void VisualSIRParticleFilter::runFilter()
 //    Mat::setDefaultAllocator(cuda::HostMem::getAllocator(cuda::HostMem::PAGE_LOCKED));
 
     unsigned int  k = 0;
-    int           num_particle = 50;
 
     double        cam_x[3];
     double        cam_o[4];
@@ -83,12 +82,12 @@ void VisualSIRParticleFilter::runFilter()
     Map<VectorXd> q_arm(ee_pose.data(), 6, 1);
     q_arm.tail(3) *= ee_pose(6);
 
-    MatrixXf      init_particle(6, num_particle);
-    for (int i = 0; i < num_particle; ++i)
+    MatrixXf      init_particle(6, num_particles_);
+    for (int i = 0; i < num_particles_; ++i)
         init_particle.col(i) = q_arm.cast<float>();
 
-    VectorXf      init_weight(num_particle, 1);
-    init_weight.setConstant(1.0/num_particle);
+    VectorXf      init_weight(num_particles_, 1);
+    init_weight.setConstant(1.0/num_particles_);
 
     const int          block_size = 16;
     const int          img_width  = 320;
@@ -125,9 +124,9 @@ void VisualSIRParticleFilter::runFilter()
             ImageOf<PixelRgb>& imgout = port_image_out_.prepare();
             imgout = *imgin;
 
-            MatrixXf temp_particle(6, num_particle);
-            VectorXf temp_weight(num_particle, 1);
-            VectorXf temp_parent(num_particle, 1);
+            MatrixXf temp_particle(6, num_particles_);
+            VectorXf temp_weight(num_particles_, 1);
+            VectorXf temp_parent(num_particles_, 1);
 
             Mat measurement = cvarrToMat(imgout.getIplImage());
 
@@ -143,7 +142,7 @@ void VisualSIRParticleFilter::runFilter()
             VectorXf sorted_pred = init_weight;
             std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
             float threshold = sorted_pred.tail(6)(0);
-            for (int i = 0; i < num_particle; ++i)
+            for (int i = 0; i < num_particles_; ++i)
                 if(init_weight(i) <= threshold) prediction_->predict(init_particle.col(i), init_particle.col(i));
 
             /* Set parameters */
@@ -170,7 +169,7 @@ void VisualSIRParticleFilter::runFilter()
             std::cout << "Neff: " << resampling_->neff(init_weight) << std::endl;
             /* ********** */
 
-            if (resampling_->neff(init_weight) < 15)
+            if (resampling_->neff(init_weight) < std::round(num_particles_ / 4.f))
             {
                 std::cout << "Resampling!" << std::endl;
 
