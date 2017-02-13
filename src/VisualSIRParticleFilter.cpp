@@ -70,7 +70,7 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept { }
 void VisualSIRParticleFilter::runFilter()
 {
     /* INITIALIZATION */
-    // FIXME: potrebbe non essere questo il problema
+    // FIXME: page locked dovrebbe essere più veloce da utilizzate con CUDA, non sembra essere il caso.
 //    Mat::setDefaultAllocator(cuda::HostMem::getAllocator(cuda::HostMem::PAGE_LOCKED));
 
     unsigned int  k = 0;
