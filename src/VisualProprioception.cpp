@@ -1,6 +1,7 @@
 #include "VisualProprioception.h"
 
 #include <cmath>
+#include <exception>
 #include <iostream>
 #include <utility>
 
@@ -22,8 +23,11 @@ using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
 
-VisualProprioception::VisualProprioception() :
-    icub_kin_finger_{iCubFinger("right_thumb"), iCubFinger("right_index"), iCubFinger("right_middle")}, icub_arm_(iCubArm("right_v2"))
+VisualProprioception::VisualProprioception(const yarp::os::ConstString lateralirty,
+                                           const unsigned int cam_width, const unsigned int cam_height,
+                                           const float eye_fx, const float eye_cx, const float eye_fy, const float eye_cy) :
+    icub_arm_(iCubArm(lateralirty+"_v2")), icub_kin_finger_{iCubFinger(lateralirty+"_thumb"), iCubFinger(lateralirty+"_index"), iCubFinger(lateralirty+"_middle")},
+    cam_width_(cam_width), cam_height_(cam_height), eye_fx_(eye_fx), eye_cx_(eye_cx), eye_fy_(eye_fy), eye_cy_(eye_cy)
 {
     cam_x_[0] = 0.0;
     cam_x_[1] = 0.0;
@@ -69,14 +73,7 @@ VisualProprioception::VisualProprioception() :
 //    cad_hand_["forearm"] = rf.findFileByName("r_forearm_scaled.obj");
 //    if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
 
-    // FIXME: get this parameters from the robot!
-    cam_width_  = 320;
-    cam_height_ = 240;
-    eye_fx_     = 232.921;
-    eye_cx_     = 232.43;
-    eye_fy_     = 162.202;
-    eye_cy_     = 125.738;
-    si_cad_     = new SICAD(cad_hand_, cam_width_, cam_height_, eye_fx_, eye_cx_, eye_fy_, eye_cy_);
+    si_cad_ = new SICAD(cad_hand_, cam_width_, cam_height_, eye_fx_, eye_cx_, eye_fy_, eye_cy_);
 
     icub_kin_finger_[0].setAllConstraints(false);
     icub_kin_finger_[1].setAllConstraints(false);
@@ -95,7 +92,9 @@ VisualProprioception::~VisualProprioception() noexcept
 
 
 VisualProprioception::VisualProprioception(const VisualProprioception& proprio) :
-    cad_hand_(proprio.cad_hand_), si_cad_(proprio.si_cad_)
+    cad_hand_(proprio.cad_hand_),
+    cam_width_(proprio.cam_width_), cam_height_(proprio.cam_height_), eye_fx_(proprio.eye_fx_), eye_cx_(proprio.eye_cx_), eye_fy_(proprio.eye_fy_), eye_cy_(proprio.eye_cy_),
+    si_cad_(proprio.si_cad_)
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -115,7 +114,9 @@ VisualProprioception::VisualProprioception(const VisualProprioception& proprio) 
 
 
 VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexcept :
-    cad_hand_(std::move(proprio.cad_hand_)), si_cad_(std::move(proprio.si_cad_)), icub_arm_(std::move(proprio.icub_arm_))
+    icub_arm_(std::move(proprio.icub_arm_)), cad_hand_(std::move(proprio.cad_hand_)),
+    cam_width_(std::move(proprio.cam_width_)), cam_height_(std::move(proprio.cam_height_)), eye_fx_(std::move(proprio.eye_fx_)), eye_cx_(std::move(proprio.eye_cx_)), eye_fy_(std::move(proprio.eye_fy_)), eye_cy_(std::move(proprio.eye_cy_)),
+    si_cad_(std::move(proprio.si_cad_))
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -152,9 +153,12 @@ VisualProprioception& VisualProprioception::operator=(const VisualProprioception
 
 VisualProprioception& VisualProprioception::operator=(VisualProprioception&& proprio) noexcept
 {
-    si_cad_   = std::move(proprio.si_cad_);
-    cad_hand_ = std::move(proprio.cad_hand_);
+    icub_arm_ = std::move(proprio.icub_arm_);
 
+    icub_kin_finger_[0] = std::move(proprio.icub_kin_finger_[0]);
+    icub_kin_finger_[1] = std::move(proprio.icub_kin_finger_[1]);
+    icub_kin_finger_[2] = std::move(proprio.icub_kin_finger_[2]);
+    
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
     cam_x_[2] = proprio.cam_x_[2];
@@ -164,11 +168,16 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
     cam_o_[2] = proprio.cam_o_[2];
     cam_o_[3] = proprio.cam_o_[3];
 
-    icub_kin_finger_[0] = std::move(proprio.icub_kin_finger_[0]);
-    icub_kin_finger_[1] = std::move(proprio.icub_kin_finger_[1]);
-    icub_kin_finger_[2] = std::move(proprio.icub_kin_finger_[2]);
+    cad_hand_ = std::move(proprio.cad_hand_);
 
-    icub_arm_ = std::move(proprio.icub_arm_);
+    cam_width_  = std::move(proprio.cam_width_);
+    cam_height_ = std::move(proprio.cam_height_);
+    eye_fx_     = std::move(proprio.eye_fx_);
+    eye_cx_     = std::move(proprio.eye_cx_);
+    eye_fy_     = std::move(proprio.eye_fy_);
+    eye_cy_     = std::move(proprio.eye_cy_);
+
+    si_cad_   = std::move(proprio.si_cad_);
 
     proprio.cam_x_[0] = 0.0;
     proprio.cam_x_[1] = 0.0;

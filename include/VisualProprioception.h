@@ -1,9 +1,6 @@
 #ifndef VISUALPROPRIOCEPTION_H
 #define VISUALPROPRIOCEPTION_H
 
-#include <exception>
-#include <functional>
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iCub/iKin/iKinFwd.h>
@@ -19,7 +16,9 @@
 class VisualProprioception : public bfl::VisualObservationModel {
 public:
     /* VisualProprioception constructor */
-    VisualProprioception();
+    VisualProprioception(const yarp::os::ConstString lateralirty,
+                         const unsigned int cam_width, const unsigned int cam_height,
+                         const float eye_fx, const float eye_cx, const float eye_fy, const float eye_cy);
 
     /* Destructor */
     ~VisualProprioception() noexcept override;
@@ -49,7 +48,8 @@ public:
     void superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, cv::Mat& img);
 
 protected:
-    // FIXME: non ha senso che siano dei puntatori
+    iCub::iKin::iCubArm      icub_arm_;
+    iCub::iKin::iCubFinger   icub_kin_finger_[3];
     double                   cam_x_[3];
     double                   cam_o_[4];
     SuperImpose::ObjFileMap  cad_hand_;
@@ -60,8 +60,6 @@ protected:
     float                    eye_fy_;
     float                    eye_cy_;
     SICAD                  * si_cad_;
-    iCub::iKin::iCubFinger   icub_kin_finger_[3];
-    iCub::iKin::iCubArm      icub_arm_;
 
     bool file_found(const yarp::os::ConstString& file);
 

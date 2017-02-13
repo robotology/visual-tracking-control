@@ -75,18 +75,18 @@ void VisualSIRParticleFilter::runFilter()
 
     unsigned int  k = 0;
 
-    double        cam_x[3];
-    double        cam_o[4];
+    double cam_x[3];
+    double cam_o[4];
 
-    Vector        ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
+    Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     Map<VectorXd> q_arm(ee_pose.data(), 6, 1);
     q_arm.tail(3) *= ee_pose(6);
 
-    MatrixXf      init_particle(6, num_particles_);
+    MatrixXf init_particle(6, num_particles_);
     for (int i = 0; i < num_particles_; ++i)
         init_particle.col(i) = q_arm.cast<float>();
 
-    VectorXf      init_weight(num_particles_, 1);
+    VectorXf init_weight(num_particles_, 1);
     init_weight.setConstant(1.0/num_particles_);
 
     const int          block_size = 16;
@@ -98,6 +98,8 @@ void VisualSIRParticleFilter::runFilter()
     cuda_hog->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
     cuda_hog->setGammaCorrection(true);
     cuda_hog->setWinStride(Size(img_width, img_height));
+
+
 
     /* FILTERING */
     ImageOf<PixelRgb>* imgin = YARP_NULLPTR;
