@@ -4,6 +4,7 @@
 #include <future>
 #include <memory>
 #include <random>
+#include <vector>
 
 #include <Eigen/Dense>
 #include <iCub/iKin/iKinFwd.h>
@@ -29,7 +30,10 @@ public:
     VisualSIRParticleFilter() = delete;
 
     /* VisualSIR complete constructor */
-    VisualSIRParticleFilter(std::shared_ptr<bfl::StateModel> state_model, std::shared_ptr<bfl::Prediction> prediction, std::shared_ptr<bfl::VisualObservationModel> observation_model, std::shared_ptr<bfl::VisualCorrection> correction, std::shared_ptr<bfl::Resampling> resampling, const int num_particles) noexcept;
+    VisualSIRParticleFilter(std::shared_ptr<bfl::StateModel> state_model, std::shared_ptr<bfl::Prediction> prediction,
+                            std::shared_ptr<bfl::VisualObservationModel> observation_model, std::shared_ptr<bfl::VisualCorrection> correction,
+                            std::shared_ptr<bfl::Resampling> resampling,
+                            const int num_particles, const int eye = 1) noexcept;
 
     /* Destructor */
     ~VisualSIRParticleFilter() noexcept override;
@@ -64,9 +68,7 @@ protected:
     std::shared_ptr<bfl::Resampling>                                resampling_;
     const int                                                       num_particles_;
 
-    Eigen::MatrixXf                                                 object_;
-    Eigen::MatrixXf                                                 measurement_;
-
+    // FIXME: utilizzare questi dati membro con nomi opportunamente cambiati
     Eigen::MatrixXf                                                 init_particle_;
     Eigen::VectorXf                                                 init_weight_;
     
@@ -74,14 +76,16 @@ protected:
     std::vector<Eigen::VectorXf>                                    result_weight_;
 
     /* DEBUG AND INIT ONLY */
-    iCub::iKin::iCubEye                                             icub_kin_eye_;
+    std::vector<iCub::iKin::iCubEye>                                icub_kin_eye_;
     iCub::iKin::iCubArm                                             icub_kin_arm_;
     iCub::iKin::iCubFinger                                          icub_kin_finger_[3];
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_left_;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_right_;
     yarp::os::BufferedPort<yarp::os::Bottle>                        port_head_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle>                        port_torso_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle>                        port_arm_enc_;
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_left_;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_right_;
     /* ******************* */
 
     bool                                                            is_running_;

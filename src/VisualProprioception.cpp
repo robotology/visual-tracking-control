@@ -23,20 +23,24 @@ using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
 
-VisualProprioception::VisualProprioception(const yarp::os::ConstString lateralirty,
-                                           const unsigned int cam_width, const unsigned int cam_height,
-                                           const float eye_fx, const float eye_cx, const float eye_fy, const float eye_cy) :
-    icub_arm_(iCubArm(lateralirty+"_v2")), icub_kin_finger_{iCubFinger(lateralirty+"_thumb"), iCubFinger(lateralirty+"_index"), iCubFinger(lateralirty+"_middle")},
-    cam_width_(cam_width), cam_height_(cam_height), eye_fx_(eye_fx), eye_cx_(eye_cx), eye_fy_(eye_fy), eye_cy_(eye_cy)
+VisualProprioception::VisualProprioception(const yarp::os::ConstString lateralirty) :
+    icub_arm_(iCubArm(lateralirty+"_v2")), icub_kin_finger_{iCubFinger(lateralirty+"_thumb"), iCubFinger(lateralirty+"_index"), iCubFinger(lateralirty+"_middle")}
 {
-    cam_x_[0] = 0.0;
-    cam_x_[1] = 0.0;
-    cam_x_[2] = 0.0;
+    cam_x_[0] = 0;
+    cam_x_[1] = 0;
+    cam_x_[2] = 0;
 
-    cam_o_[0] = 0.0;
-    cam_o_[1] = 0.0;
-    cam_o_[2] = 0.0;
-    cam_o_[3] = 0.0;
+    cam_o_[0] = 0;
+    cam_o_[1] = 0;
+    cam_o_[2] = 0;
+    cam_o_[3] = 0;
+
+    cam_width_  = 0;
+    cam_height_ = 0;
+    eye_fx_     = 0;
+    eye_cx_     = 0;
+    eye_fy_     = 0;
+    eye_cy_     = 0;
 
     // FIXME: middle finger only!
     ResourceFinder rf;
@@ -73,7 +77,7 @@ VisualProprioception::VisualProprioception(const yarp::os::ConstString lateralir
 //    cad_hand_["forearm"] = rf.findFileByName("r_forearm_scaled.obj");
 //    if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
 
-    si_cad_ = new SICAD(cad_hand_, cam_width_, cam_height_, eye_fx_, eye_cx_, eye_fy_, eye_cy_);
+    si_cad_ = new SICAD(cad_hand_);
 
     icub_kin_finger_[0].setAllConstraints(false);
     icub_kin_finger_[1].setAllConstraints(false);
@@ -281,7 +285,10 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
     observation.create(cam_height_, cam_width_ * cur_state.cols(), CV_8UC3);
     Mat hand_ogl = observation.getMat();
 
-    si_cad_->superimpose(hand_poses, cam_x_, cam_o_, hand_ogl);
+    si_cad_->superimpose(hand_poses,
+                         cam_x_, cam_o_,
+                         cam_width_, cam_height_, eye_fx_, eye_fy_, eye_cx_, eye_cy_,
+                         hand_ogl);
     glfwPostEmptyEvent();
 }
 
@@ -290,6 +297,18 @@ void VisualProprioception::setCamXO(double* cam_x, double* cam_o)
 {
     memcpy(cam_x_, cam_x, 3 * sizeof(double));
     memcpy(cam_o_, cam_o, 4 * sizeof(double));
+}
+
+
+void VisualProprioception::setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
+                                           const float eye_fx, const float eye_cx, const float eye_fy, const float eye_cy)
+{
+    cam_width_  = cam_width;
+    cam_height_ = cam_height;
+    eye_fx_     = eye_fx;
+    eye_cx_     = eye_cx;
+    eye_fy_     = eye_fy;
+    eye_cy_     = eye_cy;
 }
 
 
@@ -310,7 +329,10 @@ void VisualProprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_ma
 {
     si_cad_->setBackgroundOpt(true);
     si_cad_->setWireframeOpt(true);
-    si_cad_->superimpose(obj2pos_map, cam_x_, cam_o_, img);
+    si_cad_->superimpose(obj2pos_map,
+                         cam_x_, cam_o_,
+                         cam_width_, cam_height_, eye_fx_, eye_fy_, eye_cx_, eye_cy_,
+                         img);
     glfwPostEmptyEvent();
     si_cad_->setBackgroundOpt(false);
     si_cad_->setWireframeOpt(false);

@@ -50,7 +50,7 @@ int main(int argc, char const *argv[])
     }
 
     /* Initialize OpenGL context */
-    const int num_particles = 26; /* Must be even. */
+    const int num_particles = 50; /* Must be even. */
     if (!VisualProprioception::initOGL(320, 240, num_particles / 2)) return EXIT_FAILURE;
 
     std::shared_ptr<BrownianMotion> brown(new BrownianMotion());
@@ -58,13 +58,16 @@ int main(int argc, char const *argv[])
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
 
     // FIXME: get this parameters from the robot!
-    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception("right", 320, 240, 232.921, 232.43, 162.202, 125.738));
+    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception("right"));
 
     std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, num_particles, 2));
 
     std::shared_ptr<Resampling> resampling(new Resampling());
 
-    VisualSIRParticleFilter vsir_pf(brown, pf_prediction, proprio, vpf_correction, resampling, num_particles);
+    VisualSIRParticleFilter vsir_pf(brown, pf_prediction,
+                                    proprio, vpf_correction,
+                                    resampling,
+                                    num_particles, 2);
 
     std::future<void> thr_vpf = vsir_pf.spawn();
     while (vsir_pf.isRunning())

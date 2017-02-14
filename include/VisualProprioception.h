@@ -16,9 +16,7 @@
 class VisualProprioception : public bfl::VisualObservationModel {
 public:
     /* VisualProprioception constructor */
-    VisualProprioception(const yarp::os::ConstString lateralirty,
-                         const unsigned int cam_width, const unsigned int cam_height,
-                         const float eye_fx, const float eye_cx, const float eye_fy, const float eye_cy);
+    VisualProprioception(const yarp::os::ConstString lateralirty);
 
     /* Destructor */
     ~VisualProprioception() noexcept override;
@@ -42,6 +40,9 @@ public:
     void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, cv::OutputArray observation) override;
 
     void setCamXO(double* cam_x, double* cam_o);
+
+    void setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
+                         const float eye_fx, const float eye_cx, const float eye_fy, const float eye_cy);
 
     void setArmJoints(const yarp::sig::Vector & q);
 
