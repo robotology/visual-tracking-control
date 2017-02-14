@@ -115,6 +115,9 @@ void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_
             while (it_cam < it_cam_end)
             {
                 sum_diff += abs((*it_cam) - cpu_descriptors_[block].at<float>(i, j));
+//                if (cpu_descriptors_[block].at<float>(i, j) != 0 && *it_cam != 0)
+//                    sum_diff += (*it_cam) * std::log((*it_cam) / cpu_descriptors_[block].at<float>(i, j));
+//                    sum_diff += cpu_descriptors_[block].at<float>(i, j) * std::log(cpu_descriptors_[block].at<float>(i, j) / (*it_cam));
                 ++it_cam;
                 ++j;
             }

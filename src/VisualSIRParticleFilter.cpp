@@ -125,6 +125,20 @@ void VisualSIRParticleFilter::runFilter()
     cuda_hog->setGammaCorrection(true);
     cuda_hog->setWinStride(Size(img_width, img_height));
 
+    Vector left_eye_pose;
+    Vector right_eye_pose;
+
+    left_eye_pose = icub_kin_eye_[0].EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
+    left_cam_x[0] = left_eye_pose(0); left_cam_x[1] = left_eye_pose(1); left_cam_x[2] = left_eye_pose(2);
+    left_cam_o[0] = left_eye_pose(3); left_cam_o[1] = left_eye_pose(4); left_cam_o[2] = left_eye_pose(5); left_cam_o[3] = left_eye_pose(6);
+
+    if (icub_kin_eye_.size() == 2)
+    {
+        right_eye_pose = icub_kin_eye_[1].EndEffPose(CTRL_DEG2RAD * readRootToEye("right"));
+        right_cam_x[0] = right_eye_pose(0); right_cam_x[1] = right_eye_pose(1); right_cam_x[2] = right_eye_pose(2);
+        right_cam_o[0] = right_eye_pose(3); right_cam_o[1] = right_eye_pose(4); right_cam_o[2] = right_eye_pose(5); right_cam_o[3] = right_eye_pose(6);
+    }
+
 
 
     /* FILTERING */
@@ -133,33 +147,11 @@ void VisualSIRParticleFilter::runFilter()
     while(is_running_)
     {
         Vector             q;
-        Vector             left_eye_pose;
-        Vector             right_eye_pose;
         std::vector<float> descriptors_cam_left (descriptor_length);
         std::vector<float> descriptors_cam_right(descriptor_length);
         cuda::GpuMat       cuda_img             (Size(img_width, img_height), CV_8UC3);
         cuda::GpuMat       cuda_img_alpha       (Size(img_width, img_height), CV_8UC4);
         cuda::GpuMat       descriptors_cam_cuda (Size(descriptor_length, 1),  CV_32F );
-
-        if (imgin_left == YARP_NULLPTR)
-        {
-            q = readRootToFingers();
-
-            imgin_left  = port_image_in_left_.read (true);
-
-            left_eye_pose = icub_kin_eye_[0].EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
-            left_cam_x[0] = left_eye_pose(0); left_cam_x[1] = left_eye_pose(1); left_cam_x[2] = left_eye_pose(2);
-            left_cam_o[0] = left_eye_pose(3); left_cam_o[1] = left_eye_pose(4); left_cam_o[2] = left_eye_pose(5); left_cam_o[3] = left_eye_pose(6);
-
-            if (icub_kin_eye_.size() == 2)
-            {
-                imgin_right = port_image_in_right_.read(true);
-
-                right_eye_pose = icub_kin_eye_[1].EndEffPose(CTRL_DEG2RAD * readRootToEye("right"));
-                right_cam_x[0] = left_eye_pose(0); right_cam_x[1] = left_eye_pose(1); right_cam_x[2] = left_eye_pose(2);
-                right_cam_o[0] = left_eye_pose(3); right_cam_o[1] = left_eye_pose(4); right_cam_o[2] = left_eye_pose(5); right_cam_o[3] = left_eye_pose(6);
-            }
-        }
 
         imgin_left  = port_image_in_left_.read (true);
         imgin_right = port_image_in_right_.read(true);
@@ -198,8 +190,8 @@ void VisualSIRParticleFilter::runFilter()
 //            left_cam_o[0] = left_eye_pose(3); left_cam_o[1] = left_eye_pose(4); left_cam_o[2] = left_eye_pose(5); left_cam_o[3] = left_eye_pose(6);
 
 //            Vector right_eye_pose = icub_kin_eye_[1].EndEffPose(CTRL_DEG2RAD * readRootToEye("right"));
-//            right_cam_x[0] = left_eye_pose(0); right_cam_x[1] = left_eye_pose(1); right_cam_x[2] = left_eye_pose(2);
-//            right_cam_o[0] = left_eye_pose(3); right_cam_o[1] = left_eye_pose(4); right_cam_o[2] = left_eye_pose(5); right_cam_o[3] = left_eye_pose(6);
+//            right_cam_x[0] = right_eye_pose(0); right_cam_x[1] = right_eye_pose(1); right_cam_x[2] = right_eye_pose(2);
+//            right_cam_o[0] = right_eye_pose(3); right_cam_o[1] = right_eye_pose(4); right_cam_o[2] = right_eye_pose(5); right_cam_o[3] = right_eye_pose(6);
 
             // FIXME: move the hand over time
             Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
@@ -216,8 +208,8 @@ void VisualSIRParticleFilter::runFilter()
 
             old_hand_pose = new_arm_pose;
 
-            const double delta_pos_norm = delta_hand_pose.head(3).norm();
-            const double delta_ori_norm = delta_hand_pose.tail(3).norm();
+//            const double delta_pos_norm = delta_hand_pose.head(3).norm();
+//            const double delta_ori_norm = delta_hand_pose.tail(3).norm();
             for (int i = 0; i < icub_kin_eye_.size(); ++i)
             {
                 VectorXf sorted_pred = init_weight.middleRows(i * num_particles_, num_particles_);
@@ -228,13 +220,14 @@ void VisualSIRParticleFilter::runFilter()
                 {
                     // FIXME: move the hand over time
 
-                    if (delta_pos_norm > 0.005) init_particle.col(j + i * num_particles_).head(3) += delta_hand_pose.head(3).cast<float>();
+//                    if (delta_pos_norm > 0.005)
+                        init_particle.col(j + i * num_particles_).head(3) += delta_hand_pose.head(3).cast<float>();
 
                     float ang;
                     ang = init_particle.col(j + i * num_particles_).tail(3).norm();
                     init_particle.col(j + i * num_particles_).tail(3) /= ang;
 
-                    if (delta_ori_norm > 0.005)
+//                    if (delta_ori_norm > 0.005)
                     {
                         init_particle.col(j + i * num_particles_).tail(3) += delta_hand_pose.tail(3).cast<float>();
                         init_particle.col(j + i * num_particles_).tail(3) /= init_particle.col(j + i * num_particles_).tail(3).norm();
@@ -248,14 +241,14 @@ void VisualSIRParticleFilter::runFilter()
 //                    if (-0.002 <  ang && ang < 0)     ang = -0.002;
                     init_particle.col(j + i * num_particles_).tail(3) *= ang;
 
-                    if(init_weight(j + i * num_particles_) <= threshold)
+//                    if(init_weight(j + i * num_particles_) <= threshold)
                         prediction_->predict(init_particle.col(j + i * num_particles_), init_particle.col(j + i * num_particles_));
                 }
             }
 
             /* Set parameters */
             // FIXME: da decidere come sistemare
-//            Vector q = readRootToFingers();
+            Vector q = readRootToFingers();
             std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q);
 
             MatrixXf out_particle(6, 2);
@@ -264,12 +257,14 @@ void VisualSIRParticleFilter::runFilter()
                 if (i == LEFT)
                 {
                     std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(left_cam_x,  left_cam_o);
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
+//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
+                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
                     correction_->correct(init_particle.middleCols(i * num_particles_, num_particles_), descriptors_cam_left, init_weight.middleRows(i * num_particles_, num_particles_));
                 }
                 if (i == RIGHT)
                 {
                     std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(right_cam_x, right_cam_o);
+//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
                     std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
                     correction_->correct(init_particle.middleCols(i * num_particles_, num_particles_), descriptors_cam_right, init_weight.middleRows(i * num_particles_, num_particles_));
                 }
@@ -315,6 +310,12 @@ void VisualSIRParticleFilter::runFilter()
                 float ang;
 
                 icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
+                Vector chainjoints;
+                for (size_t i = 0; i < 3; ++i)
+                {
+                    icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), chainjoints);
+                    icub_kin_finger_[i].setAng(chainjoints * (M_PI/180.0));
+                }
 
                 ee_t(0) = out_particle(0, i);
                 ee_t(1) = out_particle(1, i);
@@ -333,7 +334,7 @@ void VisualSIRParticleFilter::runFilter()
                 YMatrix Ha = axis2dcm(ee_o);
                 Ha.setCol(3, ee_t);
                 // FIXME: middle finger only!
-                for (size_t fng = 2; fng < 3; ++fng)
+                for (size_t fng = 0; fng < 3; ++fng)
                 {
                     std::string finger_s;
                     pose.clear();
@@ -364,15 +365,16 @@ void VisualSIRParticleFilter::runFilter()
                         hand_pose.emplace(finger_s, pose);
                     }
                 }
-//                YMatrix invH6 = Ha *
-//                                getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
-//                                getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
-//                Vector j_x = invH6.getCol(3).subVector(0, 2);
-//                Vector j_o = dcm2axis(invH6);
-//                pose.clear();
-//                pose.assign(j_x.data(), j_x.data()+3);
-//                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-//                hand_pose.emplace("forearm", pose);
+
+                YMatrix invH6 = Ha *
+                                getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
+                                getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
+                Vector j_x = invH6.getCol(3).subVector(0, 2);
+                Vector j_o = dcm2axis(invH6);
+                pose.clear();
+                pose.assign(j_x.data(), j_x.data()+3);
+                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                hand_pose.emplace("forearm", pose);
 
                 if (i == LEFT)
                 {
