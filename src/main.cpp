@@ -57,7 +57,6 @@ int main(int argc, char const *argv[])
 
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
 
-    // FIXME: get this parameters from the robot!
     std::shared_ptr<VisualProprioception> proprio(new VisualProprioception("right"));
 
     std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, num_particles, 2));

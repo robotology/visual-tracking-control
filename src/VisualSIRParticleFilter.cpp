@@ -106,6 +106,8 @@ void VisualSIRParticleFilter::runFilter()
     Map<VectorXd> q_arm(ee_pose.data(), 6, 1);
     q_arm.tail(3) *= ee_pose(6);
 
+    VectorXd old_hand_pose = q_arm;
+
     MatrixXf init_particle(6, num_particles_ * icub_kin_eye_.size());
     for (int i = 0; i < num_particles_ * icub_kin_eye_.size(); ++i)
         init_particle.col(i) = q_arm.cast<float>();
@@ -159,8 +161,8 @@ void VisualSIRParticleFilter::runFilter()
             }
         }
 
-//        imgin_left  = port_image_in_left_.read (true);
-//        imgin_right = port_image_in_right_.read(true);
+        imgin_left  = port_image_in_left_.read (true);
+        imgin_right = port_image_in_right_.read(true);
 
         if (imgin_left != YARP_NULLPTR)
         {
@@ -199,6 +201,23 @@ void VisualSIRParticleFilter::runFilter()
 //            right_cam_x[0] = left_eye_pose(0); right_cam_x[1] = left_eye_pose(1); right_cam_x[2] = left_eye_pose(2);
 //            right_cam_o[0] = left_eye_pose(3); right_cam_o[1] = left_eye_pose(4); right_cam_o[2] = left_eye_pose(5); right_cam_o[3] = left_eye_pose(6);
 
+            // FIXME: move the hand over time
+            Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
+            Map<VectorXd> new_arm_pose(ee_pose.data(), 6, 1);
+            new_arm_pose.tail(3) *= ee_pose(6);
+
+            VectorXd delta_hand_pose(6);
+            double   delta_angle;
+            delta_hand_pose.head(3) = new_arm_pose.head(3) - old_hand_pose.head(3);
+            delta_angle             = new_arm_pose.tail(3).norm() - old_hand_pose.tail(3).norm();
+            if (delta_angle >  M_PI) delta_angle -= 2.0 * M_PI;
+            if (delta_angle < -M_PI) delta_angle += 2.0 * M_PI;
+            delta_hand_pose.tail(3) = (new_arm_pose.tail(3) / new_arm_pose.tail(3).norm()) - (old_hand_pose.tail(3) / old_hand_pose.tail(3).norm());
+
+            old_hand_pose = new_arm_pose;
+
+            const double delta_pos_norm = delta_hand_pose.head(3).norm();
+            const double delta_ori_norm = delta_hand_pose.tail(3).norm();
             for (int i = 0; i < icub_kin_eye_.size(); ++i)
             {
                 VectorXf sorted_pred = init_weight.middleRows(i * num_particles_, num_particles_);
@@ -206,7 +225,32 @@ void VisualSIRParticleFilter::runFilter()
 
                 float threshold = sorted_pred.tail(6)(0);
                 for (int j = 0; j < num_particles_; ++j)
-                    if(init_weight(j + i * num_particles_) <= threshold) prediction_->predict(init_particle.col(j + i * num_particles_), init_particle.col(j + i * num_particles_));
+                {
+                    // FIXME: move the hand over time
+
+                    if (delta_pos_norm > 0.005) init_particle.col(j + i * num_particles_).head(3) += delta_hand_pose.head(3).cast<float>();
+
+                    float ang;
+                    ang = init_particle.col(j + i * num_particles_).tail(3).norm();
+                    init_particle.col(j + i * num_particles_).tail(3) /= ang;
+
+                    if (delta_ori_norm > 0.005)
+                    {
+                        init_particle.col(j + i * num_particles_).tail(3) += delta_hand_pose.tail(3).cast<float>();
+                        init_particle.col(j + i * num_particles_).tail(3) /= init_particle.col(j + i * num_particles_).tail(3).norm();
+                    }
+
+                    ang += static_cast<float>(delta_angle);
+                    if (ang > 2.0 * M_PI) ang -= 2.0 * M_PI;
+//                    if (ang >  M_PI) ang -= 2.0 * M_PI;
+//                    if (ang < -M_PI) ang += 2.0 * M_PI;
+//                    if (0      <= ang && ang < 0.002) ang =  0.002;
+//                    if (-0.002 <  ang && ang < 0)     ang = -0.002;
+                    init_particle.col(j + i * num_particles_).tail(3) *= ang;
+
+                    if(init_weight(j + i * num_particles_) <= threshold)
+                        prediction_->predict(init_particle.col(j + i * num_particles_), init_particle.col(j + i * num_particles_));
+                }
             }
 
             /* Set parameters */
