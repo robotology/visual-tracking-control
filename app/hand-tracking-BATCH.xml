@@ -5,7 +5,7 @@
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking-BATCH</name>
     <description>Visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -26,7 +26,13 @@
 
     <module>
         <name>yarpview</name>
-        <parameters>--name /view/result --x 20 --y 0 --RefreshTime 30</parameters>
+        <parameters>--name /view/result/left --x 20 --y 0 --RefreshTime 30</parameters>
+        <node>yarprun</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/result/right --x 320 --y 0 --RefreshTime 30</parameters>
         <node>yarprun</node>
     </module>
 
@@ -35,6 +41,12 @@
     <connection persist="true">
         <from>/icub/camcalib/left/out</from>
         <to>/hand-tracking/left_img:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/icub/camcalib/right/out</from>
+        <to>/hand-tracking/right_img:i</to>
         <protocol>tcp</protocol>
     </connection>
 
@@ -57,8 +69,20 @@
     </connection>
 
     <connection persist="true">
-        <from>/hand-tracking/result:o</from>
-        <to>/view/result</to>
+        <from>/hand-tracking/result/left:o</from>
+        <to>/view/result/left</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/hand-tracking/result/right:o</from>
+        <to>/view/result/right</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/icub/right_hand/analog:o</from>
+        <to>/hand-tracking/right_hand/analog:i</to>
         <protocol>tcp</protocol>
     </connection>
 
