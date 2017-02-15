@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
     const int num_particles = 50; /* Must be even. */
     if (!VisualProprioception::initOGL(320, 240, num_particles / 2)) return EXIT_FAILURE;
 
-    std::shared_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 1.5, 2, 1));
+    std::shared_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 0.005, 3.0, 2.5, 1));
 
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
 

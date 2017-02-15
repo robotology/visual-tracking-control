@@ -8,6 +8,8 @@
 
 #include <Eigen/Dense>
 #include <iCub/iKin/iKinFwd.h>
+#include <yarp/dev/PolyDriver.h>
+#include <yarp/dev/IAnalogSensor.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/BufferedPort.h>
@@ -33,7 +35,7 @@ public:
     VisualSIRParticleFilter(std::shared_ptr<bfl::StateModel> state_model, std::shared_ptr<bfl::Prediction> prediction,
                             std::shared_ptr<bfl::VisualObservationModel> observation_model, std::shared_ptr<bfl::VisualCorrection> correction,
                             std::shared_ptr<bfl::Resampling> resampling,
-                            const int num_particles, const int eye = 1) noexcept;
+                            const int num_particles, const int eye = 1);
 
     /* Destructor */
     ~VisualSIRParticleFilter() noexcept override;
@@ -61,31 +63,37 @@ public:
     void stopThread();
 
 protected:
-    std::shared_ptr<bfl::StateModel>                                state_model_;
-    std::shared_ptr<bfl::Prediction>                                prediction_;
-    std::shared_ptr<bfl::VisualObservationModel>                    observation_model_;
-    std::shared_ptr<bfl::VisualCorrection>                          correction_;
-    std::shared_ptr<bfl::Resampling>                                resampling_;
-    const int                                                       num_particles_;
+    std::shared_ptr<bfl::StateModel>                                 state_model_;
+    std::shared_ptr<bfl::Prediction>                                 prediction_;
+    std::shared_ptr<bfl::VisualObservationModel>                     observation_model_;
+    std::shared_ptr<bfl::VisualCorrection>                           correction_;
+    std::shared_ptr<bfl::Resampling>                                 resampling_;
+    const int                                                        num_particles_;
 
     // FIXME: utilizzare questi dati membro con nomi opportunamente cambiati
-    Eigen::MatrixXf                                                 init_particle_;
-    Eigen::VectorXf                                                 init_weight_;
+    Eigen::MatrixXf                                                  init_particle_;
+    Eigen::VectorXf                                                  init_weight_;
     
-    std::vector<Eigen::MatrixXf>                                    result_particle_;
-    std::vector<Eigen::VectorXf>                                    result_weight_;
+    std::vector<Eigen::MatrixXf>                                     result_particle_;
+    std::vector<Eigen::VectorXf>                                     result_weight_;
 
-    /* DEBUG AND INIT ONLY */
-    std::vector<iCub::iKin::iCubEye>                                icub_kin_eye_;
-    iCub::iKin::iCubArm                                             icub_kin_arm_;
-    iCub::iKin::iCubFinger                                          icub_kin_finger_[3];
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_left_;
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_right_;
-    yarp::os::BufferedPort<yarp::os::Bottle>                        port_head_enc_;
-    yarp::os::BufferedPort<yarp::os::Bottle>                        port_torso_enc_;
-    yarp::os::BufferedPort<yarp::os::Bottle>                        port_arm_enc_;
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_left_;
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_right_;
+    /* INIT ONLY */
+    std::vector<iCub::iKin::iCubEye>                                 icub_kin_eye_;
+    iCub::iKin::iCubArm                                              icub_kin_arm_;
+    iCub::iKin::iCubFinger                                           icub_kin_finger_[3];
+    yarp::os::BufferedPort<yarp::os::Bottle>                         port_head_enc_;
+    yarp::os::BufferedPort<yarp::os::Bottle>                         port_torso_enc_;
+    yarp::os::BufferedPort<yarp::os::Bottle>                         port_arm_enc_;
+//    yarp::os::Property                                               opt_right_hand_analog_;
+//    yarp::dev::PolyDriver                                            drv_right_hand_analog_;
+//    yarp::dev::IAnalogSensor                                       * itf_right_hand_analog_;
+    yarp::os::BufferedPort<yarp::os::Bottle>                         port_right_hand_analog_;
+    yarp::sig::Matrix                                                right_hand_analogs_bounds_;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_left_;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_right_;
+    /* DEBUG ONLY */
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_out_left_;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_out_right_;
     /* ******************* */
 
     bool                                                            is_running_;
@@ -103,6 +111,8 @@ private:
     yarp::sig::Vector readRootToEye(const yarp::os::ConstString eye);
 
     yarp::sig::Vector readRootToEE();
+
+    yarp::sig::Vector readRightHandAnalogs();
 
     yarp::sig::Matrix getInvertedH(double a, double d, double alpha, double offset, double q);
     /* ************************************ */

@@ -1,5 +1,6 @@
 #include "VisualSIRParticleFilter.h"
 
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <utility>
@@ -38,7 +39,7 @@ enum laterality
 VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction,
                                                  std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction,
                                                  std::shared_ptr<Resampling> resampling,
-                                                 const int num_particles, const int eye) noexcept :
+                                                 const int num_particles, const int eye) :
     state_model_(state_model), prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling), num_particles_(num_particles),
     icub_kin_arm_(iCubArm("right_v2")), icub_kin_finger_{iCubFinger("right_thumb"), iCubFinger("right_index"), iCubFinger("right_middle")}
 {
@@ -66,16 +67,45 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> sta
     icub_kin_finger_[1].setAllConstraints(false);
     icub_kin_finger_[2].setAllConstraints(false);
 
-    /* Left images:    /icub/camcalib/left/out
-       Right images:   /icub/camcalib/right/out
-       Head encoders:  /icub/head/state:o
-       Arm encoders:   /icub/right_arm/state:o
-       Torso encoders: /icub/torso/state:o     */
-    port_image_in_left_.open ("/hand-tracking/left_img:i");
-    port_image_in_right_.open("/hand-tracking/right_img:i");
-    port_head_enc_.open      ("/hand-tracking/head:i");
-    port_arm_enc_.open       ("/hand-tracking/right_arm:i");
-    port_torso_enc_.open     ("/hand-tracking/torso:i");
+//    opt_right_hand_analog_.put("device", "analogsensorclient");
+//    opt_right_hand_analog_.put("remote", "/icub/right_hand/analog:o");
+//    opt_right_hand_analog_.put("local",  "/hand-tracking/right_hand/analog:i");
+//    if (!drv_right_hand_analog_.open(opt_right_hand_analog_)) throw std::runtime_error("Cannot open right hand analog driver!");
+//    if (!drv_right_hand_analog_.view(itf_right_hand_analog_)) throw std::runtime_error("Cannot get right hand analog interface!");
+
+    /* Left images:       /icub/camcalib/left/out
+       Right images:      /icub/camcalib/right/out
+       Head encoders:     /icub/head/state:o
+       Arm encoders:      /icub/right_arm/state:o
+       Torso encoders:    /icub/torso/state:o
+       Right hand analog: /hand-tracking/right_hand/analog:i */
+    port_image_in_left_.open    ("/hand-tracking/left_img:i");
+    port_image_in_right_.open   ("/hand-tracking/right_img:i");
+    port_head_enc_.open         ("/hand-tracking/head:i");
+    port_arm_enc_.open          ("/hand-tracking/right_arm:i");
+    port_torso_enc_.open        ("/hand-tracking/torso:i");
+    port_right_hand_analog_.open("/hand-tracking/right_hand/analog:i");
+
+    right_hand_analogs_bounds_ = YMatrix(15, 2);
+    
+    right_hand_analogs_bounds_(0, 0)  = 218.0; right_hand_analogs_bounds_(0, 1)  =  61.0;
+    right_hand_analogs_bounds_(1, 0)  = 210.0; right_hand_analogs_bounds_(1, 1)  =  20.0;
+    right_hand_analogs_bounds_(2, 0)  = 234.0; right_hand_analogs_bounds_(2, 1)  =  16.0;
+
+    right_hand_analogs_bounds_(3, 0)  = 224.0; right_hand_analogs_bounds_(3, 1)  =  15.0;
+    right_hand_analogs_bounds_(4, 0)  = 206.0; right_hand_analogs_bounds_(4, 1)  =  18.0;
+    right_hand_analogs_bounds_(5, 0)  = 237.0; right_hand_analogs_bounds_(5, 1)  =  23.0;
+
+    right_hand_analogs_bounds_(6, 0)  = 250.0; right_hand_analogs_bounds_(6, 1)  =   8.0;
+    right_hand_analogs_bounds_(7, 0)  = 195.0; right_hand_analogs_bounds_(7, 1)  =  21.0;
+    right_hand_analogs_bounds_(8, 0)  = 218.0; right_hand_analogs_bounds_(8, 1)  =   0.0;
+
+    right_hand_analogs_bounds_(9, 0)  = 220.0; right_hand_analogs_bounds_(9, 1)  =  39.0;
+    right_hand_analogs_bounds_(10, 0) = 160.0; right_hand_analogs_bounds_(10, 1) =  10.0;
+    right_hand_analogs_bounds_(11, 0) = 209.0; right_hand_analogs_bounds_(11, 1) = 101.0;
+    right_hand_analogs_bounds_(12, 0) = 224.0; right_hand_analogs_bounds_(12, 1) =  63.0;
+    right_hand_analogs_bounds_(13, 0) = 191.0; right_hand_analogs_bounds_(13, 1) =  36.0;
+    right_hand_analogs_bounds_(14, 0) = 232.0; right_hand_analogs_bounds_(14, 1) =  98.0;
 
     /* DEBUG ONLY */
     port_image_out_left_.open ("/hand-tracking/result/left:o");
@@ -147,6 +177,7 @@ void VisualSIRParticleFilter::runFilter()
     while(is_running_)
     {
         Vector             q;
+        Vector             analogs;
         std::vector<float> descriptors_cam_left (descriptor_length);
         std::vector<float> descriptors_cam_right(descriptor_length);
         cuda::GpuMat       cuda_img             (Size(img_width, img_height), CV_8UC3);
@@ -241,14 +272,19 @@ void VisualSIRParticleFilter::runFilter()
 //                    if (-0.002 <  ang && ang < 0)     ang = -0.002;
                     init_particle.col(j + i * num_particles_).tail(3) *= ang;
 
-//                    if(init_weight(j + i * num_particles_) <= threshold)
+                    if(init_weight(j + i * num_particles_) <= threshold)
                         prediction_->predict(init_particle.col(j + i * num_particles_), init_particle.col(j + i * num_particles_));
                 }
             }
 
             /* Set parameters */
             // FIXME: da decidere come sistemare
-            Vector q = readRootToFingers();
+            q = readRootToFingers();
+            // FIXME: adduzione fissata
+            q(10) = 32.0;
+            analogs = readRightHandAnalogs();
+//            itf_right_hand_analog_->read(analogs);
+//            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q, analogs, right_hand_analogs_bounds_);
             std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q);
 
             MatrixXf out_particle(6, 2);
@@ -257,15 +293,21 @@ void VisualSIRParticleFilter::runFilter()
                 if (i == LEFT)
                 {
                     std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(left_cam_x,  left_cam_o);
+                    /* BLACK FIRST UNCLUTTER */
 //                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
+                    /* BLACK NEW - BAD DISP */
+//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
+                    /* BLACK NEW - GOOD DISP */
+                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
                     correction_->correct(init_particle.middleCols(i * num_particles_, num_particles_), descriptors_cam_left, init_weight.middleRows(i * num_particles_, num_particles_));
                 }
                 if (i == RIGHT)
                 {
                     std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(right_cam_x, right_cam_o);
+                    /* BLACK NEW - BAD DISP */
 //                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
+                    /* BLACK NEW - GOOD DISP */
+                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
                     correction_->correct(init_particle.middleCols(i * num_particles_, num_particles_), descriptors_cam_right, init_weight.middleRows(i * num_particles_, num_particles_));
                 }
 
@@ -284,7 +326,7 @@ void VisualSIRParticleFilter::runFilter()
                 std::cout << "Neff: " << resampling_->neff(init_weight.middleRows(i * num_particles_, num_particles_)) << std::endl;
                 /* ********** */
 
-                if (resampling_->neff(init_weight.middleRows(i * num_particles_, num_particles_)) < std::round(num_particles_ / 4.f))
+                if (resampling_->neff(init_weight.middleRows(i * num_particles_, num_particles_)) < std::round(num_particles_ / 5.f))
                 {
                     std::cout << "Resampling!" << std::endl;
 
@@ -313,6 +355,8 @@ void VisualSIRParticleFilter::runFilter()
                 Vector chainjoints;
                 for (size_t i = 0; i < 3; ++i)
                 {
+                    // FIXME: vedere quale interfaccia è migliore
+//                    icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
                     icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), chainjoints);
                     icub_kin_finger_[i].setAng(chainjoints * (M_PI/180.0));
                 }
@@ -334,7 +378,7 @@ void VisualSIRParticleFilter::runFilter()
                 YMatrix Ha = axis2dcm(ee_o);
                 Ha.setCol(3, ee_t);
                 // FIXME: middle finger only!
-                for (size_t fng = 0; fng < 3; ++fng)
+                for (size_t fng = 2; fng < 3; ++fng)
                 {
                     std::string finger_s;
                     pose.clear();
@@ -366,20 +410,25 @@ void VisualSIRParticleFilter::runFilter()
                     }
                 }
 
-                YMatrix invH6 = Ha *
-                                getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
-                                getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
-                Vector j_x = invH6.getCol(3).subVector(0, 2);
-                Vector j_o = dcm2axis(invH6);
-                pose.clear();
-                pose.assign(j_x.data(), j_x.data()+3);
-                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-                hand_pose.emplace("forearm", pose);
+//                YMatrix invH6 = Ha *
+//                                getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
+//                                getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
+//                Vector j_x = invH6.getCol(3).subVector(0, 2);
+//                Vector j_o = dcm2axis(invH6);
+//                pose.clear();
+//                pose.assign(j_x.data(), j_x.data()+3);
+//                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+//                hand_pose.emplace("forearm", pose);
 
                 if (i == LEFT)
                 {
                     std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(left_cam_x,  left_cam_o);
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
+                    /* BLACK FIRST UNCLUTTER */
+//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
+                    /* BLACK NEW - BAD DISP */
+//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
+                    /* BLACK NEW - GOOD DISP */
+                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
                     std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement[0]);
                     glfwPostEmptyEvent();
                     port_image_out_left_.write();
@@ -388,7 +437,10 @@ void VisualSIRParticleFilter::runFilter()
                 if (i == RIGHT)
                 {
                     std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(right_cam_x, right_cam_o);
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
+                    /* BLACK NEW - BAD DISP */
+//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
+                    /* BLACK NEW - GOOD DISP */
+                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
                     std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement[1]);
                     glfwPostEmptyEvent();
                     port_image_out_right_.write();
@@ -511,6 +563,21 @@ Vector VisualSIRParticleFilter::readRootToEE()
     }
 
     return root_ee_enc;
+}
+
+Vector VisualSIRParticleFilter::readRightHandAnalogs()
+{
+    Bottle* b = port_right_hand_analog_.read();
+
+    yAssert(b->size() >= 15);
+
+    Vector analogs(b->size());
+    for (size_t i = 0; i < b->size(); ++i)
+    {
+        analogs(i) = b->get(i).asDouble();
+    }
+
+    return analogs;
 }
 
 

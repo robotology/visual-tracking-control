@@ -44,7 +44,9 @@ public:
     void setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
                          const float eye_fx, const float eye_cx, const float eye_fy, const float eye_cy);
 
-    void setArmJoints(const yarp::sig::Vector & q);
+    void setArmJoints(const yarp::sig::Vector& q);
+
+    void setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds);
 
     void superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, cv::Mat& img);
 
