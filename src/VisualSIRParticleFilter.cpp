@@ -378,7 +378,7 @@ void VisualSIRParticleFilter::runFilter()
                 YMatrix Ha = axis2dcm(ee_o);
                 Ha.setCol(3, ee_t);
                 // FIXME: middle finger only!
-                for (size_t fng = 2; fng < 3; ++fng)
+                for (size_t fng = 1; fng < 3; ++fng)
                 {
                     std::string finger_s;
                     pose.clear();
@@ -410,15 +410,15 @@ void VisualSIRParticleFilter::runFilter()
                     }
                 }
 
-//                YMatrix invH6 = Ha *
-//                                getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
-//                                getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
-//                Vector j_x = invH6.getCol(3).subVector(0, 2);
-//                Vector j_o = dcm2axis(invH6);
-//                pose.clear();
-//                pose.assign(j_x.data(), j_x.data()+3);
-//                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-//                hand_pose.emplace("forearm", pose);
+                YMatrix invH6 = Ha *
+                                getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
+                                getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
+                Vector j_x = invH6.getCol(3).subVector(0, 2);
+                Vector j_o = dcm2axis(invH6);
+                pose.clear();
+                pose.assign(j_x.data(), j_x.data()+3);
+                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                hand_pose.emplace("forearm", pose);
 
                 if (i == LEFT)
                 {
