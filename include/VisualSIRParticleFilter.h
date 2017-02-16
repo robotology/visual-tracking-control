@@ -11,8 +11,9 @@
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IAnalogSensor.h>
 #include <yarp/os/Bottle.h>
-#include <yarp/os/ConstString.h>
 #include <yarp/os/BufferedPort.h>
+#include <yarp/os/ConstString.h>
+#include <yarp/os/Port.h>
 #include <yarp/sig/Image.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
@@ -24,8 +25,11 @@
 #include <BayesFiltersLib/VisualCorrection.h>
 #include <BayesFiltersLib/Resampling.h>
 
+#include <thrift/visualSIRParticleFilterIDL.h>
 
-class VisualSIRParticleFilter: public bfl::FilteringAlgorithm {
+
+class VisualSIRParticleFilter: public bfl::FilteringAlgorithm,
+                               public visualSIRParticleFilterIDL {
 public:
 
     /* Default constructor, disabled */
@@ -84,9 +88,9 @@ protected:
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_head_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_torso_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_arm_enc_;
-//    yarp::os::Property                                               opt_right_hand_analog_;
-//    yarp::dev::PolyDriver                                            drv_right_hand_analog_;
-//    yarp::dev::IAnalogSensor                                       * itf_right_hand_analog_;
+    yarp::os::Property                                               opt_right_hand_analog_;
+    yarp::dev::PolyDriver                                            drv_right_hand_analog_;
+    yarp::dev::IAnalogSensor                                       * itf_right_hand_analog_;
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_right_hand_analog_;
     yarp::sig::Matrix                                                right_hand_analogs_bounds_;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_left_;
@@ -96,7 +100,19 @@ protected:
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_out_right_;
     /* ******************* */
 
-    bool                                                            is_running_;
+    bool                                                             is_running_;
+
+    yarp::os::Port port_rpc_command_;
+    bool setCommandPort();
+
+    bool result_images(const bool status) override;
+    bool stream_images_ = true;
+
+    bool lock_input(const bool status) override;
+    bool lock_data_ = false;
+
+    bool use_analogs(const bool status) override;
+    bool analogs_ = false;
 
 private:
     Eigen::MatrixXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;

@@ -67,12 +67,6 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> sta
     icub_kin_finger_[1].setAllConstraints(false);
     icub_kin_finger_[2].setAllConstraints(false);
 
-//    opt_right_hand_analog_.put("device", "analogsensorclient");
-//    opt_right_hand_analog_.put("remote", "/icub/right_hand/analog:o");
-//    opt_right_hand_analog_.put("local",  "/hand-tracking/right_hand/analog:i");
-//    if (!drv_right_hand_analog_.open(opt_right_hand_analog_)) throw std::runtime_error("Cannot open right hand analog driver!");
-//    if (!drv_right_hand_analog_.view(itf_right_hand_analog_)) throw std::runtime_error("Cannot get right hand analog interface!");
-
     /* Left images:       /icub/camcalib/left/out
        Right images:      /icub/camcalib/right/out
        Head encoders:     /icub/head/state:o
@@ -113,6 +107,8 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> sta
     /* ********** */
 
     is_running_ = false;
+
+    setCommandPort();
 }
 
 
@@ -233,14 +229,13 @@ void VisualSIRParticleFilter::runFilter()
             double   delta_angle;
             delta_hand_pose.head(3) = new_arm_pose.head(3) - old_hand_pose.head(3);
             delta_angle             = new_arm_pose.tail(3).norm() - old_hand_pose.tail(3).norm();
+            // FIXME: provare a tenerlo tra 0 e 2PI come fatto dopo
             if (delta_angle >  M_PI) delta_angle -= 2.0 * M_PI;
             if (delta_angle < -M_PI) delta_angle += 2.0 * M_PI;
             delta_hand_pose.tail(3) = (new_arm_pose.tail(3) / new_arm_pose.tail(3).norm()) - (old_hand_pose.tail(3) / old_hand_pose.tail(3).norm());
 
             old_hand_pose = new_arm_pose;
 
-//            const double delta_pos_norm = delta_hand_pose.head(3).norm();
-//            const double delta_ori_norm = delta_hand_pose.tail(3).norm();
             for (int i = 0; i < icub_kin_eye_.size(); ++i)
             {
                 VectorXf sorted_pred = init_weight.middleRows(i * num_particles_, num_particles_);
@@ -249,20 +244,14 @@ void VisualSIRParticleFilter::runFilter()
                 float threshold = sorted_pred.tail(6)(0);
                 for (int j = 0; j < num_particles_; ++j)
                 {
-                    // FIXME: move the hand over time
-
-//                    if (delta_pos_norm > 0.005)
-                        init_particle.col(j + i * num_particles_).head(3) += delta_hand_pose.head(3).cast<float>();
+                    init_particle.col(j + i * num_particles_).head(3) += delta_hand_pose.head(3).cast<float>();
 
                     float ang;
                     ang = init_particle.col(j + i * num_particles_).tail(3).norm();
                     init_particle.col(j + i * num_particles_).tail(3) /= ang;
 
-//                    if (delta_ori_norm > 0.005)
-                    {
-                        init_particle.col(j + i * num_particles_).tail(3) += delta_hand_pose.tail(3).cast<float>();
-                        init_particle.col(j + i * num_particles_).tail(3) /= init_particle.col(j + i * num_particles_).tail(3).norm();
-                    }
+                    init_particle.col(j + i * num_particles_).tail(3) += delta_hand_pose.tail(3).cast<float>();
+                    init_particle.col(j + i * num_particles_).tail(3) /= init_particle.col(j + i * num_particles_).tail(3).norm();
 
                     ang += static_cast<float>(delta_angle);
                     if (ang > 2.0 * M_PI) ang -= 2.0 * M_PI;
@@ -282,10 +271,13 @@ void VisualSIRParticleFilter::runFilter()
             q = readRootToFingers();
             // FIXME: adduzione fissata
             q(10) = 32.0;
-            analogs = readRightHandAnalogs();
-//            itf_right_hand_analog_->read(analogs);
-//            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q, analogs, right_hand_analogs_bounds_);
-            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q);
+            if (analogs_)
+            {
+                analogs = readRightHandAnalogs();
+                itf_right_hand_analog_->read(analogs);
+                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q, analogs, right_hand_analogs_bounds_);
+            }
+            else std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q);
 
             MatrixXf out_particle(6, 2);
             for (int i = 0; i < icub_kin_eye_.size(); ++i)
@@ -343,112 +335,115 @@ void VisualSIRParticleFilter::runFilter()
 
 
             /* DEBUG ONLY */
-            for (int i = 0; i < icub_kin_eye_.size(); ++i)
+            if (stream_images_)
             {
-                SuperImpose::ObjPoseMap hand_pose;
-                SuperImpose::ObjPose    pose;
-                Vector ee_t(4);
-                Vector ee_o(4);
-                float ang;
-
-                icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
-                Vector chainjoints;
-                for (size_t i = 0; i < 3; ++i)
+                for (int i = 0; i < icub_kin_eye_.size(); ++i)
                 {
-                    // FIXME: vedere quale interfaccia è migliore
-//                    icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
-                    icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), chainjoints);
-                    icub_kin_finger_[i].setAng(chainjoints * (M_PI/180.0));
-                }
+                    SuperImpose::ObjPoseMap hand_pose;
+                    SuperImpose::ObjPose    pose;
+                    Vector ee_t(4);
+                    Vector ee_o(4);
+                    float ang;
 
-                ee_t(0) = out_particle(0, i);
-                ee_t(1) = out_particle(1, i);
-                ee_t(2) = out_particle(2, i);
-                ee_t(3) =             1.0;
-                ang     = out_particle.col(i).tail(3).norm();
-                ee_o(0) = out_particle(3, i) / ang;
-                ee_o(1) = out_particle(4, i) / ang;
-                ee_o(2) = out_particle(5, i) / ang;
-                ee_o(3) = ang;
+                    icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
+                    Vector chainjoints;
+                    for (size_t i = 0; i < 3; ++i)
+                    {
+                        if (analogs_) icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
+                        else          icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), chainjoints);
+                        icub_kin_finger_[i].setAng(chainjoints * (M_PI/180.0));
+                    }
 
-                pose.assign(ee_t.data(), ee_t.data()+3);
-                pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
-                hand_pose.emplace("palm", pose);
+                    ee_t(0) = out_particle(0, i);
+                    ee_t(1) = out_particle(1, i);
+                    ee_t(2) = out_particle(2, i);
+                    ee_t(3) =             1.0;
+                    ang     = out_particle.col(i).tail(3).norm();
+                    ee_o(0) = out_particle(3, i) / ang;
+                    ee_o(1) = out_particle(4, i) / ang;
+                    ee_o(2) = out_particle(5, i) / ang;
+                    ee_o(3) = ang;
 
-                YMatrix Ha = axis2dcm(ee_o);
-                Ha.setCol(3, ee_t);
-                // FIXME: middle finger only!
-                for (size_t fng = 1; fng < 3; ++fng)
-                {
-                    std::string finger_s;
+                    pose.assign(ee_t.data(), ee_t.data()+3);
+                    pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
+                    hand_pose.emplace("palm", pose);
+
+                    YMatrix Ha = axis2dcm(ee_o);
+                    Ha.setCol(3, ee_t);
+                    // FIXME: middle finger only!
+                    for (size_t fng = 1; fng < 3; ++fng)
+                    {
+                        std::string finger_s;
+                        pose.clear();
+                        if (fng != 0)
+                        {
+                            Vector j_x = (Ha * (icub_kin_finger_[fng].getH0().getCol(3))).subVector(0, 2);
+                            Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH0());
+
+                            if      (fng == 1) { finger_s = "index0"; }
+                            else if (fng == 2) { finger_s = "medium0"; }
+
+                            pose.assign(j_x.data(), j_x.data()+3);
+                            pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                            hand_pose.emplace(finger_s, pose);
+                        }
+
+                        for (size_t i = 0; i < icub_kin_finger_[fng].getN(); ++i)
+                        {
+                            Vector j_x = (Ha * (icub_kin_finger_[fng].getH(i, true).getCol(3))).subVector(0, 2);
+                            Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH(i, true));
+
+                            if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
+                            else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
+                            else if (fng == 2) { finger_s = "medium"+std::to_string(i+1); }
+
+                            pose.assign(j_x.data(), j_x.data()+3);
+                            pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                            hand_pose.emplace(finger_s, pose);
+                        }
+                    }
+
+                    YMatrix invH6 = Ha *
+                                    getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
+                                    getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
+                    Vector j_x = invH6.getCol(3).subVector(0, 2);
+                    Vector j_o = dcm2axis(invH6);
                     pose.clear();
-                    if (fng != 0)
+                    pose.assign(j_x.data(), j_x.data()+3);
+                    pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+                    hand_pose.emplace("forearm", pose);
+
+                    if (i == LEFT)
                     {
-                        Vector j_x = (Ha * (icub_kin_finger_[fng].getH0().getCol(3))).subVector(0, 2);
-                        Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH0());
-
-                        if      (fng == 1) { finger_s = "index0"; }
-                        else if (fng == 2) { finger_s = "medium0"; }
-
-                        pose.assign(j_x.data(), j_x.data()+3);
-                        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-                        hand_pose.emplace(finger_s, pose);
+                        std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(left_cam_x,  left_cam_o);
+                        /* BLACK FIRST UNCLUTTER */
+    //                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
+                        /* BLACK NEW - BAD DISP */
+    //                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
+                        /* BLACK NEW - GOOD DISP */
+                        std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
+                        std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement[0]);
+                        glfwPostEmptyEvent();
+                        port_image_out_left_.write();
                     }
 
-                    for (size_t i = 0; i < icub_kin_finger_[fng].getN(); ++i)
+                    if (i == RIGHT)
                     {
-                        Vector j_x = (Ha * (icub_kin_finger_[fng].getH(i, true).getCol(3))).subVector(0, 2);
-                        Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH(i, true));
-
-                        if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
-                        else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
-                        else if (fng == 2) { finger_s = "medium"+std::to_string(i+1); }
-
-                        pose.assign(j_x.data(), j_x.data()+3);
-                        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-                        hand_pose.emplace(finger_s, pose);
+                        std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(right_cam_x, right_cam_o);
+                        /* BLACK NEW - BAD DISP */
+    //                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
+                        /* BLACK NEW - GOOD DISP */
+                        std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
+                        std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement[1]);
+                        glfwPostEmptyEvent();
+                        port_image_out_right_.write();
                     }
-                }
-
-                YMatrix invH6 = Ha *
-                                getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
-                                getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
-                Vector j_x = invH6.getCol(3).subVector(0, 2);
-                Vector j_o = dcm2axis(invH6);
-                pose.clear();
-                pose.assign(j_x.data(), j_x.data()+3);
-                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-                hand_pose.emplace("forearm", pose);
-
-                if (i == LEFT)
-                {
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(left_cam_x,  left_cam_o);
-                    /* BLACK FIRST UNCLUTTER */
-//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
-                    /* BLACK NEW - BAD DISP */
-//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
-                    /* BLACK NEW - GOOD DISP */
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement[0]);
-                    glfwPostEmptyEvent();
-                    port_image_out_left_.write();
-                }
-
-                if (i == RIGHT)
-                {
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(right_cam_x, right_cam_o);
-                    /* BLACK NEW - BAD DISP */
-//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
-                    /* BLACK NEW - GOOD DISP */
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
-                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement[1]);
-                    glfwPostEmptyEvent();
-                    port_image_out_right_.write();
                 }
             }
             /* ********** */
         }
     }
+
     // FIXME: queste close devono andare da un'altra parte. Simil RFModule.
     port_image_in_left_.close();
     port_head_enc_.close();
@@ -456,6 +451,7 @@ void VisualSIRParticleFilter::runFilter()
     port_torso_enc_.close();
     port_image_out_left_.close();
     port_image_out_right_.close();
+    if (analogs_) drv_right_hand_analog_.close();
 }
 
 
@@ -478,6 +474,73 @@ bool VisualSIRParticleFilter::isRunning()
 void VisualSIRParticleFilter::stopThread()
 {
     is_running_ = false;
+}
+
+
+bool VisualSIRParticleFilter::setCommandPort()
+{
+    std::cout << "Opening RPC command port." << std::endl;
+    if (!port_rpc_command_.open("/hand-tracking/rpc"))
+    {
+        std::cerr << "Cannot open the RPC command port." << std::endl;
+        return false;
+    }
+    if (!this->yarp().attachAsServer(port_rpc_command_))
+    {
+        std::cerr << "Cannot attach the RPC command port." << std::endl;
+        return false;
+    }
+    std::cout << "RPC command port opened and attached. Ready to recieve commands!" << std::endl;
+
+    return true;
+}
+
+
+bool VisualSIRParticleFilter::result_images(const bool status)
+{
+    stream_images_ = status;
+
+    return true;
+}
+
+
+bool VisualSIRParticleFilter::lock_input(const bool status)
+{
+    lock_data_ = status;
+
+    return true;
+}
+
+
+bool VisualSIRParticleFilter::use_analogs(const bool status)
+{
+    if (status && !analogs_)
+    {
+        opt_right_hand_analog_.put("device", "analogsensorclient");
+        opt_right_hand_analog_.put("remote", "/icub/right_hand/analog:o");
+        opt_right_hand_analog_.put("local",  "/hand-tracking/right_hand/analog:i");
+        if (!drv_right_hand_analog_.open(opt_right_hand_analog_))
+        {
+            std::cerr << "Cannot open right hand analog driver!" << std::endl;
+            return false;
+        }
+        if (!drv_right_hand_analog_.view(itf_right_hand_analog_))
+        {
+            std::cerr << "Cannot get right hand analog interface!" << std::endl;
+            drv_right_hand_analog_.close();
+            return false;
+        }
+
+        analogs_ = status;
+
+        return true;
+    }
+    else if (!status && analogs_)
+    {
+        drv_right_hand_analog_.close();
+        return true;
+    }
+    else return false;
 }
 
 

@@ -26,19 +26,27 @@ icubcontrib_add_uninstall_target()
 
 
 # Project source and header files
-set(${PROJECT_NAME}_HDR     include/BrownianMotion.h
-                            include/VisualProprioception.h
-                            include/VisualParticleFilterCorrection.h
-                            include/VisualSIRParticleFilter.h)
+set(${PROJECT_NAME}_HDR
+        include/BrownianMotion.h
+        include/VisualProprioception.h
+        include/VisualParticleFilterCorrection.h
+        include/VisualSIRParticleFilter.h)
 
-set(${PROJECT_NAME}_SRC     src/main.cpp
-                            src/BrownianMotion.cpp
-                            src/VisualProprioception.cpp
-                            src/VisualParticleFilterCorrection.cpp
-                            src/VisualSIRParticleFilter.cpp)
+set(${PROJECT_NAME}_SRC
+        src/main.cpp
+        src/BrownianMotion.cpp
+        src/VisualProprioception.cpp
+        src/VisualParticleFilterCorrection.cpp
+        src/VisualSIRParticleFilter.cpp)
+
+set(${PROJECT_NAME}_THRIFT_HDR
+        thrift/idl_visualsirpf.thrift)
 
 # Project target calls
-add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_HDR} ${${PROJECT_NAME}_SRC})
+yarp_add_idl(${PROJECT_NAME}_THRIFT_SRC ${${PROJECT_NAME}_THRIFT_HDR})
+
+add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_HDR} ${${PROJECT_NAME}_SRC}
+                               ${${PROJECT_NAME}_THRIFT_SRC})
 
 target_include_directories(${PROJECT_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                                    ${EIGEN3_INCLUDE_DIRS}
