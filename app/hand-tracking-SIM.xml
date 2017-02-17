@@ -3,7 +3,7 @@
 <application>
 
     <!-- GENERIC INFORMATION -->
-    <name>hand-tracking</name>
+    <name>hand-tracking-SIM</name>
     <description>Visual tracking of the iCub_SIM hand by means of a 3D model-aided particle filter</description>
     <version>0.1.0</version>
 
