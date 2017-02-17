@@ -61,37 +61,47 @@ target_compile_features(${EXE_TARGET_NAME} PUBLIC cxx_nullptr cxx_constexpr)
 
 
 # Custom command for RESOURCE/EXTRA files
-set(SHADERS_VERT_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.vert
-                        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_background.vert)
+set(${EXE_TARGET_NAME}_APP
+        ${PROJECT_SOURCE_DIR}/app/hand-tracking.xml
+        ${PROJECT_SOURCE_DIR}/app/hand-tracking-BATCH.xml)
 
-set(SHADERS_FRAG_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.frag
-                        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model_simple.frag
-                        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_background.frag)
+set(SHADERS_VERT_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.vert
+        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_background.vert)
 
-set(ICUB_HAND_FILES     ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_palm.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail0.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail1.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail2.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail3.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_v1.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_full_v1.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_scaled_v1.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_simpl.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_indexbase.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml0.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml1.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml2.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml3.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_palm.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl0.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl1.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl2.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl3.obj
-                        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl4.obj)
+set(SHADERS_FRAG_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.frag
+        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model_simple.frag
+        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_background.frag)
+
+set(ICUB_HAND_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_palm.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail0.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail1.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail2.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail3.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_v1.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_full_v1.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_scaled_v1.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm_simpl.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_indexbase.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml0.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml1.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml2.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml3.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_palm.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl0.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl1.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl2.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl3.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl4.obj)
 
 add_custom_command(TARGET  ${EXE_TARGET_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E make_directory             $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
                    COMMAND ${CMAKE_COMMAND} -E copy ${SHADERS_VERT_FILES} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
                    COMMAND ${CMAKE_COMMAND} -E copy ${SHADERS_FRAG_FILES} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
                    COMMAND ${CMAKE_COMMAND} -E copy ${ICUB_HAND_FILES}    $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>)
+
+install(TARGETS ${EXE_TARGET_NAME}        DESTINATION bin)
+install(FILES   ${${EXE_TARGET_NAME}_APP} DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR})
