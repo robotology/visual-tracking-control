@@ -17,7 +17,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
 
 include(YarpInstallationHelpers)
 
-# Project source and header files
+# Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotion.h
         include/VisualProprioception.h
@@ -34,7 +34,7 @@ set(${EXE_TARGET_NAME}_SRC
 set(${EXE_TARGET_NAME}_THRIFT_HDR
         thrift/idl_visualsirpf.thrift)
 
-# Project target calls
+# Application target calls
 yarp_add_idl(${EXE_TARGET_NAME}_THRIFT_SRC ${${EXE_TARGET_NAME}_THRIFT_HDR})
 
 add_executable(${EXE_TARGET_NAME}   ${${EXE_TARGET_NAME}_HDR} ${${EXE_TARGET_NAME}_SRC}

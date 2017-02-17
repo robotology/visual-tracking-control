@@ -95,6 +95,8 @@ protected:
     yarp::sig::Matrix                                                right_hand_analogs_bounds_;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_left_;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_right_;
+    /* OUTPUT */
+    yarp::os::BufferedPort<yarp::sig::Vector>                        port_estimates_out_;
     /* DEBUG ONLY */
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_out_left_;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_out_right_;

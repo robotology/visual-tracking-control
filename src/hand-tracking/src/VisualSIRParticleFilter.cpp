@@ -14,6 +14,7 @@
 #include <opencv2/cudaobjdetect.hpp>
 #include <opencv2/cudaimgproc.hpp>
 #include <yarp/math/Math.h>
+#include <yarp/eigen/Eigen.h>
 
 #include <SuperImpose/SICAD.h>
 
@@ -24,6 +25,7 @@ using namespace cv;
 using namespace Eigen;
 using namespace iCub::ctrl;
 using namespace iCub::iKin;
+using namespace yarp::eigen;
 using namespace yarp::math;
 using namespace yarp::os;
 using namespace yarp::sig;
@@ -100,6 +102,8 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> sta
     right_hand_analogs_bounds_(12, 0) = 224.0; right_hand_analogs_bounds_(12, 1) =  63.0;
     right_hand_analogs_bounds_(13, 0) = 191.0; right_hand_analogs_bounds_(13, 1) =  36.0;
     right_hand_analogs_bounds_(14, 0) = 232.0; right_hand_analogs_bounds_(14, 1) =  98.0;
+
+    port_estimates_out_.open  ("/hand-tracking/result/estimates:o");
 
     /* DEBUG ONLY */
     port_image_out_left_.open ("/hand-tracking/result/left:o");
@@ -185,6 +189,8 @@ void VisualSIRParticleFilter::runFilter()
 
         if (imgin_left != YARP_NULLPTR)
         {
+            Vector& estimates_out = port_estimates_out_.prepare();
+
             ImageOf<PixelRgb>& imgout_left = port_image_out_left_.prepare();
             imgout_left = *imgin_left;
 
@@ -332,7 +338,11 @@ void VisualSIRParticleFilter::runFilter()
             }
             k++;
 
-
+            /* STATE ESTIMATE OUTPUT */
+            estimates_out.resize(12);
+            toEigen(estimates_out).head(6) = out_particle.col(0).cast<double>();
+            toEigen(estimates_out).tail(6) = out_particle.col(1).cast<double>();
+            port_estimates_out_.write();
 
             /* DEBUG ONLY */
             if (stream_images_)
@@ -451,6 +461,7 @@ void VisualSIRParticleFilter::runFilter()
     port_torso_enc_.close();
     port_image_out_left_.close();
     port_image_out_right_.close();
+    port_estimates_out_.close();
     if (analogs_) drv_right_hand_analog_.close();
 }
 
@@ -508,7 +519,8 @@ bool VisualSIRParticleFilter::lock_input(const bool status)
 {
     lock_data_ = status;
 
-    return true;
+    std::cerr << "lock_input not yet implemented!" << std::endl;
+    return false;
 }
 
 
