@@ -63,7 +63,8 @@ target_compile_features(${EXE_TARGET_NAME} PUBLIC cxx_nullptr cxx_constexpr)
 # Custom command for RESOURCE/EXTRA files
 set(${EXE_TARGET_NAME}_APP
         ${PROJECT_SOURCE_DIR}/app/hand-tracking.xml
-        ${PROJECT_SOURCE_DIR}/app/hand-tracking-BATCH.xml)
+        ${PROJECT_SOURCE_DIR}/app/hand-tracking-BATCH.xml
+        ${PROJECT_SOURCE_DIR}/app/hand-tracking-SIM.xml)
 
 set(SHADERS_VERT_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.vert
