@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+<application>
+
+    <!-- GENERIC INFORMATION -->
+    <name>reaching</name>
+    <description>Reaching demo of the iCub to use in conjunction with the hand-tracking app</description>
+    <version>0.1.0</version>
+
+    <authors>
+        <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
+    </authors>
+
+
+    <!-- REQUIRED MODULES -->
+    <module>
+        <name>raching</name>
+        <node>yarprun</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/cam_left --out /view/cam_left/click:o --x 20 --y 0 --RefreshTime 30</parameters>
+        <node>yarprun</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/cam_right --out /view/cam_right/click:o --x 20 --y 0 --RefreshTime 30</parameters>
+        <node>yarprun</node>
+    </module>
+
+
+    <!-- REQUIRED CONNECTIONS -->
+    <connection persist="true">
+        <from>/hand-tracking/result/estimates:o</from>
+        <to>/reaching/estimates:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/icub/camcalib/left/out</from>
+        <to>/view/cam_left</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/icub/camcalib/right/out</from>
+        <to>/view/cam_right</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/view/cam_left/click:o</from>
+        <to>/reaching/cam_left/click:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection persist="true">
+        <from>/view/cam_right/click:o</from>
+        <to>/reaching/cam_right/click:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+</application>
