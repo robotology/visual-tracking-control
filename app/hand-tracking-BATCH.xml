@@ -5,7 +5,7 @@
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking-BATCH</name>
     <description>Visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -38,49 +38,49 @@
 
 
     <!-- REQUIRED CONNECTIONS -->
-    <connection persist="true">
+    <connection>
         <from>/icub/camcalib/left/out</from>
         <to>/hand-tracking/left_img:i</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
+    <connection>
         <from>/icub/camcalib/right/out</from>
         <to>/hand-tracking/right_img:i</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
+    <connection>
         <from>/icub/head/state:o</from>
         <to>/hand-tracking/head:i</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
+    <connection>
         <from>/icub/right_arm/state:o</from>
         <to>/hand-tracking/right_arm:i</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
+    <connection>
         <from>/icub/torso/state:o</from>
         <to>/hand-tracking/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
+    <connection>
         <from>/hand-tracking/result/left:o</from>
         <to>/view/result/left</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
+    <connection>
         <from>/hand-tracking/result/right:o</from>
         <to>/view/result/right</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
+    <connection>
         <from>/icub/right_hand/analog:o</from>
         <to>/hand-tracking/right_hand/analog:i</to>
         <protocol>tcp</protocol>
