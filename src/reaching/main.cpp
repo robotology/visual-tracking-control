@@ -60,11 +60,9 @@ public:
         yInfo() << "click_3d_point = ["  << click_3d_point.toString() << "]";
 
         Vector px_des;
-        px_des.push_back(px_img_left[0]);                       /* u_l */
-        px_des.push_back(px_img_right[0]);                      /* u_r */
-        px_des.push_back(px_img_left[1]);                       /* v_l */
-        px_des.push_back((l_H_r_to_cam_ * click_3d_point)[2]);  /* l_l */
-        px_des.push_back((r_H_r_to_cam_ * click_3d_point)[2]);  /* l_r */
+        px_des.push_back(px_img_left[0]);   /* u_l */
+        px_des.push_back(px_img_right[0]);  /* u_r */
+        px_des.push_back(px_img_left[1]);   /* v_l */
 
         yInfo() << "px_des = ["  << px_des.toString() << "]";
 
@@ -96,42 +94,82 @@ public:
         yInfo() << "Proj right ee = [" << (right_proj.subVector(0, 1) / right_proj[2]).toString() << "]";
 
         Vector px_ee_now;
-        px_ee_now.push_back(left_proj [0]); /* u_ee_l */
-        px_ee_now.push_back(right_proj[0]); /* u_ee_r */
-        px_ee_now.push_back(left_proj [1]); /* v_ee_l */
-        px_ee_now.push_back(left_proj [2]); /* l_ee_l */
-        px_ee_now.push_back(right_proj[2]); /* l_ee_r */
+        px_ee_now.push_back(left_proj [0] / left_proj[2]); /* u_ee_l */
+        px_ee_now.push_back(right_proj[0] / right_proj[2]); /* u_ee_r */
+        px_ee_now.push_back(left_proj [1] / left_proj[2]); /* v_ee_l */
         yInfo() << "px_ee_now = [" << px_ee_now.toString() << "]";
 
 
+        /* Gradient */
+        Matrix gradient(3, 3);
+
+        Vector l_ee_x = estimates->subVector(0, 2);
+        l_ee_x.push_back(1.0);
+
+        double l_num_u     = dot(l_H_r_to_cam_.subrow(0, 0, 4), l_ee_x);
+        double l_num_v     = dot(l_H_r_to_cam_.subrow(1, 0, 4), l_ee_x);
+        double l_lambda    = dot(l_H_r_to_cam_.subrow(2, 0, 4), l_ee_x);
+        double l_lambda_sq = pow(l_lambda, 2.0);
+
+        gradient(0, 0) = (l_H_r_to_cam_(0, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_u) / l_lambda_sq;
+        gradient(0, 1) = (l_H_r_to_cam_(0, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_u) / l_lambda_sq;
+        gradient(0, 2) = (l_H_r_to_cam_(0, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_u) / l_lambda_sq;
+
+        gradient(2, 0) = (l_H_r_to_cam_(1, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_v) / l_lambda_sq;
+        gradient(2, 1) = (l_H_r_to_cam_(1, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_v) / l_lambda_sq;
+        gradient(2, 2) = (l_H_r_to_cam_(1, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_v) / l_lambda_sq;
+
+        Vector r_ee_x = estimates->subVector(6, 8);
+        r_ee_x.push_back(1.0);
+
+        double r_num_u     = dot(r_H_r_to_cam_.subrow(0, 0, 4), r_ee_x);
+//        double r_num_v     = dot(r_H_r_to_cam_.subrow(1, 0, 4), r_ee_x);
+        double r_lambda    = dot(r_H_r_to_cam_.subrow(2, 0, 4), r_ee_x);
+        double r_lambda_sq = pow(r_lambda, 2.0);
+
+        gradient(1, 0) = (r_H_r_to_cam_(0, 0) * r_lambda - r_H_r_to_cam_(2, 0) * r_num_u) / r_lambda_sq;
+        gradient(1, 1) = (r_H_r_to_cam_(0, 1) * r_lambda - r_H_r_to_cam_(2, 1) * r_num_u) / r_lambda_sq;
+        gradient(1, 2) = (r_H_r_to_cam_(0, 2) * r_lambda - r_H_r_to_cam_(2, 2) * r_num_u) / r_lambda_sq;
+
+
         double Ts    = 0.25;  // controller's sample time [s]
-        double K     = 0.01;  // how long it takes to move to the target [s]
+        double K     = 0.1; // how long it takes to move to the target [s]
         double v_max = 0.005; // max cartesian velocity [m/s]
 
         bool done = false;
         while (!should_stop_ && !done)
         {
-            Vector e     = px_des - px_ee_now;
-            Vector vel_x = K * (px_to_cartesian_ * e);
+            Vector e = px_des - px_ee_now;
+//            Vector vel_x = K * (px_to_cartesian_ * e);
 
             yInfo() << "e = [" << e.toString() << "]";
+
+            gradient(0, 0) *= -2.0 * e[0];
+            gradient(0, 1) *= -2.0 * e[0];
+            gradient(0, 2) *= -2.0 * e[0];
+
+            gradient(1, 0) *= -2.0 * e[1];
+            gradient(1, 1) *= -2.0 * e[1];
+            gradient(1, 2) *= -2.0 * e[1];
+
+            gradient(2, 0) *= -2.0 * e[2];
+            gradient(2, 1) *= -2.0 * e[2];
+            gradient(2, 2) *= -2.0 * e[2];
+
+            Matrix inv_gradient = luinv(gradient);
+
+            e[0] *= e[0];
+            e[1] *= e[1];
+            e[2] *= e[2];
+            Vector vel_x = -1.0 * K * inv_gradient * e;
+
             yInfo() << "vel_x = [" << vel_x.toString() << "]";
-
-            /* Enforce velocity bounds */
-            for (size_t i = 0; i < vel_x.length(); ++i)
-                vel_x[i] = sign(vel_x[i]) * std::min(v_max, std::fabs(vel_x[i]));
-
-//            vel_x[0] = sign(e[2]) * std::min(v_max, std::fabs(vel_x[0]));
-//            vel_x[1] = sign(e[0]) * std::min(v_max, std::fabs(vel_x[1]));
-//            vel_x[2] = sign((px_to_cartesian_ * e)[2]) * std::min(v_max, std::fabs(vel_x[2]));
 
             yInfo() << "px_des = [" << px_des.toString() << "]";
             yInfo() << "px_ee_now = [" << px_ee_now.toString() << "]";
-            yInfo() << "bounded vel_x = [" << vel_x.toString() << "]";
 
 //            itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
 
-//            yInfo() << "Error norm: " << norm(px_to_cartesian_ * e) << "\n";
             yInfo() << "Error norm: " << norm(e) << "\n";
 
             Time::delay(Ts);
@@ -144,15 +182,53 @@ public:
             }
             else
             {
-                estimates         = port_estimates_in_.read(true);
+//                estimates         = port_estimates_in_.read(true);
+                yInfo() << "EE L now: " << estimates->subVector(0, 2).toString();
+                yInfo() << "EE R now: " << estimates->subVector(6, 8).toString() << "\n";
+
+                estimates->setSubvector(0, estimates->subVector(0, 2) + vel_x);
+                estimates->setSubvector(6, estimates->subVector(6, 8) + vel_x);
+
+                yInfo() << "EE L cor: " << estimates->subVector(0, 2).toString();
+                yInfo() << "EE R cor: " << estimates->subVector(6, 8).toString() << "\n";
+
                 Vector left_proj  = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(0, 2) - left_eye_x));
                 Vector right_proj = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(6, 8) - right_eye_x));
 
-                px_ee_now[0] = left_proj [0]; /* u_ee_l */
-                px_ee_now[1] = right_proj[0]; /* u_ee_r */
-                px_ee_now[2] = left_proj [1]; /* v_ee_l */
-                px_ee_now[3] = left_proj [2]; /* l_ee_l */
-                px_ee_now[4] = right_proj[2]; /* l_ee_r */
+                px_ee_now[0] = left_proj [0] / left_proj[2];    /* u_ee_l */
+                px_ee_now[1] = right_proj[0] / right_proj[2];   /* u_ee_r */
+                px_ee_now[2] = left_proj [1] / left_proj[2];    /* v_ee_l */
+
+
+                /* Gradient */
+                gradient(3, 3);
+                l_ee_x = estimates->subVector(0, 2);
+                l_ee_x.push_back(1.0);
+
+                l_num_u     = dot(l_H_r_to_cam_.subrow(0, 0, 4), l_ee_x);
+                l_num_v     = dot(l_H_r_to_cam_.subrow(1, 0, 4), l_ee_x);
+                l_lambda    = dot(l_H_r_to_cam_.subrow(2, 0, 4), l_ee_x);
+                l_lambda_sq = pow(l_lambda, 2.0);
+
+                gradient(0, 0) = (l_H_r_to_cam_(0, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_u) / l_lambda_sq;
+                gradient(0, 1) = (l_H_r_to_cam_(0, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_u) / l_lambda_sq;
+                gradient(0, 2) = (l_H_r_to_cam_(0, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_u) / l_lambda_sq;
+
+                gradient(2, 0) = (l_H_r_to_cam_(1, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_v) / l_lambda_sq;
+                gradient(2, 1) = (l_H_r_to_cam_(1, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_v) / l_lambda_sq;
+                gradient(2, 2) = (l_H_r_to_cam_(1, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_v) / l_lambda_sq;
+
+                r_ee_x = estimates->subVector(6, 8);
+                r_ee_x.push_back(1.0);
+
+                r_num_u     = dot(r_H_r_to_cam_.subrow(0, 0, 4), r_ee_x);
+//                r_num_v     = dot(r_H_r_to_cam_.subrow(1, 0, 4), r_ee_x);
+                r_lambda    = dot(r_H_r_to_cam_.subrow(2, 0, 4), r_ee_x);
+                r_lambda_sq = pow(r_lambda, 2.0);
+
+                gradient(1, 0) = (r_H_r_to_cam_(0, 0) * r_lambda - r_H_r_to_cam_(2, 0) * r_num_u) / r_lambda_sq;
+                gradient(1, 1) = (r_H_r_to_cam_(0, 1) * r_lambda - r_H_r_to_cam_(2, 1) * r_num_u) / r_lambda_sq;
+                gradient(1, 2) = (r_H_r_to_cam_(0, 2) * r_lambda - r_H_r_to_cam_(2, 2) * r_num_u) / r_lambda_sq;
 
 
                 /* Left eye end-effector superimposition */
@@ -308,8 +384,15 @@ public:
         yInfo() << "right_eye_o =" << right_eye_o.toString();
 
 
-        Matrix l_H_r_to_eye = SE3inv(axis2dcm(left_eye_o));
-        Matrix r_H_r_to_eye = SE3inv(axis2dcm(right_eye_o));
+        Matrix l_H_eye = axis2dcm(left_eye_o);
+        left_eye_x.push_back(1.0);
+        l_H_eye.setCol(3, left_eye_x);
+        Matrix l_H_r_to_eye = SE3inv(l_H_eye);
+
+        Matrix r_H_eye = axis2dcm(right_eye_o);
+        right_eye_x.push_back(1.0);
+        r_H_eye.setCol(3, right_eye_x);
+        Matrix r_H_r_to_eye = SE3inv(r_H_eye);
 
         yInfo() << "l_H_r_to_eye =\n" << l_H_r_to_eye.toString();
         yInfo() << "r_H_r_to_eye =\n" << r_H_r_to_eye.toString();
