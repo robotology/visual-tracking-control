@@ -133,7 +133,7 @@ public:
 
 
         double Ts    = 0.25;  // controller's sample time [s]
-        double K     = 0.1; // how long it takes to move to the target [s]
+        double K     = 0.05; // how long it takes to move to the target [s]
         double v_max = 0.005; // max cartesian velocity [m/s]
 
         bool done = false;
@@ -168,13 +168,13 @@ public:
             yInfo() << "px_des = [" << px_des.toString() << "]";
             yInfo() << "px_ee_now = [" << px_ee_now.toString() << "]";
 
-//            itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
+            itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
 
-            yInfo() << "Error norm: " << norm(e) << "\n";
+            yInfo() << "Error norm: " << norm(px_des - px_ee_now) << "\n";
 
             Time::delay(Ts);
-//            done = (norm(px_to_cartesian_ * e) < 0.01);
-            done = (norm(e) < 3.0);
+
+            done = (norm(px_des - px_ee_now) < 5.0);
             if (done)
             {
                 yInfo() << "\npx_des =" << px_des.toString() << "px_ee_now =" << px_ee_now.toString();
@@ -182,12 +182,12 @@ public:
             }
             else
             {
-//                estimates         = port_estimates_in_.read(true);
-                yInfo() << "EE L now: " << estimates->subVector(0, 2).toString();
-                yInfo() << "EE R now: " << estimates->subVector(6, 8).toString() << "\n";
-
-                estimates->setSubvector(0, estimates->subVector(0, 2) + vel_x);
-                estimates->setSubvector(6, estimates->subVector(6, 8) + vel_x);
+                estimates         = port_estimates_in_.read(true);
+//                yInfo() << "EE L now: " << estimates->subVector(0, 2).toString();
+//                yInfo() << "EE R now: " << estimates->subVector(6, 8).toString() << "\n";
+//
+//                estimates->setSubvector(0, estimates->subVector(0, 2) + vel_x);
+//                estimates->setSubvector(6, estimates->subVector(6, 8) + vel_x);
 
                 yInfo() << "EE L cor: " << estimates->subVector(0, 2).toString();
                 yInfo() << "EE R cor: " << estimates->subVector(6, 8).toString() << "\n";
@@ -283,7 +283,7 @@ public:
             }
         }
         
-//        itf_rightarm_cart_->stopControl();
+        itf_rightarm_cart_->stopControl();
 
         Time::delay(0.5);
 
