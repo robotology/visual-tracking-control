@@ -3,16 +3,20 @@
 
 #include <iCub/ctrl/minJerkCtrl.h>
 #include <iCub/iKin/iKinFwd.h>
+#include <opencv2/core/core.hpp>
+#include <SuperImpose/SISkeleton.h>
 #include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/math/Math.h>
+#include <yarp/math/SVD.h>
 #include <yarp/os/BufferedPort.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
 #include <yarp/os/Property.h>
 #include <yarp/os/RFModule.h>
 #include <yarp/os/Time.h>
+#include <yarp/sig/Image.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
 
@@ -35,79 +39,198 @@ public:
         Bottle* click_right = port_click_right_.read (true);
         Vector* estimates   = port_estimates_in_.read(true);
 
+        yInfo() << "estimates = ["  << estimates->toString() << "]";
+
         Vector px_img_left;
         px_img_left.push_back(click_left->get(0).asDouble());
         px_img_left.push_back(click_left->get(1).asDouble());
+
+        yInfo() << "px_img_left = [" << px_img_left.toString() << "]";
 
         Vector px_img_right;
         px_img_right.push_back(click_right->get(0).asDouble());
         px_img_right.push_back(click_right->get(1).asDouble());
 
+        yInfo() << "px_img_right = [" << px_img_right.toString() << "]";
+
+        Vector click_3d_point;
+        itf_gaze_->triangulate3DPoint(px_img_left, px_img_right, click_3d_point);
+        click_3d_point.push_back(1.0);
+
+        yInfo() << "click_3d_point = ["  << click_3d_point.toString() << "]";
+
         Vector px_des;
-        px_des.push_back(px_img_left[0]);  /* u_l */
-        px_des.push_back(px_img_right[0]); /* u_r */
-        px_des.push_back(px_img_left[1]);  /* v_l */
+        px_des.push_back(px_img_left[0]);                       /* u_l */
+        px_des.push_back(px_img_right[0]);                      /* u_r */
+        px_des.push_back(px_img_left[1]);                       /* v_l */
+        px_des.push_back((l_H_r_to_cam_ * click_3d_point)[2]);  /* l_l */
+        px_des.push_back((r_H_r_to_cam_ * click_3d_point)[2]);  /* l_r */
+
+        yInfo() << "px_des = ["  << px_des.toString() << "]";
 
 
-        Vector px_left;  /* u_h_l, v_h_l */
-        Vector px_right; /* u_h_r, v_h_r */
-        itf_gaze_->get2DPixel(LEFT,  estimates->subVector(0, 2), px_left);
-        itf_gaze_->get2DPixel(RIGHT, estimates->subVector(6, 8), px_right);
+        Vector px_ee_left;  /* u_ee_l, v_ee_l */
+        itf_gaze_->get2DPixel(LEFT,  estimates->subVector(0, 2), px_ee_left);
+        yInfo() << "estimates(0, 2) = ["  << estimates->subVector(0, 2).toString() << "]";
+        yInfo() << "px_ee_left = ["  << px_ee_left.toString() << "]";
 
-        Vector px_hand;
-        px_hand.push_back(px_left[0]);  /* u_h_l */
-        px_hand.push_back(px_right[0]); /* u_h_r */
-        px_hand.push_back(px_left[1]);  /* v_h_l */
 
-        double Ts    = 0.1;  // controller's sample time [s]
-        double T     = 20.0; // how long it takes to move to the target [s]
-        double v_max = 0.01; // max cartesian velocity [m/s]
+        Vector px_ee_right; /* u_ee_r, v_ee_r */
+        itf_gaze_->get2DPixel(RIGHT, estimates->subVector(6, 8), px_ee_right);
+        yInfo() << "estimates(6, 8) = ["  << estimates->subVector(6, 8).toString() << "]";
+        yInfo() << "px_ee_right = [" << px_ee_right.toString() << "]";
+
+
+        Vector left_eye_x;
+        Vector left_eye_o;
+        itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+
+        Vector left_proj = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(0, 2) - left_eye_x));
+        yInfo() << "Proj left ee = [" << (left_proj.subVector(0, 1) / left_proj[2]).toString() << "]";
+
+        Vector right_eye_x;
+        Vector right_eye_o;
+        itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+
+        Vector right_proj = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(6, 8) - right_eye_x));
+        yInfo() << "Proj right ee = [" << (right_proj.subVector(0, 1) / right_proj[2]).toString() << "]";
+
+        Vector px_ee_now;
+        px_ee_now.push_back(left_proj [0]); /* u_ee_l */
+        px_ee_now.push_back(right_proj[0]); /* u_ee_r */
+        px_ee_now.push_back(left_proj [1]); /* v_ee_l */
+        px_ee_now.push_back(left_proj [2]); /* l_ee_l */
+        px_ee_now.push_back(right_proj[2]); /* l_ee_r */
+        yInfo() << "px_ee_now = [" << px_ee_now.toString() << "]";
+
+
+        double Ts    = 0.25;  // controller's sample time [s]
+        double K     = 0.01;  // how long it takes to move to the target [s]
+        double v_max = 0.005; // max cartesian velocity [m/s]
 
         bool done = false;
-
-        double start = Time::now();
-        double checkTime;
-        while (!this->isStopping() && !done)
+        while (!should_stop_ && !done)
         {
-            Vector e     = px_des - px_hand;
-            Vector vel_x = (px_to_cartesian_ * e) / T;
+            Vector e     = px_des - px_ee_now;
+            Vector vel_x = K * (px_to_cartesian_ * e);
+
+            yInfo() << "e = [" << e.toString() << "]";
+            yInfo() << "vel_x = [" << vel_x.toString() << "]";
 
             /* Enforce velocity bounds */
             for (size_t i = 0; i < vel_x.length(); ++i)
-                vel_x[i] = sign(e[i]) * std::min(v_max, std::fabs(vel_x[i]));
+                vel_x[i] = sign(vel_x[i]) * std::min(v_max, std::fabs(vel_x[i]));
 
-            itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
+//            vel_x[0] = sign(e[2]) * std::min(v_max, std::fabs(vel_x[0]));
+//            vel_x[1] = sign(e[0]) * std::min(v_max, std::fabs(vel_x[1]));
+//            vel_x[2] = sign((px_to_cartesian_ * e)[2]) * std::min(v_max, std::fabs(vel_x[2]));
+
+            yInfo() << "px_des = [" << px_des.toString() << "]";
+            yInfo() << "px_ee_now = [" << px_ee_now.toString() << "]";
+            yInfo() << "bounded vel_x = [" << vel_x.toString() << "]";
+
+//            itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
+
+//            yInfo() << "Error norm: " << norm(px_to_cartesian_ * e) << "\n";
+            yInfo() << "Error norm: " << norm(e) << "\n";
+
             Time::delay(Ts);
-            checkTime = Time::now();
-
-            done = (norm(e.subVector(0, 2)) < 0.01 || (checkTime-start) >= 60.0);
+//            done = (norm(px_to_cartesian_ * e) < 0.01);
+            done = (norm(e) < 3.0);
             if (done)
             {
-                yDebug() << "px_des =" << px_des.toString(3, 3).c_str() << "px_hand =" << px_hand.toString(3, 3).c_str();
-                yDebug() << "Checktime " << (checkTime - start);
+                yInfo() << "\npx_des =" << px_des.toString() << "px_ee_now =" << px_ee_now.toString();
+                yInfo() << "Terminating!\n";
             }
             else
             {
-                estimates = port_estimates_in_.read(true);
-                itf_gaze_->get2DPixel(LEFT,  estimates->subVector(0, 2), px_left);
-                itf_gaze_->get2DPixel(RIGHT, estimates->subVector(6, 8), px_right);
+                estimates         = port_estimates_in_.read(true);
+                Vector left_proj  = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(0, 2) - left_eye_x));
+                Vector right_proj = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(6, 8) - right_eye_x));
 
-                px_hand.push_back(px_left[0]);  /* u_h_l */
-                px_hand.push_back(px_right[0]); /* u_h_r */
-                px_hand.push_back(px_left[1]);  /* v_h_l */
+                px_ee_now[0] = left_proj [0]; /* u_ee_l */
+                px_ee_now[1] = right_proj[0]; /* u_ee_r */
+                px_ee_now[2] = left_proj [1]; /* v_ee_l */
+                px_ee_now[3] = left_proj [2]; /* l_ee_l */
+                px_ee_now[4] = right_proj[2]; /* l_ee_r */
+
+
+                /* Left eye end-effector superimposition */
+                SuperImpose::ObjPoseMap l_click_pose;
+                SuperImpose::ObjPose    l_click;
+                l_click.assign(click_3d_point.data(), click_3d_point.data()+3);
+                l_click_pose.emplace("palm", l_click);
+
+                SuperImpose::ObjPoseMap l_ee_pose;
+                SuperImpose::ObjPose    l_pose;
+                l_pose.assign((*estimates).data(), (*estimates).data()+3);
+                l_ee_pose.emplace("palm", l_pose);
+
+                ImageOf<PixelRgb>* l_imgin  = port_image_left_in_.read(true);
+                ImageOf<PixelRgb>& l_imgout = port_image_left_out_.prepare();
+                l_imgout = *l_imgin;
+                cv::Mat l_img = cv::cvarrToMat(l_imgout.getIplImage());
+
+                Vector left_eye_x;
+                Vector left_eye_o;
+                itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+
+                l_si_skel_->superimpose(l_ee_pose,    left_eye_x.data(), left_eye_o.data(), l_img);
+                l_si_skel_->superimpose(l_click_pose, left_eye_x.data(), left_eye_o.data(), l_img);
+                
+                port_image_left_out_.write();
+
+                /* Right eye end-effector superimposition */
+                SuperImpose::ObjPoseMap r_click_pose;
+                SuperImpose::ObjPose    r_click;
+                r_click.assign(click_3d_point.data(), click_3d_point.data()+3);
+                r_click_pose.emplace("palm", r_click);
+
+                SuperImpose::ObjPoseMap r_ee_pose;
+                SuperImpose::ObjPose    r_pose;
+                r_pose.assign((*estimates).data()+6, (*estimates).data()+9);
+                r_ee_pose.emplace("palm", r_pose);
+
+                ImageOf<PixelRgb>* r_imgin  = port_image_right_in_.read(true);
+                ImageOf<PixelRgb>& r_imgout = port_image_right_out_.prepare();
+                r_imgout = *r_imgin;
+                cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
+
+                Vector right_eye_x;
+                Vector right_eye_o;
+                itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+
+                r_si_skel_->superimpose(r_ee_pose,    right_eye_x.data(), right_eye_o.data(), r_img);
+                r_si_skel_->superimpose(r_click_pose, right_eye_x.data(), right_eye_o.data(), r_img);
+                
+                port_image_right_out_.write();
             }
         }
         
-        itf_rightarm_cart_->stopControl();
+//        itf_rightarm_cart_->stopControl();
 
-        return true;
+        Time::delay(0.5);
+
+        return false;
     }
 
     bool configure(ResourceFinder &rf)
     {
         if (!port_estimates_in_.open("/reaching/estimates:i"))
         {
-            yError() << "Could not open /reaching/estimates:in port! Closing.";
+            yError() << "Could not open /reaching/estimates:i port! Closing.";
+            return false;
+        }
+
+        if (!port_image_left_in_.open("/reaching/cam_left/img:i"))
+        {
+            yError() << "Could not open /reaching/cam_left/img:i port! Closing.";
+            return false;
+        }
+
+        if (!port_image_left_out_.open("/reaching/cam_left/img:o"))
+        {
+            yError() << "Could not open /reaching/cam_left/img:o port! Closing.";
             return false;
         }
 
@@ -117,9 +240,21 @@ public:
             return false;
         }
 
+        if (!port_image_right_in_.open("/reaching/cam_right/img:i"))
+        {
+            yError() << "Could not open /reaching/cam_right/img:i port! Closing.";
+            return false;
+        }
+
+        if (!port_image_right_out_.open("/reaching/cam_right/img:o"))
+        {
+            yError() << "Could not open /reaching/cam_right/img:o port! Closing.";
+            return false;
+        }
+
         if (!port_click_right_.open("/reaching/cam_right/click:i"))
         {
-            yError() << "Could not open /reaching/cam_right/click:in port! Closing.";
+            yError() << "Could not open /reaching/cam_right/click:i port! Closing.";
             return false;
         }
 
@@ -132,12 +267,34 @@ public:
         yInfo() << "[CAM INFO]" << btl_cam_info.toString();
         Bottle* cam_left_info = btl_cam_info.findGroup("camera_intrinsics_left").get(1).asList();
         Bottle* cam_right_info = btl_cam_info.findGroup("camera_intrinsics_right").get(1).asList();
-        float left_fx_ = static_cast<float>(cam_left_info->get(0).asDouble());
-        float left_cx_ = static_cast<float>(cam_left_info->get(2).asDouble());
-        float left_fy_ = static_cast<float>(cam_left_info->get(5).asDouble());
-        float left_cy_ = static_cast<float>(cam_left_info->get(6).asDouble());
-        float right_fx_ = static_cast<float>(cam_right_info->get(0).asDouble());
-        float right_cx_ = static_cast<float>(cam_right_info->get(2).asDouble());
+
+        float left_fx  = static_cast<float>(cam_left_info->get(0).asDouble());
+        float left_cx  = static_cast<float>(cam_left_info->get(2).asDouble());
+        float left_fy  = static_cast<float>(cam_left_info->get(5).asDouble());
+        float left_cy  = static_cast<float>(cam_left_info->get(6).asDouble());
+
+        Matrix left_proj(3, 4);
+        left_proj(0, 0) = left_fx;
+        left_proj(0, 2) = left_cx;
+        left_proj(1, 1) = left_fy;
+        left_proj(1, 2) = left_cy;
+        left_proj(2, 2) = 1.0;
+
+        yInfo() << "left_proj =\n" << left_proj.toString();
+
+        float right_fx = static_cast<float>(cam_right_info->get(0).asDouble());
+        float right_cx = static_cast<float>(cam_right_info->get(2).asDouble());
+        float right_fy = static_cast<float>(cam_right_info->get(5).asDouble());
+        float right_cy = static_cast<float>(cam_right_info->get(6).asDouble());
+
+        Matrix right_proj(3, 4);
+        right_proj(0, 0) = right_fx;
+        right_proj(0, 2) = right_cx;
+        right_proj(1, 1) = right_fy;
+        right_proj(1, 2) = right_cy;
+        right_proj(2, 2) = 1.0;
+
+        yInfo() << "right_proj =\n" << right_proj.toString();
 
         Vector left_eye_x;
         Vector left_eye_o;
@@ -145,74 +302,76 @@ public:
 
         Vector right_eye_x;
         Vector right_eye_o;
-        itf_gaze_->getLeftEyePose(right_eye_x, right_eye_o);
+        itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
-       
-        double l_theta  = left_eye_o[3];
-        double l_c = cos(l_theta);
-        double l_s = sin(l_theta);
-        double l_C = 1.0 - l_c;
-
-        double l_xs  = left_eye_o[0] * l_s;
-        double l_ys  = left_eye_o[1] * l_s;
-        double l_zs  = left_eye_o[2] * l_s;
-        double l_xC  = left_eye_o[0] * l_C;
-        double l_yC  = left_eye_o[1] * l_C;
-        double l_zC  = left_eye_o[2] * l_C;
-        double l_xyC = left_eye_o[0] * l_yC;
-        double l_yzC = left_eye_o[1] * l_zC;
-        double l_zxC = left_eye_o[2] * l_xC;
-
-        double l_h00 = left_eye_o[0] * l_xC + l_c;
-        double l_h01 = l_xyC - l_zs;
-        double l_h02 = l_zxC + l_ys;
-        double l_h10 = l_xyC + l_zs;
-        double l_h11 = left_eye_o[1] * l_yC + l_c;
-        double l_h12 = l_yzC - l_xs;
-        double l_h20 = l_zxC - l_ys;
-        double l_h21 = l_yzC + l_xs;
-        double l_h22 = left_eye_o[2] * l_zC + l_c;
+        yInfo() << "left_eye_o =" << left_eye_o.toString();
+        yInfo() << "right_eye_o =" << right_eye_o.toString();
 
 
-        double r_theta = right_eye_o[3];
-        double r_c = cos(r_theta);
-        double r_s = sin(r_theta);
-        double r_C = 1.0 - r_c;
-        
-        double r_xs  = right_eye_o[0] * r_s;
-        double r_ys  = right_eye_o[1] * r_s;
-        double r_zs  = right_eye_o[2] * r_s;
-        double r_xC  = right_eye_o[0] * r_C;
-        double r_yC  = right_eye_o[1] * r_C;
-        double r_zC  = right_eye_o[2] * r_C;
-        double r_xyC = right_eye_o[0] * r_yC;
-        double r_yzC = right_eye_o[1] * r_zC;
-        double r_zxC = right_eye_o[2] * r_xC;
-        
-        double r_h00 = right_eye_o[0] * r_xC + r_c;
-        double r_h01 = r_xyC - r_zs;
-        double r_h02 = r_zxC + r_ys;
-//        double r_h10 = r_xyC + r_zs;
-//        double r_h11 = right_eye_o[1] * r_yC + r_c;
-//        double r_h12 = r_yzC - r_xs;
-        double r_h20 = r_zxC - r_ys;
-        double r_h21 = r_yzC + r_xs;
-        double r_h22 = right_eye_o[2] * r_zC + r_c;
+        Matrix l_H_r_to_eye = SE3inv(axis2dcm(left_eye_o));
+        Matrix r_H_r_to_eye = SE3inv(axis2dcm(right_eye_o));
 
-        px_to_cartesian_ = Matrix(3, 3);
-        px_to_cartesian_(0, 0) = left_fx_  * l_h00 + left_cx_  * l_h20;
-        px_to_cartesian_(0, 1) = left_fx_  * l_h01 + left_cx_  * l_h21;
-        px_to_cartesian_(0, 2) = left_fx_  * l_h02 + left_cx_  * l_h22;
+        yInfo() << "l_H_r_to_eye =\n" << l_H_r_to_eye.toString();
+        yInfo() << "r_H_r_to_eye =\n" << r_H_r_to_eye.toString();
 
-        px_to_cartesian_(1, 0) = right_fx_ * r_h00 + right_cx_ * r_h20;
-        px_to_cartesian_(1, 1) = right_fx_ * r_h01 + right_cx_ * r_h21;
-        px_to_cartesian_(1, 2) = right_fx_ * r_h02 + right_cx_ * r_h22;
+        l_H_r_to_cam_ = left_proj  * l_H_r_to_eye;
+        r_H_r_to_cam_ = right_proj * r_H_r_to_eye;
 
-        px_to_cartesian_(2, 0) = left_fy_  * l_h10 + left_cy_  * l_h20;
-        px_to_cartesian_(2, 1) = left_fy_  * l_h11 + left_cy_  * l_h21;
-        px_to_cartesian_(2, 2) = left_fy_  * l_h12 + left_cy_  * l_h22;
+        yInfo() << "l_H_r_to_cam_ =\n" << l_H_r_to_cam_.toString();
+        yInfo() << "r_H_r_to_cam_ =\n" << r_H_r_to_cam_.toString();
 
-        px_to_cartesian_ = luinv(px_to_cartesian_);
+
+        Matrix cartesian_to_px(5, 3);
+
+        cartesian_to_px(0, 0) = l_H_r_to_cam_(0, 0);
+        cartesian_to_px(0, 1) = l_H_r_to_cam_(0, 1);
+        cartesian_to_px(0, 2) = l_H_r_to_cam_(0, 2);
+
+        cartesian_to_px(1, 0) = r_H_r_to_cam_(0, 0);
+        cartesian_to_px(1, 1) = r_H_r_to_cam_(0, 1);
+        cartesian_to_px(1, 2) = r_H_r_to_cam_(0, 2);
+
+        cartesian_to_px(2, 0) = l_H_r_to_cam_(1, 0);
+        cartesian_to_px(2, 1) = l_H_r_to_cam_(1, 1);
+        cartesian_to_px(2, 2) = l_H_r_to_cam_(1, 2);
+
+        cartesian_to_px(3, 0) = l_H_r_to_cam_(2, 0);
+        cartesian_to_px(3, 1) = l_H_r_to_cam_(2, 1);
+        cartesian_to_px(3, 2) = l_H_r_to_cam_(2, 2);
+
+        cartesian_to_px(4, 0) = r_H_r_to_cam_(2, 0);
+        cartesian_to_px(4, 1) = r_H_r_to_cam_(2, 1);
+        cartesian_to_px(4, 2) = r_H_r_to_cam_(2, 2);
+
+        px_to_cartesian_ = pinv(cartesian_to_px);
+
+        yInfo() << "px_to_cartesian_ =\n" << px_to_cartesian_.toString();
+
+        l_si_skel_ = new SISkeleton(left_fx,  left_fy,  left_cx,  left_cy);
+        r_si_skel_ = new SISkeleton(right_fx, right_fy, right_cx, right_cy);
+
+        handler_port_.open("/reaching/cmd:i");
+        attach(handler_port_);
+
+        return true;
+    }
+
+    bool respond(const Bottle& command, Bottle& reply)
+    {
+        int cmd = command.get(0).asVocab();
+        switch (cmd)
+        {
+            case VOCAB4('q','u','i','t'):
+            {
+                reply = command;
+                should_stop_ = true;
+                break;
+            }
+            default:
+            {
+                reply.addString("nack");
+            }
+        }
 
         return true;
     }
@@ -221,9 +380,16 @@ public:
     {
         yInfo() << "Interrupting module.\nPort cleanup...";
 
+        Time::delay(3.0);
+
         port_estimates_in_.interrupt();
+        port_image_left_in_.interrupt();
+        port_image_left_out_.interrupt();
         port_click_left_.interrupt();
+        port_image_right_in_.interrupt();
+        port_image_right_out_.interrupt();
         port_click_right_.interrupt();
+        handler_port_.interrupt();
 
         return true;
     }
@@ -233,7 +399,11 @@ public:
         yInfo() << "Calling close functions...";
 
         port_estimates_in_.close();
+        port_image_left_in_.close();
+        port_image_left_out_.close();
         port_click_left_.close();
+        port_image_right_in_.close();
+        port_image_right_out_.close();
         port_click_right_.close();
 
         itf_rightarm_cart_->removeTipFrame();
@@ -241,23 +411,37 @@ public:
         if (rightarm_cartesian_driver_.isValid()) rightarm_cartesian_driver_.close();
         if (gaze_driver_.isValid())               gaze_driver_.close();
 
+        handler_port_.close();
+
         return true;
     }
 
 private:
-    BufferedPort<Vector>  port_estimates_in_;
+    Port                             handler_port_;
+    bool                             should_stop_ = false;
 
-    BufferedPort<Bottle>  port_click_left_;
+    SISkeleton                     * l_si_skel_;
+    SISkeleton                     * r_si_skel_;
 
-    BufferedPort<Bottle>  port_click_right_;
+    BufferedPort<Vector>             port_estimates_in_;
 
-    PolyDriver            rightarm_cartesian_driver_;
-    ICartesianControl   * itf_rightarm_cart_;
+    BufferedPort<ImageOf<PixelRgb>>  port_image_left_in_;
+    BufferedPort<ImageOf<PixelRgb>>  port_image_left_out_;
+    BufferedPort<Bottle>             port_click_left_;
 
-    PolyDriver            gaze_driver_;
-    IGazeControl        * itf_gaze_;
+    BufferedPort<ImageOf<PixelRgb>>  port_image_right_in_;
+    BufferedPort<ImageOf<PixelRgb>>  port_image_right_out_;
+    BufferedPort<Bottle>             port_click_right_;
 
-    Matrix                px_to_cartesian_;
+    PolyDriver                       rightarm_cartesian_driver_;
+    ICartesianControl              * itf_rightarm_cart_;
+
+    PolyDriver                       gaze_driver_;
+    IGazeControl                   * itf_gaze_;
+
+    Matrix                           l_H_r_to_cam_;
+    Matrix                           r_H_r_to_cam_;
+    Matrix                           px_to_cartesian_;
     enum camsel
     {
         LEFT = 0,

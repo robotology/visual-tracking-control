@@ -78,8 +78,8 @@ VisualProprioception::VisualProprioception(const yarp::os::ConstString lateralir
     cad_hand_["medium3"] = rf.findFileByName("r_ml3.obj");
     if (!file_found(cad_hand_["medium3"])) throw std::runtime_error("Runtime error: file r_ml3.obj not found!");
 
-    cad_hand_["forearm"] = rf.findFileByName("r_forearm.obj");
-    if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
+//    cad_hand_["forearm"] = rf.findFileByName("r_forearm.obj");
+//    if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
 
     si_cad_ = new SICAD(cad_hand_);
 
@@ -273,15 +273,15 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
             }
         }
 
-        YMatrix invH6 = Ha *
-                        getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
-                        getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
-        Vector j_x = invH6.getCol(3).subVector(0, 2);
-        Vector j_o = dcm2axis(invH6);
-        pose.clear();
-        pose.assign(j_x.data(), j_x.data()+3);
-        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-        hand_pose.emplace("forearm", pose);
+//        YMatrix invH6 = Ha *
+//                        getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
+//                        getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
+//        Vector j_x = invH6.getCol(3).subVector(0, 2);
+//        Vector j_o = dcm2axis(invH6);
+//        pose.clear();
+//        pose.assign(j_x.data(), j_x.data()+3);
+//        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+//        hand_pose.emplace("forearm", pose);
 
         hand_poses.push_back(hand_pose);
     }

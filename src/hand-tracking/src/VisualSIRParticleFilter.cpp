@@ -16,7 +16,8 @@
 #include <yarp/math/Math.h>
 #include <yarp/eigen/Eigen.h>
 
-#include <SuperImpose/SICAD.h>
+//#include <SuperImpose/SICAD.h>
+#include <SuperImpose/SISkeleton.h>
 
 #include "VisualProprioception.h"
 
@@ -170,7 +171,6 @@ void VisualSIRParticleFilter::runFilter()
     }
 
 
-
     /* FILTERING */
     ImageOf<PixelRgb>* imgin_left  = YARP_NULLPTR;
     ImageOf<PixelRgb>* imgin_right = YARP_NULLPTR;
@@ -236,8 +236,9 @@ void VisualSIRParticleFilter::runFilter()
             delta_hand_pose.head(3) = new_arm_pose.head(3) - old_hand_pose.head(3);
             delta_angle             = new_arm_pose.tail(3).norm() - old_hand_pose.tail(3).norm();
             // FIXME: provare a tenerlo tra 0 e 2PI come fatto dopo
-            if (delta_angle >  M_PI) delta_angle -= 2.0 * M_PI;
-            if (delta_angle < -M_PI) delta_angle += 2.0 * M_PI;
+            if (delta_angle > 2.0 * M_PI) delta_angle -= 2.0 * M_PI;
+//            if (delta_angle >  M_PI) delta_angle -= 2.0 * M_PI;
+//            if (delta_angle < -M_PI) delta_angle += 2.0 * M_PI;
             delta_hand_pose.tail(3) = (new_arm_pose.tail(3) / new_arm_pose.tail(3).norm()) - (old_hand_pose.tail(3) / old_hand_pose.tail(3).norm());
 
             old_hand_pose = new_arm_pose;
@@ -339,10 +340,52 @@ void VisualSIRParticleFilter::runFilter()
             k++;
 
             /* STATE ESTIMATE OUTPUT */
+            icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
+            Vector chainjoints;
+            if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
+            else          icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), chainjoints);
+            icub_kin_finger_[1].setAng(chainjoints * (M_PI/180.0));
+
+            Vector l_ee_t(3);
+            toEigen(l_ee_t) = out_particle.col(0).head(3).cast<double>();
+            l_ee_t.push_back(1.0);
+
+            Vector l_ee_o(3);
+            toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
+            l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
+
+            YMatrix l_Ha = axis2dcm(l_ee_o);
+            l_Ha.setCol(3, l_ee_t);
+            Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
+            Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
+            l_i_o.setSubvector(0, l_i_o.subVector(0, 2) * l_i_o[3]);
+
+
+            Vector r_ee_t(3);
+            toEigen(r_ee_t) = out_particle.col(1).head(3).cast<double>();
+            r_ee_t.push_back(1.0);
+
+            Vector r_ee_o(3);
+            toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
+            r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
+
+            YMatrix r_Ha = axis2dcm(r_ee_o);
+            r_Ha.setCol(3, r_ee_t);
+            Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
+            Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
+            r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
+
             estimates_out.resize(12);
-            toEigen(estimates_out).head(6) = out_particle.col(0).cast<double>();
-            toEigen(estimates_out).tail(6) = out_particle.col(1).cast<double>();
+            estimates_out.setSubvector(0, l_i_x);
+            estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
+            estimates_out.setSubvector(6, r_i_x);
+            estimates_out.setSubvector(9, r_i_o.subVector(0, 2));
             port_estimates_out_.write();
+
+//            estimates_out.resize(12);
+//            toEigen(estimates_out).head(6) = out_particle.col(0).cast<double>();
+//            toEigen(estimates_out).tail(6) = out_particle.col(1).cast<double>();
+//            port_estimates_out_.write();
 
             /* DEBUG ONLY */
             if (stream_images_)
@@ -367,7 +410,7 @@ void VisualSIRParticleFilter::runFilter()
                     ee_t(0) = out_particle(0, i);
                     ee_t(1) = out_particle(1, i);
                     ee_t(2) = out_particle(2, i);
-                    ee_t(3) =             1.0;
+                    ee_t(3) = 1.0;
                     ang     = out_particle.col(i).tail(3).norm();
                     ee_o(0) = out_particle(3, i) / ang;
                     ee_o(1) = out_particle(4, i) / ang;
@@ -413,15 +456,15 @@ void VisualSIRParticleFilter::runFilter()
                         }
                     }
 
-                    YMatrix invH6 = Ha *
-                                    getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
-                                    getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
-                    Vector j_x = invH6.getCol(3).subVector(0, 2);
-                    Vector j_o = dcm2axis(invH6);
-                    pose.clear();
-                    pose.assign(j_x.data(), j_x.data()+3);
-                    pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-                    hand_pose.emplace("forearm", pose);
+//                    YMatrix invH6 = Ha *
+//                                    getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
+//                                    getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
+//                    Vector j_x = invH6.getCol(3).subVector(0, 2);
+//                    Vector j_o = dcm2axis(invH6);
+//                    pose.clear();
+//                    pose.assign(j_x.data(), j_x.data()+3);
+//                    pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+//                    hand_pose.emplace("forearm", pose);
 
                     if (i == LEFT)
                     {
@@ -433,6 +476,7 @@ void VisualSIRParticleFilter::runFilter()
                         /* BLACK NEW - GOOD DISP */
                         std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
                         std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement[0]);
+
                         glfwPostEmptyEvent();
                         port_image_out_left_.write();
                     }
@@ -445,6 +489,7 @@ void VisualSIRParticleFilter::runFilter()
                         /* BLACK NEW - GOOD DISP */
                         std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
                         std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement[1]);
+
                         glfwPostEmptyEvent();
                         port_image_out_right_.write();
                     }
@@ -543,13 +588,16 @@ bool VisualSIRParticleFilter::use_analogs(const bool status)
             return false;
         }
 
-        analogs_ = status;
+        analogs_ = true;
 
         return true;
     }
     else if (!status && analogs_)
     {
         drv_right_hand_analog_.close();
+
+        analogs_ = false;
+
         return true;
     }
     else return false;
