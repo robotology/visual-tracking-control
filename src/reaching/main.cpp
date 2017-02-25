@@ -4,6 +4,7 @@
 #include <iCub/ctrl/minJerkCtrl.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <SuperImpose/SISkeleton.h>
 #include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/GazeControl.h>
@@ -15,6 +16,7 @@
 #include <yarp/os/Network.h>
 #include <yarp/os/Property.h>
 #include <yarp/os/RFModule.h>
+#include <yarp/os/RpcClient.h>
 #include <yarp/os/Time.h>
 #include <yarp/sig/Image.h>
 #include <yarp/sig/Matrix.h>
@@ -35,29 +37,25 @@ public:
 
     bool updateModule()
     {
-        Bottle* click_left  = port_click_left_.read  (true);
-        Bottle* click_right = port_click_right_.read (true);
+        while (!take_estimates_);
+
         Vector* estimates   = port_estimates_in_.read(true);
+
+        if (should_stop_) return false;
 
         yInfo() << "estimates = ["  << estimates->toString() << "]";
 
         Vector px_img_left;
-        px_img_left.push_back(click_left->get(0).asDouble());
-        px_img_left.push_back(click_left->get(1).asDouble());
+        px_img_left.push_back(l_px_location_[0]);
+        px_img_left.push_back(l_px_location_[1]);
 
         yInfo() << "px_img_left = [" << px_img_left.toString() << "]";
 
         Vector px_img_right;
-        px_img_right.push_back(click_right->get(0).asDouble());
-        px_img_right.push_back(click_right->get(1).asDouble());
+        px_img_right.push_back(r_px_location_[0]);
+        px_img_right.push_back(r_px_location_[1]);
 
         yInfo() << "px_img_right = [" << px_img_right.toString() << "]";
-
-        Vector click_3d_point;
-        itf_gaze_->triangulate3DPoint(px_img_left, px_img_right, click_3d_point);
-        click_3d_point.push_back(1.0);
-
-        yInfo() << "click_3d_point = ["  << click_3d_point.toString() << "]";
 
         Vector px_des;
         px_des.push_back(px_img_left[0]);   /* u_l */
@@ -132,15 +130,14 @@ public:
         gradient(1, 2) = (r_H_r_to_cam_(0, 2) * r_lambda - r_H_r_to_cam_(2, 2) * r_num_u) / r_lambda_sq;
 
 
-        double Ts    = 0.25;  // controller's sample time [s]
-        double K     = 0.05; // how long it takes to move to the target [s]
+        double Ts    = 0.25; // controller's sample time [s]
+        double K     = 1;  // how long it takes to move to the target [s]
         double v_max = 0.005; // max cartesian velocity [m/s]
 
         bool done = false;
         while (!should_stop_ && !done)
         {
             Vector e = px_des - px_ee_now;
-//            Vector vel_x = K * (px_to_cartesian_ * e);
 
             yInfo() << "e = [" << e.toString() << "]";
 
@@ -165,16 +162,23 @@ public:
 
             yInfo() << "vel_x = [" << vel_x.toString() << "]";
 
+            /* Enforce velocity bounds */
+            for (size_t i = 0; i < vel_x.length(); ++i)
+                vel_x[i] = sign(vel_x[i]) * std::min(v_max, std::fabs(vel_x[i]));
+
+            yInfo() << "bounded vel_x = [" << vel_x.toString() << "]";
             yInfo() << "px_des = [" << px_des.toString() << "]";
             yInfo() << "px_ee_now = [" << px_ee_now.toString() << "]";
 
             itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
 
-            yInfo() << "Error norm: " << norm(px_des - px_ee_now) << "\n";
+            yInfo() << "Pixel error norm (0, 1): " << norm(px_des.subVector(0, 1) - px_ee_now.subVector(0, 1));
+            yInfo() << "Pixel error norm (2): " << std::abs(px_des(2) - px_ee_now(2));
+            yInfo() << "Poistion error norm: " << norm(vel_x);
 
             Time::delay(Ts);
 
-            done = (norm(px_des - px_ee_now) < 5.0);
+            done = ((norm(px_des.subVector(0, 1) - px_ee_now.subVector(0, 1)) < 5.0) && (std::abs(px_des(2) - px_ee_now(2)) < 5.0));
             if (done)
             {
                 yInfo() << "\npx_des =" << px_des.toString() << "px_ee_now =" << px_ee_now.toString();
@@ -232,11 +236,6 @@ public:
 
 
                 /* Left eye end-effector superimposition */
-                SuperImpose::ObjPoseMap l_click_pose;
-                SuperImpose::ObjPose    l_click;
-                l_click.assign(click_3d_point.data(), click_3d_point.data()+3);
-                l_click_pose.emplace("palm", l_click);
-
                 SuperImpose::ObjPoseMap l_ee_pose;
                 SuperImpose::ObjPose    l_pose;
                 l_pose.assign((*estimates).data(), (*estimates).data()+3);
@@ -252,16 +251,11 @@ public:
                 itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
 
                 l_si_skel_->superimpose(l_ee_pose,    left_eye_x.data(), left_eye_o.data(), l_img);
-                l_si_skel_->superimpose(l_click_pose, left_eye_x.data(), left_eye_o.data(), l_img);
+                cv::circle(l_img, cv::Point(l_px_location_[0], l_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
                 
                 port_image_left_out_.write();
 
                 /* Right eye end-effector superimposition */
-                SuperImpose::ObjPoseMap r_click_pose;
-                SuperImpose::ObjPose    r_click;
-                r_click.assign(click_3d_point.data(), click_3d_point.data()+3);
-                r_click_pose.emplace("palm", r_click);
-
                 SuperImpose::ObjPoseMap r_ee_pose;
                 SuperImpose::ObjPose    r_pose;
                 r_pose.assign((*estimates).data()+6, (*estimates).data()+9);
@@ -277,7 +271,7 @@ public:
                 itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
                 r_si_skel_->superimpose(r_ee_pose,    right_eye_x.data(), right_eye_o.data(), r_img);
-                r_si_skel_->superimpose(r_click_pose, right_eye_x.data(), right_eye_o.data(), r_img);
+                cv::circle(r_img, cv::Point(r_px_location_[0], r_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
                 
                 port_image_right_out_.write();
             }
@@ -334,9 +328,13 @@ public:
             return false;
         }
 
-        if (!setRightArmCartesianController()) return false;
-
         if (!setGazeController()) return false;
+
+        if (!setTorsoRemoteControlboard()) return false;
+
+        if (!setRightArmRemoteControlboard()) return false;
+
+        if (!setRightArmCartesianController()) return false;
 
         Bottle btl_cam_info;
         itf_gaze_->getInfo(btl_cam_info);
@@ -349,28 +347,29 @@ public:
         float left_fy  = static_cast<float>(cam_left_info->get(5).asDouble());
         float left_cy  = static_cast<float>(cam_left_info->get(6).asDouble());
 
-        Matrix left_proj(3, 4);
-        left_proj(0, 0) = left_fx;
-        left_proj(0, 2) = left_cx;
-        left_proj(1, 1) = left_fy;
-        left_proj(1, 2) = left_cy;
-        left_proj(2, 2) = 1.0;
+        left_proj_ = Matrix(3, 4);
+        left_proj_(0, 0) = left_fx;
+        left_proj_(0, 2) = left_cx;
+        left_proj_(1, 1) = left_fy;
+        left_proj_(1, 2) = left_cy;
+        left_proj_(2, 2) = 1.0;
 
-        yInfo() << "left_proj =\n" << left_proj.toString();
+        yInfo() << "left_proj =\n" << left_proj_.toString();
 
         float right_fx = static_cast<float>(cam_right_info->get(0).asDouble());
         float right_cx = static_cast<float>(cam_right_info->get(2).asDouble());
         float right_fy = static_cast<float>(cam_right_info->get(5).asDouble());
         float right_cy = static_cast<float>(cam_right_info->get(6).asDouble());
 
-        Matrix right_proj(3, 4);
-        right_proj(0, 0) = right_fx;
-        right_proj(0, 2) = right_cx;
-        right_proj(1, 1) = right_fy;
-        right_proj(1, 2) = right_cy;
-        right_proj(2, 2) = 1.0;
+        right_proj_ = Matrix(3, 4);
+        right_proj_(0, 0) = right_fx;
+        right_proj_(0, 2) = right_cx;
+        right_proj_(1, 1) = right_fy;
+        right_proj_(1, 2) = right_cy;
+        right_proj_(2, 2) = 1.0;
 
-        yInfo() << "right_proj =\n" << right_proj.toString();
+        yInfo() << "right_proj =\n" << right_proj_.toString();
+
 
         Vector left_eye_x;
         Vector left_eye_o;
@@ -397,41 +396,24 @@ public:
         yInfo() << "l_H_r_to_eye =\n" << l_H_r_to_eye.toString();
         yInfo() << "r_H_r_to_eye =\n" << r_H_r_to_eye.toString();
 
-        l_H_r_to_cam_ = left_proj  * l_H_r_to_eye;
-        r_H_r_to_cam_ = right_proj * r_H_r_to_eye;
+        l_H_r_to_cam_ = left_proj_  * l_H_r_to_eye;
+        r_H_r_to_cam_ = right_proj_ * r_H_r_to_eye;
 
         yInfo() << "l_H_r_to_cam_ =\n" << l_H_r_to_cam_.toString();
         yInfo() << "r_H_r_to_cam_ =\n" << r_H_r_to_cam_.toString();
 
 
-        Matrix cartesian_to_px(5, 3);
-
-        cartesian_to_px(0, 0) = l_H_r_to_cam_(0, 0);
-        cartesian_to_px(0, 1) = l_H_r_to_cam_(0, 1);
-        cartesian_to_px(0, 2) = l_H_r_to_cam_(0, 2);
-
-        cartesian_to_px(1, 0) = r_H_r_to_cam_(0, 0);
-        cartesian_to_px(1, 1) = r_H_r_to_cam_(0, 1);
-        cartesian_to_px(1, 2) = r_H_r_to_cam_(0, 2);
-
-        cartesian_to_px(2, 0) = l_H_r_to_cam_(1, 0);
-        cartesian_to_px(2, 1) = l_H_r_to_cam_(1, 1);
-        cartesian_to_px(2, 2) = l_H_r_to_cam_(1, 2);
-
-        cartesian_to_px(3, 0) = l_H_r_to_cam_(2, 0);
-        cartesian_to_px(3, 1) = l_H_r_to_cam_(2, 1);
-        cartesian_to_px(3, 2) = l_H_r_to_cam_(2, 2);
-
-        cartesian_to_px(4, 0) = r_H_r_to_cam_(2, 0);
-        cartesian_to_px(4, 1) = r_H_r_to_cam_(2, 1);
-        cartesian_to_px(4, 2) = r_H_r_to_cam_(2, 2);
-
-        px_to_cartesian_ = pinv(cartesian_to_px);
-
-        yInfo() << "px_to_cartesian_ =\n" << px_to_cartesian_.toString();
-
         l_si_skel_ = new SISkeleton(left_fx,  left_fy,  left_cx,  left_cy);
         r_si_skel_ = new SISkeleton(right_fx, right_fy, right_cx, right_cy);
+
+        icub_index_ = iCubFinger("right_index");
+        std::deque<IControlLimits*> temp_lim;
+        temp_lim.push_front(itf_fingers_lim_);
+        if (!icub_index_.alignJointsBounds(temp_lim))
+        {
+            yError() << "Cannot set joint bound for index finger.";
+            return false;
+        }
 
         handler_port_.open("/reaching/cmd:i");
         attach(handler_port_);
@@ -446,8 +428,412 @@ public:
         {
             case VOCAB4('q','u','i','t'):
             {
+                itf_rightarm_cart_->stopControl();
+
+                take_estimates_ = true;
+                should_stop_    = true;
+
+                this->interruptModule();
+
                 reply = command;
-                should_stop_ = true;
+
+                break;
+            }
+            case VOCAB2('u', 'p'):
+            {
+                Vector hand_x;
+                Vector hand_o;
+                itf_rightarm_cart_->getPose(hand_x, hand_o);
+
+                hand_x[2] += 0.08;
+
+                itf_rightarm_cart_->goToPoseSync(hand_x, hand_o);
+                itf_rightarm_cart_->waitMotionDone();
+
+                itf_rightarm_cart_->stopControl();
+
+                reply = command;
+
+                break;
+            }
+            case VOCAB3('i','m','g'):
+            {
+                Vector left_eye_x;
+                Vector left_eye_o;
+                itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+
+                Vector right_eye_x;
+                Vector right_eye_o;
+                itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+
+                yInfo() << "left_eye_o =" << left_eye_o.toString();
+                yInfo() << "right_eye_o =" << right_eye_o.toString();
+
+
+                Matrix l_H_eye = axis2dcm(left_eye_o);
+                left_eye_x.push_back(1.0);
+                l_H_eye.setCol(3, left_eye_x);
+                Matrix l_H_r_to_eye = SE3inv(l_H_eye);
+
+                Matrix r_H_eye = axis2dcm(right_eye_o);
+                right_eye_x.push_back(1.0);
+                r_H_eye.setCol(3, right_eye_x);
+                Matrix r_H_r_to_eye = SE3inv(r_H_eye);
+
+                yInfo() << "l_H_r_to_eye =\n" << l_H_r_to_eye.toString();
+                yInfo() << "r_H_r_to_eye =\n" << r_H_r_to_eye.toString();
+
+
+                l_H_r_to_cam_ = left_proj_  * l_H_r_to_eye;
+                r_H_r_to_cam_ = right_proj_ * r_H_r_to_eye;
+
+
+                Bottle* click_left  = port_click_left_.read  (true);
+                Bottle* click_right = port_click_right_.read (true);
+
+                l_px_location_.resize(2);
+                l_px_location_[0] = click_left->get(0).asDouble();
+                l_px_location_[1] = click_left->get(1).asDouble();
+
+                r_px_location_.resize(2);
+                r_px_location_[0] = click_right->get(0).asDouble();
+                r_px_location_[1] = click_right->get(1).asDouble();
+
+                reply = command;
+
+                break;
+            }
+            case VOCAB3('e','s','t'):
+            {
+                reply = command;
+                take_estimates_ = true;
+
+                break;
+            }
+            case VOCAB3('o', 'p', 'c'):
+            {
+                Network yarp;
+                Bottle cmd;
+                Bottle rep;
+
+                RpcClient port_memory;
+                port_memory.open("/reaching/tomemory");
+                yarp.connect("/reaching/tomemory", "/memory/rpc");
+
+                cmd.addVocab(Vocab::encode("ask"));
+                Bottle &content = cmd.addList().addList();
+                content.addString("name");
+                content.addString("==");
+                content.addString("Duck");
+
+                port_memory.write(cmd, rep);
+
+                if (rep.size()>1)
+                {
+                    if (rep.get(0).asVocab() == Vocab::encode("ack"))
+                    {
+                        if (Bottle *idField = rep.get(1).asList())
+                        {
+                            if (Bottle *idValues = idField->get(1).asList())
+                            {
+                                int id = idValues->get(0).asInt();
+
+                                cmd.clear();
+
+                                cmd.addVocab(Vocab::encode("get"));
+                                Bottle& content = cmd.addList();
+                                Bottle& list_bid = content.addList();
+
+                                list_bid.addString("id");
+                                list_bid.addInt(id);
+
+                                Bottle& list_propSet = content.addList();
+                                list_propSet.addString("propSet");
+
+                                Bottle& list_items = list_propSet.addList();
+                                list_items.addString("position_2d_left");
+
+                                Bottle reply_prop;
+                                port_memory.write(cmd, reply_prop);
+
+                                if (reply_prop.get(0).asVocab() == Vocab::encode("ack"))
+                                {
+                                    if (Bottle* propField = reply_prop.get(1).asList())
+                                    {
+                                        if (Bottle* position_2d = propField->find("position_2d_left").asList())
+                                        {
+                                            if (position_2d->size() == 4)
+                                            {
+                                                l_px_location_.resize(2);
+                                                l_px_location_[0] = position_2d->get(0).asDouble() + (position_2d->get(2).asDouble() - position_2d->get(0).asDouble()) / 2;
+                                                l_px_location_[1] = position_2d->get(1).asDouble() + (position_2d->get(3).asDouble() - position_2d->get(1).asDouble()) / 2;
+
+                                                RpcClient port_sfm;
+                                                port_sfm.open("/reaching/tosfm");
+                                                yarp.connect("/reaching/tosfm", "/SFM/rpc");
+
+                                                cmd.clear();
+
+                                                cmd.addInt(l_px_location_[0]);
+                                                cmd.addInt(l_px_location_[1]);
+
+                                                Bottle reply_pos;
+                                                port_sfm.write(cmd, reply_pos);
+
+                                                if (reply_pos.size() == 5)
+                                                {
+                                                    location_.resize(3);
+                                                    location_[0] = reply_pos.get(0).asDouble();
+                                                    location_[1] = reply_pos.get(1).asDouble();
+                                                    location_[2] = reply_pos.get(2).asDouble();
+
+                                                    r_px_location_.resize(2);
+                                                    r_px_location_[0] = reply_pos.get(3).asDouble();
+                                                    r_px_location_[1] = reply_pos.get(4).asDouble();
+                                                }
+                                                else
+                                                {
+                                                    reply.addString("nack_9");
+                                                }
+
+                                                yarp.disconnect("/reaching/tosfm", "/SFM/rpc");
+                                                port_sfm.close();
+                                            }
+                                            else
+                                            {
+                                                reply.addString("nack_8");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            reply.addString("nack_7");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        reply.addString("nack_6");
+                                    }
+                                }
+                                else
+                                {
+                                    reply.addString("nack_5");
+                                }
+                            }
+                            else
+                            {
+                                reply.addString("nack_4");
+                            }
+                        }
+                        else
+                        {
+                            reply.addString("nack_3");
+                        }
+                    }
+                    else
+                    {
+                        reply.addString("nack_2");
+                    }
+                }
+                else
+                {
+                    reply.addString("nack_1");
+                }
+                yarp.disconnect("/reaching/tomemory", "/memory/rpc");
+                port_memory.close();
+
+                yInfo() << "l_px_location: " << l_px_location_.toString();
+                yInfo() << "r_px_location: " << r_px_location_.toString();
+                yInfo() << "location: " << location_.toString();
+
+                reply.addString("ack");
+
+                break;
+            }
+            case VOCAB3('s', 'f', 'm'):
+            {
+                Network yarp;
+                Bottle  cmd;
+                Bottle  rep;
+
+
+                Bottle* click_left  = port_click_left_.read  (true);
+
+                l_px_location_.resize(2);
+                l_px_location_[0] = click_left->get(0).asDouble();
+                l_px_location_[1] = click_left->get(1).asDouble();
+
+
+                RpcClient port_sfm;
+                port_sfm.open("/reaching/tosfm");
+                yarp.connect("/reaching/tosfm", "/SFM/rpc");
+
+                cmd.clear();
+
+                cmd.addInt(l_px_location_[0]);
+                cmd.addInt(l_px_location_[1]);
+
+                Bottle reply_pos;
+                port_sfm.write(cmd, reply_pos);
+
+                if (reply_pos.size() == 5)
+                {
+                    location_.resize(3);
+                    location_[0] = reply_pos.get(0).asDouble();
+                    location_[1] = reply_pos.get(1).asDouble();
+                    location_[2] = reply_pos.get(2).asDouble();
+
+                    yInfo() << "location: " << location_.toString();
+
+                    r_px_location_.resize(2);
+                    r_px_location_[0] = reply_pos.get(3).asDouble();
+                    r_px_location_[1] = reply_pos.get(4).asDouble();
+                }
+                else
+                {
+                    reply.addString("nack");
+                }
+
+                yarp.disconnect("/reaching/tosfm", "/SFM/rpc");
+                port_sfm.close();
+
+                reply = command;
+
+                break;
+            }
+            case VOCAB2('g', 'o'):
+            {
+                Matrix Od(3, 3);
+                Od(0, 0) = -1.0;
+                Od(1, 1) =  1.0;
+                Od(2, 2) = -1.0;
+                Vector od = dcm2axis(Od);
+
+                double traj_time = 0.0;
+                itf_rightarm_cart_->getTrajTime(&traj_time);
+
+                if (traj_time == traj_time_)
+                {
+                    Vector chain_joints;
+                    icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
+
+                    Matrix tip_pose_index = icub_index_.getH((M_PI/180.0) * chain_joints);
+                    Vector tip_x = tip_pose_index.getCol(3);
+                    Vector tip_o = dcm2axis(tip_pose_index);
+                    itf_rightarm_cart_->attachTipFrame(tip_x, tip_o);
+                    setTorsoDOF();
+
+                    location_[2] =  -0.04;
+
+                    itf_gaze_->lookAtFixationPointSync(location_);
+                    itf_gaze_->waitMotionDone();
+
+                    itf_rightarm_cart_->goToPoseSync(location_, od);
+                    itf_rightarm_cart_->waitMotionDone();
+
+                    itf_gaze_->lookAtFixationPointSync(location_);
+                    itf_gaze_->waitMotionDone();
+
+                    unsetTorsoDOF();
+                    itf_rightarm_cart_->removeTipFrame();
+
+                    reply.addString("ack");
+                }
+                else
+                {
+                    reply.addString("nack");
+                }
+                
+                break;
+            }
+            case VOCAB4('i', 'n', 'i', 't'):
+            {
+                /* FINGERTIP */
+//                Matrix Od(3, 3);
+//                Od(0, 0) = -1.0;
+//                Od(1, 1) =  1.0;
+//                Od(2, 2) = -1.0;
+//                Vector od = dcm2axis(Od);
+
+                /* KARATE */
+                Matrix Od = zeros(3, 3);
+                Od(0, 0) = -1.0;
+                Od(2, 1) = -1.0;
+                Od(1, 2) = -1.0;
+                Vector od = dcm2axis(Od);
+
+                double traj_time = 0.0;
+                itf_rightarm_cart_->getTrajTime(&traj_time);
+
+                if (traj_time == traj_time_)
+                {
+                    /* FINGERTIP */
+//                    Vector chain_joints;
+//                    icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
+//
+//                    Matrix tip_pose_index = icub_index_.getH((M_PI/180.0) * chain_joints);
+//                    Vector tip_x = tip_pose_index.getCol(3);
+//                    Vector tip_o = dcm2axis(tip_pose_index);
+//                    itf_rightarm_cart_->attachTipFrame(tip_x, tip_o);
+//
+//                    location_[0] +=  0.08;
+//                    location_[1] +=  0.05;
+//                    location_[2] =   0.12;
+
+                    setTorsoDOF();
+
+                    /* KARATE */
+                    location_[0] += 0.10;
+                    location_[1] += 0.10;
+                    location_[2] =  0.06;
+
+                    Vector gaze_loc(3);
+                    gaze_loc(0) = -0.69;
+                    gaze_loc(1) =  0.265;
+                    gaze_loc(2) = -0.273;
+
+                    itf_gaze_->lookAtFixationPointSync(gaze_loc);
+                    itf_gaze_->waitMotionDone();
+
+                    int ctxt;
+                    itf_rightarm_cart_->storeContext(&ctxt);
+
+                    itf_rightarm_cart_->setLimits(0, 20.0, 20.0);
+
+                    itf_rightarm_cart_->goToPoseSync(location_, od);
+                    itf_rightarm_cart_->waitMotionDone();
+                    itf_rightarm_cart_->stopControl();
+
+                    itf_rightarm_cart_->restoreContext(ctxt);
+                    itf_rightarm_cart_->deleteContext(ctxt);
+
+                    itf_gaze_->lookAtFixationPointSync(gaze_loc);
+                    itf_gaze_->waitMotionDone();
+
+                    unsetTorsoDOF();
+                    itf_rightarm_cart_->removeTipFrame();
+
+                    reply.addString("ack");
+                }
+                else
+                {
+                    reply.addString("nack");
+                }
+                
+                break;
+            }
+            case VOCAB4('s', 't', 'o', 'p'):
+            {
+                if (itf_rightarm_cart_->stopControl())
+                {
+                    itf_rightarm_cart_->removeTipFrame();
+
+                    reply.addString("ack");
+                }
+                else
+                {
+                    reply.addString("nack_2");
+                }
+
                 break;
             }
             default:
@@ -522,9 +908,27 @@ private:
     PolyDriver                       gaze_driver_;
     IGazeControl                   * itf_gaze_;
 
+    PolyDriver                       rightarm_remote_driver_;
+    IEncoders                      * itf_rightarm_enc_;
+    IControlLimits                 * itf_fingers_lim_;
+
+    PolyDriver                       torso_remote_driver_;
+    IEncoders                      * itf_torso_enc_;
+
+    iCubFinger                       icub_index_;
+
+    Matrix                           left_proj_;
+    Matrix                           right_proj_;
     Matrix                           l_H_r_to_cam_;
     Matrix                           r_H_r_to_cam_;
     Matrix                           px_to_cartesian_;
+
+    double                           traj_time_ = 2.5;
+    Vector                           l_px_location_;
+    Vector                           r_px_location_;
+    Vector                           location_;
+    bool                             take_estimates_ = false;
+
     enum camsel
     {
         LEFT = 0,
@@ -555,7 +959,7 @@ private:
             return false;
         }
 
-        if (!itf_rightarm_cart_->setTrajTime(20.0))
+        if (!itf_rightarm_cart_->setTrajTime(traj_time_))
         {
             yError() << "Error setting ICartesianControl trajectory time.";
             return false;
@@ -596,6 +1000,134 @@ private:
         }
         
         return true;
+    }
+
+    bool setRightArmRemoteControlboard()
+    {
+        Property rightarm_remote_options;
+        rightarm_remote_options.put("device", "remote_controlboard");
+        rightarm_remote_options.put("local",  "/reaching/control_right_arm");
+        rightarm_remote_options.put("remote", "/icub/right_arm");
+
+        rightarm_remote_driver_.open(rightarm_remote_options);
+        if (rightarm_remote_driver_.isValid())
+        {
+            yInfo() << "Right arm remote_controlboard succefully opened.";
+
+            rightarm_remote_driver_.view(itf_rightarm_enc_);
+            if (!itf_rightarm_enc_)
+            {
+                yError() << "Error getting right arm IEncoders interface.";
+                return false;
+            }
+
+            rightarm_remote_driver_.view(itf_fingers_lim_);
+            if (!itf_fingers_lim_)
+            {
+                yError() << "Error getting IControlLimits interface.";
+                return false;
+            }
+        }
+        else
+        {
+            yError() << "Error opening right arm remote_controlboard device.";
+            return false;
+        }
+        
+        return true;
+    }
+
+    bool setTorsoRemoteControlboard()
+    {
+        Property torso_remote_options;
+        torso_remote_options.put("device", "remote_controlboard");
+        torso_remote_options.put("local",  "/reaching/control_torso");
+        torso_remote_options.put("remote", "/icub/torso");
+
+        torso_remote_driver_.open(torso_remote_options);
+        if (torso_remote_driver_.isValid())
+        {
+            yInfo() << "Torso remote_controlboard succefully opened.";
+
+            torso_remote_driver_.view(itf_torso_enc_);
+            if (!itf_torso_enc_)
+            {
+                yError() << "Error getting torso IEncoders interface.";
+                return false;
+            }
+
+            return true;
+        }
+        else
+        {
+            yError() << "Error opening Torso remote_controlboard device.";
+            return false;
+        }
+    }
+
+    bool setTorsoDOF()
+    {
+        Vector curDOF;
+        itf_rightarm_cart_->getDOF(curDOF);
+        yInfo() << "Old DOF: [" + curDOF.toString(0) + "].";
+        yInfo() << "Setting iCub to use the DOF from the torso.";
+        Vector newDOF(curDOF);
+        newDOF[0] = 1;
+        newDOF[1] = 2;
+        newDOF[2] = 1;
+        if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
+        {
+            yError() << "Cannot use torso DOF.";
+            return false;
+        }
+        yInfo() << "Setting the DOF done.";
+        yInfo() << "New DOF: [" + curDOF.toString(0) + "]";
+
+        return true;
+    }
+
+    bool unsetTorsoDOF()
+    {
+        Vector curDOF;
+        itf_rightarm_cart_->getDOF(curDOF);
+        yInfo() << "Old DOF: [" + curDOF.toString(0) + "].";
+        yInfo() << "Setting iCub to use the DOF from the torso.";
+        Vector newDOF(curDOF);
+        newDOF[0] = 0;
+        newDOF[1] = 2;
+        newDOF[2] = 0;
+        if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
+        {
+            yError() << "Cannot use torso DOF.";
+            return false;
+        }
+        yInfo() << "Setting the DOF done.";
+        yInfo() << "New DOF: [" + curDOF.toString(0) + "]";
+
+        return true;
+    }
+
+    Vector readTorso()
+    {
+        Vector torso_enc(3);
+        itf_torso_enc_->getEncoders(torso_enc.data());
+
+        std::swap(torso_enc(0), torso_enc(2));
+
+        return torso_enc;
+    }
+
+    Vector readRootToFingers()
+    {
+        Vector rightarm_encoder(16);
+        itf_rightarm_enc_->getEncoders(rightarm_encoder.data());
+
+        Vector root_fingers_enc(19);
+        root_fingers_enc.setSubvector(0, readTorso());
+
+        root_fingers_enc.setSubvector(3, rightarm_encoder);
+        
+        return root_fingers_enc;
     }
 };
 
