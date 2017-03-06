@@ -40,27 +40,28 @@ public:
         while (!take_estimates_);
 
         /* Get the initial end-effector pose from hand-tracking */
-//        Vector* estimates = port_estimates_in_.read(true);
+        Vector* estimates = port_estimates_in_.read(true);
 
         /* Get the initial end-effector pose from the cartesian controller */
-        Vector pose(12);
-        Vector pose_x;
-        Vector pose_o;
-        itf_rightarm_cart_->getPose(pose_x, pose_o);
-        pose_x.push_back(1.0);
-        Matrix Ha = axis2dcm(pose_o);
-        Ha.setCol(3, pose_x);
-
-        Vector init_chain_joints;
-        icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), init_chain_joints);
-        Vector init_tip_pose_index = (Ha * icub_index_.getH((M_PI/180.0) * init_chain_joints).getCol(3)).subVector(0, 2);
-
-        pose.setSubvector(0,  init_tip_pose_index);
-        pose.setSubvector(3,  zeros(3));
-        pose.setSubvector(6,  init_tip_pose_index);
-        pose.setSubvector(9,  zeros(3));
-
-        Vector* estimates = &pose;
+//        Vector pose(12);
+//        Vector pose_x;
+//        Vector pose_o;
+//        itf_rightarm_cart_->getPose(pose_x, pose_o);
+//        pose_x.push_back(1.0);
+//        Matrix Ha = axis2dcm(pose_o);
+//        Ha.setCol(3, pose_x);
+//
+//        Vector init_chain_joints;
+//        icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), init_chain_joints);
+//        Vector init_tip_pose_index = (Ha * icub_index_.getH((M_PI/180.0) * init_chain_joints).getCol(3)).subVector(0, 2);
+//
+//        pose.setSubvector(0,  init_tip_pose_index);
+//        pose.setSubvector(3,  zeros(3));
+//        pose.setSubvector(6,  init_tip_pose_index);
+//        pose.setSubvector(9,  zeros(3));
+//
+//        Vector* estimates = &pose;
+        /* **************************************************** */
 
 
         if (should_stop_) return false;
@@ -210,22 +211,22 @@ public:
             else
             {
                 /* Get the new end-effector pose from hand-tracking */
-//                estimates = port_estimates_in_.read(true);
+                estimates = port_estimates_in_.read(true);
 
                 /* Get the initial end-effector pose from the cartesian controller */
-                itf_rightarm_cart_->getPose(pose_x, pose_o);
-                pose_x.push_back(1.0);
-                Ha = axis2dcm(pose_o);
-                Ha.setCol(3, pose_x);
-
-                Vector chain_joints;
-                icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
-                Vector tip_pose_index = (Ha * icub_index_.getH((M_PI/180.0) * chain_joints).getCol(3)).subVector(0, 2);
-
-                pose.setSubvector(0,  tip_pose_index);
-                pose.setSubvector(3,  zeros(3));
-                pose.setSubvector(6,  tip_pose_index);
-                pose.setSubvector(9,  zeros(3));
+//                itf_rightarm_cart_->getPose(pose_x, pose_o);
+//                pose_x.push_back(1.0);
+//                Ha = axis2dcm(pose_o);
+//                Ha.setCol(3, pose_x);
+//
+//                Vector chain_joints;
+//                icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
+//                Vector tip_pose_index = (Ha * icub_index_.getH((M_PI/180.0) * chain_joints).getCol(3)).subVector(0, 2);
+//
+//                pose.setSubvector(0,  tip_pose_index);
+//                pose.setSubvector(3,  zeros(3));
+//                pose.setSubvector(6,  tip_pose_index);
+//                pose.setSubvector(9,  zeros(3));
 
                 /* Simulate reaching starting from the initial position */
                 /* Comment any previous write on variable 'estimates' */
@@ -234,6 +235,7 @@ public:
 //
 //                estimates->setSubvector(0, estimates->subVector(0, 2) + vel_x);
 //                estimates->setSubvector(6, estimates->subVector(6, 8) + vel_x);
+                /* **************************************************** */
 
                 yInfo() << "EE L cor: " << estimates->subVector(0, 2).toString();
                 yInfo() << "EE R cor: " << estimates->subVector(6, 8).toString() << "\n";
@@ -298,42 +300,22 @@ public:
 
 
                 /* Left eye end-effector superimposition */
-//                SuperImpose::ObjPoseMap l_ee_pose;
-//                SuperImpose::ObjPose    l_pose;
-//                l_pose.assign((*estimates).data(), (*estimates).data()+3);
-//                l_ee_pose.emplace("palm", l_pose);
-
                 ImageOf<PixelRgb>* l_imgin  = port_image_left_in_.read(true);
                 ImageOf<PixelRgb>& l_imgout = port_image_left_out_.prepare();
                 l_imgout = *l_imgin;
                 cv::Mat l_img = cv::cvarrToMat(l_imgout.getIplImage());
 
-//                Vector left_eye_x;
-//                Vector left_eye_o;
-//                itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
-
-//                l_si_skel_->superimpose(l_ee_pose, left_eye_x.data(), left_eye_o.data(), l_img);
                 cv::circle(l_img, cv::Point(left_proj[0],      left_proj[1]),      4, cv::Scalar(0, 255, 0), 4);
                 cv::circle(l_img, cv::Point(l_px_location_[0], l_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
                 
                 port_image_left_out_.write();
 
                 /* Right eye end-effector superimposition */
-//                SuperImpose::ObjPoseMap r_ee_pose;
-//                SuperImpose::ObjPose    r_pose;
-//                r_pose.assign((*estimates).data()+6, (*estimates).data()+9);
-//                r_ee_pose.emplace("palm", r_pose);
-
                 ImageOf<PixelRgb>* r_imgin  = port_image_right_in_.read(true);
                 ImageOf<PixelRgb>& r_imgout = port_image_right_out_.prepare();
                 r_imgout = *r_imgin;
                 cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
 
-//                Vector right_eye_x;
-//                Vector right_eye_o;
-//                itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
-
-//                r_si_skel_->superimpose(r_ee_pose, right_eye_x.data(), right_eye_o.data(), r_img);
                 cv::circle(r_img, cv::Point(right_proj[0],     right_proj[1]),     4, cv::Scalar(0, 255, 0), 4);
                 cv::circle(r_img, cv::Point(r_px_location_[0], r_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
                 
