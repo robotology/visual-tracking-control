@@ -42,11 +42,29 @@
         <node>localhost</node>
     </module>
 
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/cam_left/x --txTime --rxTime --type bottle</parameters>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/cam_right/x --txTime --rxTime --type bottle</parameters>
+    </module>
+
 
     <!-- REQUIRED CONNECTIONS -->
     <connection>
         <from>/hand-tracking/result/estimates:o</from>
         <to>/reaching/estimates:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/cartesianController/right_arm/state:o</from>
+        <to>/reaching/pose:i</to>
         <protocol>tcp</protocol>
     </connection>
 
@@ -75,6 +93,12 @@
     </connection>
 
     <connection>
+        <from>/view/cam_right/click:o</from>
+        <to>/reaching/cam_right/click:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
         <from>/icub/camcalib/right/out</from>
         <to>/view/cam_right</to>
         <protocol>tcp</protocol>
@@ -93,8 +117,14 @@
     </connection>
 
     <connection>
-        <from>/view/cam_right/click:o</from>
-        <to>/reaching/cam_right/click:i</to>
+        <from>/reaching/cam_left/x:o</from>
+        <to>/datadumper/cam_left/x</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/reaching/cam_right/x:o</from>
+        <to>/datadumper/cam_right/x</to>
         <protocol>tcp</protocol>
     </connection>
 
