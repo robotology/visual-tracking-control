@@ -279,12 +279,12 @@ void VisualSIRParticleFilter::runFilter()
             // FIXME: adduzione fissata
             q(10) = 32.0;
             q(11) = 30.0;
-            q(12) = 0.0;
-            q(13) = 0.0;
-            q(14) = 0.0;
-            q(15) = 0.0;
-            q(16) = 0.0;
-            q(17) = 0.0;
+//            q(12) = 0.0;
+//            q(13) = 0.0;
+//            q(14) = 0.0;
+//            q(15) = 0.0;
+//            q(16) = 0.0;
+//            q(17) = 0.0;
             if (analogs_)
             {
                 analogs = readRightHandAnalogs();
@@ -348,54 +348,54 @@ void VisualSIRParticleFilter::runFilter()
 
             /* STATE ESTIMATE OUTPUT */
             /* INDEX FINGERTIP */
-//            icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
-//            Vector chainjoints;
-//            if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
-//            else          icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), chainjoints);
-//            icub_kin_finger_[1].setAng(chainjoints * (M_PI/180.0));
-//
-//            Vector l_ee_t(3);
-//            toEigen(l_ee_t) = out_particle.col(0).head(3).cast<double>();
-//            l_ee_t.push_back(1.0);
-//
-//            Vector l_ee_o(3);
-//            toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
-//            l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
-//
-//            YMatrix l_Ha = axis2dcm(l_ee_o);
-//            l_Ha.setCol(3, l_ee_t);
-//            Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
-//            Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
-//            l_i_o.setSubvector(0, l_i_o.subVector(0, 2) * l_i_o[3]);
-//
-//
-//            Vector r_ee_t(3);
-//            toEigen(r_ee_t) = out_particle.col(1).head(3).cast<double>();
-//            r_ee_t.push_back(1.0);
-//
-//            Vector r_ee_o(3);
-//            toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
-//            r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
-//
-//            YMatrix r_Ha = axis2dcm(r_ee_o);
-//            r_Ha.setCol(3, r_ee_t);
-//            Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
-//            Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
-//            r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
-//
-//
-//            estimates_out.resize(12);
-//            estimates_out.setSubvector(0, l_i_x);
-//            estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
-//            estimates_out.setSubvector(6, r_i_x);
-//            estimates_out.setSubvector(9, r_i_o.subVector(0, 2));
-//            port_estimates_out_.write();
+            icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
+            Vector chainjoints;
+            if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
+            else          icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), chainjoints);
+            icub_kin_finger_[1].setAng(chainjoints * (M_PI/180.0));
+
+            Vector l_ee_t(3);
+            toEigen(l_ee_t) = out_particle.col(0).head(3).cast<double>();
+            l_ee_t.push_back(1.0);
+
+            Vector l_ee_o(3);
+            toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
+            l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
+
+            YMatrix l_Ha = axis2dcm(l_ee_o);
+            l_Ha.setCol(3, l_ee_t);
+            Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
+            Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
+            l_i_o.setSubvector(0, l_i_o.subVector(0, 2) * l_i_o[3]);
+
+
+            Vector r_ee_t(3);
+            toEigen(r_ee_t) = out_particle.col(1).head(3).cast<double>();
+            r_ee_t.push_back(1.0);
+
+            Vector r_ee_o(3);
+            toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
+            r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
+
+            YMatrix r_Ha = axis2dcm(r_ee_o);
+            r_Ha.setCol(3, r_ee_t);
+            Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
+            Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
+            r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
+
+
+            estimates_out.resize(12);
+            estimates_out.setSubvector(0, l_i_x);
+            estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
+            estimates_out.setSubvector(6, r_i_x);
+            estimates_out.setSubvector(9, r_i_o.subVector(0, 2));
+            port_estimates_out_.write();
 
             /* PALM */
-            estimates_out.resize(12);
-            toEigen(estimates_out).head(6) = out_particle.col(0).cast<double>();
-            toEigen(estimates_out).tail(6) = out_particle.col(1).cast<double>();
-            port_estimates_out_.write();
+//            estimates_out.resize(12);
+//            toEigen(estimates_out).head(6) = out_particle.col(0).cast<double>();
+//            toEigen(estimates_out).tail(6) = out_particle.col(1).cast<double>();
+//            port_estimates_out_.write();
 
             /* DEBUG ONLY */
             if (stream_images_)
@@ -434,7 +434,7 @@ void VisualSIRParticleFilter::runFilter()
                     YMatrix Ha = axis2dcm(ee_o);
                     Ha.setCol(3, ee_t);
                     // FIXME: middle finger only!
-                    for (size_t fng = 1; fng < 3; ++fng)
+                    for (size_t fng = 0; fng < 3; ++fng)
                     {
                         std::string finger_s;
                         pose.clear();

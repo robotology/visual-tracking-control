@@ -39,7 +39,29 @@ public:
     {
         while (!take_estimates_);
 
-        Vector* estimates   = port_estimates_in_.read(true);
+        /* Get the initial end-effector pose from hand-tracking */
+//        Vector* estimates = port_estimates_in_.read(true);
+
+        /* Get the initial end-effector pose from the cartesian controller */
+        Vector pose(12);
+        Vector pose_x;
+        Vector pose_o;
+        itf_rightarm_cart_->getPose(pose_x, pose_o);
+        pose_x.push_back(1.0);
+        Matrix Ha = axis2dcm(pose_o);
+        Ha.setCol(3, pose_x);
+
+        Vector init_chain_joints;
+        icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), init_chain_joints);
+        Vector init_tip_pose_index = (Ha * icub_index_.getH((M_PI/180.0) * init_chain_joints).getCol(3)).subVector(0, 2);
+
+        pose.setSubvector(0,  init_tip_pose_index);
+        pose.setSubvector(3,  zeros(3));
+        pose.setSubvector(6,  init_tip_pose_index);
+        pose.setSubvector(9,  zeros(3));
+
+        Vector* estimates = &pose;
+
 
         if (should_stop_) return false;
 
@@ -130,8 +152,8 @@ public:
         gradient(1, 2) = (r_H_r_to_cam_(0, 2) * r_lambda - r_H_r_to_cam_(2, 2) * r_num_u) / r_lambda_sq;
 
 
-        double Ts    = 0.25; // controller's sample time [s]
-        double K     = 1;  // how long it takes to move to the target [s]
+        double Ts    = 0.05;  // controller's sample time [s]
+        double K     = 1;    // how long it takes to move to the target [s]
         double v_max = 0.005; // max cartesian velocity [m/s]
 
         bool done = false;
@@ -172,13 +194,14 @@ public:
 
             itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
 
-            yInfo() << "Pixel error norm (0, 1): " << norm(px_des.subVector(0, 1) - px_ee_now.subVector(0, 1));
+            yInfo() << "Pixel error norm (0): " << std::abs(px_des(0) - px_ee_now(0));
+            yInfo() << "Pixel error norm (1): " << std::abs(px_des(1) - px_ee_now(1));
             yInfo() << "Pixel error norm (2): " << std::abs(px_des(2) - px_ee_now(2));
             yInfo() << "Poistion error norm: " << norm(vel_x);
 
             Time::delay(Ts);
 
-            done = ((norm(px_des.subVector(0, 1) - px_ee_now.subVector(0, 1)) < 5.0) && (std::abs(px_des(2) - px_ee_now(2)) < 5.0));
+            done = ((std::abs(px_des(0) - px_ee_now(0)) < 1.0) && (std::abs(px_des(1) - px_ee_now(1)) < 1.0) && (std::abs(px_des(2) - px_ee_now(2)) < 1.0));
             if (done)
             {
                 yInfo() << "\npx_des =" << px_des.toString() << "px_ee_now =" << px_ee_now.toString();
@@ -186,7 +209,26 @@ public:
             }
             else
             {
-                estimates         = port_estimates_in_.read(true);
+                /* Get the new end-effector pose from hand-tracking */
+//                estimates = port_estimates_in_.read(true);
+
+                /* Get the initial end-effector pose from the cartesian controller */
+                itf_rightarm_cart_->getPose(pose_x, pose_o);
+                pose_x.push_back(1.0);
+                Ha = axis2dcm(pose_o);
+                Ha.setCol(3, pose_x);
+
+                Vector chain_joints;
+                icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
+                Vector tip_pose_index = (Ha * icub_index_.getH((M_PI/180.0) * chain_joints).getCol(3)).subVector(0, 2);
+
+                pose.setSubvector(0,  tip_pose_index);
+                pose.setSubvector(3,  zeros(3));
+                pose.setSubvector(6,  tip_pose_index);
+                pose.setSubvector(9,  zeros(3));
+
+                /* Simulate reaching starting from the initial position */
+                /* Comment any previous write on variable 'estimates' */
 //                yInfo() << "EE L now: " << estimates->subVector(0, 2).toString();
 //                yInfo() << "EE R now: " << estimates->subVector(6, 8).toString() << "\n";
 //
@@ -199,9 +241,29 @@ public:
                 Vector left_proj  = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(0, 2) - left_eye_x));
                 Vector right_proj = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(6, 8) - right_eye_x));
 
-                px_ee_now[0] = left_proj [0] / left_proj[2];    /* u_ee_l */
-                px_ee_now[1] = right_proj[0] / right_proj[2];   /* u_ee_r */
-                px_ee_now[2] = left_proj [1] / left_proj[2];    /* v_ee_l */
+                left_proj[0] /= left_proj[2];
+                left_proj[1] /= left_proj[2];
+
+                right_proj[0] /= right_proj[2];
+                right_proj[1] /= right_proj[2];
+
+                px_ee_now[0] = left_proj [0];   /* u_ee_l */
+                px_ee_now[1] = right_proj[0];   /* u_ee_r */
+                px_ee_now[2] = left_proj [1];   /* v_ee_l */
+
+
+                /* Dump pixel coordinates of the end-effector */
+                Bottle& l_px_endeffector = port_px_left_endeffector.prepare();
+                l_px_endeffector.clear();
+                l_px_endeffector.addInt(left_proj[0]);
+                l_px_endeffector.addInt(left_proj[1]);
+                port_px_left_endeffector.write();
+
+                Bottle& r_px_endeffector = port_px_right_endeffector.prepare();
+                r_px_endeffector.clear();
+                r_px_endeffector.addInt(right_proj[0]);
+                r_px_endeffector.addInt(right_proj[1]);
+                port_px_right_endeffector.write();
 
 
                 /* Gradient */
@@ -236,41 +298,43 @@ public:
 
 
                 /* Left eye end-effector superimposition */
-                SuperImpose::ObjPoseMap l_ee_pose;
-                SuperImpose::ObjPose    l_pose;
-                l_pose.assign((*estimates).data(), (*estimates).data()+3);
-                l_ee_pose.emplace("palm", l_pose);
+//                SuperImpose::ObjPoseMap l_ee_pose;
+//                SuperImpose::ObjPose    l_pose;
+//                l_pose.assign((*estimates).data(), (*estimates).data()+3);
+//                l_ee_pose.emplace("palm", l_pose);
 
                 ImageOf<PixelRgb>* l_imgin  = port_image_left_in_.read(true);
                 ImageOf<PixelRgb>& l_imgout = port_image_left_out_.prepare();
                 l_imgout = *l_imgin;
                 cv::Mat l_img = cv::cvarrToMat(l_imgout.getIplImage());
 
-                Vector left_eye_x;
-                Vector left_eye_o;
-                itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+//                Vector left_eye_x;
+//                Vector left_eye_o;
+//                itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
 
-                l_si_skel_->superimpose(l_ee_pose,    left_eye_x.data(), left_eye_o.data(), l_img);
+//                l_si_skel_->superimpose(l_ee_pose, left_eye_x.data(), left_eye_o.data(), l_img);
+                cv::circle(l_img, cv::Point(left_proj[0],      left_proj[1]),      4, cv::Scalar(0, 255, 0), 4);
                 cv::circle(l_img, cv::Point(l_px_location_[0], l_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
                 
                 port_image_left_out_.write();
 
                 /* Right eye end-effector superimposition */
-                SuperImpose::ObjPoseMap r_ee_pose;
-                SuperImpose::ObjPose    r_pose;
-                r_pose.assign((*estimates).data()+6, (*estimates).data()+9);
-                r_ee_pose.emplace("palm", r_pose);
+//                SuperImpose::ObjPoseMap r_ee_pose;
+//                SuperImpose::ObjPose    r_pose;
+//                r_pose.assign((*estimates).data()+6, (*estimates).data()+9);
+//                r_ee_pose.emplace("palm", r_pose);
 
                 ImageOf<PixelRgb>* r_imgin  = port_image_right_in_.read(true);
                 ImageOf<PixelRgb>& r_imgout = port_image_right_out_.prepare();
                 r_imgout = *r_imgin;
                 cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
 
-                Vector right_eye_x;
-                Vector right_eye_o;
-                itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+//                Vector right_eye_x;
+//                Vector right_eye_o;
+//                itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
-                r_si_skel_->superimpose(r_ee_pose,    right_eye_x.data(), right_eye_o.data(), r_img);
+//                r_si_skel_->superimpose(r_ee_pose, right_eye_x.data(), right_eye_o.data(), r_img);
+                cv::circle(r_img, cv::Point(right_proj[0],     right_proj[1]),     4, cv::Scalar(0, 255, 0), 4);
                 cv::circle(r_img, cv::Point(r_px_location_[0], r_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
                 
                 port_image_right_out_.write();
@@ -325,6 +389,18 @@ public:
         if (!port_click_right_.open("/reaching/cam_right/click:i"))
         {
             yError() << "Could not open /reaching/cam_right/click:i port! Closing.";
+            return false;
+        }
+
+        if (!port_px_left_endeffector.open("/reaching/cam_left/x:o"))
+        {
+            yError() << "Could not open /reaching/cam_left/x:o port! Closing.";
+            return false;
+        }
+
+        if (!port_px_right_endeffector.open("/reaching/cam_right/x:o"))
+        {
+            yError() << "Could not open /reaching/cam_right/x:o port! Closing.";
             return false;
         }
 
@@ -426,6 +502,7 @@ public:
         int cmd = command.get(0).asVocab();
         switch (cmd)
         {
+            /* Safely close the application */
             case VOCAB4('q','u','i','t'):
             {
                 itf_rightarm_cart_->stopControl();
@@ -439,23 +516,8 @@ public:
 
                 break;
             }
-            case VOCAB2('u', 'p'):
-            {
-                Vector hand_x;
-                Vector hand_o;
-                itf_rightarm_cart_->getPose(hand_x, hand_o);
-
-                hand_x[2] += 0.08;
-
-                itf_rightarm_cart_->goToPoseSync(hand_x, hand_o);
-                itf_rightarm_cart_->waitMotionDone();
-
-                itf_rightarm_cart_->stopControl();
-
-                reply = command;
-
-                break;
-            }
+            /* Take pixel coordinates from the left and right camera images */
+            /* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
             case VOCAB3('i','m','g'):
             {
                 Vector left_eye_x;
@@ -503,13 +565,60 @@ public:
 
                 break;
             }
-            case VOCAB3('e','s','t'):
+            /* Set a fixed goal in pixel coordinates */
+            /* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
+            case VOCAB4('g', 'o', 'a', 'l'):
+            {
+                Vector left_eye_x;
+                Vector left_eye_o;
+                itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+
+                Vector right_eye_x;
+                Vector right_eye_o;
+                itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+
+                yInfo() << "left_eye_o =" << left_eye_o.toString();
+                yInfo() << "right_eye_o =" << right_eye_o.toString();
+
+
+                Matrix l_H_eye = axis2dcm(left_eye_o);
+                left_eye_x.push_back(1.0);
+                l_H_eye.setCol(3, left_eye_x);
+                Matrix l_H_r_to_eye = SE3inv(l_H_eye);
+
+                Matrix r_H_eye = axis2dcm(right_eye_o);
+                right_eye_x.push_back(1.0);
+                r_H_eye.setCol(3, right_eye_x);
+                Matrix r_H_r_to_eye = SE3inv(r_H_eye);
+
+                yInfo() << "l_H_r_to_eye =\n" << l_H_r_to_eye.toString();
+                yInfo() << "r_H_r_to_eye =\n" << r_H_r_to_eye.toString();
+
+                l_H_r_to_cam_ = left_proj_  * l_H_r_to_eye;
+                r_H_r_to_cam_ = right_proj_ * r_H_r_to_eye;
+
+
+                l_px_location_.resize(2);
+                l_px_location_[0] = 125;
+                l_px_location_[1] = 135;
+
+                r_px_location_.resize(2);
+                r_px_location_[0] = 89;
+                r_px_location_[1] = 135;
+
+                reply = command;
+
+                break;
+            }
+            /* Start reaching phase */
+            case VOCAB2('g','o'):
             {
                 reply = command;
                 take_estimates_ = true;
 
                 break;
             }
+            /* Get 3D information from the OPC of IOL */
             case VOCAB3('o', 'p', 'c'):
             {
                 Network yarp;
@@ -649,6 +758,23 @@ public:
 
                 break;
             }
+            /* Set a fixed (hard-coded) 3D position for open-loop reaching */
+            case VOCAB3('p', 'o', 's'):
+            {
+                Bottle  cmd;
+
+                location_.resize(3);
+                location_[0] = -0.412;
+                location_[1] =  0.0435;
+                location_[2] =  0.0524;
+
+                yInfo() << "location: " << location_.toString();
+                
+                reply = command;
+                
+                break;
+            }
+            /* Get 3D point from Structure From Motion clicking on the left camera image */
             case VOCAB3('s', 'f', 'm'):
             {
                 Network yarp;
@@ -700,66 +826,22 @@ public:
 
                 break;
             }
-            case VOCAB2('g', 'o'):
+            /* Go to initial position (open-loop) */
+            case VOCAB4('i', 'n', 'i', 't'):
             {
+                /* FINGERTIP */
                 Matrix Od(3, 3);
                 Od(0, 0) = -1.0;
                 Od(1, 1) =  1.0;
                 Od(2, 2) = -1.0;
                 Vector od = dcm2axis(Od);
 
-                double traj_time = 0.0;
-                itf_rightarm_cart_->getTrajTime(&traj_time);
-
-                if (traj_time == traj_time_)
-                {
-                    Vector chain_joints;
-                    icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
-
-                    Matrix tip_pose_index = icub_index_.getH((M_PI/180.0) * chain_joints);
-                    Vector tip_x = tip_pose_index.getCol(3);
-                    Vector tip_o = dcm2axis(tip_pose_index);
-                    itf_rightarm_cart_->attachTipFrame(tip_x, tip_o);
-                    setTorsoDOF();
-
-                    location_[2] =  -0.04;
-
-                    itf_gaze_->lookAtFixationPointSync(location_);
-                    itf_gaze_->waitMotionDone();
-
-                    itf_rightarm_cart_->goToPoseSync(location_, od);
-                    itf_rightarm_cart_->waitMotionDone();
-
-                    itf_gaze_->lookAtFixationPointSync(location_);
-                    itf_gaze_->waitMotionDone();
-
-                    unsetTorsoDOF();
-                    itf_rightarm_cart_->removeTipFrame();
-
-                    reply.addString("ack");
-                }
-                else
-                {
-                    reply.addString("nack");
-                }
-                
-                break;
-            }
-            case VOCAB4('i', 'n', 'i', 't'):
-            {
-                /* FINGERTIP */
-//                Matrix Od(3, 3);
-//                Od(0, 0) = -1.0;
-//                Od(1, 1) =  1.0;
-//                Od(2, 2) = -1.0;
-//                Vector od = dcm2axis(Od);
-
                 /* KARATE */
-                Matrix Od = zeros(3, 3);
-                Od(0, 0) = -1.0;
-                Od(2, 1) = -1.0;
-                Od(1, 2) = -1.0;
-                Vector od = dcm2axis(Od);
+//                Matrix Od = zeros(3, 3);
+//                Od(0, 0) = -1.0;
+//                Od(2, 1) = -1.0;
+//                Od(1, 2) = -1.0;
+//                Vector od = dcm2axis(Od);
 
                 double traj_time = 0.0;
                 itf_rightarm_cart_->getTrajTime(&traj_time);
@@ -767,32 +849,33 @@ public:
                 if (traj_time == traj_time_)
                 {
                     /* FINGERTIP */
-//                    Vector chain_joints;
-//                    icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
-//
-//                    Matrix tip_pose_index = icub_index_.getH((M_PI/180.0) * chain_joints);
-//                    Vector tip_x = tip_pose_index.getCol(3);
-//                    Vector tip_o = dcm2axis(tip_pose_index);
-//                    itf_rightarm_cart_->attachTipFrame(tip_x, tip_o);
-//
-//                    location_[0] +=  0.08;
-//                    location_[1] +=  0.05;
-//                    location_[2] =   0.12;
+                    Vector chain_joints;
+                    icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
+
+                    Matrix tip_pose_index = icub_index_.getH((M_PI/180.0) * chain_joints);
+                    Vector tip_x = tip_pose_index.getCol(3);
+                    Vector tip_o = dcm2axis(tip_pose_index);
+                    itf_rightarm_cart_->attachTipFrame(tip_x, tip_o);
+
+                    location_[0] += 0.03;
+                    location_[1] += 0.07;
+                    location_[2] =  0.12;
 
                     setTorsoDOF();
 
                     /* KARATE */
-                    location_[0] += 0.10;
-                    location_[1] += 0.10;
-                    location_[2] =  0.06;
+//                    location_[0] += 0.10;
+//                    location_[1] += 0.10;
+//                    location_[2] =  0.06;
 
                     Vector gaze_loc(3);
-                    gaze_loc(0) = -0.69;
-                    gaze_loc(1) =  0.265;
-                    gaze_loc(2) = -0.273;
+                    gaze_loc(0) = -0.579;
+                    gaze_loc(1) =  0.472;
+                    gaze_loc(2) = -0.280;
 
-                    itf_gaze_->lookAtFixationPointSync(gaze_loc);
-                    itf_gaze_->waitMotionDone();
+
+//                    itf_gaze_->lookAtFixationPointSync(gaze_loc);
+//                    itf_gaze_->waitMotionDone();
 
                     int ctxt;
                     itf_rightarm_cart_->storeContext(&ctxt);
@@ -821,6 +904,7 @@ public:
                 
                 break;
             }
+            /* Stop the Cartesian controller */
             case VOCAB4('s', 't', 'o', 'p'):
             {
                 if (itf_rightarm_cart_->stopControl())
@@ -901,6 +985,9 @@ private:
     BufferedPort<ImageOf<PixelRgb>>  port_image_right_in_;
     BufferedPort<ImageOf<PixelRgb>>  port_image_right_out_;
     BufferedPort<Bottle>             port_click_right_;
+
+    BufferedPort<Bottle>             port_px_left_endeffector;
+    BufferedPort<Bottle>             port_px_right_endeffector;
 
     PolyDriver                       rightarm_cartesian_driver_;
     ICartesianControl              * itf_rightarm_cart_;

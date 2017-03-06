@@ -47,16 +47,16 @@ VisualProprioception::VisualProprioception(const yarp::os::ConstString lateralir
     cad_hand_["palm"] = rf.findFileByName("r_palm.obj");
     if (!file_found(cad_hand_["palm"])) throw std::runtime_error("Runtime error: file r_palm.obj not found!");
 
-//    cad_hand_["thumb1"] = rf.findFileByName("r_tl0.obj");
-//    if (!file_found(cad_hand_["thumb1"])) throw std::runtime_error("Runtime error: file r_tl0.obj not found!");
-//    cad_hand_["thumb2"] = rf.findFileByName("r_tl1.obj");
-//    if (!file_found(cad_hand_["thumb2"])) throw std::runtime_error("Runtime error: file r_tl1.obj not found!");
-//    cad_hand_["thumb3"] = rf.findFileByName("r_tl2.obj");
-//    if (!file_found(cad_hand_["thumb3"])) throw std::runtime_error("Runtime error: file r_tl2.obj not found!");
-//    cad_hand_["thumb4"] = rf.findFileByName("r_tl3.obj");
-//    if (!file_found(cad_hand_["thumb4"])) throw std::runtime_error("Runtime error: file r_tl3.obj not found!");
-//    cad_hand_["thumb5"] = rf.findFileByName("r_tl4.obj");
-//    if (!file_found(cad_hand_["thumb5"])) throw std::runtime_error("Runtime error: file r_tl4.obj not found!");
+    cad_hand_["thumb1"] = rf.findFileByName("r_tl0.obj");
+    if (!file_found(cad_hand_["thumb1"])) throw std::runtime_error("Runtime error: file r_tl0.obj not found!");
+    cad_hand_["thumb2"] = rf.findFileByName("r_tl1.obj");
+    if (!file_found(cad_hand_["thumb2"])) throw std::runtime_error("Runtime error: file r_tl1.obj not found!");
+    cad_hand_["thumb3"] = rf.findFileByName("r_tl2.obj");
+    if (!file_found(cad_hand_["thumb3"])) throw std::runtime_error("Runtime error: file r_tl2.obj not found!");
+    cad_hand_["thumb4"] = rf.findFileByName("r_tl3.obj");
+    if (!file_found(cad_hand_["thumb4"])) throw std::runtime_error("Runtime error: file r_tl3.obj not found!");
+    cad_hand_["thumb5"] = rf.findFileByName("r_tl4.obj");
+    if (!file_found(cad_hand_["thumb5"])) throw std::runtime_error("Runtime error: file r_tl4.obj not found!");
 
     cad_hand_["index0"] = rf.findFileByName("r_indexbase.obj");
     if (!file_found(cad_hand_["index0"])) throw std::runtime_error("Runtime error: file r_indexbase.obj not found!");
@@ -241,7 +241,7 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
         YMatrix Ha = axis2dcm(ee_o);
         Ha.setCol(3, ee_t);
         // FIXME: middle finger only!
-        for (size_t fng = 1; fng < 3; ++fng)
+        for (size_t fng = 0; fng < 3; ++fng)
         {
             std::string finger_s;
             pose.clear();
