@@ -276,7 +276,8 @@ void VisualSIRParticleFilter::runFilter()
             /* Set parameters */
             // FIXME: da decidere come sistemare
             q = readRootToFingers();
-            // FIXME: adduzione fissata
+
+            // FIXME: abduzione e apertura pollice fissata
             q(10) = 32.0;
             q(11) = 30.0;
 //            q(12) = 0.0;
