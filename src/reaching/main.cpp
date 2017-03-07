@@ -307,7 +307,7 @@ public:
 
                 cv::circle(l_img, cv::Point(left_proj[0],      left_proj[1]),      4, cv::Scalar(0, 255, 0), 4);
                 cv::circle(l_img, cv::Point(l_px_location_[0], l_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
-                
+
                 port_image_left_out_.write();
 
                 /* Right eye end-effector superimposition */
@@ -318,11 +318,11 @@ public:
 
                 cv::circle(r_img, cv::Point(right_proj[0],     right_proj[1]),     4, cv::Scalar(0, 255, 0), 4);
                 cv::circle(r_img, cv::Point(r_px_location_[0], r_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
-                
+
                 port_image_right_out_.write();
             }
         }
-        
+
         itf_rightarm_cart_->stopControl();
 
         Time::delay(0.5);
