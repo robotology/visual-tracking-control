@@ -18,6 +18,7 @@ set(${EXE_TARGET_NAME}_SRC
 add_executable(${EXE_TARGET_NAME} ${${EXE_TARGET_NAME}_SRC})
 
 target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                                                      ${ICUB_INCLUDE_DIRS}
                                                       ${YARP_INCLUDE_DIRS})
 
 target_link_libraries(${EXE_TARGET_NAME} ctrlLib
