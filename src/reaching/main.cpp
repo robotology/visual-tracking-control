@@ -421,7 +421,7 @@ public:
 
 
                 /* Update Jacobian */
-                jacobian(3, 3);
+                jacobian = zeros(3, 3);
                 l_ee_x = estimates->subVector(0, 2);
                 l_ee_x.push_back(1.0);
 
