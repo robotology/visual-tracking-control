@@ -31,8 +31,8 @@ target_link_libraries(${EXE_TARGET_NAME} ctrlLib
 target_compile_features(${EXE_TARGET_NAME} PUBLIC cxx_nullptr cxx_constexpr)
 
 set(${EXE_TARGET_NAME}_APP
-        ${PROJECT_SOURCE_DIR}/app/reaching.xml
-        ${PROJECT_SOURCE_DIR}/app/reaching-SIM.xml)
+        ${PROJECT_SOURCE_DIR}/app/reaching_pose.xml
+        ${PROJECT_SOURCE_DIR}/app/reaching_pose-SIM.xml)
 
 install(TARGETS ${EXE_TARGET_NAME}        DESTINATION bin)
 install(FILES   ${${EXE_TARGET_NAME}_APP} DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR})
