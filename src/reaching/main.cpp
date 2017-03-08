@@ -122,7 +122,7 @@ public:
 
 
         /* Jacobian */
-        Matrix gradient(3, 3);
+        Matrix jacobian(3, 3);
 
         Vector l_ee_x = estimates->subVector(0, 2);
         l_ee_x.push_back(1.0);
@@ -132,13 +132,13 @@ public:
         double l_lambda    = dot(l_H_r_to_cam_.subrow(2, 0, 4), l_ee_x);
         double l_lambda_sq = pow(l_lambda, 2.0);
 
-        gradient(0, 0) = (l_H_r_to_cam_(0, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_u) / l_lambda_sq;
-        gradient(0, 1) = (l_H_r_to_cam_(0, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_u) / l_lambda_sq;
-        gradient(0, 2) = (l_H_r_to_cam_(0, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_u) / l_lambda_sq;
+        jacobian(0, 0) = (l_H_r_to_cam_(0, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_u) / l_lambda_sq;
+        jacobian(0, 1) = (l_H_r_to_cam_(0, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_u) / l_lambda_sq;
+        jacobian(0, 2) = (l_H_r_to_cam_(0, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_u) / l_lambda_sq;
 
-        gradient(2, 0) = (l_H_r_to_cam_(1, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_v) / l_lambda_sq;
-        gradient(2, 1) = (l_H_r_to_cam_(1, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_v) / l_lambda_sq;
-        gradient(2, 2) = (l_H_r_to_cam_(1, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_v) / l_lambda_sq;
+        jacobian(2, 0) = (l_H_r_to_cam_(1, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_v) / l_lambda_sq;
+        jacobian(2, 1) = (l_H_r_to_cam_(1, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_v) / l_lambda_sq;
+        jacobian(2, 2) = (l_H_r_to_cam_(1, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_v) / l_lambda_sq;
 
         Vector r_ee_x = estimates->subVector(6, 8);
         r_ee_x.push_back(1.0);
@@ -148,9 +148,9 @@ public:
         double r_lambda    = dot(r_H_r_to_cam_.subrow(2, 0, 4), r_ee_x);
         double r_lambda_sq = pow(r_lambda, 2.0);
 
-        gradient(1, 0) = (r_H_r_to_cam_(0, 0) * r_lambda - r_H_r_to_cam_(2, 0) * r_num_u) / r_lambda_sq;
-        gradient(1, 1) = (r_H_r_to_cam_(0, 1) * r_lambda - r_H_r_to_cam_(2, 1) * r_num_u) / r_lambda_sq;
-        gradient(1, 2) = (r_H_r_to_cam_(0, 2) * r_lambda - r_H_r_to_cam_(2, 2) * r_num_u) / r_lambda_sq;
+        jacobian(1, 0) = (r_H_r_to_cam_(0, 0) * r_lambda - r_H_r_to_cam_(2, 0) * r_num_u) / r_lambda_sq;
+        jacobian(1, 1) = (r_H_r_to_cam_(0, 1) * r_lambda - r_H_r_to_cam_(2, 1) * r_num_u) / r_lambda_sq;
+        jacobian(1, 2) = (r_H_r_to_cam_(0, 2) * r_lambda - r_H_r_to_cam_(2, 2) * r_num_u) / r_lambda_sq;
 
 
         double Ts    = 0.05;  // controller's sample time [s]
@@ -164,24 +164,24 @@ public:
 
             yInfo() << "e = [" << e.toString() << "]";
 
-            gradient(0, 0) *= -2.0 * e[0];
-            gradient(0, 1) *= -2.0 * e[0];
-            gradient(0, 2) *= -2.0 * e[0];
+            jacobian(0, 0) *= -2.0 * e[0];
+            jacobian(0, 1) *= -2.0 * e[0];
+            jacobian(0, 2) *= -2.0 * e[0];
 
-            gradient(1, 0) *= -2.0 * e[1];
-            gradient(1, 1) *= -2.0 * e[1];
-            gradient(1, 2) *= -2.0 * e[1];
+            jacobian(1, 0) *= -2.0 * e[1];
+            jacobian(1, 1) *= -2.0 * e[1];
+            jacobian(1, 2) *= -2.0 * e[1];
 
-            gradient(2, 0) *= -2.0 * e[2];
-            gradient(2, 1) *= -2.0 * e[2];
-            gradient(2, 2) *= -2.0 * e[2];
+            jacobian(2, 0) *= -2.0 * e[2];
+            jacobian(2, 1) *= -2.0 * e[2];
+            jacobian(2, 2) *= -2.0 * e[2];
 
-            Matrix inv_gradient = luinv(gradient);
+            Matrix inv_jacobian = luinv(jacobian);
 
             e[0] *= e[0];
             e[1] *= e[1];
             e[2] *= e[2];
-            Vector vel_x = -1.0 * K * inv_gradient * e;
+            Vector vel_x = -1.0 * K * inv_jacobian * e;
 
             yInfo() << "vel_x = [" << vel_x.toString() << "]";
 
@@ -269,7 +269,7 @@ public:
 
 
                 /* Update Jacobian */
-                gradient(3, 3);
+                jacobian(3, 3);
                 l_ee_x = estimates->subVector(0, 2);
                 l_ee_x.push_back(1.0);
 
@@ -278,13 +278,13 @@ public:
                 l_lambda    = dot(l_H_r_to_cam_.subrow(2, 0, 4), l_ee_x);
                 l_lambda_sq = pow(l_lambda, 2.0);
 
-                gradient(0, 0) = (l_H_r_to_cam_(0, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_u) / l_lambda_sq;
-                gradient(0, 1) = (l_H_r_to_cam_(0, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_u) / l_lambda_sq;
-                gradient(0, 2) = (l_H_r_to_cam_(0, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_u) / l_lambda_sq;
+                jacobian(0, 0) = (l_H_r_to_cam_(0, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_u) / l_lambda_sq;
+                jacobian(0, 1) = (l_H_r_to_cam_(0, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_u) / l_lambda_sq;
+                jacobian(0, 2) = (l_H_r_to_cam_(0, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_u) / l_lambda_sq;
 
-                gradient(2, 0) = (l_H_r_to_cam_(1, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_v) / l_lambda_sq;
-                gradient(2, 1) = (l_H_r_to_cam_(1, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_v) / l_lambda_sq;
-                gradient(2, 2) = (l_H_r_to_cam_(1, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_v) / l_lambda_sq;
+                jacobian(2, 0) = (l_H_r_to_cam_(1, 0) * l_lambda - l_H_r_to_cam_(2, 0) * l_num_v) / l_lambda_sq;
+                jacobian(2, 1) = (l_H_r_to_cam_(1, 1) * l_lambda - l_H_r_to_cam_(2, 1) * l_num_v) / l_lambda_sq;
+                jacobian(2, 2) = (l_H_r_to_cam_(1, 2) * l_lambda - l_H_r_to_cam_(2, 2) * l_num_v) / l_lambda_sq;
 
                 r_ee_x = estimates->subVector(6, 8);
                 r_ee_x.push_back(1.0);
@@ -294,9 +294,9 @@ public:
                 r_lambda    = dot(r_H_r_to_cam_.subrow(2, 0, 4), r_ee_x);
                 r_lambda_sq = pow(r_lambda, 2.0);
 
-                gradient(1, 0) = (r_H_r_to_cam_(0, 0) * r_lambda - r_H_r_to_cam_(2, 0) * r_num_u) / r_lambda_sq;
-                gradient(1, 1) = (r_H_r_to_cam_(0, 1) * r_lambda - r_H_r_to_cam_(2, 1) * r_num_u) / r_lambda_sq;
-                gradient(1, 2) = (r_H_r_to_cam_(0, 2) * r_lambda - r_H_r_to_cam_(2, 2) * r_num_u) / r_lambda_sq;
+                jacobian(1, 0) = (r_H_r_to_cam_(0, 0) * r_lambda - r_H_r_to_cam_(2, 0) * r_num_u) / r_lambda_sq;
+                jacobian(1, 1) = (r_H_r_to_cam_(0, 1) * r_lambda - r_H_r_to_cam_(2, 1) * r_num_u) / r_lambda_sq;
+                jacobian(1, 2) = (r_H_r_to_cam_(0, 2) * r_lambda - r_H_r_to_cam_(2, 2) * r_num_u) / r_lambda_sq;
 
 
                 /* Left eye end-effector superimposition */
