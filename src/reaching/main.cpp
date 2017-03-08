@@ -33,7 +33,158 @@ using namespace iCub::iKin;
 class RFMReaching : public RFModule
 {
 public:
+    bool configure(ResourceFinder &rf)
+    {
+        if (!port_estimates_in_.open("/reaching/estimates:i"))
+        {
+            yError() << "Could not open /reaching/estimates:i port! Closing.";
+            return false;
+        }
+
+        if (!port_image_left_in_.open("/reaching/cam_left/img:i"))
+        {
+            yError() << "Could not open /reaching/cam_left/img:i port! Closing.";
+            return false;
+        }
+
+        if (!port_image_left_out_.open("/reaching/cam_left/img:o"))
+        {
+            yError() << "Could not open /reaching/cam_left/img:o port! Closing.";
+            return false;
+        }
+
+        if (!port_click_left_.open("/reaching/cam_left/click:i"))
+        {
+            yError() << "Could not open /reaching/cam_left/click:in port! Closing.";
+            return false;
+        }
+
+        if (!port_image_right_in_.open("/reaching/cam_right/img:i"))
+        {
+            yError() << "Could not open /reaching/cam_right/img:i port! Closing.";
+            return false;
+        }
+
+        if (!port_image_right_out_.open("/reaching/cam_right/img:o"))
+        {
+            yError() << "Could not open /reaching/cam_right/img:o port! Closing.";
+            return false;
+        }
+
+        if (!port_click_right_.open("/reaching/cam_right/click:i"))
+        {
+            yError() << "Could not open /reaching/cam_right/click:i port! Closing.";
+            return false;
+        }
+
+        if (!port_px_left_endeffector.open("/reaching/cam_left/x:o"))
+        {
+            yError() << "Could not open /reaching/cam_left/x:o port! Closing.";
+            return false;
+        }
+
+        if (!port_px_right_endeffector.open("/reaching/cam_right/x:o"))
+        {
+            yError() << "Could not open /reaching/cam_right/x:o port! Closing.";
+            return false;
+        }
+
+        if (!setGazeController()) return false;
+
+        if (!setTorsoRemoteControlboard()) return false;
+
+        if (!setRightArmRemoteControlboard()) return false;
+
+        if (!setRightArmCartesianController()) return false;
+
+        Bottle btl_cam_info;
+        itf_gaze_->getInfo(btl_cam_info);
+        yInfo() << "[CAM INFO]" << btl_cam_info.toString();
+        Bottle* cam_left_info = btl_cam_info.findGroup("camera_intrinsics_left").get(1).asList();
+        Bottle* cam_right_info = btl_cam_info.findGroup("camera_intrinsics_right").get(1).asList();
+
+        float left_fx  = static_cast<float>(cam_left_info->get(0).asDouble());
+        float left_cx  = static_cast<float>(cam_left_info->get(2).asDouble());
+        float left_fy  = static_cast<float>(cam_left_info->get(5).asDouble());
+        float left_cy  = static_cast<float>(cam_left_info->get(6).asDouble());
+
+        left_proj_ = zeros(3, 4);
+        left_proj_(0, 0) = left_fx;
+        left_proj_(0, 2) = left_cx;
+        left_proj_(1, 1) = left_fy;
+        left_proj_(1, 2) = left_cy;
+        left_proj_(2, 2) = 1.0;
+
+        yInfo() << "left_proj_ =\n" << left_proj_.toString();
+
+        float right_fx = static_cast<float>(cam_right_info->get(0).asDouble());
+        float right_cx = static_cast<float>(cam_right_info->get(2).asDouble());
+        float right_fy = static_cast<float>(cam_right_info->get(5).asDouble());
+        float right_cy = static_cast<float>(cam_right_info->get(6).asDouble());
+
+        right_proj_ = zeros(3, 4);
+        right_proj_(0, 0) = right_fx;
+        right_proj_(0, 2) = right_cx;
+        right_proj_(1, 1) = right_fy;
+        right_proj_(1, 2) = right_cy;
+        right_proj_(2, 2) = 1.0;
+
+        yInfo() << "right_proj_ =\n" << right_proj_.toString();
+
+
+        Vector left_eye_x;
+        Vector left_eye_o;
+        itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+
+        Vector right_eye_x;
+        Vector right_eye_o;
+        itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+
+        yInfo() << "left_eye_o =" << left_eye_o.toString();
+        yInfo() << "right_eye_o =" << right_eye_o.toString();
+
+
+        Matrix l_H_eye = axis2dcm(left_eye_o);
+        left_eye_x.push_back(1.0);
+        l_H_eye.setCol(3, left_eye_x);
+        Matrix l_H_r_to_eye = SE3inv(l_H_eye);
+
+        Matrix r_H_eye = axis2dcm(right_eye_o);
+        right_eye_x.push_back(1.0);
+        r_H_eye.setCol(3, right_eye_x);
+        Matrix r_H_r_to_eye = SE3inv(r_H_eye);
+
+        yInfo() << "l_H_r_to_eye =\n" << l_H_r_to_eye.toString();
+        yInfo() << "r_H_r_to_eye =\n" << r_H_r_to_eye.toString();
+
+        l_H_r_to_cam_ = left_proj_  * l_H_r_to_eye;
+        r_H_r_to_cam_ = right_proj_ * r_H_r_to_eye;
+
+        yInfo() << "l_H_r_to_cam_ =\n" << l_H_r_to_cam_.toString();
+        yInfo() << "r_H_r_to_cam_ =\n" << r_H_r_to_cam_.toString();
+
+
+        l_si_skel_ = new SISkeleton(left_fx,  left_fy,  left_cx,  left_cy);
+        r_si_skel_ = new SISkeleton(right_fx, right_fy, right_cx, right_cy);
+
+        icub_index_ = iCubFinger("right_index");
+        std::deque<IControlLimits*> temp_lim;
+        temp_lim.push_front(itf_fingers_lim_);
+        if (!icub_index_.alignJointsBounds(temp_lim))
+        {
+            yError() << "Cannot set joint bound for index finger.";
+            return false;
+        }
+        
+        handler_port_.open("/reaching/cmd:i");
+        attach(handler_port_);
+        
+        return true;
+    }
+
+    
     double getPeriod() { return 0; }
+
 
     bool updateModule()
     {
@@ -330,154 +481,6 @@ public:
         return false;
     }
 
-    bool configure(ResourceFinder &rf)
-    {
-        if (!port_estimates_in_.open("/reaching/estimates:i"))
-        {
-            yError() << "Could not open /reaching/estimates:i port! Closing.";
-            return false;
-        }
-
-        if (!port_image_left_in_.open("/reaching/cam_left/img:i"))
-        {
-            yError() << "Could not open /reaching/cam_left/img:i port! Closing.";
-            return false;
-        }
-
-        if (!port_image_left_out_.open("/reaching/cam_left/img:o"))
-        {
-            yError() << "Could not open /reaching/cam_left/img:o port! Closing.";
-            return false;
-        }
-
-        if (!port_click_left_.open("/reaching/cam_left/click:i"))
-        {
-            yError() << "Could not open /reaching/cam_left/click:in port! Closing.";
-            return false;
-        }
-
-        if (!port_image_right_in_.open("/reaching/cam_right/img:i"))
-        {
-            yError() << "Could not open /reaching/cam_right/img:i port! Closing.";
-            return false;
-        }
-
-        if (!port_image_right_out_.open("/reaching/cam_right/img:o"))
-        {
-            yError() << "Could not open /reaching/cam_right/img:o port! Closing.";
-            return false;
-        }
-
-        if (!port_click_right_.open("/reaching/cam_right/click:i"))
-        {
-            yError() << "Could not open /reaching/cam_right/click:i port! Closing.";
-            return false;
-        }
-
-        if (!port_px_left_endeffector.open("/reaching/cam_left/x:o"))
-        {
-            yError() << "Could not open /reaching/cam_left/x:o port! Closing.";
-            return false;
-        }
-
-        if (!port_px_right_endeffector.open("/reaching/cam_right/x:o"))
-        {
-            yError() << "Could not open /reaching/cam_right/x:o port! Closing.";
-            return false;
-        }
-
-        if (!setGazeController()) return false;
-
-        if (!setTorsoRemoteControlboard()) return false;
-
-        if (!setRightArmRemoteControlboard()) return false;
-
-        if (!setRightArmCartesianController()) return false;
-
-        Bottle btl_cam_info;
-        itf_gaze_->getInfo(btl_cam_info);
-        yInfo() << "[CAM INFO]" << btl_cam_info.toString();
-        Bottle* cam_left_info = btl_cam_info.findGroup("camera_intrinsics_left").get(1).asList();
-        Bottle* cam_right_info = btl_cam_info.findGroup("camera_intrinsics_right").get(1).asList();
-
-        float left_fx  = static_cast<float>(cam_left_info->get(0).asDouble());
-        float left_cx  = static_cast<float>(cam_left_info->get(2).asDouble());
-        float left_fy  = static_cast<float>(cam_left_info->get(5).asDouble());
-        float left_cy  = static_cast<float>(cam_left_info->get(6).asDouble());
-
-        left_proj_ = zeros(3, 4);
-        left_proj_(0, 0) = left_fx;
-        left_proj_(0, 2) = left_cx;
-        left_proj_(1, 1) = left_fy;
-        left_proj_(1, 2) = left_cy;
-        left_proj_(2, 2) = 1.0;
-
-        yInfo() << "left_proj_ =\n" << left_proj_.toString();
-
-        float right_fx = static_cast<float>(cam_right_info->get(0).asDouble());
-        float right_cx = static_cast<float>(cam_right_info->get(2).asDouble());
-        float right_fy = static_cast<float>(cam_right_info->get(5).asDouble());
-        float right_cy = static_cast<float>(cam_right_info->get(6).asDouble());
-
-        right_proj_ = zeros(3, 4);
-        right_proj_(0, 0) = right_fx;
-        right_proj_(0, 2) = right_cx;
-        right_proj_(1, 1) = right_fy;
-        right_proj_(1, 2) = right_cy;
-        right_proj_(2, 2) = 1.0;
-
-        yInfo() << "right_proj_ =\n" << right_proj_.toString();
-
-
-        Vector left_eye_x;
-        Vector left_eye_o;
-        itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
-
-        Vector right_eye_x;
-        Vector right_eye_o;
-        itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
-
-        yInfo() << "left_eye_o =" << left_eye_o.toString();
-        yInfo() << "right_eye_o =" << right_eye_o.toString();
-
-
-        Matrix l_H_eye = axis2dcm(left_eye_o);
-        left_eye_x.push_back(1.0);
-        l_H_eye.setCol(3, left_eye_x);
-        Matrix l_H_r_to_eye = SE3inv(l_H_eye);
-
-        Matrix r_H_eye = axis2dcm(right_eye_o);
-        right_eye_x.push_back(1.0);
-        r_H_eye.setCol(3, right_eye_x);
-        Matrix r_H_r_to_eye = SE3inv(r_H_eye);
-
-        yInfo() << "l_H_r_to_eye =\n" << l_H_r_to_eye.toString();
-        yInfo() << "r_H_r_to_eye =\n" << r_H_r_to_eye.toString();
-
-        l_H_r_to_cam_ = left_proj_  * l_H_r_to_eye;
-        r_H_r_to_cam_ = right_proj_ * r_H_r_to_eye;
-
-        yInfo() << "l_H_r_to_cam_ =\n" << l_H_r_to_cam_.toString();
-        yInfo() << "r_H_r_to_cam_ =\n" << r_H_r_to_cam_.toString();
-
-
-        l_si_skel_ = new SISkeleton(left_fx,  left_fy,  left_cx,  left_cy);
-        r_si_skel_ = new SISkeleton(right_fx, right_fy, right_cx, right_cy);
-
-        icub_index_ = iCubFinger("right_index");
-        std::deque<IControlLimits*> temp_lim;
-        temp_lim.push_front(itf_fingers_lim_);
-        if (!icub_index_.alignJointsBounds(temp_lim))
-        {
-            yError() << "Cannot set joint bound for index finger.";
-            return false;
-        }
-
-        handler_port_.open("/reaching/cmd:i");
-        attach(handler_port_);
-
-        return true;
-    }
 
     bool respond(const Bottle& command, Bottle& reply)
     {
