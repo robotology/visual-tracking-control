@@ -104,20 +104,20 @@ public:
         Vector left_eye_o;
         itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
 
-        Vector left_proj = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(0, 2) - left_eye_x));
-        yInfo() << "Proj left ee = [" << (left_proj.subVector(0, 1) / left_proj[2]).toString() << "]";
+        Vector l_px = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(0, 2) - left_eye_x));
+        yInfo() << "Proj left ee = [" << (l_px.subVector(0, 1) / l_px[2]).toString() << "]";
 
         Vector right_eye_x;
         Vector right_eye_o;
         itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
-        Vector right_proj = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(6, 8) - right_eye_x));
-        yInfo() << "Proj right ee = [" << (right_proj.subVector(0, 1) / right_proj[2]).toString() << "]";
+        Vector r_px = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(6, 8) - right_eye_x));
+        yInfo() << "Proj right ee = [" << (r_px.subVector(0, 1) / r_px[2]).toString() << "]";
 
         Vector px_ee_now;
-        px_ee_now.push_back(left_proj [0] / left_proj[2]); /* u_ee_l */
-        px_ee_now.push_back(right_proj[0] / right_proj[2]); /* u_ee_r */
-        px_ee_now.push_back(left_proj [1] / left_proj[2]); /* v_ee_l */
+        px_ee_now.push_back(l_px [0] / l_px[2]);    /* u_ee_l */
+        px_ee_now.push_back(r_px[0] / r_px[2]);     /* u_ee_r */
+        px_ee_now.push_back(l_px [1] / l_px[2]);    /* v_ee_l */
         yInfo() << "px_ee_now = [" << px_ee_now.toString() << "]";
 
 
@@ -153,9 +153,9 @@ public:
         jacobian(1, 2) = (r_H_r_to_cam_(0, 2) * r_lambda - r_H_r_to_cam_(2, 2) * r_num_u) / r_lambda_sq;
 
 
-        double Ts    = 0.05;  // controller's sample time [s]
-        double K     = 1;    // how long it takes to move to the target [s]
-        double v_max = 0.005; // max cartesian velocity [m/s]
+        double Ts    = 0.05;    // controller's sample time [s]
+        double K     = 1;       // how long it takes to move to the target [s]
+        double v_max = 0.005;   // max cartesian velocity [m/s]
 
         bool done = false;
         while (!should_stop_ && !done)
@@ -240,31 +240,31 @@ public:
                 yInfo() << "EE L cor: " << estimates->subVector(0, 2).toString();
                 yInfo() << "EE R cor: " << estimates->subVector(6, 8).toString() << "\n";
 
-                Vector left_proj  = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(0, 2) - left_eye_x));
-                Vector right_proj = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(6, 8) - right_eye_x));
+                l_px = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(0, 2) - left_eye_x));
+                r_px = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(6, 8) - right_eye_x));
 
-                left_proj[0] /= left_proj[2];
-                left_proj[1] /= left_proj[2];
+                l_px[0] /= l_px[2];
+                l_px[1] /= l_px[2];
 
-                right_proj[0] /= right_proj[2];
-                right_proj[1] /= right_proj[2];
+                r_px[0] /= r_px[2];
+                r_px[1] /= r_px[2];
 
-                px_ee_now[0] = left_proj [0];   /* u_ee_l */
-                px_ee_now[1] = right_proj[0];   /* u_ee_r */
-                px_ee_now[2] = left_proj [1];   /* v_ee_l */
+                px_ee_now[0] = l_px [0];    /* u_ee_l */
+                px_ee_now[1] = r_px[0];     /* u_ee_r */
+                px_ee_now[2] = l_px [1];    /* v_ee_l */
 
 
                 /* Dump pixel coordinates of the end-effector */
                 Bottle& l_px_endeffector = port_px_left_endeffector.prepare();
                 l_px_endeffector.clear();
-                l_px_endeffector.addInt(left_proj[0]);
-                l_px_endeffector.addInt(left_proj[1]);
+                l_px_endeffector.addInt(l_px[0]);
+                l_px_endeffector.addInt(l_px[1]);
                 port_px_left_endeffector.write();
 
                 Bottle& r_px_endeffector = port_px_right_endeffector.prepare();
                 r_px_endeffector.clear();
-                r_px_endeffector.addInt(right_proj[0]);
-                r_px_endeffector.addInt(right_proj[1]);
+                r_px_endeffector.addInt(r_px[0]);
+                r_px_endeffector.addInt(r_px[1]);
                 port_px_right_endeffector.write();
 
 
@@ -305,7 +305,7 @@ public:
                 l_imgout = *l_imgin;
                 cv::Mat l_img = cv::cvarrToMat(l_imgout.getIplImage());
 
-                cv::circle(l_img, cv::Point(left_proj[0],      left_proj[1]),      4, cv::Scalar(0, 255, 0), 4);
+                cv::circle(l_img, cv::Point(l_px[0],      l_px[1]),      4, cv::Scalar(0, 255, 0), 4);
                 cv::circle(l_img, cv::Point(l_px_location_[0], l_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
 
                 port_image_left_out_.write();
@@ -316,7 +316,7 @@ public:
                 r_imgout = *r_imgin;
                 cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
 
-                cv::circle(r_img, cv::Point(right_proj[0],     right_proj[1]),     4, cv::Scalar(0, 255, 0), 4);
+                cv::circle(r_img, cv::Point(r_px[0],     r_px[1]),     4, cv::Scalar(0, 255, 0), 4);
                 cv::circle(r_img, cv::Point(r_px_location_[0], r_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
 
                 port_image_right_out_.write();
@@ -412,7 +412,7 @@ public:
         left_proj_(1, 2) = left_cy;
         left_proj_(2, 2) = 1.0;
 
-        yInfo() << "left_proj =\n" << left_proj_.toString();
+        yInfo() << "left_proj_ =\n" << left_proj_.toString();
 
         float right_fx = static_cast<float>(cam_right_info->get(0).asDouble());
         float right_cx = static_cast<float>(cam_right_info->get(2).asDouble());
@@ -426,7 +426,7 @@ public:
         right_proj_(1, 2) = right_cy;
         right_proj_(2, 2) = 1.0;
 
-        yInfo() << "right_proj =\n" << right_proj_.toString();
+        yInfo() << "right_proj_ =\n" << right_proj_.toString();
 
 
         Vector left_eye_x;
