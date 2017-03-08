@@ -121,7 +121,7 @@ public:
         yInfo() << "px_ee_now = [" << px_ee_now.toString() << "]";
 
 
-        /* Gradient */
+        /* Jacobian */
         Matrix gradient(3, 3);
 
         Vector l_ee_x = estimates->subVector(0, 2);
@@ -268,7 +268,7 @@ public:
                 port_px_right_endeffector.write();
 
 
-                /* Gradient */
+                /* Update Jacobian */
                 gradient(3, 3);
                 l_ee_x = estimates->subVector(0, 2);
                 l_ee_x.push_back(1.0);
