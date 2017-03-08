@@ -182,7 +182,7 @@ public:
         return true;
     }
 
-    
+
     double getPeriod() { return 0; }
 
 
@@ -214,31 +214,29 @@ public:
 //        Vector* estimates = &pose;
         /* **************************************************** */
 
-
         if (should_stop_) return false;
+
 
         yInfo() << "estimates = ["  << estimates->toString() << "]";
 
         Vector px_img_left;
-        px_img_left.push_back(l_px_location_[0]);
-        px_img_left.push_back(l_px_location_[1]);
-
+        px_img_left.push_back(l_px_goal_[0]);
+        px_img_left.push_back(l_px_goal_[1]);
         yInfo() << "px_img_left = [" << px_img_left.toString() << "]";
 
         Vector px_img_right;
-        px_img_right.push_back(r_px_location_[0]);
-        px_img_right.push_back(r_px_location_[1]);
-
+        px_img_right.push_back(r_px_goal_[0]);
+        px_img_right.push_back(r_px_goal_[1]);
         yInfo() << "px_img_right = [" << px_img_right.toString() << "]";
 
         Vector px_des;
         px_des.push_back(px_img_left[0]);   /* u_l */
         px_des.push_back(px_img_right[0]);  /* u_r */
         px_des.push_back(px_img_left[1]);   /* v_l */
-
         yInfo() << "px_des = ["  << px_des.toString() << "]";
 
 
+        // FIXME: solo per controllo con l/r_px?
         Vector px_ee_left;  /* u_ee_l, v_ee_l */
         itf_gaze_->get2DPixel(LEFT,  estimates->subVector(0, 2), px_ee_left);
         yInfo() << "estimates(0, 2) = ["  << estimates->subVector(0, 2).toString() << "]";
@@ -249,6 +247,7 @@ public:
         itf_gaze_->get2DPixel(RIGHT, estimates->subVector(6, 8), px_ee_right);
         yInfo() << "estimates(6, 8) = ["  << estimates->subVector(6, 8).toString() << "]";
         yInfo() << "px_ee_right = [" << px_ee_right.toString() << "]";
+        /* ********************************** */
 
 
         Vector left_eye_x;
@@ -258,12 +257,14 @@ public:
         Vector l_px = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(0, 2) - left_eye_x));
         yInfo() << "Proj left ee = [" << (l_px.subVector(0, 1) / l_px[2]).toString() << "]";
 
+
         Vector right_eye_x;
         Vector right_eye_o;
         itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
         Vector r_px = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (estimates->subVector(6, 8) - right_eye_x));
         yInfo() << "Proj right ee = [" << (r_px.subVector(0, 1) / r_px[2]).toString() << "]";
+
 
         Vector px_ee_now;
         px_ee_now.push_back(l_px [0] / l_px[2]);    /* u_ee_l */
@@ -456,8 +457,8 @@ public:
                 l_imgout = *l_imgin;
                 cv::Mat l_img = cv::cvarrToMat(l_imgout.getIplImage());
 
-                cv::circle(l_img, cv::Point(l_px[0],      l_px[1]),      4, cv::Scalar(0, 255, 0), 4);
-                cv::circle(l_img, cv::Point(l_px_location_[0], l_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
+                cv::circle(l_img, cv::Point(l_px[0],       l_px[1]),       4, cv::Scalar(0, 255, 0), 4);
+                cv::circle(l_img, cv::Point(l_px_goal_[0], l_px_goal_[1]), 4, cv::Scalar(0, 255, 0), 4);
 
                 port_image_left_out_.write();
 
@@ -467,8 +468,8 @@ public:
                 r_imgout = *r_imgin;
                 cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
 
-                cv::circle(r_img, cv::Point(r_px[0],     r_px[1]),     4, cv::Scalar(0, 255, 0), 4);
-                cv::circle(r_img, cv::Point(r_px_location_[0], r_px_location_[1]), 4, cv::Scalar(0, 255, 0), 4);
+                cv::circle(r_img, cv::Point(r_px[0],       r_px[1]),       4, cv::Scalar(0, 255, 0), 4);
+                cv::circle(r_img, cv::Point(r_px_goal_[0], r_px_goal_[1]), 4, cv::Scalar(0, 255, 0), 4);
 
                 port_image_right_out_.write();
             }
@@ -538,13 +539,13 @@ public:
                 Bottle* click_left  = port_click_left_.read  (true);
                 Bottle* click_right = port_click_right_.read (true);
 
-                l_px_location_.resize(2);
-                l_px_location_[0] = click_left->get(0).asDouble();
-                l_px_location_[1] = click_left->get(1).asDouble();
+                l_px_goal_.resize(2);
+                l_px_goal_[0] = click_left->get(0).asDouble();
+                l_px_goal_[1] = click_left->get(1).asDouble();
 
-                r_px_location_.resize(2);
-                r_px_location_[0] = click_right->get(0).asDouble();
-                r_px_location_[1] = click_right->get(1).asDouble();
+                r_px_goal_.resize(2);
+                r_px_goal_[0] = click_right->get(0).asDouble();
+                r_px_goal_[1] = click_right->get(1).asDouble();
 
                 reply = command;
 
@@ -583,13 +584,13 @@ public:
                 r_H_r_to_cam_ = right_proj_ * r_H_r_to_eye;
 
 
-                l_px_location_.resize(2);
-                l_px_location_[0] = 125;
-                l_px_location_[1] = 135;
+                l_px_goal_.resize(2);
+                l_px_goal_[0] = 125;
+                l_px_goal_[1] = 135;
 
-                r_px_location_.resize(2);
-                r_px_location_[0] = 89;
-                r_px_location_[1] = 135;
+                r_px_goal_.resize(2);
+                r_px_goal_[0] = 89;
+                r_px_goal_[1] = 135;
 
                 reply = command;
 
@@ -658,9 +659,9 @@ public:
                                         {
                                             if (position_2d->size() == 4)
                                             {
-                                                l_px_location_.resize(2);
-                                                l_px_location_[0] = position_2d->get(0).asDouble() + (position_2d->get(2).asDouble() - position_2d->get(0).asDouble()) / 2;
-                                                l_px_location_[1] = position_2d->get(1).asDouble() + (position_2d->get(3).asDouble() - position_2d->get(1).asDouble()) / 2;
+                                                l_px_goal_.resize(2);
+                                                l_px_goal_[0] = position_2d->get(0).asDouble() + (position_2d->get(2).asDouble() - position_2d->get(0).asDouble()) / 2;
+                                                l_px_goal_[1] = position_2d->get(1).asDouble() + (position_2d->get(3).asDouble() - position_2d->get(1).asDouble()) / 2;
 
                                                 RpcClient port_sfm;
                                                 port_sfm.open("/reaching/tosfm");
@@ -668,8 +669,8 @@ public:
 
                                                 cmd.clear();
 
-                                                cmd.addInt(l_px_location_[0]);
-                                                cmd.addInt(l_px_location_[1]);
+                                                cmd.addInt(l_px_goal_[0]);
+                                                cmd.addInt(l_px_goal_[1]);
 
                                                 Bottle reply_pos;
                                                 port_sfm.write(cmd, reply_pos);
@@ -681,9 +682,9 @@ public:
                                                     location_[1] = reply_pos.get(1).asDouble();
                                                     location_[2] = reply_pos.get(2).asDouble();
 
-                                                    r_px_location_.resize(2);
-                                                    r_px_location_[0] = reply_pos.get(3).asDouble();
-                                                    r_px_location_[1] = reply_pos.get(4).asDouble();
+                                                    r_px_goal_.resize(2);
+                                                    r_px_goal_[0] = reply_pos.get(3).asDouble();
+                                                    r_px_goal_[1] = reply_pos.get(4).asDouble();
                                                 }
                                                 else
                                                 {
@@ -735,8 +736,8 @@ public:
                 yarp.disconnect("/reaching/tomemory", "/memory/rpc");
                 port_memory.close();
 
-                yInfo() << "l_px_location: " << l_px_location_.toString();
-                yInfo() << "r_px_location: " << r_px_location_.toString();
+                yInfo() << "l_px_location: " << l_px_goal_.toString();
+                yInfo() << "r_px_location: " << r_px_goal_.toString();
                 yInfo() << "location: " << location_.toString();
 
                 reply.addString("ack");
@@ -767,11 +768,11 @@ public:
                 Bottle  rep;
 
 
-                Bottle* click_left  = port_click_left_.read  (true);
+                Bottle* click_left = port_click_left_.read  (true);
 
-                l_px_location_.resize(2);
-                l_px_location_[0] = click_left->get(0).asDouble();
-                l_px_location_[1] = click_left->get(1).asDouble();
+                l_px_goal_.resize(2);
+                l_px_goal_[0] = click_left->get(0).asDouble();
+                l_px_goal_[1] = click_left->get(1).asDouble();
 
 
                 RpcClient port_sfm;
@@ -780,8 +781,8 @@ public:
 
                 cmd.clear();
 
-                cmd.addInt(l_px_location_[0]);
-                cmd.addInt(l_px_location_[1]);
+                cmd.addInt(l_px_goal_[0]);
+                cmd.addInt(l_px_goal_[1]);
 
                 Bottle reply_pos;
                 port_sfm.write(cmd, reply_pos);
@@ -795,9 +796,9 @@ public:
 
                     yInfo() << "location: " << location_.toString();
 
-                    r_px_location_.resize(2);
-                    r_px_location_[0] = reply_pos.get(3).asDouble();
-                    r_px_location_[1] = reply_pos.get(4).asDouble();
+                    r_px_goal_.resize(2);
+                    r_px_goal_[0] = reply_pos.get(3).asDouble();
+                    r_px_goal_[1] = reply_pos.get(4).asDouble();
                 }
                 else
                 {
@@ -996,8 +997,8 @@ private:
     Matrix                           px_to_cartesian_;
 
     double                           traj_time_ = 2.5;
-    Vector                           l_px_location_;
-    Vector                           r_px_location_;
+    Vector                           l_px_goal_;
+    Vector                           r_px_goal_;
     Vector                           location_;
     bool                             take_estimates_ = false;
 
