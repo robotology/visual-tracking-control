@@ -4,7 +4,7 @@
 
     <!-- GENERIC INFORMATION -->
     <name>reaching-SIM</name>
-    <description>Reaching demo of the iCub_SIM to use in conjunction with the hand-tracking app</description>
+    <description>This app allows the iCub_SIM to reach a point with the end-effector. Must be used with the hand-tracking app.</description>
     <version>0.2.0</version>
 
     <authors>

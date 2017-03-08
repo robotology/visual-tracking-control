@@ -4,8 +4,8 @@
 
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking-BATCH</name>
-    <description>Visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
-    <version>0.2.2</version>
+    <description>Offline visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
+    <version>0.2.3</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
