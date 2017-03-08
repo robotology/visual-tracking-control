@@ -405,7 +405,7 @@ public:
         float left_fy  = static_cast<float>(cam_left_info->get(5).asDouble());
         float left_cy  = static_cast<float>(cam_left_info->get(6).asDouble());
 
-        left_proj_ = Matrix(3, 4);
+        left_proj_ = zeros(3, 4);
         left_proj_(0, 0) = left_fx;
         left_proj_(0, 2) = left_cx;
         left_proj_(1, 1) = left_fy;
@@ -419,7 +419,7 @@ public:
         float right_fy = static_cast<float>(cam_right_info->get(5).asDouble());
         float right_cy = static_cast<float>(cam_right_info->get(6).asDouble());
 
-        right_proj_ = Matrix(3, 4);
+        right_proj_ = zeros(3, 4);
         right_proj_(0, 0) = right_fx;
         right_proj_(0, 2) = right_cx;
         right_proj_(1, 1) = right_fy;
