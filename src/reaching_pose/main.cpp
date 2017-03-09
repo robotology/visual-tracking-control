@@ -12,6 +12,7 @@
 #include <yarp/math/Math.h>
 #include <yarp/math/SVD.h>
 #include <yarp/os/BufferedPort.h>
+#include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
 #include <yarp/os/Property.h>
@@ -35,6 +36,13 @@ class RFMReaching : public RFModule
 public:
     bool configure(ResourceFinder &rf)
     {
+        robot_name_ = rf.find("robot").asString();
+        if (robot_name_.empty())
+        {
+            yError() << "Robot name not provided! Closing.";
+            return false;
+        }
+
         if (!port_estimates_in_.open("/reaching_pose/estimates:i"))
         {
             yError() << "Could not open /reaching_pose/estimates:i port! Closing.";
@@ -942,6 +950,8 @@ public:
     }
 
 private:
+    ConstString                      robot_name_;
+
     Port                             handler_port_;
     bool                             should_stop_ = false;
 
@@ -998,7 +1008,7 @@ private:
         Property rightarm_cartesian_options;
         rightarm_cartesian_options.put("device", "cartesiancontrollerclient");
         rightarm_cartesian_options.put("local",  "/reaching_pose/cart_right_arm");
-        rightarm_cartesian_options.put("remote", "/icub/cartesianController/right_arm");
+        rightarm_cartesian_options.put("remote", "/"+robot_name_+"/cartesianController/right_arm");
 
         rightarm_cartesian_driver_.open(rightarm_cartesian_options);
         if (rightarm_cartesian_driver_.isValid())
@@ -1065,7 +1075,7 @@ private:
         Property rightarm_remote_options;
         rightarm_remote_options.put("device", "remote_controlboard");
         rightarm_remote_options.put("local",  "/reaching_pose/control_right_arm");
-        rightarm_remote_options.put("remote", "/icub/right_arm");
+        rightarm_remote_options.put("remote", "/"+robot_name_+"/right_arm");
 
         rightarm_remote_driver_.open(rightarm_remote_options);
         if (rightarm_remote_driver_.isValid())
@@ -1100,7 +1110,7 @@ private:
         Property torso_remote_options;
         torso_remote_options.put("device", "remote_controlboard");
         torso_remote_options.put("local",  "/reaching_pose/control_torso");
-        torso_remote_options.put("remote", "/icub/torso");
+        torso_remote_options.put("remote", "/"+robot_name_+"/torso");
 
         torso_remote_driver_.open(torso_remote_options);
         if (torso_remote_driver_.isValid())
@@ -1268,7 +1278,7 @@ private:
 };
 
 
-int main()
+int main(int argc, char **argv)
 {
     Network yarp;
     if (!yarp.checkNetwork(3.0))
@@ -1278,6 +1288,7 @@ int main()
     }
 
     ResourceFinder rf;
+    rf.configure(argc, argv);
     RFMReaching reaching;
     reaching.runModule(rf);
 
