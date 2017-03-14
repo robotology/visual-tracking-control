@@ -15,6 +15,7 @@
     <!-- REQUIRED MODULES -->
     <module>
         <name>raching_pose</name>
+        <parameters>--robot icubSim</parameters>
         <node>yarprun</node>
     </module>
 
@@ -45,19 +46,19 @@
 
     <!-- REQUIRED CONNECTIONS -->
     <connection>
-        <from>/hand-tracking/result/estimates:o</from>
+        <from>/icubSim/cartesianController/right_arm/state:o</from>
         <to>/reaching_pose/estimates:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/icub/camcalib/left/out</from>
+        <from>/icubSim/cam/left</from>
         <to>/view/cam_left</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/icub/camcalib/left/out</from>
+        <from>/icubSim/cam/left</from>
         <to>/reaching_pose/cam_left/img:i</to>
         <protocol>tcp</protocol>
     </connection>
@@ -75,13 +76,13 @@
     </connection>
 
     <connection>
-        <from>/icub/camcalib/right/out</from>
+        <from>/icubSim/cam/right</from>
         <to>/view/cam_right</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/icub/camcalib/right/out</from>
+        <from>/icubSim/cam/right</from>
         <to>/reaching_pose/cam_right/img:i</to>
         <protocol>tcp</protocol>
     </connection>

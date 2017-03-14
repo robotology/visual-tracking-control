@@ -14,7 +14,8 @@
 
     <!-- REQUIRED MODULES -->
     <module>
-        <name>raching</name>
+        <name>raching_pose</name>
+        <parameters>--robot icub</parameters>
         <node>localhost</node>
     </module>
 
