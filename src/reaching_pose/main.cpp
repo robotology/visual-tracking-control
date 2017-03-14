@@ -116,28 +116,28 @@ public:
         float left_fy  = static_cast<float>(cam_left_info->get(5).asDouble());
         float left_cy  = static_cast<float>(cam_left_info->get(6).asDouble());
 
-        left_proj_ = zeros(3, 4);
-        left_proj_(0, 0) = left_fx;
-        left_proj_(0, 2) = left_cx;
-        left_proj_(1, 1) = left_fy;
-        left_proj_(1, 2) = left_cy;
-        left_proj_(2, 2) = 1.0;
+        l_proj_ = zeros(3, 4);
+        l_proj_(0, 0)  = left_fx;
+        l_proj_(0, 2)  = left_cx;
+        l_proj_(1, 1)  = left_fy;
+        l_proj_(1, 2)  = left_cy;
+        l_proj_(2, 2)  = 1.0;
 
-        yInfo() << "left_proj_ =\n" << left_proj_.toString();
+        yInfo() << "l_proj_ =\n" << l_proj_.toString();
 
         float right_fx = static_cast<float>(cam_right_info->get(0).asDouble());
         float right_cx = static_cast<float>(cam_right_info->get(2).asDouble());
         float right_fy = static_cast<float>(cam_right_info->get(5).asDouble());
         float right_cy = static_cast<float>(cam_right_info->get(6).asDouble());
 
-        right_proj_ = zeros(3, 4);
-        right_proj_(0, 0) = right_fx;
-        right_proj_(0, 2) = right_cx;
-        right_proj_(1, 1) = right_fy;
-        right_proj_(1, 2) = right_cy;
-        right_proj_(2, 2) = 1.0;
+        r_proj_ = zeros(3, 4);
+        r_proj_(0, 0)  = right_fx;
+        r_proj_(0, 2)  = right_cx;
+        r_proj_(1, 1)  = right_fy;
+        r_proj_(1, 2)  = right_cy;
+        r_proj_(2, 2)  = 1.0;
 
-        yInfo() << "right_proj_ =\n" << right_proj_.toString();
+        yInfo() << "r_proj_ =\n" << r_proj_.toString();
 
 
         Vector left_eye_x;
@@ -152,21 +152,21 @@ public:
         yInfo() << "right_eye_o =" << right_eye_o.toString();
 
 
-        Matrix l_H_eye = axis2dcm(left_eye_o);
+        l_H_eye_to_r_ = axis2dcm(left_eye_o);
         left_eye_x.push_back(1.0);
-        l_H_eye.setCol(3, left_eye_x);
-        Matrix l_H_r_to_eye = SE3inv(l_H_eye);
+        l_H_eye_to_r_.setCol(3, left_eye_x);
+        l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
 
-        Matrix r_H_eye = axis2dcm(right_eye_o);
+        r_H_eye_to_r_ = axis2dcm(right_eye_o);
         right_eye_x.push_back(1.0);
-        r_H_eye.setCol(3, right_eye_x);
-        Matrix r_H_r_to_eye = SE3inv(r_H_eye);
+        r_H_eye_to_r_.setCol(3, right_eye_x);
+        r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
 
-        yInfo() << "l_H_r_to_eye =\n" << l_H_r_to_eye.toString();
-        yInfo() << "r_H_r_to_eye =\n" << r_H_r_to_eye.toString();
+        yInfo() << "l_H_r_to_eye_ =\n" << l_H_r_to_eye_.toString();
+        yInfo() << "r_H_r_to_eye_ =\n" << r_H_r_to_eye_.toString();
 
-        l_H_r_to_cam_ = left_proj_  * l_H_r_to_eye;
-        r_H_r_to_cam_ = right_proj_ * r_H_r_to_eye;
+        l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
+        r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
 
         yInfo() << "l_H_r_to_cam_ =\n" << l_H_r_to_cam_.toString();
         yInfo() << "r_H_r_to_cam_ =\n" << r_H_r_to_cam_.toString();
@@ -198,35 +198,28 @@ public:
     {
         while (!take_estimates_);
 
+        if (should_stop_) return false;
+
         /* Get the initial end-effector pose from hand-tracking */
         Vector* estimates = port_estimates_in_.read(true);
 
-        /* Get the initial end-effector pose from the cartesian controller */
-//        Vector pose(12);
-//        Vector pose_x;
-//        Vector pose_o;
-//        itf_rightarm_cart_->getPose(pose_x, pose_o);
-//        pose_x.push_back(1.0);
-//        Matrix Ha = axis2dcm(pose_o);
-//        Ha.setCol(3, pose_x);
-//
-//        Vector init_chain_joints;
-//        icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), init_chain_joints);
-//        Vector init_tip_pose_index = (Ha * icub_index_.getH((M_PI/180.0) * init_chain_joints).getCol(3)).subVector(0, 2);
-//
-//        pose.setSubvector(0,  init_tip_pose_index);
-//        pose.setSubvector(3,  zeros(3));
-//        pose.setSubvector(6,  init_tip_pose_index);
-//        pose.setSubvector(9,  zeros(3));
-//
-//        Vector* estimates = &pose;
-        /* **************************************************** */
+        /* If the end-effector pose is taken from the direct kinematics, then the pose is replicated */
+        Vector est_copy(*estimates);
+        if (est_copy.size() == 7)
+        {
+            double ang = est_copy(6);
+            est_copy.setSubvector(3, est_copy.subVector(3, 5) * ang);
 
-        if (should_stop_) return false;
+            est_copy(6) = est_copy(0);
+            for (int i = 1; i < 6; ++i)
+            {
+                est_copy.push_back(est_copy(i));
+            }
+        }
 
         yInfo() << "RUNNING!\n";
 
-        yInfo() << "estimates = ["  << estimates->toString() << "]";
+        yInfo() << "estimates = ["  << est_copy.toString() << "]";
         yInfo() << "l_px_goal_ = [" << l_px_goal_.toString() << "]";
         yInfo() << "r_px_goal_ = [" << r_px_goal_.toString() << "]";
 
@@ -234,110 +227,132 @@ public:
         px_des.push_back(l_px_goal_[0]);    /* u_ee_l */
         px_des.push_back(r_px_goal_[0]);    /* u_ee_r */
         px_des.push_back(l_px_goal_[1]);    /* v_ee_l */
+
         px_des.push_back(l_px_goal_[2]);    /* u_x1_l */
         px_des.push_back(r_px_goal_[2]);    /* u_x1_r */
         px_des.push_back(l_px_goal_[3]);    /* v_x1_l */
+
         px_des.push_back(l_px_goal_[4]);    /* u_x2_l */
         px_des.push_back(r_px_goal_[4]);    /* u_x2_r */
         px_des.push_back(l_px_goal_[5]);    /* v_x2_l */
+
+        px_des.push_back(l_px_goal_[6]);    /* u_x3_l */
+        px_des.push_back(r_px_goal_[6]);    /* u_x3_r */
+        px_des.push_back(l_px_goal_[7]);    /* v_x3_l */
+
         yInfo() << "px_des = ["  << px_des.toString() << "]";
 
 
         // FIXME: solo per controllo con l/r_px?
         Vector px_ee_left;  /* u_ee_l, v_ee_l */
-        itf_gaze_->get2DPixel(LEFT,  estimates->subVector(0, 2), px_ee_left);
-        yInfo() << "estimates(0, 2) = ["  << estimates->subVector(0, 2).toString() << "]";
+        itf_gaze_->get2DPixel(LEFT,  est_copy.subVector(0, 2), px_ee_left);
+        yInfo() << "estimates(0, 2) = ["  << est_copy.subVector(0, 2).toString() << "]";
         yInfo() << "px_ee_left = ["  << px_ee_left.toString() << "]";
 
 
         Vector px_ee_right; /* u_ee_r, v_ee_r */
-        itf_gaze_->get2DPixel(RIGHT, estimates->subVector(6, 8), px_ee_right);
-        yInfo() << "estimates(6, 8) = ["  << estimates->subVector(6, 8).toString() << "]";
+        itf_gaze_->get2DPixel(RIGHT, est_copy.subVector(6, 8), px_ee_right);
+        yInfo() << "estimates(6, 8) = ["  << est_copy.subVector(6, 8).toString() << "]";
         yInfo() << "px_ee_right = [" << px_ee_right.toString() << "]";
         /* ********************************** */
 
 
-        Vector l_ee_x  = estimates->subVector(0, 2);
+        Vector l_ee_x0 = zeros(4);
         Vector l_ee_x1 = zeros(4);
         Vector l_ee_x2 = zeros(4);
-        getPalmPoints(estimates->subVector(0, 5), l_ee_x1, l_ee_x2);
+        Vector l_ee_x3 = zeros(4);
+        getPalmPoints(est_copy.subVector(0, 5), l_ee_x0, l_ee_x1, l_ee_x2, l_ee_x3);
 
-        Vector left_eye_x;
-        Vector left_eye_o;
-        itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
 
-        Vector l_px = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (l_ee_x - left_eye_x));
-        l_px[0] /= l_px[2];
-        l_px[1] /= l_px[2];
+        Vector l_px0 = l_H_r_to_cam_ * l_ee_x0;
+        l_px0[0] /= l_px0[2];
+        l_px0[1] /= l_px0[2];
         Vector l_px1 = l_H_r_to_cam_ * l_ee_x1;
         l_px1[0] /= l_px1[2];
         l_px1[1] /= l_px1[2];
         Vector l_px2 = l_H_r_to_cam_ * l_ee_x2;
         l_px2[0] /= l_px2[2];
         l_px2[1] /= l_px2[2];
-        yInfo() << "Proj left ee    = [" << l_px.subVector(0, 1).toString()  << "]";
+        Vector l_px3 = l_H_r_to_cam_ * l_ee_x3;
+        yInfo() << "Proj left ee    = [" << l_px0.subVector(0, 1).toString() << "]";
         yInfo() << "Proj left ee x1 = [" << l_px1.subVector(0, 1).toString() << "]";
         yInfo() << "Proj left ee x2 = [" << l_px2.subVector(0, 1).toString() << "]";
+        yInfo() << "Proj left ee x3 = [" << l_px3.subVector(0, 1).toString() << "]";
 
-        Vector r_ee_x = estimates->subVector(6, 8);
+
+        Vector r_ee_x0 = zeros(4);
         Vector r_ee_x1 = zeros(4);
         Vector r_ee_x2 = zeros(4);
-        getPalmPoints(estimates->subVector(6, 11), r_ee_x1, r_ee_x2);
+        Vector r_ee_x3 = zeros(4);
+        getPalmPoints(est_copy.subVector(6, 11), r_ee_x0, r_ee_x1, r_ee_x2, r_ee_x3);
 
-        Vector right_eye_x;
-        Vector right_eye_o;
-        itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
-        Vector r_px = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (r_ee_x - right_eye_x));
-        r_px[0] /= r_px[2];
-        r_px[1] /= r_px[2];
+        Vector r_px0 = r_H_r_to_cam_ * r_ee_x0;
+        r_px0[0] /= r_px0[2];
+        r_px0[1] /= r_px0[2];
         Vector r_px1 = r_H_r_to_cam_ * r_ee_x1;
         r_px1[0] /= r_px1[2];
         r_px1[1] /= r_px1[2];
         Vector r_px2 = r_H_r_to_cam_ * r_ee_x2;
         r_px2[0] /= r_px2[2];
         r_px2[1] /= r_px2[2];
-        yInfo() << "Proj right ee    = [" << r_px.subVector(0, 1).toString() << "]";
+        Vector r_px3 = r_H_r_to_cam_ * r_ee_x3;
+        r_px3[0] /= r_px3[2];
+        r_px3[1] /= r_px3[2];
+        yInfo() << "Proj right ee    = [" << r_px0.subVector(0, 1).toString() << "]";
         yInfo() << "Proj right ee x1 = [" << r_px1.subVector(0, 1).toString() << "]";
         yInfo() << "Proj right ee x2 = [" << r_px2.subVector(0, 1).toString() << "]";
+        yInfo() << "Proj right ee x3 = [" << r_px3.subVector(0, 1).toString() << "]";
 
 
         Vector px_ee_now;
-        px_ee_now.push_back(l_px [0]);  /* u_ee_l */
-        px_ee_now.push_back(r_px [0]);  /* u_ee_r */
-        px_ee_now.push_back(l_px [1]);  /* v_ee_l */
+        px_ee_now.push_back(l_px0[0]);  /* u_ee_l */
+        px_ee_now.push_back(r_px0[0]);  /* u_ee_r */
+        px_ee_now.push_back(l_px0[1]);  /* v_ee_l */
+
         px_ee_now.push_back(l_px1[0]);  /* u_x1_l */
         px_ee_now.push_back(r_px1[0]);  /* u_x1_r */
         px_ee_now.push_back(l_px1[1]);  /* v_x1_l */
+
         px_ee_now.push_back(l_px2[0]);  /* u_x2_l */
         px_ee_now.push_back(r_px2[0]);  /* u_x2_r */
         px_ee_now.push_back(l_px2[1]);  /* v_x2_l */
+
+        px_ee_now.push_back(l_px3[0]);  /* u_x3_l */
+        px_ee_now.push_back(r_px3[0]);  /* u_x3_r */
+        px_ee_now.push_back(l_px3[1]);  /* v_x3_l */
+
         yInfo() << "px_ee_now = [" << px_ee_now.toString() << "]";
 
 
         /* Jacobian */
-        Matrix jacobian = zeros(9, 6);
+        Matrix jacobian = zeros(12, 6);
 
-        /* End-effector */
-        jacobian.setRow(0, setJacobianU(LEFT,  l_ee_x(2),  l_px ));
-        jacobian.setRow(1, setJacobianU(RIGHT, r_ee_x(2),  r_px ));
-        jacobian.setRow(2, setJacobianV(LEFT,  l_ee_x(2),  l_px ));
+        /* Point 0 */
+        jacobian.setRow(0,  setJacobianU(LEFT,  l_px0));
+        jacobian.setRow(1,  setJacobianU(RIGHT, r_px0));
+        jacobian.setRow(2,  setJacobianV(LEFT,  l_px0));
 
-        /* Extra point 1 */
-        jacobian.setRow(3, setJacobianU(LEFT,  l_ee_x1(2), l_px1));
-        jacobian.setRow(4, setJacobianU(RIGHT, r_ee_x1(2), r_px1));
-        jacobian.setRow(5, setJacobianV(LEFT,  l_ee_x1(2), l_px1));
+        /* Point 1 */
+        jacobian.setRow(3,  setJacobianU(LEFT,  l_px1));
+        jacobian.setRow(4,  setJacobianU(RIGHT, r_px1));
+        jacobian.setRow(5,  setJacobianV(LEFT,  l_px1));
 
-        /* Extra point 2 */
-        jacobian.setRow(6, setJacobianU(LEFT,  l_ee_x2(2), l_px2));
-        jacobian.setRow(7, setJacobianU(RIGHT, r_ee_x2(2), r_px2));
-        jacobian.setRow(8, setJacobianV(LEFT,  l_ee_x2(2), l_px2));
+        /* Point 2 */
+        jacobian.setRow(6,  setJacobianU(LEFT,  l_px2));
+        jacobian.setRow(7,  setJacobianU(RIGHT, r_px2));
+        jacobian.setRow(8,  setJacobianV(LEFT,  l_px2));
+
+        /* Point 3 */
+        jacobian.setRow(9,  setJacobianU(LEFT,  l_px3));
+        jacobian.setRow(10, setJacobianU(RIGHT, r_px3));
+        jacobian.setRow(11, setJacobianV(LEFT,  l_px3));
         /* ******** */
 
 
-        double Ts    = 0.05;   // controller's sample time [s]
-        double K_x   = 1.0;  // visual servoing proportional gain
-        double K_o   = 0.001;  // visual servoing proportional gain
+        double Ts    = 0.1;   // controller's sample time [s]
+        double K_x   = 0.5;  // visual servoing proportional gain
+        double K_o   = 0.5;  // visual servoing proportional gain
         double v_max = 0.0005; // max cartesian velocity [m/s]
 
         bool done = false;
@@ -345,39 +360,72 @@ public:
         {
             Vector e            = px_des - px_ee_now;
             Matrix inv_jacobian = pinv(jacobian);
-            Vector vel_x        = K_x * inv_jacobian.submatrix(0, 2, 0, 8) * e;
-            Vector vel_o        = - K_o * inv_jacobian.submatrix(3, 5, 0, 8) * e;
 
-//            yInfo() << "jacobian = [\n"     << jacobian.toString()     << "]";
-//            yInfo() << "inv_jacobian = [\n" << inv_jacobian.toString() << "]";
-            yInfo() << "px_des = ["         << px_des.toString()       << "]";
-            yInfo() << "px_ee_now = ["      << px_ee_now.toString()    << "]";
-            yInfo() << "e = ["              << e.toString()            << "]";
-            yInfo() << "vel_x = ["          << vel_x.toString()        << "]";
-            yInfo() << "vel_o = ["          << vel_o.toString()        << "]";
+
+            Vector vel_x = zeros(3);
+            Vector vel_o = zeros(3);
+            for (int i = 0; i < inv_jacobian.cols(); ++i)
+            {
+                Vector delta_vel = inv_jacobian.getCol(i) * e(i);
+
+                if (i == 1 || i == 4 || i == 7 || i == 10)
+                {
+//                    Vector delta_o = r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
+//                    vel_x += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2) - cross(delta_o, r_H_eye_to_r_.getCol(3).subVector(0, 2));
+//                    vel_o += delta_o;
+
+                    vel_x += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2);
+                    vel_o += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
+                }
+                else
+                {
+//                    Vector delta_o = l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
+//                    vel_x += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2) - cross(delta_o, l_H_eye_to_r_.getCol(3).subVector(0, 2));
+//                    vel_o += delta_o;
+
+                    vel_x += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2);
+                    vel_o += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
+                }
+            }
+
+
+            yInfo() << "px_des = ["    << px_des.toString()    << "]";
+            yInfo() << "px_ee_now = [" << px_ee_now.toString() << "]";
+            yInfo() << "e = ["         << e.toString()         << "]";
+            yInfo() << "vel_x = ["     << vel_x.toString()     << "]";
+            yInfo() << "vel_o = ["     << vel_o.toString()     << "]";
 
             /* Enforce velocity bounds */
-            for (size_t i = 0; i < vel_x.length(); ++i)
-            {
-                vel_x[i] = sign(vel_x[i]) * std::min(v_max, std::fabs(vel_x[i]));
-            }
+//            for (size_t i = 0; i < vel_x.length(); ++i)
+//            {
+//                vel_x[i] = sign(vel_x[i]) * std::min(v_max, std::fabs(vel_x[i]));
+//            }
 
             yInfo() << "bounded vel_x = [" << vel_x.toString() << "]";
 
-            vel_o = dcm2axis(rpy2dcm(vel_o));
-            yInfo() << "transformed vel_o = [" << vel_o.toString() << "]";
+            double ang = norm(vel_o);
+            vel_o /= ang;
+            vel_o.push_back(ang);
+            yInfo() << "axis-angle vel_o = [" << vel_o.toString() << "]";
 
-            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+            vel_x    *= K_x;
+            vel_o(3) *= K_o;
+//            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+//            itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
+//            itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
 
-            yInfo() << "Pixel error: " << std::abs(px_des(0) - px_ee_now(0)) << std::abs(px_des(1) - px_ee_now(1)) << std::abs(px_des(2) - px_ee_now(2))
-                                       << std::abs(px_des(3) - px_ee_now(3)) << std::abs(px_des(4) - px_ee_now(4)) << std::abs(px_des(5) - px_ee_now(5))
-                                       << std::abs(px_des(6) - px_ee_now(6)) << std::abs(px_des(7) - px_ee_now(7)) << std::abs(px_des(8) - px_ee_now(8));
+            yInfo() << "Pixel error: " << std::abs(px_des(0) - px_ee_now(0)) << std::abs(px_des(1)  - px_ee_now(1))  << std::abs(px_des(2)  - px_ee_now(2))
+                                       << std::abs(px_des(3) - px_ee_now(3)) << std::abs(px_des(4)  - px_ee_now(4))  << std::abs(px_des(5)  - px_ee_now(5))
+                                       << std::abs(px_des(6) - px_ee_now(6)) << std::abs(px_des(7)  - px_ee_now(7))  << std::abs(px_des(8)  - px_ee_now(8))
+                                       << std::abs(px_des(9) - px_ee_now(9)) << std::abs(px_des(10) - px_ee_now(10)) << std::abs(px_des(11) - px_ee_now(11));
 
             Time::delay(Ts);
 
-            done = ((std::abs(px_des(0) - px_ee_now(0)) < 5.0) && (std::abs(px_des(1) - px_ee_now(1)) < 5.0) && (std::abs(px_des(2) - px_ee_now(2)) < 5.0) &&
-                    (std::abs(px_des(3) - px_ee_now(3)) < 5.0) && (std::abs(px_des(4) - px_ee_now(4)) < 5.0) && (std::abs(px_des(5) - px_ee_now(5)) < 5.0) &&
-                    (std::abs(px_des(6) - px_ee_now(6)) < 5.0) && (std::abs(px_des(7) - px_ee_now(7)) < 5.0) && (std::abs(px_des(8) - px_ee_now(8)) < 5.0));
+            done = ((std::abs(px_des(0) - px_ee_now(0)) < 5.0) && (std::abs(px_des(1)  - px_ee_now(1))  < 5.0) && (std::abs(px_des(2)  - px_ee_now(2))  < 5.0) &&
+                    (std::abs(px_des(3) - px_ee_now(3)) < 5.0) && (std::abs(px_des(4)  - px_ee_now(4))  < 5.0) && (std::abs(px_des(5)  - px_ee_now(5))  < 5.0) &&
+                    (std::abs(px_des(6) - px_ee_now(6)) < 5.0) && (std::abs(px_des(7)  - px_ee_now(7))  < 5.0) && (std::abs(px_des(8)  - px_ee_now(8))  < 5.0) &&
+                    (std::abs(px_des(9) - px_ee_now(9)) < 5.0) && (std::abs(px_des(10) - px_ee_now(10)) < 5.0) && (std::abs(px_des(11) - px_ee_now(11)) < 5.0));
+            done = false;
             if (done)
             {
                 yInfo() << "\npx_des ="  << px_des.toString();
@@ -386,118 +434,162 @@ public:
             }
             else
             {
-                /* Get the new end-effector pose from hand-tracking */
-                estimates = port_estimates_in_.read(true);
-
-                /* Get the initial end-effector pose from the cartesian controller */
-//                itf_rightarm_cart_->getPose(pose_x, pose_o);
-//                pose_x.push_back(1.0);
-//                Ha = axis2dcm(pose_o);
-//                Ha.setCol(3, pose_x);
+//                /* Get the new end-effector pose from hand-tracking */
+//                estimates = port_estimates_in_.read(true);
 //
-//                Vector chain_joints;
-//                icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
-//                Vector tip_pose_index = (Ha * icub_index_.getH((M_PI/180.0) * chain_joints).getCol(3)).subVector(0, 2);
+//                /* If the end-effector pose is taken from the direct kinematics, then the pose is replicated */
+//                est_copy = Vector(*estimates);
+//                if (est_copy.size() == 7)
+//                {
+//                    double ang = est_copy(6);
+//                    est_copy.setSubvector(3, est_copy.subVector(3, 5) * ang);
 //
-//                pose.setSubvector(0,  tip_pose_index);
-//                pose.setSubvector(3,  zeros(3));
-//                pose.setSubvector(6,  tip_pose_index);
-//                pose.setSubvector(9,  zeros(3));
+//                    est_copy(6) = est_copy(0);
+//                    for (int i = 1; i < 6; ++i)
+//                    {
+//                        est_copy.push_back(est_copy(i));
+//                    }
+//                }
 
                 /* Simulate reaching starting from the initial position */
                 /* Comment any previous write on variable 'estimates' */
-//                yInfo() << "EE L now: " << estimates->subVector(0, 2).toString();
-//                yInfo() << "EE R now: " << estimates->subVector(6, 8).toString() << "\n";
-//
-//                estimates->setSubvector(0, estimates->subVector(0, 2) + vel_x);
-//                estimates->setSubvector(6, estimates->subVector(6, 8) + vel_x);
+                yInfo() << "EE L now: " << est_copy.subVector(0, 2).toString();
+                yInfo() << "EE R now: " << est_copy.subVector(6, 8).toString() << "\n";
+
+                Vector l_o = getAxisAngle(est_copy.subVector(3, 5));
+                Matrix l_R = axis2dcm(l_o);
+                Vector r_o = getAxisAngle(est_copy.subVector(9, 11));
+                Matrix r_R = axis2dcm(r_o);
+
+                vel_o[3] *= Ts;
+                l_R = axis2dcm(vel_o) * l_R;
+                r_R = axis2dcm(vel_o) * r_R;
+
+                Vector l_new_o = dcm2axis(l_R);
+                double l_ang = l_new_o(3);
+                l_new_o.pop_back();
+                l_new_o *= l_ang;
+
+                Vector r_new_o = dcm2axis(r_R);
+                double r_ang = r_new_o(3);
+                r_new_o.pop_back();
+                r_new_o *= r_ang;
+
+                est_copy.setSubvector(0, est_copy.subVector(0, 2)  + vel_x * Ts);
+                est_copy.setSubvector(3, l_new_o);
+                est_copy.setSubvector(6, est_copy.subVector(6, 8)  + vel_x * Ts);
+                est_copy.setSubvector(9, r_new_o);
                 /* **************************************************** */
 
-                yInfo() << "EE L coord: " << estimates->subVector(0, 2).toString();
-                yInfo() << "EE R coord: " << estimates->subVector(6, 8).toString() << "\n";
+                yInfo() << "EE L coord: " << est_copy.subVector(0, 2).toString();
+                yInfo() << "EE R coord: " << est_copy.subVector(6, 8).toString() << "\n";
 
-                l_ee_x  = estimates->subVector(0, 2);
+
+                l_ee_x0 = zeros(4);
                 l_ee_x1 = zeros(4);
                 l_ee_x2 = zeros(4);
-                getPalmPoints(estimates->subVector(0, 5), l_ee_x1, l_ee_x2);
+                l_ee_x3 = zeros(4);
+                getPalmPoints(est_copy.subVector(0, 5), l_ee_x0, l_ee_x1, l_ee_x2, l_ee_x3);
 
-                l_px = (l_H_r_to_cam_.submatrix(0, 2, 0, 2) * (l_ee_x - left_eye_x));
-                l_px[0] /= l_px[2];
-                l_px[1] /= l_px[2];
+                l_px0 = l_H_r_to_cam_ * l_ee_x0;
+                l_px0[0] /= l_px0[2];
+                l_px0[1] /= l_px0[2];
                 l_px1 = l_H_r_to_cam_ * l_ee_x1;
                 l_px1[0] /= l_px1[2];
                 l_px1[1] /= l_px1[2];
                 l_px2 = l_H_r_to_cam_ * l_ee_x2;
                 l_px2[0] /= l_px2[2];
                 l_px2[1] /= l_px2[2];
+                l_px3 = l_H_r_to_cam_ * l_ee_x3;
+                l_px3[0] /= l_px3[2];
+                l_px3[1] /= l_px3[2];
 
 
-                r_ee_x = estimates->subVector(6, 8);
+                r_ee_x0 = zeros(4);
                 r_ee_x1 = zeros(4);
                 r_ee_x2 = zeros(4);
-                getPalmPoints(estimates->subVector(6, 11), r_ee_x1, r_ee_x2);
+                r_ee_x3 = zeros(4);
+                getPalmPoints(est_copy.subVector(6, 11), r_ee_x0, r_ee_x1, r_ee_x2, r_ee_x3);
 
-                r_px = (r_H_r_to_cam_.submatrix(0, 2, 0, 2) * (r_ee_x - right_eye_x));
-                r_px[0] /= r_px[2];
-                r_px[1] /= r_px[2];
+                r_px0 = r_H_r_to_cam_ * r_ee_x0;
+                r_px0[0] /= r_px0[2];
+                r_px0[1] /= r_px0[2];
                 r_px1 = r_H_r_to_cam_ * r_ee_x1;
                 r_px1[0] /= r_px1[2];
                 r_px1[1] /= r_px1[2];
                 r_px2 = r_H_r_to_cam_ * r_ee_x2;
                 r_px2[0] /= r_px2[2];
                 r_px2[1] /= r_px2[2];
+                r_px3 = r_H_r_to_cam_ * r_ee_x3;
+                r_px3[0] /= r_px3[2];
+                r_px3[1] /= r_px3[2];
 
 
-                px_ee_now[0] = l_px[0];     /* u_ee_l */
-                px_ee_now[1] = r_px[0];     /* u_ee_r */
-                px_ee_now[2] = l_px[1];     /* v_ee_l */
-                px_ee_now[3] = l_px1[0];    /* u_x1_l */
-                px_ee_now[4] = r_px1[0];    /* u_x1_r */
-                px_ee_now[5] = l_px1[1];    /* v_x1_l */
-                px_ee_now[6] = l_px2[0];    /* u_x2_l */
-                px_ee_now[7] = r_px2[0];    /* u_x2_r */
-                px_ee_now[8] = l_px2[1];    /* v_x2_l */
+                px_ee_now[0]  = l_px0[0];   /* u_ee_l */
+                px_ee_now[1]  = r_px0[0];   /* u_ee_r */
+                px_ee_now[2]  = l_px0[1];   /* v_ee_l */
+
+                px_ee_now[3]  = l_px1[0];   /* u_x1_l */
+                px_ee_now[4]  = r_px1[0];   /* u_x1_r */
+                px_ee_now[5]  = l_px1[1];   /* v_x1_l */
+
+                px_ee_now[6]  = l_px2[0];   /* u_x2_l */
+                px_ee_now[7]  = r_px2[0];   /* u_x2_r */
+                px_ee_now[8]  = l_px2[1];   /* v_x2_l */
+
+                px_ee_now[9]  = l_px3[0];   /* u_x3_l */
+                px_ee_now[10] = r_px3[0];   /* u_x3_r */
+                px_ee_now[11] = l_px3[1];   /* v_x3_l */
 
 
                 /* Update Jacobian */
-                jacobian = zeros(9, 6);
+                jacobian = zeros(12, 6);
 
-                /* End-effector */
-                jacobian.setRow(0, setJacobianU(LEFT,  l_ee_x(2),  l_px ));
-                jacobian.setRow(1, setJacobianU(RIGHT, r_ee_x(2),  r_px ));
-                jacobian.setRow(2, setJacobianV(LEFT,  l_ee_x(2),  l_px ));
+                /* Point 0 */
+                jacobian.setRow(0,  setJacobianU(LEFT,  l_px0));
+                jacobian.setRow(1,  setJacobianU(RIGHT, r_px0));
+                jacobian.setRow(2,  setJacobianV(LEFT,  l_px0));
 
-                /* Extra point 1 */
-                jacobian.setRow(3, setJacobianU(LEFT,  l_ee_x1(2), l_px1));
-                jacobian.setRow(4, setJacobianU(RIGHT, r_ee_x1(2), r_px1));
-                jacobian.setRow(5, setJacobianV(LEFT,  l_ee_x1(2), l_px1));
+                /* Point 1 */
+                jacobian.setRow(3,  setJacobianU(LEFT,  l_px1));
+                jacobian.setRow(4,  setJacobianU(RIGHT, r_px1));
+                jacobian.setRow(5,  setJacobianV(LEFT,  l_px1));
 
-                /* Extra point 2 */
-                jacobian.setRow(6, setJacobianU(LEFT,  l_ee_x2(2), l_px2));
-                jacobian.setRow(7, setJacobianU(RIGHT, r_ee_x2(2), r_px2));
-                jacobian.setRow(8, setJacobianV(LEFT,  l_ee_x2(2), l_px2));
+                /* Point 2 */
+                jacobian.setRow(6,  setJacobianU(LEFT,  l_px2));
+                jacobian.setRow(7,  setJacobianU(RIGHT, r_px2));
+                jacobian.setRow(8,  setJacobianV(LEFT,  l_px2));
+
+                /* Point 3 */
+                jacobian.setRow(9,  setJacobianU(LEFT,  l_px3));
+                jacobian.setRow(10, setJacobianU(RIGHT, r_px3));
+                jacobian.setRow(11, setJacobianV(LEFT,  l_px3));
                 /* *************** */
 
 
                 /* Dump pixel coordinates of the goal */
                 Bottle& l_px_endeffector = port_px_left_endeffector.prepare();
                 l_px_endeffector.clear();
-                l_px_endeffector.addInt(l_px [0]);
-                l_px_endeffector.addInt(l_px [1]);
+                l_px_endeffector.addInt(l_px0[0]);
+                l_px_endeffector.addInt(l_px0[1]);
                 l_px_endeffector.addInt(l_px1[0]);
                 l_px_endeffector.addInt(l_px1[1]);
                 l_px_endeffector.addInt(l_px2[0]);
                 l_px_endeffector.addInt(l_px2[1]);
+                l_px_endeffector.addInt(l_px3[0]);
+                l_px_endeffector.addInt(l_px3[1]);
                 port_px_left_endeffector.write();
 
                 Bottle& r_px_endeffector = port_px_right_endeffector.prepare();
                 r_px_endeffector.clear();
-                r_px_endeffector.addInt(r_px [0]);
-                r_px_endeffector.addInt(r_px [1]);
+                r_px_endeffector.addInt(r_px0[0]);
+                r_px_endeffector.addInt(r_px0[1]);
                 r_px_endeffector.addInt(r_px1[0]);
                 r_px_endeffector.addInt(r_px1[1]);
                 r_px_endeffector.addInt(r_px2[0]);
                 r_px_endeffector.addInt(r_px2[1]);
+                r_px_endeffector.addInt(r_px3[0]);
+                r_px_endeffector.addInt(r_px3[1]);
                 port_px_right_endeffector.write();
 
 
@@ -507,12 +599,14 @@ public:
                 l_imgout = *l_imgin;
                 cv::Mat l_img = cv::cvarrToMat(l_imgout.getIplImage());
 
-                cv::circle(l_img, cv::Point(l_px[0],       l_px[1] ),      4, cv::Scalar(255,   0,   0), 4);
+                cv::circle(l_img, cv::Point(l_px0[0],      l_px0[1]),      4, cv::Scalar(255,   0,   0), 4);
                 cv::circle(l_img, cv::Point(l_px1[0],      l_px1[1]),      4, cv::Scalar(0,   255,   0), 4);
                 cv::circle(l_img, cv::Point(l_px2[0],      l_px2[1]),      4, cv::Scalar(0,     0, 255), 4);
+                cv::circle(l_img, cv::Point(l_px3[0],      l_px3[1]),      4, cv::Scalar(255, 255,   0), 4);
                 cv::circle(l_img, cv::Point(l_px_goal_[0], l_px_goal_[1]), 4, cv::Scalar(255,   0,   0), 4);
                 cv::circle(l_img, cv::Point(l_px_goal_[2], l_px_goal_[3]), 4, cv::Scalar(0,   255,   0), 4);
                 cv::circle(l_img, cv::Point(l_px_goal_[4], l_px_goal_[5]), 4, cv::Scalar(0,     0, 255), 4);
+                cv::circle(l_img, cv::Point(l_px_goal_[6], l_px_goal_[7]), 4, cv::Scalar(255, 255,   0), 4);
 
                 port_image_left_out_.write();
 
@@ -522,12 +616,14 @@ public:
                 r_imgout = *r_imgin;
                 cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
 
-                cv::circle(r_img, cv::Point(r_px[0],       r_px[1] ),      4, cv::Scalar(255,   0,   0), 4);
+                cv::circle(r_img, cv::Point(r_px0[0],      r_px0[1]),      4, cv::Scalar(255,   0,   0), 4);
                 cv::circle(r_img, cv::Point(r_px1[0],      r_px1[1]),      4, cv::Scalar(0,   255,   0), 4);
                 cv::circle(r_img, cv::Point(r_px2[0],      r_px2[1]),      4, cv::Scalar(0,     0, 255), 4);
+                cv::circle(r_img, cv::Point(r_px3[0],      r_px3[1]),      4, cv::Scalar(255, 255,   0), 4);
                 cv::circle(r_img, cv::Point(r_px_goal_[0], r_px_goal_[1]), 4, cv::Scalar(255,   0,   0), 4);
                 cv::circle(r_img, cv::Point(r_px_goal_[2], r_px_goal_[3]), 4, cv::Scalar(0,   255,   0), 4);
                 cv::circle(r_img, cv::Point(r_px_goal_[4], r_px_goal_[5]), 4, cv::Scalar(0,     0, 255), 4);
+                cv::circle(r_img, cv::Point(r_px_goal_[6], r_px_goal_[7]), 4, cv::Scalar(255, 255,   0), 4);
 
                 port_image_right_out_.write();
             }
@@ -564,11 +660,18 @@ public:
 //                Vector od = dcm2axis(Od);
 
                 /* GRASPING */
-                Vector od = zeros(4);
-                od(0) = -0.141;
-                od(1) =  0.612;
-                od(2) = -0.777;
-                od(4) =  3.012;
+//                Vector od = zeros(4);
+//                od(0) = -0.141;
+//                od(1) =  0.612;
+//                od(2) = -0.777;
+//                od(4) =  3.012;
+
+                /* SIM */
+                Matrix Od(3, 3);
+                Od(0, 0) = -1.0;
+                Od(1, 1) = -1.0;
+                Od(2, 2) =  1.0;
+                Vector od = dcm2axis(Od);
 
 
                 double traj_time = 0.0;
@@ -578,7 +681,7 @@ public:
                 {
                     Vector init_pos = zeros(3);
 
-                    /* FINGERTIP */
+                    /* FINGERTIP init */
 //                    Vector chain_joints;
 //                    icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
 //
@@ -592,13 +695,18 @@ public:
 //                    init_pos[1] =  0.139;
 //                    init_pos[2] =  0.089;
 
-                    /* KARATE */
+                    /* KARATE init */
                     // FIXME: to implement
 
-                    /* GRASPING */
-                    init_pos[0] = -0.370;
-                    init_pos[1] =  0.103;
-                    init_pos[2] =  0.064;
+                    /* GRASPING init */
+//                    init_pos[0] = -0.370;
+//                    init_pos[1] =  0.103;
+//                    init_pos[2] =  0.064;
+
+                    /* SIM init */
+                    init_pos[0] = -0.416;
+                    init_pos[1] =  0.024 + 0.1;
+                    init_pos[2] =  0.055;
 
 
                     setTorsoDOF();
@@ -612,22 +720,23 @@ public:
                     int ctxt;
                     itf_rightarm_cart_->storeContext(&ctxt);
 
-                    itf_rightarm_cart_->setLimits(0,  15.0,  15.0);
-                    itf_rightarm_cart_->setLimits(2, -23.0, -23.0);
-                    itf_rightarm_cart_->setLimits(3, -16.0, -16.0);
-                    itf_rightarm_cart_->setLimits(4,  53.0,  53.0);
-                    itf_rightarm_cart_->setLimits(5,   0.0,   0.0);
-                    itf_rightarm_cart_->setLimits(7, -58.0, -58.0);
+//                    itf_rightarm_cart_->setLimits(0,  15.0,  15.0);
+//                    itf_rightarm_cart_->setLimits(2, -23.0, -23.0);
+//                    itf_rightarm_cart_->setLimits(3, -16.0, -16.0);
+//                    itf_rightarm_cart_->setLimits(4,  53.0,  53.0);
+//                    itf_rightarm_cart_->setLimits(5,   0.0,   0.0);
+//                    itf_rightarm_cart_->setLimits(7, -58.0, -58.0);
 
                     itf_rightarm_cart_->goToPoseSync(init_pos, od);
-                    itf_rightarm_cart_->waitMotionDone();
+                    itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
                     itf_rightarm_cart_->stopControl();
 
                     itf_rightarm_cart_->restoreContext(ctxt);
                     itf_rightarm_cart_->deleteContext(ctxt);
                     
                     itf_gaze_->lookAtFixationPointSync(gaze_loc);
-                    itf_gaze_->waitMotionDone();
+                    itf_gaze_->waitMotionDone(0.1, 10.0);
+                    itf_gaze_->stopControl();
                     
                     unsetTorsoDOF();
                     itf_rightarm_cart_->removeTipFrame();
@@ -657,21 +766,21 @@ public:
                 yInfo() << "right_eye_o =" << right_eye_o.toString();
 
 
-                Matrix l_H_eye = axis2dcm(left_eye_o);
+                l_H_eye_to_r_ = axis2dcm(left_eye_o);
                 left_eye_x.push_back(1.0);
-                l_H_eye.setCol(3, left_eye_x);
-                Matrix l_H_r_to_eye = SE3inv(l_H_eye);
+                l_H_eye_to_r_.setCol(3, left_eye_x);
+                l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
 
-                Matrix r_H_eye = axis2dcm(right_eye_o);
+                r_H_eye_to_r_ = axis2dcm(right_eye_o);
                 right_eye_x.push_back(1.0);
-                r_H_eye.setCol(3, right_eye_x);
-                Matrix r_H_r_to_eye = SE3inv(r_H_eye);
+                r_H_eye_to_r_.setCol(3, right_eye_x);
+                r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
 
-                yInfo() << "l_H_r_to_eye =\n" << l_H_r_to_eye.toString();
-                yInfo() << "r_H_r_to_eye =\n" << r_H_r_to_eye.toString();
+                yInfo() << "l_H_r_to_eye_ =\n" << l_H_r_to_eye_.toString();
+                yInfo() << "r_H_r_to_eye_ =\n" << r_H_r_to_eye_.toString();
 
-                l_H_r_to_cam_ = left_proj_  * l_H_r_to_eye;
-                r_H_r_to_cam_ = right_proj_ * r_H_r_to_eye;
+                l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
+                r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
 
 
                 Network yarp;
@@ -679,11 +788,9 @@ public:
                 Bottle  rep;
 
                 Bottle* click_left = port_click_left_.read(true);
-
-                l_px_goal_.resize(6);
-                l_px_goal_[0] = click_left->get(0).asDouble();
-                l_px_goal_[1] = click_left->get(1).asDouble();
-
+                Vector l_click = zeros(2);
+                l_click[0] = click_left->get(0).asDouble();
+                l_click[1] = click_left->get(1).asDouble();
 
                 RpcClient port_sfm;
                 port_sfm.open("/reaching_pose/tosfm");
@@ -691,8 +798,8 @@ public:
 
                 cmd.clear();
 
-                cmd.addInt(l_px_goal_[0]);
-                cmd.addInt(l_px_goal_[1]);
+                cmd.addInt(l_click[0]);
+                cmd.addInt(l_click[1]);
 
                 Bottle reply_pos;
                 port_sfm.write(cmd, reply_pos);
@@ -704,50 +811,69 @@ public:
                     R_ee(2, 2) = -1.0;
                     Vector ee_o = dcm2axis(R_ee);
 
-                    Vector goal_pos = zeros(9);
-                    goal_pos[0] = reply_pos.get(0).asDouble();
-                    goal_pos[1] = reply_pos.get(1).asDouble();
-                    goal_pos[2] = reply_pos.get(2).asDouble();
+                    Vector sfm_pos = zeros(3);
+                    sfm_pos[0] = reply_pos.get(0).asDouble();
+                    sfm_pos[1] = reply_pos.get(1).asDouble();
+                    sfm_pos[2] = reply_pos.get(2).asDouble();
 
                     Vector p = zeros(7);
-                    p.setSubvector(0, goal_pos.subVector(0, 2));
+                    p.setSubvector(0, sfm_pos.subVector(0, 2));
                     p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+                    Vector p0 = zeros(4);
                     Vector p1 = zeros(4);
                     Vector p2 = zeros(4);
-                    getPalmPoints(p, p1, p2);
-                    goal_pos.setSubvector(3, p1.subVector(0, 2));
-                    goal_pos.setSubvector(6, p2.subVector(0, 2));
+                    Vector p3 = zeros(4);
+                    getPalmPoints(p, p0, p1, p2, p3);
 
-                    yInfo() << "goal_pos: [" << goal_pos.toString() << "];";
+                    yInfo() << "goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
 
 
+                    Vector l_px0 = l_H_r_to_cam_ * p0;
+                    l_px0[0] /= l_px0[2];
+                    l_px0[1] /= l_px0[2];
                     Vector l_px1 = l_H_r_to_cam_ * p1;
                     l_px1[0] /= l_px1[2];
                     l_px1[1] /= l_px1[2];
                     Vector l_px2 = l_H_r_to_cam_ * p2;
                     l_px2[0] /= l_px2[2];
                     l_px2[1] /= l_px2[2];
+                    Vector l_px3 = l_H_r_to_cam_ * p3;
+                    l_px3[0] /= l_px3[2];
+                    l_px3[1] /= l_px3[2];
 
+                    l_px_goal_.resize(8);
+                    l_px_goal_[0] = l_px0[0];
+                    l_px_goal_[1] = l_px0[1];
                     l_px_goal_[2] = l_px1[0];
                     l_px_goal_[3] = l_px1[1];
                     l_px_goal_[4] = l_px2[0];
                     l_px_goal_[5] = l_px2[1];
+                    l_px_goal_[6] = l_px3[0];
+                    l_px_goal_[7] = l_px3[1];
 
 
+                    Vector r_px0 = r_H_r_to_cam_ * p0;
+                    r_px0[0] /= r_px0[2];
+                    r_px0[1] /= r_px0[2];
                     Vector r_px1 = r_H_r_to_cam_ * p1;
                     r_px1[0] /= r_px1[2];
                     r_px1[1] /= r_px1[2];
                     Vector r_px2 = r_H_r_to_cam_ * p2;
                     r_px2[0] /= r_px2[2];
                     r_px2[1] /= r_px2[2];
+                    Vector r_px3 = r_H_r_to_cam_ * p3;
+                    r_px3[0] /= r_px3[2];
+                    r_px3[1] /= r_px3[2];
 
-                    r_px_goal_.resize(6);
-                    r_px_goal_[0] = reply_pos.get(3).asDouble();
-                    r_px_goal_[1] = reply_pos.get(4).asDouble();
+                    r_px_goal_.resize(8);
+                    r_px_goal_[0] = r_px0[0];
+                    r_px_goal_[1] = r_px0[1];
                     r_px_goal_[2] = r_px1[0];
                     r_px_goal_[3] = r_px1[1];
                     r_px_goal_[4] = r_px2[0];
                     r_px_goal_[5] = r_px2[1];
+                    r_px_goal_[6] = r_px3[0];
+                    r_px_goal_[7] = r_px3[1];
                 }
                 else
                 {
@@ -773,25 +899,25 @@ public:
                 Vector right_eye_o;
                 itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
-                yInfo() << "left_eye_o =" << left_eye_o.toString();
-                yInfo() << "right_eye_o =" << right_eye_o.toString();
+                yInfo() << "left_eye_o = ["  << left_eye_o.toString()  << "]";
+                yInfo() << "right_eye_o = [" << right_eye_o.toString() << "]";
 
 
-                Matrix l_H_eye = axis2dcm(left_eye_o);
+                l_H_eye_to_r_ = axis2dcm(left_eye_o);
                 left_eye_x.push_back(1.0);
-                l_H_eye.setCol(3, left_eye_x);
-                Matrix l_H_r_to_eye = SE3inv(l_H_eye);
+                l_H_eye_to_r_.setCol(3, left_eye_x);
+                l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
 
-                Matrix r_H_eye = axis2dcm(right_eye_o);
+                r_H_eye_to_r_ = axis2dcm(right_eye_o);
                 right_eye_x.push_back(1.0);
-                r_H_eye.setCol(3, right_eye_x);
-                Matrix r_H_r_to_eye = SE3inv(r_H_eye);
+                r_H_eye_to_r_.setCol(3, right_eye_x);
+                r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
 
-                yInfo() << "l_H_r_to_eye =\n" << l_H_r_to_eye.toString();
-                yInfo() << "r_H_r_to_eye =\n" << r_H_r_to_eye.toString();
+                yInfo() << "l_H_r_to_eye_ = [\n" << l_H_r_to_eye_.toString() << "]";
+                yInfo() << "r_H_r_to_eye_ = [\n" << r_H_r_to_eye_.toString() << "]";
 
-                l_H_r_to_cam_ = left_proj_  * l_H_r_to_eye;
-                r_H_r_to_cam_ = right_proj_ * r_H_r_to_eye;
+                l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
+                r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
 
 
                 Matrix R_ee = zeros(3, 3);
@@ -801,61 +927,73 @@ public:
                 Vector ee_o = dcm2axis(R_ee);
 
                 // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
-                Vector goal_pos = zeros(9);
-                goal_pos[0] = -0.416311;
-                goal_pos[1] = -0.026632;
-                goal_pos[2] =  0.055334;
+//                Vector p = zeros(7);
+//                p(0) = -0.416;
+//                p(1) = -0.026;
+//                p(2) =  0.055;
+//                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
 
                 Vector p = zeros(7);
-                p.setSubvector(0, goal_pos.subVector(0, 2));
+                p(0) = -0.416;
+                p(1) =  0.024;
+                p(2) =  0.055;
                 p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+                Vector p0 = zeros(4);
                 Vector p1 = zeros(4);
                 Vector p2 = zeros(4);
-                getPalmPoints(p, p1, p2);
-                goal_pos.setSubvector(3, p1.subVector(0, 2));
-                goal_pos.setSubvector(6, p2.subVector(0, 2));
+                Vector p3 = zeros(4);
+                getPalmPoints(p, p0, p1, p2, p3);
 
-                yInfo() << "goal_pos: [" << goal_pos.toString() << "];";
+                yInfo() << "goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
 
 
-                Vector ee_x  = p.subVector(0, 2);
-                ee_x.push_back(1.0);
-
-                Vector l_px  = l_H_r_to_cam_ * ee_x;
-                l_px[0] /= l_px[2];
-                l_px[1] /= l_px[2];
+                Vector l_px0 = l_H_r_to_cam_ * p0;
+                l_px0[0] /= l_px0[2];
+                l_px0[1] /= l_px0[2];
                 Vector l_px1 = l_H_r_to_cam_ * p1;
                 l_px1[0] /= l_px1[2];
                 l_px1[1] /= l_px1[2];
                 Vector l_px2 = l_H_r_to_cam_ * p2;
                 l_px2[0] /= l_px2[2];
                 l_px2[1] /= l_px2[2];
+                Vector l_px3 = l_H_r_to_cam_ * p3;
+                l_px3[0] /= l_px3[2];
+                l_px3[1] /= l_px3[2];
 
-                l_px_goal_[0] = l_px [0];
-                l_px_goal_[1] = l_px [1];
+                l_px_goal_.resize(8);
+                l_px_goal_[0] = l_px0[0];
+                l_px_goal_[1] = l_px0[1];
                 l_px_goal_[2] = l_px1[0];
                 l_px_goal_[3] = l_px1[1];
                 l_px_goal_[4] = l_px2[0];
                 l_px_goal_[5] = l_px2[1];
+                l_px_goal_[6] = l_px3[0];
+                l_px_goal_[7] = l_px3[1];
 
 
-                Vector r_px  = r_H_r_to_cam_ * ee_x;
-                r_px[0] /= r_px[2];
-                r_px[1] /= r_px[2];
+                Vector r_px0 = r_H_r_to_cam_ * p0;
+                r_px0[0] /= r_px0[2];
+                r_px0[1] /= r_px0[2];
                 Vector r_px1 = r_H_r_to_cam_ * p1;
                 r_px1[0] /= r_px1[2];
                 r_px1[1] /= r_px1[2];
                 Vector r_px2 = r_H_r_to_cam_ * p2;
                 r_px2[0] /= r_px2[2];
                 r_px2[1] /= r_px2[2];
+                Vector r_px3 = r_H_r_to_cam_ * p3;
+                r_px3[0] /= r_px3[2];
+                r_px3[1] /= r_px3[2];
 
-                r_px_goal_.resize(6);
-                r_px_goal_[0] = r_px [0];
-                r_px_goal_[1] = r_px [1];
+                r_px_goal_.resize(8);
+                r_px_goal_[0] = r_px0[0];
+                r_px_goal_[1] = r_px0[1];
                 r_px_goal_[2] = r_px1[0];
                 r_px_goal_[3] = r_px1[1];
                 r_px_goal_[4] = r_px2[0];
                 r_px_goal_[5] = r_px2[1];
+                r_px_goal_[6] = r_px3[0];
+                r_px_goal_[7] = r_px3[1];
 
                 
                 reply = command;
@@ -870,26 +1008,11 @@ public:
 
                 break;
             }
-            /* Stop the Cartesian controller */
-            case VOCAB4('s', 't', 'o', 'p'):
-            {
-                if (itf_rightarm_cart_->stopControl())
-                {
-                    itf_rightarm_cart_->removeTipFrame();
-
-                    reply.addString("ack");
-                }
-                else
-                {
-                    reply.addString("nack_2");
-                }
-
-                break;
-            }
             /* Safely close the application */
             case VOCAB4('q','u','i','t'):
             {
                 itf_rightarm_cart_->stopControl();
+                itf_gaze_->stopControl();
 
                 take_estimates_ = true;
                 should_stop_    = true;
@@ -986,8 +1109,12 @@ private:
 
     iCubFinger                       icub_index_;
 
-    Matrix                           left_proj_;
-    Matrix                           right_proj_;
+    Matrix                           l_proj_;
+    Matrix                           r_proj_;
+    Matrix                           l_H_r_to_eye_;
+    Matrix                           r_H_r_to_eye_;
+    Matrix                           l_H_eye_to_r_;
+    Matrix                           r_H_eye_to_r_;
     Matrix                           l_H_r_to_cam_;
     Matrix                           r_H_r_to_cam_;
     Matrix                           px_to_cartesian_;
@@ -1198,7 +1325,7 @@ private:
         return root_fingers_enc;
     }
 
-    void getPalmPoints(const Vector& endeffector, Vector& p1, Vector& p2)
+    void getPalmPoints(const Vector& endeffector, Vector& p0, Vector& p1, Vector& p2, Vector& p3)
     {
         Vector ee_x = endeffector.subVector(0, 2);
         ee_x.push_back(1.0);
@@ -1209,71 +1336,124 @@ private:
         Matrix H_ee_to_root = axis2dcm(ee_o);
         H_ee_to_root.setCol(3, ee_x);
 
-        p1 = zeros(4);
-        p2 = zeros(4);
+
         Vector p = zeros(4);
 
-        p(0) = -0.035;
-        p(1) = -0.01;
+        p(0) =  0;
+        p(1) = -0.015;
+        p(2) =  0;
+        p(3) =  1.0;
+
+        p0 = zeros(4);
+        p0 = H_ee_to_root * p;
+
+        p(0) = 0;
+        p(1) = 0.015;
         p(2) = 0;
         p(3) = 1.0;
 
+        p1 = zeros(4);
         p1 = H_ee_to_root * p;
 
         p(0) = -0.035;
-        p(1) = 0.01;
-        p(2) = 0;
-        p(3) = 1.0;
+        p(1) = -0.015;
+        p(2) =  0;
+        p(3) =  1.0;
 
+        p2 = zeros(4);
         p2 = H_ee_to_root * p;
+
+        p(0) = -0.035;
+        p(1) =  0.015;
+        p(2) =  0;
+        p(3) =  1.0;
+
+        p3 = zeros(4);
+        p3 = H_ee_to_root * p;
     }
 
-    Vector setJacobianU(const int cam, const double z, const Vector& px)
+    Vector setJacobianU(const int cam, const Vector& px)
     {
         Vector jacobian = zeros(6);
 
         if (cam == LEFT)
         {
-            jacobian(0) = left_proj_(0, 0) / z;
-            jacobian(2) = -(px(0) - left_proj_(0, 2)) / z;
-            jacobian(3) = -((px(0) - left_proj_(0, 2)) * (px(1) - left_proj_(1, 2))) / left_proj_(1, 1);
-            jacobian(4) = (pow(left_proj_(0, 0), 2.0) + pow(px(0) - left_proj_(0, 2), 2.0)) / left_proj_(0, 0);
-            jacobian(5) = left_proj_(0, 0) / left_proj_(1, 1) * (px(1) - left_proj_(1, 2));
+            jacobian(0) = l_proj_(0, 0) / px(2);
+            jacobian(2) = - (px(0) - l_proj_(0, 2)) / px(2);
+            jacobian(3) = - ((px(0) - l_proj_(0, 2)) * (px(1) - l_proj_(1, 2))) / l_proj_(1, 1);
+            jacobian(4) = (pow(l_proj_(0, 0), 2.0) + pow(px(0) - l_proj_(0, 2), 2.0)) / l_proj_(0, 0);
+            jacobian(5) = - l_proj_(0, 0) / l_proj_(1, 1) * (px(1) - l_proj_(1, 2));
         }
         else if (cam == RIGHT)
         {
-            jacobian(0) = right_proj_(0, 0) / z;
-            jacobian(2) = -(px(0) - right_proj_(0, 2)) / z;
-            jacobian(3) = -((px(0) - right_proj_(0, 2)) * (px(1) - right_proj_(1, 2))) / right_proj_(1, 1);
-            jacobian(4) = (pow(right_proj_(0, 0), 2.0) + pow(px(0) - right_proj_(0, 2), 2.0)) / right_proj_(0, 0);
-            jacobian(5) = right_proj_(0, 0) / right_proj_(1, 1) * (px(1) - right_proj_(1, 2));
+            jacobian(0) = r_proj_(0, 0) / px(2);
+            jacobian(2) = - (px(0) - r_proj_(0, 2)) / px(2);
+            jacobian(3) = - ((px(0) - r_proj_(0, 2)) * (px(1) - r_proj_(1, 2))) / r_proj_(1, 1);
+            jacobian(4) = (pow(r_proj_(0, 0), 2.0) + pow(px(0) - r_proj_(0, 2), 2.0)) / r_proj_(0, 0);
+            jacobian(5) = - r_proj_(0, 0) / r_proj_(1, 1) * (px(1) - r_proj_(1, 2));
         }
 
         return jacobian;
     }
 
-    Vector setJacobianV(const int cam, const double z, const Vector& px)
+    Vector setJacobianV(const int cam, const Vector& px)
     {
         Vector jacobian = zeros(6);
 
         if (cam == LEFT)
         {
-            jacobian(1) = left_proj_(1, 1) / z;
-            jacobian(2) = -(px(1) - left_proj_(1, 2)) / z;
-            jacobian(3) = -(pow(left_proj_(1, 1), 2.0) + pow(px(1) - left_proj_(1, 2), 2.0)) / left_proj_(1, 1);
-            jacobian(4) = ((px(0) - left_proj_(0, 2)) * (px(1) - left_proj_(1, 2))) / left_proj_(0, 0);
-            jacobian(5) = left_proj_(1, 1) / left_proj_(0, 0) * (px(0) - left_proj_(0, 2));
+            jacobian(1) = l_proj_(1, 1) / px(2);
+            jacobian(2) = - (px(1) - l_proj_(1, 2)) / px(2);
+            jacobian(3) = - (pow(l_proj_(1, 1), 2.0) + pow(px(1) - l_proj_(1, 2), 2.0)) / l_proj_(1, 1);
+            jacobian(4) = ((px(0) - l_proj_(0, 2)) * (px(1) - l_proj_(1, 2))) / l_proj_(0, 0);
+            jacobian(5) = l_proj_(1, 1) / l_proj_(0, 0) * (px(0) - l_proj_(0, 2));
         }
         else if (cam == RIGHT)
         {
-            jacobian(1) = right_proj_(1, 1) / z;
-            jacobian(2) = -(px(1) - right_proj_(1, 2)) / z;
-            jacobian(3) = -(pow(right_proj_(1, 1), 2.0) + pow(px(1) - right_proj_(1, 2), 2.0)) / right_proj_(1, 1);
-            jacobian(4) = ((px(0) - right_proj_(0, 2)) * (px(1) - right_proj_(1, 2))) / right_proj_(0, 0);
-            jacobian(5) = right_proj_(1, 1) / right_proj_(0, 0) * (px(0) - right_proj_(0, 2));
+            jacobian(1) = r_proj_(1, 1) / px(2);
+            jacobian(2) = - (px(1) - r_proj_(1, 2)) / px(2);
+            jacobian(3) = - (pow(r_proj_(1, 1), 2.0) + pow(px(1) - r_proj_(1, 2), 2.0)) / r_proj_(1, 1);
+            jacobian(4) = ((px(0) - r_proj_(0, 2)) * (px(1) - r_proj_(1, 2))) / r_proj_(0, 0);
+            jacobian(5) = r_proj_(1, 1) / r_proj_(0, 0) * (px(0) - r_proj_(0, 2));
         }
 
         return jacobian;
+    }
+
+    Matrix getSkew(const Vector& v)
+    {
+        Matrix skew = zeros(3, 3);
+
+        skew(0, 1) = -v(2);
+        skew(0, 2) =  v(1);
+
+        skew(1, 0) =  v(2);
+        skew(1, 2) = -v(0);
+
+        skew(2, 0) = -v(1);
+        skew(2, 1) =  v(0);
+
+        return skew;
+    }
+
+    Matrix getGamma(const Vector& p)
+    {
+        Matrix G = zeros(6, 6);
+
+        G.setSubmatrix(-1.0 * eye(3, 3), 0, 0);
+        G.setSubmatrix(getSkew(p)      , 0, 3);
+        G.setSubmatrix(-1.0 * eye(3, 3), 3, 3);
+
+        return G;
+    }
+
+    Vector getAxisAngle(const Vector& v)
+    {
+        double ang  = norm(v);
+        Vector aa   = v / ang;
+        aa.push_back(ang);
+
+        return aa;
     }
 };
 
