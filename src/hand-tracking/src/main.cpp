@@ -37,8 +37,8 @@ int main(int argc, char const *argv[])
     yInfo() << log_ID << "Configuring and starting module...";
 
     cuda::DeviceInfo gpu_dev;
-    yInfo() << log_ID << "[CUDA] Engine count:" << engine_count_to_string(gpu_dev.asyncEngineCount());
-    yInfo() << log_ID << "[CUDA] Concurrent kernel:" << gpu_dev.concurrentKernels();
+    yInfo() << log_ID << "[CUDA] Engine capability:" << engine_count_to_string(gpu_dev.asyncEngineCount());
+    yInfo() << log_ID << "[CUDA] Can have concurrent kernel:" << gpu_dev.concurrentKernels();
     yInfo() << log_ID << "[CUDA] Multiprocessor count:" << gpu_dev.multiProcessorCount();
     yInfo() << log_ID << "[CUDA] Device can map host memory:" << gpu_dev.canMapHostMemory();
 
