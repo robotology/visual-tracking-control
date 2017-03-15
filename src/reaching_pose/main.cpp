@@ -421,11 +421,10 @@ public:
 
             Time::delay(Ts);
 
-            done = ((std::abs(px_des(0) - px_ee_now(0)) < 5.0) && (std::abs(px_des(1)  - px_ee_now(1))  < 5.0) && (std::abs(px_des(2)  - px_ee_now(2))  < 5.0) &&
-                    (std::abs(px_des(3) - px_ee_now(3)) < 5.0) && (std::abs(px_des(4)  - px_ee_now(4))  < 5.0) && (std::abs(px_des(5)  - px_ee_now(5))  < 5.0) &&
-                    (std::abs(px_des(6) - px_ee_now(6)) < 5.0) && (std::abs(px_des(7)  - px_ee_now(7))  < 5.0) && (std::abs(px_des(8)  - px_ee_now(8))  < 5.0) &&
-                    (std::abs(px_des(9) - px_ee_now(9)) < 5.0) && (std::abs(px_des(10) - px_ee_now(10)) < 5.0) && (std::abs(px_des(11) - px_ee_now(11)) < 5.0));
-            done = false;
+            done = ((std::abs(px_des(0) - px_ee_now(0)) < 1.0) && (std::abs(px_des(1)  - px_ee_now(1))  < 1.0) && (std::abs(px_des(2)  - px_ee_now(2))  < 1.0) &&
+                    (std::abs(px_des(3) - px_ee_now(3)) < 1.0) && (std::abs(px_des(4)  - px_ee_now(4))  < 1.0) && (std::abs(px_des(5)  - px_ee_now(5))  < 1.0) &&
+                    (std::abs(px_des(6) - px_ee_now(6)) < 1.0) && (std::abs(px_des(7)  - px_ee_now(7))  < 1.0) && (std::abs(px_des(8)  - px_ee_now(8))  < 1.0) &&
+                    (std::abs(px_des(9) - px_ee_now(9)) < 1.0) && (std::abs(px_des(10) - px_ee_now(10)) < 1.0) && (std::abs(px_des(11) - px_ee_now(11)) < 1.0));
             if (done)
             {
                 yInfo() << "\npx_des ="  << px_des.toString();
