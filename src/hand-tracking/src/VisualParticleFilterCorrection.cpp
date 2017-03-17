@@ -30,7 +30,8 @@ VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<V
     cuda_hog_->setGammaCorrection(true);
     cuda_hog_->setWinStride(Size(img_width_, img_height_));
 
-    for (int block = 0; block < num_particle_ / num_img_stream_; ++block) {
+    for (int block = 0; block < num_particle_ / num_img_stream_; ++block)
+    {
         hand_rendered_.insert   (hand_rendered_.begin(),    Mat(         Size(img_width_ * num_img_stream_, img_height_), CV_8UC3));
         cuda_img_.insert        (cuda_img_.begin(),         cuda::GpuMat(Size(img_width_ * num_img_stream_, img_height_), CV_8UC3));
         cuda_img_alpha_.insert  (cuda_img_alpha_.begin(),   cuda::GpuMat(Size(img_width_ * num_img_stream_, img_height_), CV_8UC4));
