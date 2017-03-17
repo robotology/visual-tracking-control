@@ -239,9 +239,9 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
         pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
         hand_pose.emplace("palm", pose);
 
+        /* Comment/Uncomment to add/remove limbs */
         YMatrix Ha = axis2dcm(ee_o);
         Ha.setCol(3, ee_t);
-        // FIXME: middle finger only!
         for (size_t fng = 0; fng < 3; ++fng)
         {
             std::string finger_s;

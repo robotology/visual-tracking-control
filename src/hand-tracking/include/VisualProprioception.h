@@ -1,6 +1,7 @@
 #ifndef VISUALPROPRIOCEPTION_H
 #define VISUALPROPRIOCEPTION_H
 
+// FIXME: perchè sono inclusi GL/GLFW?
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iCub/iKin/iKinFwd.h>
