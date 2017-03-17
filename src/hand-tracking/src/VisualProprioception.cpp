@@ -37,10 +37,10 @@ VisualProprioception::VisualProprioception(const int width, const int height, co
 
     cam_width_  = 0;
     cam_height_ = 0;
-    eye_fx_     = 0;
-    eye_cx_     = 0;
-    eye_fy_     = 0;
-    eye_cy_     = 0;
+    cam_fx_     = 0;
+    cam_cx_     = 0;
+    cam_fy_     = 0;
+    cam_cy_     = 0;
 
     /* Comment/Uncomment to add/remove limbs */
     ResourceFinder rf;
@@ -108,7 +108,7 @@ VisualProprioception::~VisualProprioception() noexcept
 
 VisualProprioception::VisualProprioception(const VisualProprioception& proprio) :
     cad_hand_(proprio.cad_hand_),
-    cam_width_(proprio.cam_width_), cam_height_(proprio.cam_height_), eye_fx_(proprio.eye_fx_), eye_cx_(proprio.eye_cx_), eye_fy_(proprio.eye_fy_), eye_cy_(proprio.eye_cy_),
+    cam_width_(proprio.cam_width_), cam_height_(proprio.cam_height_), cam_fx_(proprio.cam_fx_), cam_cx_(proprio.cam_cx_), cam_fy_(proprio.cam_fy_), cam_cy_(proprio.cam_cy_),
     si_cad_(proprio.si_cad_)
 {
     cam_x_[0] = proprio.cam_x_[0];
@@ -130,7 +130,7 @@ VisualProprioception::VisualProprioception(const VisualProprioception& proprio) 
 
 VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexcept :
     icub_arm_(std::move(proprio.icub_arm_)), cad_hand_(std::move(proprio.cad_hand_)),
-    cam_width_(std::move(proprio.cam_width_)), cam_height_(std::move(proprio.cam_height_)), eye_fx_(std::move(proprio.eye_fx_)), eye_cx_(std::move(proprio.eye_cx_)), eye_fy_(std::move(proprio.eye_fy_)), eye_cy_(std::move(proprio.eye_cy_)),
+    cam_width_(std::move(proprio.cam_width_)), cam_height_(std::move(proprio.cam_height_)), cam_fx_(std::move(proprio.cam_fx_)), cam_cx_(std::move(proprio.cam_cx_)), cam_fy_(std::move(proprio.cam_fy_)), cam_cy_(std::move(proprio.cam_cy_)),
     si_cad_(std::move(proprio.si_cad_))
 {
     cam_x_[0] = proprio.cam_x_[0];
@@ -187,10 +187,10 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 
     cam_width_  = std::move(proprio.cam_width_);
     cam_height_ = std::move(proprio.cam_height_);
-    eye_fx_     = std::move(proprio.eye_fx_);
-    eye_cx_     = std::move(proprio.eye_cx_);
-    eye_fy_     = std::move(proprio.eye_fy_);
-    eye_cy_     = std::move(proprio.eye_cy_);
+    cam_fx_     = std::move(proprio.cam_fx_);
+    cam_cx_     = std::move(proprio.cam_cx_);
+    cam_fy_     = std::move(proprio.cam_fy_);
+    cam_cy_     = std::move(proprio.cam_cy_);
 
     si_cad_   = std::move(proprio.si_cad_);
 
@@ -291,7 +291,7 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
     Mat hand_ogl = observation.getMat();
 
     si_cad_->superimpose(hand_poses, cam_x_, cam_o_, hand_ogl,
-                         cam_width_, cam_height_, eye_fx_, eye_fy_, eye_cx_, eye_cy_);
+                         cam_width_, cam_height_, cam_fx_, cam_fy_, cam_cx_, cam_cy_);
 
     glfwPostEmptyEvent();
 }
@@ -309,10 +309,10 @@ void VisualProprioception::setCamIntrinsic(const unsigned int cam_width, const u
 {
     cam_width_  = cam_width;
     cam_height_ = cam_height;
-    eye_fx_     = eye_fx;
-    eye_cx_     = eye_cx;
-    eye_fy_     = eye_fy;
-    eye_cy_     = eye_cy;
+    cam_fx_     = eye_fx;
+    cam_cx_     = eye_cx;
+    cam_fy_     = eye_fy;
+    cam_cy_     = eye_cy;
 }
 
 
@@ -348,7 +348,7 @@ void VisualProprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_ma
     si_cad_->setWireframeOpt(true);
 
     si_cad_->superimpose(obj2pos_map, cam_x_, cam_o_, img,
-                         cam_width_, cam_height_, eye_fx_, eye_fy_, eye_cx_, eye_cy_);
+                         cam_width_, cam_height_, cam_fx_, cam_fy_, cam_cx_, cam_cy_);
     glfwPostEmptyEvent();
 
     si_cad_->setBackgroundOpt(false);

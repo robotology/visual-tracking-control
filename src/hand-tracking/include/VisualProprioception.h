@@ -57,10 +57,10 @@ protected:
     SuperImpose::ObjFileMap  cad_hand_;
     int                      cam_width_;
     int                      cam_height_;
-    float                    eye_fx_;
-    float                    eye_cx_;
-    float                    eye_fy_;
-    float                    eye_cy_;
+    float                    cam_fx_;
+    float                    cam_cx_;
+    float                    cam_fy_;
+    float                    cam_cy_;
     SICAD                  * si_cad_;
 
     bool file_found(const yarp::os::ConstString& file);
