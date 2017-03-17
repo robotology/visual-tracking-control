@@ -23,17 +23,17 @@ using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
 
-VisualProprioception::VisualProprioception(const yarp::os::ConstString lateralirty) :
+VisualProprioception::VisualProprioception(const int width, const int height, const int num_images, const yarp::os::ConstString lateralirty) :
     icub_arm_(iCubArm(lateralirty+"_v2")), icub_kin_finger_{iCubFinger(lateralirty+"_thumb"), iCubFinger(lateralirty+"_index"), iCubFinger(lateralirty+"_middle")}
 {
-    cam_x_[0] = 0;
-    cam_x_[1] = 0;
-    cam_x_[2] = 0;
+    cam_x_[0]   = 0;
+    cam_x_[1]   = 0;
+    cam_x_[2]   = 0;
 
-    cam_o_[0] = 0;
-    cam_o_[1] = 0;
-    cam_o_[2] = 0;
-    cam_o_[3] = 0;
+    cam_o_[0]   = 0;
+    cam_o_[1]   = 0;
+    cam_o_[2]   = 0;
+    cam_o_[3]   = 0;
 
     cam_width_  = 0;
     cam_height_ = 0;
@@ -42,7 +42,7 @@ VisualProprioception::VisualProprioception(const yarp::os::ConstString lateralir
     eye_fy_     = 0;
     eye_cy_     = 0;
 
-    // FIXME: middle finger only!
+    /* Comment/Uncomment to add/remove limbs */
     ResourceFinder rf;
     cad_hand_["palm"] = rf.findFileByName("r_palm.obj");
     if (!file_found(cad_hand_["palm"])) throw std::runtime_error("Runtime error: file r_palm.obj not found!");
@@ -81,7 +81,14 @@ VisualProprioception::VisualProprioception(const yarp::os::ConstString lateralir
 //    cad_hand_["forearm"] = rf.findFileByName("r_forearm.obj");
 //    if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
 
-    si_cad_ = new SICAD(cad_hand_);
+    try
+    {
+        si_cad_ = new SICAD(cad_hand_, width, height, num_images);
+    }
+    catch (const std::runtime_error& e)
+    {
+        throw std::runtime_error(e.what());
+    }
 
     icub_kin_finger_[0].setAllConstraints(false);
     icub_kin_finger_[1].setAllConstraints(false);
@@ -200,15 +207,9 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 }
 
 
-bool VisualProprioception::initOGL(const GLsizei width, const GLsizei height, const GLint view)
-{
-    return SICAD::initOGL(width, height, view);
-}
-
-
 int VisualProprioception::oglWindowShouldClose()
 {
-    return SICAD::oglWindowShouldClose();
+    return si_cad_->oglWindowShouldClose();
 }
 
 
@@ -286,13 +287,12 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
         hand_poses.push_back(hand_pose);
     }
 
-    observation.create(cam_height_, cam_width_ * cur_state.cols(), CV_8UC3);
+    observation.create(cam_height_ * si_cad_->getTilesRows(), cam_width_ * si_cad_->getTilesCols(), CV_8UC3);
     Mat hand_ogl = observation.getMat();
 
-    si_cad_->superimpose(hand_poses,
-                         cam_x_, cam_o_,
-                         cam_width_, cam_height_, eye_fx_, eye_fy_, eye_cx_, eye_cy_,
-                         hand_ogl);
+    si_cad_->superimpose(hand_poses, cam_x_, cam_o_, hand_ogl,
+                         cam_width_, cam_height_, eye_fx_, eye_fy_, eye_cx_, eye_cy_);
+
     glfwPostEmptyEvent();
 }
 
@@ -346,11 +346,11 @@ void VisualProprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_ma
 {
     si_cad_->setBackgroundOpt(true);
     si_cad_->setWireframeOpt(true);
-    si_cad_->superimpose(obj2pos_map,
-                         cam_x_, cam_o_,
-                         cam_width_, cam_height_, eye_fx_, eye_fy_, eye_cx_, eye_cy_,
-                         img);
+
+    si_cad_->superimpose(obj2pos_map, cam_x_, cam_o_, img,
+                         cam_width_, cam_height_, eye_fx_, eye_fy_, eye_cx_, eye_cy_);
     glfwPostEmptyEvent();
+
     si_cad_->setBackgroundOpt(false);
     si_cad_->setWireframeOpt(false);
 }

@@ -50,14 +50,13 @@ int main(int argc, char const *argv[])
     }
 
     /* Initialize OpenGL context */
-    const int num_particles = 50; /* Must be even. */
-    if (!VisualProprioception::initOGL(320, 240, num_particles / 2)) return EXIT_FAILURE;
+    const int num_particles = 50;
 
     std::shared_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 0.005, 3.0, 1.5, 1));
 
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
 
-    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception("right"));
+    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(320, 240, num_particles / 2, "right"));
 
     std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, num_particles, 2));
 
@@ -71,7 +70,7 @@ int main(int argc, char const *argv[])
     std::future<void> thr_vpf = vsir_pf.spawn();
     while (vsir_pf.isRunning())
     {
-        if (VisualProprioception::oglWindowShouldClose())
+        if (proprio->oglWindowShouldClose())
         {
             vsir_pf.stopThread();
             yInfo() << log_ID << "Joining filthering thread...";

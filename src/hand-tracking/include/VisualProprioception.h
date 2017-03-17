@@ -16,7 +16,7 @@
 class VisualProprioception : public bfl::VisualObservationModel {
 public:
     /* VisualProprioception constructor */
-    VisualProprioception(const yarp::os::ConstString lateralirty);
+    VisualProprioception(const int width, const int height, const int num_images, const yarp::os::ConstString lateralirty);
 
     /* Destructor */
     ~VisualProprioception() noexcept override;
@@ -33,9 +33,7 @@ public:
     /* Move assignment operator */
     VisualProprioception& operator=(VisualProprioception&& proprio) noexcept;
 
-    static bool initOGL(const GLsizei width, const GLsizei height, const GLint view = 1);
-
-    static int  oglWindowShouldClose();
+    int  oglWindowShouldClose();
 
     void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, cv::OutputArray observation) override;
 
@@ -56,8 +54,8 @@ protected:
     double                   cam_x_[3];
     double                   cam_o_[4];
     SuperImpose::ObjFileMap  cad_hand_;
-    unsigned int             cam_width_;
-    unsigned int             cam_height_;
+    int                      cam_width_;
+    int                      cam_height_;
     float                    eye_fx_;
     float                    eye_cx_;
     float                    eye_fy_;
