@@ -17,12 +17,12 @@ using namespace cv;
 using namespace Eigen;
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualObservationModel> measurement_model, const int num_particle) noexcept :
+VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> measurement_model, const int num_particle) noexcept :
     VisualParticleFilterCorrection(measurement_model, num_particle, 2) { };
 
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualObservationModel> measurement_model, const int num_particle, const int num_cuda_stream) noexcept :
+VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> measurement_model, const int num_particle, const int num_cuda_stream) noexcept :
     measurement_model_(measurement_model), num_particle_(num_particle), num_cuda_stream_(num_cuda_stream), num_img_stream_(num_particle / num_cuda_stream), cuda_stream_(num_cuda_stream)
 {
     cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);

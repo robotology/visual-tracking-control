@@ -11,6 +11,8 @@
 #include <opencv2/cudaobjdetect.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 
+#include "VisualProprioception.h"
+
 
 class VisualParticleFilterCorrection : public bfl::VisualCorrection {
 public:
@@ -18,10 +20,10 @@ public:
     VisualParticleFilterCorrection() = delete;
 
     /* VPF correction constructor */
-    VisualParticleFilterCorrection(std::shared_ptr<bfl::VisualObservationModel> observation_model, const int num_particle) noexcept;
+    VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> observation_model, const int num_particle) noexcept;
 
     /* Detailed VPF correction constructor */
-    VisualParticleFilterCorrection(std::shared_ptr<bfl::VisualObservationModel> observation_model, const int num_particle, const int num_cuda_stream = 10) noexcept;
+    VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> observation_model, const int num_particle, const int num_cuda_stream = 10) noexcept;
 
     /* Destructor */
     ~VisualParticleFilterCorrection() noexcept override;
@@ -45,23 +47,23 @@ public:
     void likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovation, Eigen::Ref<Eigen::MatrixXf> cor_state) override;
 
 protected:
-    std::shared_ptr<bfl::VisualObservationModel>  measurement_model_;
+    std::shared_ptr<VisualProprioception>  measurement_model_;
 
-    const int                                     block_size_ = 16;
-    const int                                     bin_number_ = 9;
-    const int                                     img_width_  = 320;
-    const int                                     img_height_ = 240;
-    cv::Ptr<cv::cuda::HOG>                        cuda_hog_;
+    const int                              block_size_ = 16;
+    const int                              bin_number_ = 9;
+    const int                              img_width_  = 320;
+    const int                              img_height_ = 240;
+    cv::Ptr<cv::cuda::HOG>                 cuda_hog_;
 
-    const int                                     num_particle_;
-    const int                                     num_cuda_stream_;
-    const int                                     num_img_stream_;
-    std::vector<cv::cuda::Stream>                 cuda_stream_;
-    std::vector<cv::Mat>                          hand_rendered_;
-    std::vector<cv::cuda::GpuMat>                 cuda_img_;
-    std::vector<cv::cuda::GpuMat>                 cuda_img_alpha_;
-    std::vector<cv::cuda::GpuMat>                 cuda_descriptors_;
-    std::vector<cv::Mat>                          cpu_descriptors_;
+    const int                              num_particle_;
+    const int                              num_cuda_stream_;
+    const int                              num_img_stream_;
+    std::vector<cv::cuda::Stream>          cuda_stream_;
+    std::vector<cv::Mat>                   hand_rendered_;
+    std::vector<cv::cuda::GpuMat>          cuda_img_;
+    std::vector<cv::cuda::GpuMat>          cuda_img_alpha_;
+    std::vector<cv::cuda::GpuMat>          cuda_descriptors_;
+    std::vector<cv::Mat>                   cpu_descriptors_;
 };
 
 #endif /* VISUALPARTICLEFILTERCORRECTION_H */
