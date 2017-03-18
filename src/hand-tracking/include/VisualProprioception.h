@@ -49,6 +49,9 @@ public:
 
     void superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, cv::Mat& img);
 
+    int  getOGLTilesRows();
+    int  getOGLTilesCols();
+
 protected:
     iCub::iKin::iCubArm      icub_arm_;
     iCub::iKin::iCubFinger   icub_kin_finger_[3];
@@ -61,7 +64,10 @@ protected:
     float                    cam_cx_;
     float                    cam_fy_;
     float                    cam_cy_;
+
     SICAD                  * si_cad_;
+    int                      ogl_tiles_rows_;
+    int                      ogl_tiles_cols_;
 
     bool file_found(const yarp::os::ConstString& file);
 

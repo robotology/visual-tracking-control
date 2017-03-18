@@ -239,7 +239,7 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
         pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
         hand_pose.emplace("palm", pose);
 
-        /* Comment/Uncomment to add/remove limbs */
+        /* Change index to add/remove limbs */
         YMatrix Ha = axis2dcm(ee_o);
         Ha.setCol(3, ee_t);
         for (size_t fng = 0; fng < 3; ++fng)
@@ -273,7 +273,7 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
                 hand_pose.emplace(finger_s, pose);
             }
         }
-
+        /* Comment/Uncomment to add/remove limbs */
 //        YMatrix invH6 = Ha *
 //                        getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
 //                        getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
@@ -362,6 +362,19 @@ bool VisualProprioception::file_found(const ConstString & file)
         return false;
     return true;
 }
+
+
+int  VisualProprioception::getOGLTilesRows()
+{
+    return si_cad_->getTilesRows();
+}
+
+
+int  VisualProprioception::getOGLTilesCols()
+{
+    return si_cad_->getTilesCols();
+}
+
 
 YMatrix VisualProprioception::getInvertedH(double a, double d, double alpha, double offset, double q)
 {

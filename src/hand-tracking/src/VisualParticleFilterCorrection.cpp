@@ -32,9 +32,9 @@ VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<V
 
     for (int block = 0; block < num_particle_ / num_img_stream_; ++block)
     {
-        hand_rendered_.insert   (hand_rendered_.begin(),    Mat(         Size(img_width_ * num_img_stream_, img_height_), CV_8UC3));
-        cuda_img_.insert        (cuda_img_.begin(),         cuda::GpuMat(Size(img_width_ * num_img_stream_, img_height_), CV_8UC3));
-        cuda_img_alpha_.insert  (cuda_img_alpha_.begin(),   cuda::GpuMat(Size(img_width_ * num_img_stream_, img_height_), CV_8UC4));
+        hand_rendered_.insert   (hand_rendered_.begin(),    Mat(         Size(img_width_ * measurement_model->getOGLTilesCols(), img_height_* measurement_model->getOGLTilesRows()), CV_8UC3));
+        cuda_img_.insert        (cuda_img_.begin(),         cuda::GpuMat(Size(img_width_ * measurement_model->getOGLTilesCols(), img_height_* measurement_model->getOGLTilesRows()), CV_8UC3));
+        cuda_img_alpha_.insert  (cuda_img_alpha_.begin(),   cuda::GpuMat(Size(img_width_ * measurement_model->getOGLTilesCols(), img_height_* measurement_model->getOGLTilesRows()), CV_8UC4));
         cuda_descriptors_.insert(cuda_descriptors_.begin(), cuda::GpuMat(Size(num_img_stream_, ((img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4)), CV_32F));
         cpu_descriptors_.insert (cpu_descriptors_.begin(),  Mat(         Size(num_img_stream_, ((img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4)), CV_32F));
     }
