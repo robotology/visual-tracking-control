@@ -116,6 +116,12 @@ protected:
     bool use_analogs(const bool status) override;
     bool analogs_ = false;
 
+    enum laterality
+    {
+       LEFT  = 0,
+       RIGHT = 1
+    };
+
 private:
     Eigen::MatrixXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 

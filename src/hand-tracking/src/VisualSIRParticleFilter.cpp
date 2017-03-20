@@ -16,9 +16,6 @@
 #include <yarp/math/Math.h>
 #include <yarp/eigen/Eigen.h>
 
-//#include <SuperImpose/SICAD.h>
-#include <SuperImpose/SISkeleton.h>
-
 #include "VisualProprioception.h"
 
 using namespace bfl;
@@ -32,12 +29,6 @@ using namespace yarp::os;
 using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
-
-enum laterality
-{
-    LEFT  = 0,
-    RIGHT = 1
-};
 
 VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction,
                                                  std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction,
