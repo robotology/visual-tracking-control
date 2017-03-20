@@ -62,7 +62,7 @@ int main(int argc, char const *argv[])
 
     std::shared_ptr<Resampling> resampling(new Resampling());
 
-    VisualSIRParticleFilter vsir_pf(brown, pf_prediction,
+    VisualSIRParticleFilter vsir_pf(pf_prediction,
                                     proprio, vpf_correction,
                                     resampling,
                                     num_particles, 2);

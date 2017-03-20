@@ -36,7 +36,7 @@ public:
     VisualSIRParticleFilter() = delete;
 
     /* VisualSIR complete constructor */
-    VisualSIRParticleFilter(std::shared_ptr<bfl::StateModel> state_model, std::shared_ptr<bfl::Prediction> prediction,
+    VisualSIRParticleFilter(std::shared_ptr<bfl::Prediction> prediction,
                             std::shared_ptr<bfl::VisualObservationModel> observation_model, std::shared_ptr<bfl::VisualCorrection> correction,
                             std::shared_ptr<bfl::Resampling> resampling,
                             const int num_particles, const int eye = 1);
@@ -67,7 +67,6 @@ public:
     void stopThread();
 
 protected:
-    std::shared_ptr<bfl::StateModel>                                 state_model_;
     std::shared_ptr<bfl::Prediction>                                 prediction_;
     std::shared_ptr<bfl::VisualObservationModel>                     observation_model_;
     std::shared_ptr<bfl::VisualCorrection>                           correction_;

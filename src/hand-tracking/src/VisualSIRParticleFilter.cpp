@@ -30,11 +30,11 @@ using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
 
-VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<StateModel> state_model, std::shared_ptr<Prediction> prediction,
+VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<Prediction> prediction,
                                                  std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction,
                                                  std::shared_ptr<Resampling> resampling,
                                                  const int num_particles, const int eye) :
-    state_model_(state_model), prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling), num_particles_(num_particles),
+    prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling), num_particles_(num_particles),
     icub_kin_arm_(iCubArm("right_v2")), icub_kin_finger_{iCubFinger("right_thumb"), iCubFinger("right_index"), iCubFinger("right_middle")}
 {
     icub_kin_eye_.push_back(iCubEye("left_v2"));
