@@ -115,25 +115,14 @@ void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_
             int  j          = 0;
             while (it_cam < it_cam_end)
             {
-                /* ABS DIFF*/
                 sum_diff += abs((*it_cam) - cpu_descriptors_[block].at<float>(i, j));
 
-                /* EUCLIDEAN DISTANCE */
-//                sum_diff += pow((*it_cam) - cpu_descriptors_[block].at<float>(i, j), 2.0);
-
-                /* KL DIVERGENCE */
-//                if (cpu_descriptors_[block].at<float>(i, j) != 0 && *it_cam != 0)
-//                    sum_diff += (*it_cam) * std::log((*it_cam) / cpu_descriptors_[block].at<float>(i, j));
-//                    sum_diff += cpu_descriptors_[block].at<float>(i, j) * std::log(cpu_descriptors_[block].at<float>(i, j) / (*it_cam));
                 ++it_cam;
                 ++j;
             }
             }
-            /* ABS / KLD */
-            innovation(block * num_img_stream_ + i, 0) = sum_diff;
 
-            /* EUCLIDEAN DISTANCE */
-//            innovation(block * num_img_stream_ + i, 0) = sqrt(sum_diff);
+            innovation(block * num_img_stream_ + i, 0) = sum_diff;
         }
     }
 }
@@ -141,14 +130,10 @@ void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_
 
 void VisualParticleFilterCorrection::likelihood(const Ref<const MatrixXf>& innovation, Ref<MatrixXf> cor_state)
 {
-    // FIXME: Kernel likelihood need to be tuned!
     for (int i = 0; i < innovation.rows(); ++i)
     {
-        /* ABS / KLD */
-        cor_state(i, 0) *= ( exp( -0.001 * innovation(i, 0) /* / pow(1, 2.0) */ ) );
+        cor_state(i, 0) *= ( exp(-0.001 * innovation(i, 0)) );
 
-        /* EUCLIDEAN DISTANCE */
-//        cor_state(i, 0) *= ( exp( -0.01 * innovation(i, 0) / pow(0.25, 2.0) ) );
         if (cor_state(i, 0) <= 0) cor_state(i, 0) = std::numeric_limits<float>::min();
     }
 }
