@@ -2,14 +2,15 @@
 #include <future>
 #include <iostream>
 
-#include <yarp/os/ConstString.h>
-#include <yarp/os/LogStream.h>
-#include <yarp/os/Network.h>
-#include <opencv2/core/cuda.hpp>
-
 #include <BayesFiltersLib/FilteringContext.h>
 #include <BayesFiltersLib/FilteringFunction.h>
 #include <BayesFiltersLib/SIRParticleFilter.h>
+#include <yarp/os/ConstString.h>
+#include <yarp/os/LogStream.h>
+#include <yarp/os/Network.h>
+#include <yarp/os/ResourceFinder.h>
+#include <yarp/os/Value.h>
+#include <opencv2/core/cuda.hpp>
 
 #include "BrownianMotion.h"
 #include "VisualProprioception.h"
@@ -31,16 +32,10 @@ std::string engine_count_to_string(int engine_count)
 }
 
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
     ConstString log_ID = "[Main]";
     yInfo() << log_ID << "Configuring and starting module...";
-
-    cuda::DeviceInfo gpu_dev;
-    yInfo() << log_ID << "[CUDA] Engine capability:"              << engine_count_to_string(gpu_dev.asyncEngineCount());
-    yInfo() << log_ID << "[CUDA] Can have concurrent kernel:"     << gpu_dev.concurrentKernels();
-    yInfo() << log_ID << "[CUDA] Streaming Multiprocessor count:" << gpu_dev.multiProcessorCount();
-    yInfo() << log_ID << "[CUDA] Device can map host memory:"     << gpu_dev.canMapHostMemory();
 
     Network yarp;
     if (!yarp.checkNetwork(3.0))
@@ -49,14 +44,36 @@ int main(int argc, char const *argv[])
         return EXIT_FAILURE;
     }
 
-    /* Initialize OpenGL context */
-    const int num_particles = 50;
+    cuda::DeviceInfo gpu_dev;
+    yInfo() << log_ID << "[CUDA] Engine capability:"              << engine_count_to_string(gpu_dev.asyncEngineCount());
+    yInfo() << log_ID << "[CUDA] Can have concurrent kernel:"     << gpu_dev.concurrentKernels();
+    yInfo() << log_ID << "[CUDA] Streaming Multiprocessor count:" << gpu_dev.multiProcessorCount();
+    yInfo() << log_ID << "[CUDA] Device can map host memory:"     << gpu_dev.canMapHostMemory();
+
+    ResourceFinder rf;
+    rf.setVerbose();
+    rf.setDefaultContext("hand-tracking");
+    rf.setDefaultConfigFile("parameters.ini");
+    rf.configure(argc, argv);
+
+    ConstString robot_name       = rf.find("robot").asString();
+    ConstString robot_cam_sel    = rf.find("cam").asString();
+    ConstString robot_laterality = rf.find("laterality").asString();
+    const int   num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
+
+    yInfo() << log_ID << "Running with:";
+    yInfo() << log_ID << " - robot name:"          << robot_name;
+    yInfo() << log_ID << " - robot camera:"        << robot_cam_sel;
+    yInfo() << log_ID << " - robot laterality:"    << robot_laterality;
+    yInfo() << log_ID << " - number of particles:" << num_particles;
+
+    /* Initialize filtering functions */
 
     std::shared_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 0.005, 3.0, 1.5, 1));
 
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
 
-    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(320, 240, num_particles / 2, "right"));
+    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(320, 240, num_particles / 2, robot_laterality));
 
     std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, num_particles, 2));
 
@@ -65,7 +82,7 @@ int main(int argc, char const *argv[])
     VisualSIRParticleFilter vsir_pf(pf_prediction,
                                     proprio, vpf_correction,
                                     resampling,
-                                    num_particles, 2);
+                                    robot_cam_sel, robot_laterality, num_particles);
 
     std::future<void> thr_vpf = vsir_pf.spawn();
     while (vsir_pf.isRunning())

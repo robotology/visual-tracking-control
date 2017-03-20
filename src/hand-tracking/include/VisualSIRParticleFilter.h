@@ -39,7 +39,7 @@ public:
     VisualSIRParticleFilter(std::shared_ptr<bfl::Prediction> prediction,
                             std::shared_ptr<bfl::VisualObservationModel> observation_model, std::shared_ptr<bfl::VisualCorrection> correction,
                             std::shared_ptr<bfl::Resampling> resampling,
-                            const int num_particles, const int eye = 1);
+                            yarp::os::ConstString cam_sel, yarp::os::ConstString laterality, const int num_particles);
 
     /* Destructor */
     ~VisualSIRParticleFilter() noexcept override;
@@ -71,17 +71,12 @@ protected:
     std::shared_ptr<bfl::VisualObservationModel>                     observation_model_;
     std::shared_ptr<bfl::VisualCorrection>                           correction_;
     std::shared_ptr<bfl::Resampling>                                 resampling_;
+    yarp::os::ConstString                                            cam_sel_;
+    yarp::os::ConstString                                            laterality_;
     const int                                                        num_particles_;
 
-    // FIXME: utilizzare questi dati membro con nomi opportunamente cambiati
-    Eigen::MatrixXf                                                  init_particle_;
-    Eigen::VectorXf                                                  init_weight_;
-    
-    std::vector<Eigen::MatrixXf>                                     result_particle_;
-    std::vector<Eigen::VectorXf>                                     result_weight_;
-
     /* INIT ONLY */
-    std::vector<iCub::iKin::iCubEye>                                 icub_kin_eye_;
+    iCub::iKin::iCubEye                                              icub_kin_eye_;
     iCub::iKin::iCubArm                                              icub_kin_arm_;
     iCub::iKin::iCubFinger                                           icub_kin_finger_[3];
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_head_enc_;
@@ -93,12 +88,10 @@ protected:
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_right_hand_analog_;
     yarp::sig::Matrix                                                right_hand_analogs_bounds_;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_left_;
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_right_;
     /* OUTPUT */
     yarp::os::BufferedPort<yarp::sig::Vector>                        port_estimates_out_;
     /* DEBUG ONLY */
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_out_left_;
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_out_right_;
     /* ******************* */
 
     bool                                                             is_running_;

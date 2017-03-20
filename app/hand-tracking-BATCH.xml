@@ -5,7 +5,7 @@
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking-BATCH</name>
     <description>Offline visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
-    <version>0.2.3</version>
+    <version>0.3.0</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -15,6 +15,13 @@
     <!-- REQUIRED MODULES -->
     <module>
         <name>hand-tracking</name>
+        <parameters>--robot iCub --cam left --laterality right</parameters>
+        <node>yarprun</node>
+    </module>
+
+    <module>
+        <name>hand-tracking</name>
+        <parameters>--robot iCub --cam right --laterality right</parameters>
         <node>yarprun</node>
     </module>
 

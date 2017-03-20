@@ -305,14 +305,14 @@ void VisualProprioception::setCamXO(double* cam_x, double* cam_o)
 
 
 void VisualProprioception::setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
-                                           const float eye_fx, const float eye_cx, const float eye_fy, const float eye_cy)
+                                           const float cam_fx, const float cam_cx, const float cam_fy, const float cam_cy)
 {
     cam_width_  = cam_width;
     cam_height_ = cam_height;
-    cam_fx_     = eye_fx;
-    cam_cx_     = eye_cx;
-    cam_fy_     = eye_fy;
-    cam_cy_     = eye_cy;
+    cam_fx_     = cam_fx;
+    cam_cx_     = cam_cx;
+    cam_fy_     = cam_fy;
+    cam_cy_     = cam_cy;
 }
 
 
