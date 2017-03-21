@@ -403,21 +403,61 @@ void VisualProprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_ma
 
 bool VisualProprioception::file_found(const ConstString & file)
 {
-    if (file.empty())
-        return false;
-    return true;
+    return (file.empty() ? false : true);
 }
 
 
-int  VisualProprioception::getOGLTilesRows()
+int VisualProprioception::getOGLTilesNumber()
+{
+    return si_cad_->getTilesNumber();
+}
+
+
+int VisualProprioception::getOGLTilesRows()
 {
     return si_cad_->getTilesRows();
 }
 
 
-int  VisualProprioception::getOGLTilesCols()
+int VisualProprioception::getOGLTilesCols()
 {
     return si_cad_->getTilesCols();
+}
+
+
+unsigned int VisualProprioception::getCamWidth()
+{
+    return cam_width_;
+}
+
+
+unsigned int VisualProprioception::getCamHeight()
+{
+    return cam_height_;
+}
+
+
+float VisualProprioception::getCamFx()
+{
+    return cam_fx_;
+}
+
+
+float VisualProprioception::getCamFy()
+{
+    return cam_fy_;
+}
+
+
+float VisualProprioception::getCamCx()
+{
+    return cam_cx_;
+}
+
+
+float VisualProprioception::getCamCy()
+{
+    return cam_cy_;
 }
 
 

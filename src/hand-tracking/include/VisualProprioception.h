@@ -54,8 +54,16 @@ public:
 
     void superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, cv::Mat& img);
 
+    int  getOGLTilesNumber();
     int  getOGLTilesRows();
     int  getOGLTilesCols();
+
+    unsigned int getCamWidth();
+    unsigned int getCamHeight();
+    float        getCamFx();
+    float        getCamFy();
+    float        getCamCx();
+    float        getCamCy();
 
 protected:
     yarp::os::ConstString    log_ID_;

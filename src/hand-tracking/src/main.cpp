@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
     std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality));
 
-    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, num_particles, gpu_dev.multiProcessorCount()));
+    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, gpu_dev.multiProcessorCount()));
 
     std::shared_ptr<Resampling> resampling(new Resampling());
 

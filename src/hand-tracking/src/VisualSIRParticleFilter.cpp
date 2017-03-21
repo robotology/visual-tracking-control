@@ -147,18 +147,16 @@ void VisualSIRParticleFilter::runFilter()
 
     /* FILTERING */
     ImageOf<PixelRgb>* imgin_left  = YARP_NULLPTR;
-    ImageOf<PixelRgb>* imgin_right = YARP_NULLPTR;
     while(is_running_)
     {
         Vector             q;
         Vector             analogs;
         std::vector<float> descriptors_cam_left (descriptor_length);
-        std::vector<float> descriptors_cam_right(descriptor_length);
         cuda::GpuMat       cuda_img             (Size(img_width, img_height), CV_8UC3);
         cuda::GpuMat       cuda_img_alpha       (Size(img_width, img_height), CV_8UC4);
         cuda::GpuMat       descriptors_cam_cuda (Size(descriptor_length, 1),  CV_32F );
 
-        imgin_left  = port_image_in_left_.read (true);
+        imgin_left = port_image_in_left_.read(true);
 
         if (imgin_left != YARP_NULLPTR)
         {
@@ -255,20 +253,18 @@ void VisualSIRParticleFilter::runFilter()
             VectorXf out_particle(6);
 
             std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(left_cam_x, left_cam_o);
-            /* BLACK FIRST UNCLUTTER */
+            /* BLACK - LEFT - FIRST UNCLUTTER */
 //            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
-            /* BLACK NEW - BAD DISP */
+            /* BLACK - LEFT - BAD DISP */
 //            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
-            /* BLACK NEW - GOOD DISP */
+            /* BLACK - LEFT - GOOD DISP */
             std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
-            correction_->correct(init_particle, descriptors_cam_left, init_weight);
 
-//            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(right_cam_x, right_cam_o);
-//            /* BLACK NEW - BAD DISP */
-////            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
-//            /* BLACK NEW - GOOD DISP */
+            /* BLACK - RIGHT - BAD DISP */
+//            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
+            /* BLACK - RIGHT - GOOD DISP */
 //            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
-//            correction_->correct(init_particle, descriptors_cam_right, init_weight.middleRows);
+            correction_->correct(init_particle, descriptors_cam_left, init_weight);
 
             init_weight /= init_weight.sum();
 
@@ -427,29 +423,22 @@ void VisualSIRParticleFilter::runFilter()
 //                hand_pose.emplace("forearm", pose);
 
                 std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(left_cam_x,  left_cam_o);
-                /* BLACK FIRST UNCLUTTER */
+                /* BLACK - LEFT - UNCLUTTER */
 //                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
-                /* BLACK NEW - BAD DISP */
+                /* BLACK - LEFT - BAD DISP */
 //                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
-                /* BLACK NEW - GOOD DISP */
+                /* BLACK - LEFT - GOOD DISP */
                 std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
+
+                /* BLACK - RIGHT - BAD DISP */
+//                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
+                /* BLACK - RIGHT - GOOD DISP */
+//                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
+
                 std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement);
 
                 glfwPostEmptyEvent();
                 port_image_out_left_.write();
-
-//                if (i == RIGHT)
-//                {
-//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(right_cam_x, right_cam_o);
-//                    /* BLACK NEW - BAD DISP */
-////                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
-//                    /* BLACK NEW - GOOD DISP */
-//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
-//                    std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement[1]);
-//
-//                    glfwPostEmptyEvent();
-//                    port_image_out_right_.write();
-//                }
             }
             /* ********** */
         }

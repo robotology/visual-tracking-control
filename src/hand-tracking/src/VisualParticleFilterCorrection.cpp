@@ -17,26 +17,35 @@ using namespace cv;
 using namespace Eigen;
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> measurement_model, const int num_particle) noexcept :
-    VisualParticleFilterCorrection(measurement_model, num_particle, 1) { };
+VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> measurement_model) noexcept :
+    VisualParticleFilterCorrection(measurement_model, 1) { };
 
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> measurement_model, const int num_particle, const int num_cuda_stream) noexcept :
-    measurement_model_(measurement_model), num_particle_(num_particle), num_cuda_stream_(num_cuda_stream), num_img_stream_(num_particle / num_cuda_stream), cuda_stream_(num_cuda_stream)
+VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> measurement_model, const int num_cuda_stream) noexcept :
+    measurement_model_(measurement_model),
+    num_cuda_stream_(num_cuda_stream), num_img_stream_(measurement_model->getOGLTilesNumber()), cuda_stream_(std::vector<cuda::Stream>(num_cuda_stream))
 {
-    cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
+    int          block_size     = 16;
+    int          bin_number     = 9;
+    unsigned int img_width      = measurement_model->getCamWidth();
+    unsigned int img_height     = measurement_model->getCamHeight();
+    unsigned int ogl_tiles_cols = measurement_model->getOGLTilesCols();
+    unsigned int ogl_tiles_rows = measurement_model->getOGLTilesRows();
+    unsigned int feature_dim    = (img_width/block_size*2-1) * (img_height/block_size*2-1) * bin_number * 4;
+
+    cuda_hog_ = cuda::HOG::create(Size(img_width, img_height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), bin_number);
     cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
     cuda_hog_->setGammaCorrection(true);
-    cuda_hog_->setWinStride(Size(img_width_, img_height_));
+    cuda_hog_->setWinStride(Size(img_width, img_height));
 
-    for (int block = 0; block < num_particle_ / num_img_stream_; ++block)
+    for (int s = 0; s < num_cuda_stream_; ++s)
     {
-        hand_rendered_.insert   (hand_rendered_.begin(),    Mat(         Size(img_width_ * measurement_model->getOGLTilesCols(), img_height_* measurement_model->getOGLTilesRows()), CV_8UC3));
-        cuda_img_.insert        (cuda_img_.begin(),         cuda::GpuMat(Size(img_width_ * measurement_model->getOGLTilesCols(), img_height_* measurement_model->getOGLTilesRows()), CV_8UC3));
-        cuda_img_alpha_.insert  (cuda_img_alpha_.begin(),   cuda::GpuMat(Size(img_width_ * measurement_model->getOGLTilesCols(), img_height_* measurement_model->getOGLTilesRows()), CV_8UC4));
-        cuda_descriptors_.insert(cuda_descriptors_.begin(), cuda::GpuMat(Size(num_img_stream_, ((img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4)), CV_32F));
-        cpu_descriptors_.insert (cpu_descriptors_.begin(),  Mat(         Size(num_img_stream_, ((img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4)), CV_32F));
+        hand_rendered_.insert   (hand_rendered_.begin(),    Mat(         Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC3));
+        cuda_img_.insert        (cuda_img_.begin(),         cuda::GpuMat(Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC3));
+        cuda_img_alpha_.insert  (cuda_img_alpha_.begin(),   cuda::GpuMat(Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC4));
+        cuda_descriptors_.insert(cuda_descriptors_.begin(), cuda::GpuMat(Size(num_img_stream_, feature_dim),                           CV_32F ));
+        cpu_descriptors_.insert (cpu_descriptors_.begin(),  Mat(         Size(num_img_stream_, feature_dim),                           CV_32F ));
     }
 }
 
@@ -85,26 +94,23 @@ void VisualParticleFilterCorrection::correct(const Ref<const MatrixXf>& pred_sta
 
 void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> innovation)
 {
-    for (int block = 0; block < num_particle_ / num_img_stream_; ++block)
+    for (int s = 0; s < num_cuda_stream_; ++s)
     {
-        measurement_model_->observe(pred_state.block(0, block * num_img_stream_, 6, num_img_stream_), hand_rendered_[block]);
+        measurement_model_->observe(pred_state.block(0, s * num_img_stream_, 6, num_img_stream_), hand_rendered_[s]);
     }
 
-    for (int block = 0; block < num_particle_ / num_img_stream_; ++block)
+    for (int s = 0; s < num_cuda_stream_; ++s)
     {
-        const unsigned int stream_index = block % num_cuda_stream_;
-
-        cuda_img_[block].upload(hand_rendered_[block], cuda_stream_[stream_index]);
-        cuda::cvtColor(cuda_img_[block], cuda_img_alpha_[block], COLOR_BGR2BGRA, 4, cuda_stream_[stream_index]);
-        cuda_hog_->compute(cuda_img_alpha_[block], cuda_descriptors_[block], cuda_stream_[stream_index]);
+        cuda_img_[s].upload(hand_rendered_[s], cuda_stream_[s]);
+        cuda::cvtColor(cuda_img_[s], cuda_img_alpha_[s], COLOR_BGR2BGRA, 4, cuda_stream_[s]);
+        cuda_hog_->compute(cuda_img_alpha_[s], cuda_descriptors_[s], cuda_stream_[s]);
     }
 
     for (int s = 0; s < num_cuda_stream_; ++s) cuda_stream_[s].waitForCompletion();
 
-    for (int block = 0; block < num_particle_ / num_img_stream_; ++block)
+    for (int s = 0; s < num_cuda_stream_; ++s)
     {
-        const unsigned int stream_index = block % num_cuda_stream_;
-        cuda_descriptors_[block].download(cpu_descriptors_[block], cuda_stream_[stream_index]);
+        cuda_descriptors_[s].download(cpu_descriptors_[s], cuda_stream_[s]);
 
         for (int i = 0; i < num_img_stream_; ++i)
         {
@@ -115,14 +121,14 @@ void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_
             int  j          = 0;
             while (it_cam < it_cam_end)
             {
-                sum_diff += abs((*it_cam) - cpu_descriptors_[block].at<float>(i, j));
+                sum_diff += abs((*it_cam) - cpu_descriptors_[s].at<float>(i, j));
 
                 ++it_cam;
                 ++j;
             }
             }
 
-            innovation(block * num_img_stream_ + i, 0) = sum_diff;
+            innovation(s * num_img_stream_ + i, 0) = sum_diff;
         }
     }
 }
