@@ -73,41 +73,57 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     /* Comment/Uncomment to add/remove limbs */
     ResourceFinder rf;
     cad_hand_["palm"] = rf.findFileByName("r_palm.obj");
-    if (!file_found(cad_hand_["palm"])) throw std::runtime_error("Runtime error: file r_palm.obj not found!");
+    if (!file_found(cad_hand_["palm"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_palm.obj not found!");
 
     cad_hand_["thumb1"] = rf.findFileByName("r_tl0.obj");
-    if (!file_found(cad_hand_["thumb1"])) throw std::runtime_error("Runtime error: file r_tl0.obj not found!");
+    if (!file_found(cad_hand_["thumb1"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
     cad_hand_["thumb2"] = rf.findFileByName("r_tl1.obj");
-    if (!file_found(cad_hand_["thumb2"])) throw std::runtime_error("Runtime error: file r_tl1.obj not found!");
+    if (!file_found(cad_hand_["thumb2"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
     cad_hand_["thumb3"] = rf.findFileByName("r_tl2.obj");
-    if (!file_found(cad_hand_["thumb3"])) throw std::runtime_error("Runtime error: file r_tl2.obj not found!");
+    if (!file_found(cad_hand_["thumb3"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
     cad_hand_["thumb4"] = rf.findFileByName("r_tl3.obj");
-    if (!file_found(cad_hand_["thumb4"])) throw std::runtime_error("Runtime error: file r_tl3.obj not found!");
+    if (!file_found(cad_hand_["thumb4"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
     cad_hand_["thumb5"] = rf.findFileByName("r_tl4.obj");
-    if (!file_found(cad_hand_["thumb5"])) throw std::runtime_error("Runtime error: file r_tl4.obj not found!");
+    if (!file_found(cad_hand_["thumb5"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
 
     cad_hand_["index0"] = rf.findFileByName("r_indexbase.obj");
-    if (!file_found(cad_hand_["index0"])) throw std::runtime_error("Runtime error: file r_indexbase.obj not found!");
+    if (!file_found(cad_hand_["index0"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_indexbase.obj not found!");
     cad_hand_["index1"] = rf.findFileByName("r_ail0.obj");
-    if (!file_found(cad_hand_["index1"])) throw std::runtime_error("Runtime error: file r_ail0.obj not found!");
+    if (!file_found(cad_hand_["index1"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ail0.obj not found!");
     cad_hand_["index2"] = rf.findFileByName("r_ail1.obj");
-    if (!file_found(cad_hand_["index2"])) throw std::runtime_error("Runtime error: file r_ail1.obj not found!");
+    if (!file_found(cad_hand_["index2"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ail1.obj not found!");
     cad_hand_["index3"] = rf.findFileByName("r_ail2.obj");
-    if (!file_found(cad_hand_["index3"])) throw std::runtime_error("Runtime error: file r_ail2.obj not found!");
+    if (!file_found(cad_hand_["index3"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ail2.obj not found!");
     cad_hand_["index4"] = rf.findFileByName("r_ail3.obj");
-    if (!file_found(cad_hand_["index4"])) throw std::runtime_error("Runtime error: file r_ail3.obj not found!");
+    if (!file_found(cad_hand_["index4"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ail3.obj not found!");
 
     cad_hand_["medium0"] = rf.findFileByName("r_ml0.obj");
-    if (!file_found(cad_hand_["medium0"])) throw std::runtime_error("Runtime error: file r_ml0.obj not found!");
+    if (!file_found(cad_hand_["medium0"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ml0.obj not found!");
     cad_hand_["medium1"] = rf.findFileByName("r_ml1.obj");
-    if (!file_found(cad_hand_["medium1"])) throw std::runtime_error("Runtime error: file r_ml1.obj not found!");
+    if (!file_found(cad_hand_["medium1"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ml1.obj not found!");
     cad_hand_["medium2"] = rf.findFileByName("r_ml2.obj");
-    if (!file_found(cad_hand_["medium2"])) throw std::runtime_error("Runtime error: file r_ml2.obj not found!");
+    if (!file_found(cad_hand_["medium2"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ml2.obj not found!");
     cad_hand_["medium3"] = rf.findFileByName("r_ml3.obj");
-    if (!file_found(cad_hand_["medium3"])) throw std::runtime_error("Runtime error: file r_ml3.obj not found!");
+    if (!file_found(cad_hand_["medium3"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ml3.obj not found!");
 
 //    cad_hand_["forearm"] = rf.findFileByName("r_forearm.obj");
-//    if (!file_found(cad_hand_["forearm"])) throw std::runtime_error("Runtime error: file r_forearm.obj not found!");
+//    if (!file_found(cad_hand_["forearm"]))
+//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_forearm.obj not found!");
 
     try
     {
