@@ -65,7 +65,6 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - number of particles:" << num_particles;
 
     /* Initialize filtering functions */
-
     std::shared_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 0.005, 3.0, 1.5, 1));
 
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
