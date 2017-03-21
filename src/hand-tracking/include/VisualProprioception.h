@@ -71,7 +71,8 @@ protected:
 
     bool file_found(const yarp::os::ConstString& file);
 
-    yarp::sig::Matrix getInvertedH(double a, double d, double alpha, double offset, double q);
+private:
+    yarp::sig::Matrix getInvertedH(const double a, const double d, const double alpha, const double offset, const double q);
 };
 
 #endif /* VISUALPROPRIOCEPTION_H */

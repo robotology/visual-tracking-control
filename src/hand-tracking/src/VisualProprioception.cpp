@@ -376,7 +376,7 @@ int  VisualProprioception::getOGLTilesCols()
 }
 
 
-YMatrix VisualProprioception::getInvertedH(double a, double d, double alpha, double offset, double q)
+YMatrix VisualProprioception::getInvertedH(const double a, const double d, const double alpha, const double offset, const double q)
 {
     /** Table of the DH parameters for the right arm V2.
      *  Link i  Ai (mm)     d_i (mm)    alpha_i (rad)   theta_i (deg)
