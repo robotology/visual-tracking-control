@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     cuda::DeviceInfo gpu_dev;
     yInfo() << log_ID << "[CUDA] Engine capability:"              << engine_count_to_string(gpu_dev.asyncEngineCount());
     yInfo() << log_ID << "[CUDA] Can have concurrent kernel:"     << gpu_dev.concurrentKernels();
-    yInfo() << log_ID << "[CUDA] Streaming Multiprocessor count:" << gpu_dev.multiProcessorCount();
+    yInfo() << log_ID << "[CUDA] Streaming multiprocessor count:" << gpu_dev.multiProcessorCount();
     yInfo() << log_ID << "[CUDA] Device can map host memory:"     << gpu_dev.canMapHostMemory();
 
     ResourceFinder rf;
@@ -70,9 +70,9 @@ int main(int argc, char *argv[])
 
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
 
-    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(num_particles / 2, robot_cam_sel, robot_laterality));
+    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality));
 
-    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, num_particles, 2));
+    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, num_particles, gpu_dev.multiProcessorCount()));
 
     std::shared_ptr<Resampling> resampling(new Resampling());
 
