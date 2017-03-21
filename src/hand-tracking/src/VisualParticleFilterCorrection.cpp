@@ -18,7 +18,7 @@ using namespace Eigen;
 
 
 VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> measurement_model, const int num_particle) noexcept :
-    VisualParticleFilterCorrection(measurement_model, num_particle, 2) { };
+    VisualParticleFilterCorrection(measurement_model, num_particle, 1) { };
 
 
 

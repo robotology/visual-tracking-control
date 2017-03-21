@@ -23,7 +23,7 @@ public:
     VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> observation_model, const int num_particle) noexcept;
 
     /* Detailed VPF correction constructor */
-    VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> observation_model, const int num_particle, const int num_cuda_stream = 10) noexcept;
+    VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> observation_model, const int num_particle, const int num_cuda_stream) noexcept;
 
     /* Destructor */
     ~VisualParticleFilterCorrection() noexcept override;
