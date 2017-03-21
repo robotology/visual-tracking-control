@@ -11,11 +11,14 @@
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/math/Math.h>
 #include <yarp/sig/Vector.h>
+#include <yarp/os/LogStream.h>
+#include <yarp/os/Property.h>
 
 
 using namespace cv;
 using namespace Eigen;
 using namespace iCub::iKin;
+using namespace yarp::dev;
 using namespace yarp::os;
 using namespace yarp::math;
 using namespace yarp::sig;
@@ -23,9 +26,41 @@ using namespace yarp::sig;
 typedef typename yarp::sig::Matrix YMatrix;
 
 
-VisualProprioception::VisualProprioception(const int width, const int height, const int num_images, const yarp::os::ConstString lateralirty) :
-    icub_arm_(iCubArm(lateralirty+"_v2")), icub_kin_finger_{iCubFinger(lateralirty+"_thumb"), iCubFinger(lateralirty+"_index"), iCubFinger(lateralirty+"_middle")}
+VisualProprioception::VisualProprioception(const int num_images, const ConstString cam_sel, const ConstString laterality) :
+    log_ID_("[VisualProprioception]"),
+    laterality_(laterality), icub_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")},
+    cam_sel_(cam_sel)
 {
+    if (setGazeController(drv_gaze, itf_gaze, "hand-tracking/" + cam_sel_))
+    {
+        itf_gaze->getInfo(cam_info);
+        yInfo() << log_ID_ << "[CAM PARAMS]" << cam_info.toString();
+        Bottle* cam_sel_intrinsic  = cam_info.findGroup("camera_intrinsics_" + cam_sel_).get(1).asList();
+        cam_width_  = cam_info.findGroup("camera_width_" + cam_sel_).get(1).asInt();
+        cam_height_ = cam_info.findGroup("camera_height_" + cam_sel_).get(1).asInt();
+        cam_fx_     = static_cast<float>(cam_sel_intrinsic->get(0).asDouble());
+        cam_cx_     = static_cast<float>(cam_sel_intrinsic->get(2).asDouble());
+        cam_fy_     = static_cast<float>(cam_sel_intrinsic->get(5).asDouble());
+        cam_cy_     = static_cast<float>(cam_sel_intrinsic->get(6).asDouble());
+    }
+    else
+    {
+        yWarning() << log_ID_ << "[CAM PARAMS]" << "No intrinisc camera information could be found by the ctor. Rolling back to default values.";
+        cam_width_  = 320;
+        cam_height_ = 240;
+        cam_fx_     = 257.34;
+        cam_cx_     = 160;
+        cam_fy_     = 120;
+        cam_cy_     = 257.34;
+    }
+    yInfo() << log_ID_ << "[CAM]" << "Running with:";
+    yInfo() << log_ID_ << "[CAM]" << " - width:"  << cam_width_;
+    yInfo() << log_ID_ << "[CAM]" << " - height:" << cam_height_;
+    yInfo() << log_ID_ << "[CAM]" << " - fx:"     << cam_fx_;
+    yInfo() << log_ID_ << "[CAM]" << " - fy:"     << cam_fy_;
+    yInfo() << log_ID_ << "[CAM]" << " - cx:"     << cam_cx_;
+    yInfo() << log_ID_ << "[CAM]" << " - cy:"     << cam_cy_;
+
     cam_x_[0]   = 0;
     cam_x_[1]   = 0;
     cam_x_[2]   = 0;
@@ -34,13 +69,6 @@ VisualProprioception::VisualProprioception(const int width, const int height, co
     cam_o_[1]   = 0;
     cam_o_[2]   = 0;
     cam_o_[3]   = 0;
-
-    cam_width_  = 0;
-    cam_height_ = 0;
-    cam_fx_     = 0;
-    cam_cx_     = 0;
-    cam_fy_     = 0;
-    cam_cy_     = 0;
 
     /* Comment/Uncomment to add/remove limbs */
     ResourceFinder rf;
@@ -83,7 +111,8 @@ VisualProprioception::VisualProprioception(const int width, const int height, co
 
     try
     {
-        si_cad_ = new SICAD(cad_hand_, width, height, num_images);
+        si_cad_ = new SICAD(cad_hand_, cam_width_, cam_height_, num_images,
+                            cam_width_, cam_height_, cam_fx_, cam_fy_, cam_cx_, cam_cy_);
     }
     catch (const std::runtime_error& e)
     {
@@ -421,4 +450,31 @@ YMatrix VisualProprioception::getInvertedH(const double a, const double d, const
     H(3,3) =           1;
 
     return H;
+}
+
+
+bool VisualProprioception::setGazeController(PolyDriver& drv_gaze, IGazeControl*& itf_gaze, ConstString program_name)
+{
+    Property opt_gaze;
+    opt_gaze.put("device", "gazecontrollerclient");
+    opt_gaze.put("local", "/" + program_name + "/gaze");
+    opt_gaze.put("remote", "/iKinGazeCtrl");
+
+    drv_gaze.open(opt_gaze);
+    if (drv_gaze.isValid())
+    {
+        drv_gaze.view(itf_gaze);
+        if (!itf_gaze)
+        {
+            yError() << log_ID_ << "Error getting IGazeControl interface.";
+            return false;
+        }
+    }
+    else
+    {
+        yError() << log_ID_ << "Gaze control device not available.";
+        return false;
+    }
+
+    return true;
 }

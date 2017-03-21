@@ -1,11 +1,16 @@
 #ifndef VISUALPROPRIOCEPTION_H
 #define VISUALPROPRIOCEPTION_H
 
+#include <string>
+
 // FIXME: perchè sono inclusi GL/GLFW?
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/core/core.hpp>
+#include <yarp/dev/GazeControl.h>
+#include <yarp/dev/PolyDriver.h>
+#include <yarp/os/Bottle.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
@@ -17,7 +22,7 @@
 class VisualProprioception : public bfl::VisualObservationModel {
 public:
     /* VisualProprioception constructor */
-    VisualProprioception(const int width, const int height, const int num_images, const yarp::os::ConstString lateralirty);
+    VisualProprioception(const int num_images, const yarp::os::ConstString cam_sel, const yarp::os::ConstString laterality);
 
     /* Destructor */
     ~VisualProprioception() noexcept override;
@@ -53,13 +58,23 @@ public:
     int  getOGLTilesCols();
 
 protected:
+    yarp::os::ConstString    log_ID_;
+
+    /* ICUB */
+    yarp::os::ConstString    laterality_;
+    yarp::dev::PolyDriver    drv_gaze;
+    yarp::dev::IGazeControl* itf_gaze;
+    yarp::os::Bottle         cam_info;
     iCub::iKin::iCubArm      icub_arm_;
     iCub::iKin::iCubFinger   icub_kin_finger_[3];
+    /* **** */
+
+    yarp::os::ConstString    cam_sel_;
     double                   cam_x_[3];
     double                   cam_o_[4];
     SuperImpose::ObjFileMap  cad_hand_;
-    int                      cam_width_;
-    int                      cam_height_;
+    unsigned int             cam_width_;
+    unsigned int             cam_height_;
     float                    cam_fx_;
     float                    cam_cx_;
     float                    cam_fy_;
@@ -73,6 +88,8 @@ protected:
 
 private:
     yarp::sig::Matrix getInvertedH(const double a, const double d, const double alpha, const double offset, const double q);
+
+    bool              setGazeController(yarp::dev::PolyDriver& drv_gaze, yarp::dev::IGazeControl*& itf_gaze, yarp::os::ConstString program_name);
 };
 
 #endif /* VISUALPROPRIOCEPTION_H */

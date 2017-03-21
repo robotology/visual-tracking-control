@@ -20,18 +20,15 @@
 using namespace bfl;
 using namespace cv;
 using namespace Eigen;
+using namespace yarp::dev;
 using namespace yarp::os;
 
 
-std::string engine_count_to_string(int engine_count)
-{
-    if (engine_count == 0) return "concurrency is unsupported on this device";
-    if (engine_count == 1) return "the device can concurrently copy memory between host and device while executing a kernel";
-    if (engine_count == 2) return "the device can concurrently copy memory between host and device in both directions and execute a kernel at the same time";
-    return "wrong argument...!";
-}
+/* UTILITY FUNCTIONS FOREWORD DECLARATIONS */
+std::string engine_count_to_string(int engine_count);
 
 
+/* MAIN */
 int main(int argc, char *argv[])
 {
     ConstString log_ID = "[Main]";
@@ -73,7 +70,7 @@ int main(int argc, char *argv[])
 
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
 
-    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(320, 240, num_particles / 2, robot_laterality));
+    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(num_particles / 2, robot_cam_sel, robot_laterality));
 
     std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, num_particles, 2));
 
@@ -105,3 +102,12 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
+
+/* UTILITY FUNCTIONS */
+std::string engine_count_to_string(int engine_count)
+{
+    if (engine_count == 0) return "concurrency is unsupported on this device";
+    if (engine_count == 1) return "the device can concurrently copy memory between host and device while executing a kernel";
+    if (engine_count == 2) return "the device can concurrently copy memory between host and device in both directions and execute a kernel at the same time";
+    return "wrong argument...!";
+}
