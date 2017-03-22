@@ -58,6 +58,13 @@ int main(int argc, char *argv[])
     ConstString robot_laterality = rf.find("laterality").asString();
     const int   num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
 
+    if (robot_name.empty())
+        robot_name       = "icub";
+    if (robot_cam_sel.empty())
+        robot_cam_sel    = "left";
+    if (robot_laterality.empty())
+        robot_laterality = "right";
+
     yInfo() << log_ID << "Running with:";
     yInfo() << log_ID << " - robot name:"          << robot_name;
     yInfo() << log_ID << " - robot camera:"        << robot_cam_sel;
@@ -69,7 +76,16 @@ int main(int argc, char *argv[])
 
     std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
 
-    std::shared_ptr<VisualProprioception> proprio(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality));
+    std::shared_ptr<VisualProprioception> proprio;
+    try
+    {
+        proprio = std::make_shared<VisualProprioception>(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality, rf.getContext());
+    }
+    catch (const std::runtime_error& e)
+    {
+        yError() << e.what();
+        return EXIT_FAILURE;
+    }
 
     std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, gpu_dev.multiProcessorCount()));
 

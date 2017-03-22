@@ -18,7 +18,7 @@
 class VisualProprioception : public bfl::VisualObservationModel {
 public:
     /* VisualProprioception constructor */
-    VisualProprioception(const int num_images, const yarp::os::ConstString cam_sel, const yarp::os::ConstString laterality);
+    VisualProprioception(const int num_images, const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const yarp::os::ConstString& context);
 
     /* Destructor */
     ~VisualProprioception() noexcept override;
@@ -62,7 +62,7 @@ public:
     float        getCamCy();
 
 protected:
-    yarp::os::ConstString    log_ID_;
+    yarp::os::ConstString    log_ID_ = "[VisualProprioception]";
 
     /* ICUB */
     yarp::os::ConstString    laterality_;
@@ -88,9 +88,9 @@ protected:
     int                      ogl_tiles_rows_;
     int                      ogl_tiles_cols_;
 
+
     bool file_found(const yarp::os::ConstString& file);
 
-private:
     yarp::sig::Matrix getInvertedH(const double a, const double d, const double alpha, const double offset, const double q);
 
     bool              setGazeController(yarp::dev::PolyDriver& drv_gaze, yarp::dev::IGazeControl*& itf_gaze, yarp::os::ConstString program_name);

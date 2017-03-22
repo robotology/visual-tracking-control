@@ -23,8 +23,7 @@ using namespace yarp::math;
 using yarp::sig::Vector;
 
 
-VisualProprioception::VisualProprioception(const int num_images, const ConstString cam_sel, const ConstString laterality) :
-    log_ID_("[VisualProprioception]"),
+VisualProprioception::VisualProprioception(const int num_images, const ConstString& cam_sel, const ConstString& laterality, const ConstString& context) :
     laterality_(laterality), icub_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")},
     cam_sel_(cam_sel)
 {
@@ -69,6 +68,7 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
 
     /* Comment/Uncomment to add/remove limbs */
     ResourceFinder rf;
+    rf.setDefaultContext((context + "/mesh").c_str());
 
     cad_hand_["palm"] = rf.findFileByName("r_palm.obj");
     if (!file_found(cad_hand_["palm"]))
@@ -123,7 +123,10 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
 //    if (!file_found(cad_hand_["forearm"]))
 //        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_forearm.obj not found!");
 
+    rf.setDefaultContext((context + "/shader").c_str());
     ConstString shader_path = rf.findFileByName("shader_model.vert");
+    if (!file_found(shader_path))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::DIR\nERROR: shader directory not found!");
     shader_path = shader_path.substr(0, shader_path.rfind("/"));
 
     try
@@ -402,9 +405,15 @@ void VisualProprioception::superimpose(const SuperImpose::ObjPoseMap& obj2pos_ma
 }
 
 
-bool VisualProprioception::file_found(const ConstString & file)
+bool VisualProprioception::file_found(const ConstString& file)
 {
-    return (file.empty() ? false : true);
+    if (!file.empty())
+    {
+        yInfo() << log_ID_ << "File " + file.substr(file.rfind("/") + 1) + " found.";
+        return true;
+    }
+
+    return false;
 }
 
 
