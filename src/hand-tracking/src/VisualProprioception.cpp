@@ -14,7 +14,6 @@
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Property.h>
 
-
 using namespace cv;
 using namespace Eigen;
 using namespace iCub::iKin;
