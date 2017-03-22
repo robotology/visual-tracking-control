@@ -92,6 +92,7 @@ protected:
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_out_left_;
     /* ******************* */
 
+    bool                                                             is_filter_init_;
     bool                                                             is_running_;
 
     yarp::os::Port port_rpc_command_;

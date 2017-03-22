@@ -93,7 +93,8 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<Prediction> pre
     port_image_out_left_.open ("/hand-tracking/result/" + cam_sel_ + ":o");
     /* ********** */
 
-    is_running_ = false;
+    is_filter_init_ = false;
+    is_running_     = false;
 
     setCommandPort();
 }
@@ -145,6 +146,7 @@ void VisualSIRParticleFilter::runFilter()
     left_cam_x[0] = left_eye_pose(0); left_cam_x[1] = left_eye_pose(1); left_cam_x[2] = left_eye_pose(2);
     left_cam_o[0] = left_eye_pose(3); left_cam_o[1] = left_eye_pose(4); left_cam_o[2] = left_eye_pose(5); left_cam_o[3] = left_eye_pose(6);
 
+    is_filter_init_ = true;
 
     /* FILTERING */
     ImageOf<PixelRgb>* imgin_left  = YARP_NULLPTR;
@@ -474,6 +476,14 @@ bool VisualSIRParticleFilter::isRunning()
 
 void VisualSIRParticleFilter::stopThread()
 {
+    if (!is_filter_init_)
+    {
+        port_head_enc_.interrupt();
+        port_arm_enc_.interrupt();
+        port_torso_enc_.interrupt();
+        port_image_in_left_.interrupt();
+    }
+
     is_running_ = false;
 }
 
@@ -584,6 +594,7 @@ Vector VisualSIRParticleFilter::readTorso()
 Vector VisualSIRParticleFilter::readRootToFingers()
 {
     Bottle* b = port_arm_enc_.read();
+    if (!b) return Vector(1, 0.0);
 
     yAssert(b->size() == 16);
 
@@ -601,6 +612,7 @@ Vector VisualSIRParticleFilter::readRootToFingers()
 Vector VisualSIRParticleFilter::readRootToEye(const ConstString cam_sel)
 {
     Bottle* b = port_head_enc_.read();
+    if (!b) return Vector(1, 0.0);
 
     yAssert(b->size() == 6);
 
@@ -620,6 +632,7 @@ Vector VisualSIRParticleFilter::readRootToEye(const ConstString cam_sel)
 Vector VisualSIRParticleFilter::readRootToEE()
 {
     Bottle* b = port_arm_enc_.read();
+    if (!b) return Vector(1, 0.0);
 
     yAssert(b->size() == 16);
 
@@ -636,6 +649,7 @@ Vector VisualSIRParticleFilter::readRootToEE()
 Vector VisualSIRParticleFilter::readRightHandAnalogs()
 {
     Bottle* b = port_right_hand_analog_.read();
+    if (!b) return Vector(1, 0.0);
 
     yAssert(b->size() >= 15);
 
