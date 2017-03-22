@@ -72,6 +72,7 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
 
     /* Comment/Uncomment to add/remove limbs */
     ResourceFinder rf;
+
     cad_hand_["palm"] = rf.findFileByName("r_palm.obj");
     if (!file_found(cad_hand_["palm"]))
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_palm.obj not found!");
@@ -125,10 +126,13 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
 //    if (!file_found(cad_hand_["forearm"]))
 //        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_forearm.obj not found!");
 
+    ConstString shader_path = rf.findFileByName("shader_model.vert");
+    shader_path = shader_path.substr(0, shader_path.rfind("/"));
+
     try
     {
-        si_cad_ = new SICAD(cad_hand_, cam_width_, cam_height_, num_images,
-                            cam_width_, cam_height_, cam_fx_, cam_fy_, cam_cx_, cam_cy_);
+        si_cad_ = new SICAD(cad_hand_, cam_width_, cam_height_, num_images, shader_path,
+                            cam_fx_, cam_fy_, cam_cx_, cam_cy_);
     }
     catch (const std::runtime_error& e)
     {
