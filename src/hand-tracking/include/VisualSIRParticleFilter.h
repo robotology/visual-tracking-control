@@ -6,8 +6,15 @@
 #include <random>
 #include <vector>
 
+#include <BayesFiltersLib/FilteringAlgorithm.h>
+#include <BayesFiltersLib/StateModel.h>
+#include <BayesFiltersLib/Prediction.h>
+#include <BayesFiltersLib/VisualObservationModel.h>
+#include <BayesFiltersLib/VisualCorrection.h>
+#include <BayesFiltersLib/Resampling.h>
 #include <Eigen/Dense>
 #include <iCub/iKin/iKinFwd.h>
+#include <thrift/visualSIRParticleFilterIDL.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IAnalogSensor.h>
 #include <yarp/os/Bottle.h>
@@ -17,15 +24,6 @@
 #include <yarp/sig/Image.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
-
-#include <BayesFiltersLib/FilteringAlgorithm.h>
-#include <BayesFiltersLib/StateModel.h>
-#include <BayesFiltersLib/Prediction.h>
-#include <BayesFiltersLib/VisualObservationModel.h>
-#include <BayesFiltersLib/VisualCorrection.h>
-#include <BayesFiltersLib/Resampling.h>
-
-#include <thrift/visualSIRParticleFilterIDL.h>
 
 
 class VisualSIRParticleFilter: public bfl::FilteringAlgorithm,

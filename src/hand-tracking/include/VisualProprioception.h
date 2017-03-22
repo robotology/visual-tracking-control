@@ -3,20 +3,16 @@
 
 #include <string>
 
-// FIXME: perchè sono inclusi GL/GLFW?
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <BayesFiltersLib/VisualObservationModel.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/core/core.hpp>
+#include <SuperImpose/SICAD.h>
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
-
-#include <BayesFiltersLib/VisualObservationModel.h>
-#include <SuperImpose/SICAD.h>
 
 
 class VisualProprioception : public bfl::VisualObservationModel {
