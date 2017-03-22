@@ -111,11 +111,6 @@ void VisualSIRParticleFilter::runFilter()
 
     unsigned int  k = 0;
 
-    double left_cam_x [3];
-    double left_cam_o [4];
-//    double right_cam_x[3];
-//    double right_cam_o[4];
-
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     Map<VectorXd> init_hand_pose(ee_pose.data(), 6, 1);
     init_hand_pose.tail(3) *= ee_pose(6);
@@ -139,6 +134,8 @@ void VisualSIRParticleFilter::runFilter()
     cuda_hog->setGammaCorrection(true);
     cuda_hog->setWinStride(Size(img_width, img_height));
 
+    double left_cam_x[3];
+    double left_cam_o[4];
     Vector left_eye_pose;
     Vector right_eye_pose;
 
@@ -180,7 +177,7 @@ void VisualSIRParticleFilter::runFilter()
             cuda_hog->compute(cuda_img_alpha, descriptors_cam_cuda);
             descriptors_cam_cuda.download(descriptors_cam_left);
 
-//            Vector left_eye_pose = icub_kin_eye_[0].EndEffPose(CTRL_DEG2RAD * readRootToEye("left"));
+//            Vector left_eye_pose = icub_kin_eye_[0].EndEffPose(CTRL_DEG2RAD * readRootToEye(cam_sel_));
 //            left_cam_x[0] = left_eye_pose(0); left_cam_x[1] = left_eye_pose(1); left_cam_x[2] = left_eye_pose(2);
 //            left_cam_o[0] = left_eye_pose(3); left_cam_o[1] = left_eye_pose(4); left_cam_o[2] = left_eye_pose(5); left_cam_o[3] = left_eye_pose(6);
 
