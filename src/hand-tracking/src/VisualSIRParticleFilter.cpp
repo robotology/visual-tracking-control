@@ -26,8 +26,9 @@ using namespace iCub::iKin;
 using namespace yarp::eigen;
 using namespace yarp::math;
 using namespace yarp::os;
-using namespace yarp::sig;
-typedef typename yarp::sig::Matrix YMatrix;
+using yarp::sig::Vector;
+using yarp::sig::ImageOf;
+using yarp::sig::PixelRgb;
 
 
 VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<Prediction> prediction,
@@ -65,7 +66,7 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<Prediction> pre
     port_torso_enc_.open        ("/hand-tracking/torso:i");
     port_right_hand_analog_.open("/hand-tracking/right_hand/analog:i");
 
-    right_hand_analogs_bounds_ = YMatrix(15, 2);
+    right_hand_analogs_bounds_ = yarp::sig::Matrix(15, 2);
     
     right_hand_analogs_bounds_(0, 0)  = 218.0; right_hand_analogs_bounds_(0, 1)  =  61.0;
     right_hand_analogs_bounds_(1, 0)  = 210.0; right_hand_analogs_bounds_(1, 1)  =  20.0;
@@ -311,7 +312,7 @@ void VisualSIRParticleFilter::runFilter()
 //            toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
 //            l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
 //
-//            YMatrix l_Ha = axis2dcm(l_ee_o);
+//            yarp::sig::Matrix l_Ha = axis2dcm(l_ee_o);
 //            l_Ha.setCol(3, l_ee_t);
 //            Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
 //            Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
@@ -326,7 +327,7 @@ void VisualSIRParticleFilter::runFilter()
 //            toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
 //            r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
 //
-//            YMatrix r_Ha = axis2dcm(r_ee_o);
+//            yarp::sig::Matrix r_Ha = axis2dcm(r_ee_o);
 //            r_Ha.setCol(3, r_ee_t);
 //            Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
 //            Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
@@ -377,7 +378,7 @@ void VisualSIRParticleFilter::runFilter()
                 pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
                 hand_pose.emplace("palm", pose);
 
-                YMatrix Ha = axis2dcm(ee_o);
+                yarp::sig::Matrix Ha = axis2dcm(ee_o);
                 Ha.setCol(3, ee_t);
                 // FIXME: middle finger only!
                 for (size_t fng = 0; fng < 3; ++fng)
@@ -412,9 +413,9 @@ void VisualSIRParticleFilter::runFilter()
                     }
                 }
 
-//                YMatrix invH6 = Ha *
-//                                getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
-//                                getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
+//                yarp::sig::Matrix invH6 = Ha *
+//                                          getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
+//                                          getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
 //                Vector j_x = invH6.getCol(3).subVector(0, 2);
 //                Vector j_o = dcm2axis(invH6);
 //                pose.clear();
@@ -648,9 +649,9 @@ Vector VisualSIRParticleFilter::readRightHandAnalogs()
 }
 
 
-YMatrix VisualSIRParticleFilter::getInvertedH(double a, double d, double alpha, double offset, double q)
+yarp::sig::Matrix VisualSIRParticleFilter::getInvertedH(double a, double d, double alpha, double offset, double q)
 {
-    YMatrix H(4, 4);
+    yarp::sig::Matrix H(4, 4);
 
     double theta = offset + q;
     double c_th  = cos(theta);

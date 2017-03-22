@@ -21,9 +21,7 @@ using namespace iCub::iKin;
 using namespace yarp::dev;
 using namespace yarp::os;
 using namespace yarp::math;
-using namespace yarp::sig;
-// FIXME: sistemare tutte queste matrici e capire cosa è meglio usare!
-typedef typename yarp::sig::Matrix YMatrix;
+using yarp::sig::Vector;
 
 
 VisualProprioception::VisualProprioception(const int num_images, const ConstString cam_sel, const ConstString laterality) :
@@ -289,7 +287,7 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
         hand_pose.emplace("palm", pose);
 
         /* Change index to add/remove limbs */
-        YMatrix Ha = axis2dcm(ee_o);
+        yarp::sig::Matrix Ha = axis2dcm(ee_o);
         Ha.setCol(3, ee_t);
         for (size_t fng = 0; fng < 3; ++fng)
         {
@@ -323,9 +321,9 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
             }
         }
         /* Comment/Uncomment to add/remove limbs */
-//        YMatrix invH6 = Ha *
-//                        getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
-//                        getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
+//        yarp::sig::Matrix invH6 = Ha *
+//                                  getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
+//                                  getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
 //        Vector j_x = invH6.getCol(3).subVector(0, 2);
 //        Vector j_o = dcm2axis(invH6);
 //        pose.clear();
@@ -378,7 +376,7 @@ void VisualProprioception::setArmJoints(const Vector& q)
 }
 
 
-void VisualProprioception::setArmJoints(const Vector& q, const Vector& analogs, const YMatrix& analog_bounds)
+void VisualProprioception::setArmJoints(const Vector& q, const Vector& analogs, const yarp::sig::Matrix& analog_bounds)
 {
     icub_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
 
@@ -465,7 +463,7 @@ float VisualProprioception::getCamCy()
 }
 
 
-YMatrix VisualProprioception::getInvertedH(const double a, const double d, const double alpha, const double offset, const double q)
+yarp::sig::Matrix VisualProprioception::getInvertedH(const double a, const double d, const double alpha, const double offset, const double q)
 {
     /** Table of the DH parameters for the right arm V2.
      *  Link i  Ai (mm)     d_i (mm)    alpha_i (rad)   theta_i (deg)
@@ -481,7 +479,7 @@ YMatrix VisualProprioception::getInvertedH(const double a, const double d, const
      *  i = 9	62.5        25.98       0                180 + (-25 ->    25)
      **/
     
-    YMatrix H(4, 4);
+    yarp::sig::Matrix H(4, 4);
 
     double theta = offset + q;
     double c_th  = cos(theta);
