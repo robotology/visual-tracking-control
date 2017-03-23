@@ -145,6 +145,7 @@ void VisualSIRParticleFilter::runFilter()
 
     is_filter_init_ = true;
 
+
     /* FILTERING */
     ImageOf<PixelRgb>* imgin_left  = YARP_NULLPTR;
     while(is_running_)
@@ -176,14 +177,6 @@ void VisualSIRParticleFilter::runFilter()
             cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);
             cuda_hog->compute(cuda_img_alpha, descriptors_cam_cuda);
             descriptors_cam_cuda.download(descriptors_cam_left);
-
-//            Vector left_eye_pose = icub_kin_eye_[0].EndEffPose(CTRL_DEG2RAD * readRootToEye(cam_sel_));
-//            left_cam_x[0] = left_eye_pose(0); left_cam_x[1] = left_eye_pose(1); left_cam_x[2] = left_eye_pose(2);
-//            left_cam_o[0] = left_eye_pose(3); left_cam_o[1] = left_eye_pose(4); left_cam_o[2] = left_eye_pose(5); left_cam_o[3] = left_eye_pose(6);
-
-//            Vector right_eye_pose = icub_kin_eye_[1].EndEffPose(CTRL_DEG2RAD * readRootToEye("right"));
-//            right_cam_x[0] = right_eye_pose(0); right_cam_x[1] = right_eye_pose(1); right_cam_x[2] = right_eye_pose(2);
-//            right_cam_o[0] = right_eye_pose(3); right_cam_o[1] = right_eye_pose(4); right_cam_o[2] = right_eye_pose(5); right_cam_o[3] = right_eye_pose(6);
 
             // FIXME: move the hand over time
             Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
@@ -478,8 +471,9 @@ void VisualSIRParticleFilter::stopThread()
         port_head_enc_.interrupt();
         port_arm_enc_.interrupt();
         port_torso_enc_.interrupt();
-        port_image_in_left_.interrupt();
     }
+
+    port_image_in_left_.interrupt();
 
     is_running_ = false;
 }

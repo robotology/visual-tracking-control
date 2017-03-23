@@ -68,7 +68,7 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
 
     /* Comment/Uncomment to add/remove limbs */
     ResourceFinder rf;
-    rf.setDefaultContext((context + "/mesh").c_str());
+    rf.setDefaultContext(context + "/mesh");
 
     cad_hand_["palm"] = rf.findFileByName("r_palm.obj");
     if (!file_found(cad_hand_["palm"]))
@@ -123,7 +123,7 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
 //    if (!file_found(cad_hand_["forearm"]))
 //        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_forearm.obj not found!");
 
-    rf.setDefaultContext((context + "/shader").c_str());
+    rf.setDefaultContext(context + "/shader");
     ConstString shader_path = rf.findFileByName("shader_model.vert");
     if (!file_found(shader_path))
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::DIR\nERROR: shader directory not found!");
