@@ -27,9 +27,9 @@
 
 
 class VisualSIRParticleFilter: public bfl::FilteringAlgorithm,
-                               public visualSIRParticleFilterIDL {
+                               public visualSIRParticleFilterIDL
+{
 public:
-
     /* Default constructor, disabled */
     VisualSIRParticleFilter() = delete;
 
