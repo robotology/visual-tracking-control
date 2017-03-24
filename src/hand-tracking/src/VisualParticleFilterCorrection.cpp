@@ -17,21 +17,20 @@ using namespace cv;
 using namespace Eigen;
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> measurement_model) noexcept :
-    VisualParticleFilterCorrection(measurement_model, 1) { };
+VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> measurement_model) noexcept :
+    VisualParticleFilterCorrection(std::move(measurement_model), 1) { };
 
 
-
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<VisualProprioception> measurement_model, const int num_cuda_stream) noexcept :
-    measurement_model_(measurement_model),
-    num_cuda_stream_(num_cuda_stream), num_img_stream_(measurement_model->getOGLTilesNumber()), cuda_stream_(std::vector<cuda::Stream>(num_cuda_stream))
+VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> measurement_model, const int num_cuda_stream) noexcept :
+    measurement_model_(std::move(measurement_model)),
+    num_cuda_stream_(num_cuda_stream), num_img_stream_(measurement_model_->getOGLTilesNumber()), cuda_stream_(std::vector<cuda::Stream>(num_cuda_stream))
 {
     int          block_size     = 16;
     int          bin_number     = 9;
-    unsigned int img_width      = measurement_model->getCamWidth();
-    unsigned int img_height     = measurement_model->getCamHeight();
-    unsigned int ogl_tiles_cols = measurement_model->getOGLTilesCols();
-    unsigned int ogl_tiles_rows = measurement_model->getOGLTilesRows();
+    unsigned int img_width      = measurement_model_->getCamWidth();
+    unsigned int img_height     = measurement_model_->getCamHeight();
+    unsigned int ogl_tiles_cols = measurement_model_->getOGLTilesCols();
+    unsigned int ogl_tiles_rows = measurement_model_->getOGLTilesRows();
     unsigned int feature_dim    = (img_width/block_size*2-1) * (img_height/block_size*2-1) * bin_number * 4;
 
     cuda_hog_ = cuda::HOG::create(Size(img_width, img_height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), bin_number);
@@ -53,25 +52,8 @@ VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::shared_ptr<V
 VisualParticleFilterCorrection::~VisualParticleFilterCorrection() noexcept { }
 
 
-//VisualParticleFilterCorrection::VisualParticleFilterCorrection(const VisualParticleFilterCorrection& vpf_correction) :
-//    num_particle_(vpf_correction.num_particle_), num_image_stream_(vpf_correction.num_image_stream_)
-//{
-//    // FIXME: riscrivere i costruttori/opertori move e copy con tutti i parametri
-//    measurement_model_ = vpf_correction.measurement_model_;
-//}
-//
-//
 //VisualParticleFilterCorrection::VisualParticleFilterCorrection(VisualParticleFilterCorrection&& vpf_correction) noexcept :
 //measurement_model_(std::move(vpf_correction.measurement_model_)), num_particle_(std::move(vpf_correction.num_particle_)), num_image_stream_(std::move(vpf_correction.num_image_stream_)) { };
-//
-//
-//VisualParticleFilterCorrection& VisualParticleFilterCorrection::operator=(const VisualParticleFilterCorrection& vpf_correction)
-//{
-//    VisualParticleFilterCorrection tmp(vpf_correction);
-//    *this = std::move(tmp);
-//
-//    return *this;
-//}
 //
 //
 //VisualParticleFilterCorrection& VisualParticleFilterCorrection::operator=(VisualParticleFilterCorrection&& vpf_correction) noexcept
@@ -142,4 +124,42 @@ void VisualParticleFilterCorrection::likelihood(const Ref<const MatrixXf>& innov
 
         if (cor_state(i, 0) <= 0) cor_state(i, 0) = std::numeric_limits<float>::min();
     }
+}
+
+
+void VisualParticleFilterCorrection::setCamXO(double* cam_x, double* cam_o)
+{
+    measurement_model_->setCamXO(cam_x, cam_o);
+}
+
+
+void VisualParticleFilterCorrection::setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
+                                                     const float cam_fx, const float cam_cx, const float cam_fy, const float cam_cy)
+{
+    measurement_model_->setCamIntrinsic(cam_width, cam_height,
+                                        cam_fx, cam_cx, cam_fy, cam_cy);
+}
+
+
+void VisualParticleFilterCorrection::setArmJoints(const yarp::sig::Vector& q)
+{
+    measurement_model_->setArmJoints(q);
+}
+
+
+void VisualParticleFilterCorrection::setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds)
+{
+    measurement_model_->setArmJoints(q, analogs, analog_bounds);
+}
+
+
+void VisualParticleFilterCorrection::superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, cv::Mat& img)
+{
+    measurement_model_->superimpose(obj2pos_map, img);
+}
+
+
+bool VisualParticleFilterCorrection::oglWindowShouldClose()
+{
+    return measurement_model_->oglWindowShouldClose();
 }

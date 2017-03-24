@@ -35,14 +35,14 @@ public:
     /* Move assignment operator */
     VisualProprioception& operator=(VisualProprioception&& proprio) noexcept;
 
-    int  oglWindowShouldClose();
+    bool oglWindowShouldClose();
 
     void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, cv::OutputArray observation) override;
 
     void setCamXO(double* cam_x, double* cam_o);
 
     void setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
-                         const float eye_fx, const float eye_cx, const float eye_fy, const float eye_cy);
+                         const float cam_fx, const float cam_cx, const float cam_fy, const float cam_cy);
 
     void setArmJoints(const yarp::sig::Vector& q);
 
@@ -76,7 +76,6 @@ protected:
     yarp::os::ConstString    cam_sel_;
     double                   cam_x_[3];
     double                   cam_o_[4];
-    SuperImpose::ObjFileMap  cad_hand_;
     unsigned int             cam_width_;
     unsigned int             cam_height_;
     float                    cam_fx_;
@@ -84,6 +83,7 @@ protected:
     float                    cam_fy_;
     float                    cam_cy_;
 
+    SuperImpose::ObjFileMap  cad_hand_;
     SICAD                  * si_cad_;
     int                      ogl_tiles_rows_;
     int                      ogl_tiles_cols_;

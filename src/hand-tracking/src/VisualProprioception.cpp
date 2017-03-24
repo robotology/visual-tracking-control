@@ -232,8 +232,6 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
     cam_o_[2] = proprio.cam_o_[2];
     cam_o_[3] = proprio.cam_o_[3];
 
-    cad_hand_ = std::move(proprio.cad_hand_);
-
     cam_width_  = std::move(proprio.cam_width_);
     cam_height_ = std::move(proprio.cam_height_);
     cam_fx_     = std::move(proprio.cam_fx_);
@@ -241,6 +239,7 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
     cam_fy_     = std::move(proprio.cam_fy_);
     cam_cy_     = std::move(proprio.cam_cy_);
 
+    cad_hand_ = std::move(proprio.cad_hand_);
     si_cad_   = std::move(proprio.si_cad_);
 
     proprio.cam_x_[0] = 0.0;
@@ -256,7 +255,7 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 }
 
 
-int VisualProprioception::oglWindowShouldClose()
+bool VisualProprioception::oglWindowShouldClose()
 {
     return si_cad_->oglWindowShouldClose();
 }

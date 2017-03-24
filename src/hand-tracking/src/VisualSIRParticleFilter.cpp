@@ -16,8 +16,6 @@
 #include <yarp/math/Math.h>
 #include <yarp/eigen/Eigen.h>
 
-#include "VisualProprioception.h"
-
 using namespace bfl;
 using namespace cv;
 using namespace Eigen;
@@ -31,11 +29,11 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIRParticleFilter::VisualSIRParticleFilter(std::shared_ptr<Prediction> prediction,
-                                                 std::shared_ptr<VisualObservationModel> observation_model, std::shared_ptr<VisualCorrection> correction,
-                                                 std::shared_ptr<Resampling> resampling,
+VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<Prediction> prediction, std::unique_ptr<VisualParticleFilterCorrection> correction,
+                                                 std::unique_ptr<Resampling> resampling,
                                                  ConstString cam_sel, ConstString laterality, const int num_particles) :
-    prediction_(prediction), observation_model_(observation_model), correction_(correction), resampling_(resampling),
+    prediction_(std::move(prediction)), correction_(std::move(correction)),
+    resampling_(std::move(resampling)),
     cam_sel_(cam_sel), laterality_(laterality), num_particles_(num_particles),
     icub_kin_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")}
 {
@@ -239,24 +237,13 @@ void VisualSIRParticleFilter::runFilter()
             {
                 analogs = readRightHandAnalogs();
                 itf_right_hand_analog_->read(analogs);
-                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q, analogs, right_hand_analogs_bounds_);
+                correction_->setArmJoints(q, analogs, right_hand_analogs_bounds_);
             }
-            else std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setArmJoints(q);
+            else correction_->setArmJoints(q);
 
             VectorXf out_particle(6);
 
-            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(left_cam_x, left_cam_o);
-            /* BLACK - LEFT - FIRST UNCLUTTER */
-//            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
-            /* BLACK - LEFT - BAD DISP */
-//            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
-            /* BLACK - LEFT - GOOD DISP */
-            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
-
-            /* BLACK - RIGHT - BAD DISP */
-//            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
-            /* BLACK - RIGHT - GOOD DISP */
-//            std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
+            correction_->setCamXO(left_cam_x, left_cam_o);
             correction_->correct(init_particle, descriptors_cam_left, init_weight);
 
             init_weight /= init_weight.sum();
@@ -267,9 +254,6 @@ void VisualSIRParticleFilter::runFilter()
 //            out_particle = mode(init_particle, init_weight);
 
             /* DEBUG ONLY */
-//            VectorXf sorted = init_weight;
-//            std::sort(sorted.data(), sorted.data() + sorted.size());
-//            std::cout <<  sorted << std::endl;
             std::cout << "Step: " << k << std::endl;
             std::cout << "Neff: " << resampling_->neff(init_weight) << std::endl;
             /* ********** */
@@ -415,20 +399,7 @@ void VisualSIRParticleFilter::runFilter()
 //                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
 //                hand_pose.emplace("forearm", pose);
 
-                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamXO(left_cam_x,  left_cam_o);
-                /* BLACK - LEFT - UNCLUTTER */
-//                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
-                /* BLACK - LEFT - BAD DISP */
-//                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
-                /* BLACK - LEFT - GOOD DISP */
-                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
-
-                /* BLACK - RIGHT - BAD DISP */
-//                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
-                /* BLACK - RIGHT - GOOD DISP */
-//                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
-
-                std::dynamic_pointer_cast<VisualProprioception>(observation_model_)->superimpose(hand_pose, measurement);
+                correction_->superimpose(hand_pose, measurement);
 
                 glfwPostEmptyEvent();
                 port_image_out_left_.write();
@@ -461,6 +432,12 @@ std::future<void> VisualSIRParticleFilter::spawn()
 bool VisualSIRParticleFilter::isRunning()
 {
     return is_running_;
+}
+
+
+bool VisualSIRParticleFilter::shouldStop()
+{
+    return correction_->oglWindowShouldClose();
 }
 
 

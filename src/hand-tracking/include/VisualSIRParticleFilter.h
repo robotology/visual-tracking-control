@@ -25,6 +25,8 @@
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
 
+#include "VisualParticleFilterCorrection.h"
+
 
 class VisualSIRParticleFilter: public bfl::FilteringAlgorithm,
                                public visualSIRParticleFilterIDL
@@ -34,9 +36,8 @@ public:
     VisualSIRParticleFilter() = delete;
 
     /* VisualSIR complete constructor */
-    VisualSIRParticleFilter(std::shared_ptr<bfl::Prediction> prediction,
-                            std::shared_ptr<bfl::VisualObservationModel> observation_model, std::shared_ptr<bfl::VisualCorrection> correction,
-                            std::shared_ptr<bfl::Resampling> resampling,
+    VisualSIRParticleFilter(std::unique_ptr<bfl::Prediction> prediction, std::unique_ptr<VisualParticleFilterCorrection> correction,
+                            std::unique_ptr<bfl::Resampling> resampling,
                             yarp::os::ConstString cam_sel, yarp::os::ConstString laterality, const int num_particles);
 
     /* Destructor */
@@ -62,13 +63,14 @@ public:
 
     bool isRunning();
 
+    bool shouldStop();
+
     void stopThread();
 
 protected:
-    std::shared_ptr<bfl::Prediction>                                 prediction_;
-    std::shared_ptr<bfl::VisualObservationModel>                     observation_model_;
-    std::shared_ptr<bfl::VisualCorrection>                           correction_;
-    std::shared_ptr<bfl::Resampling>                                 resampling_;
+    std::unique_ptr<bfl::Prediction>                                 prediction_;
+    std::unique_ptr<VisualParticleFilterCorrection>                  correction_;
+    std::unique_ptr<bfl::Resampling>                                 resampling_;
     yarp::os::ConstString                                            cam_sel_;
     yarp::os::ConstString                                            laterality_;
     const int                                                        num_particles_;
@@ -118,7 +120,7 @@ private:
 
     Eigen::MatrixXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 
-    /* THIS CALL SHOULD BE IN OTHER CLASSES */
+    /* THIS CALL SHOULD BE IN ANOTHER CLASS */
     yarp::sig::Vector readTorso();
 
     yarp::sig::Vector readRootToFingers();

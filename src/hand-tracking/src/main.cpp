@@ -72,14 +72,16 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - number of particles:" << num_particles;
 
     /* Initialize filtering functions */
-    std::shared_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 0.005, 3.0, 1.5, 1));
+    std::unique_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 0.005, 3.0, 1.5, 1));
 
-    std::shared_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(brown));
+    std::unique_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(std::move(brown)));
 
-    std::shared_ptr<VisualProprioception> proprio;
+    std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        proprio = std::make_shared<VisualProprioception>(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality, rf.getContext());
+        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality, rf.getContext()));
+
+        proprio = std::move(vp);
     }
     catch (const std::runtime_error& e)
     {
@@ -87,19 +89,30 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    std::shared_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(proprio, gpu_dev.multiProcessorCount()));
+    /* BLACK - LEFT - FIRST UNCLUTTER */
+    //proprio->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
+    /* BLACK - LEFT - BAD DISP */
+    //proprio->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
+    /* BLACK - LEFT - GOOD DISP */
+    proprio->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
 
-    std::shared_ptr<Resampling> resampling(new Resampling());
+    /* BLACK - RIGHT - BAD DISP */
+    //proprio->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
+    /* BLACK - RIGHT - GOOD DISP */
+    //proprio->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
 
-    VisualSIRParticleFilter vsir_pf(pf_prediction,
-                                    proprio, vpf_correction,
-                                    resampling,
+    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
+
+    std::unique_ptr<Resampling> resampling(new Resampling());
+
+    VisualSIRParticleFilter vsir_pf(std::move(pf_prediction), std::move(vpf_correction),
+                                    std::move(resampling),
                                     robot_cam_sel, robot_laterality, num_particles);
 
     std::future<void> thr_vpf = vsir_pf.spawn();
     while (vsir_pf.isRunning())
     {
-        if (proprio->oglWindowShouldClose())
+        if (vsir_pf.shouldStop())
         {
             vsir_pf.stopThread();
             yInfo() << log_ID << "Joining filthering thread...";
