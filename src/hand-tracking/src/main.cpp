@@ -91,18 +91,6 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    /* BLACK - LEFT - FIRST UNCLUTTER */
-    //proprio->setCamIntrinsic(320, 240, 232.921, 162.202, 232.43, 125.738);
-    /* BLACK - LEFT - BAD DISP */
-    //proprio->setCamIntrinsic(320, 240, 201.603, 176.165, 200.828, 127.696);
-    /* BLACK - LEFT - GOOD DISP */
-    proprio->setCamIntrinsic(320, 240, 235.251, 160.871, 234.742, 124.055);
-
-    /* BLACK - RIGHT - BAD DISP */
-    //proprio->setCamIntrinsic(320, 240, 203.657, 164.527, 203.205, 113.815);
-    /* BLACK - RIGHT - GOOD DISP */
-    //proprio->setCamIntrinsic(320, 240, 234.667, 149.515, 233.927, 122.808);
-
     std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
 
     std::unique_ptr<Resampling> resampling(new Resampling());

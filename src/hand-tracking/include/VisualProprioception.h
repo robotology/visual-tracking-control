@@ -43,9 +43,6 @@ public:
 
     /* TO BE DEPRECATED */
     void superimpose(const Eigen::Ref<const Eigen::VectorXf>& state, cv::Mat& img);
-
-    void setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
-                         const float cam_fx, const float cam_cx, const float cam_fy, const float cam_cy);
     /* **************** */
 
     int          getOGLTilesNumber();

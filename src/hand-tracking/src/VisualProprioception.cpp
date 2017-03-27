@@ -25,6 +25,8 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     laterality_(laterality), icub_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")},
     cam_sel_(cam_sel)
 {
+    ResourceFinder rf;
+
     icub_kin_eye_ = iCubEye(cam_sel_+"_v2");
     icub_kin_eye_.setAllConstraints(false);
     icub_kin_eye_.releaseLink(0);
@@ -45,13 +47,35 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     }
     else
     {
-        yWarning() << log_ID_ << "[CAM PARAMS]" << "No intrinisc camera information could be found by the ctor. Rolling back to default values.";
-        cam_width_  = 320;
-        cam_height_ = 240;
-        cam_fx_     = 257.34;
-        cam_cx_     = 160;
-        cam_fy_     = 120;
-        cam_cy_     = 257.34;
+        yWarning() << log_ID_ << "[CAM PARAMS]" << "No intrinisc camera information could be found by the ctor. Looking for fallback values in parameters.ini.";
+
+        rf.setVerbose();
+        rf.setDefaultContext(context);
+        rf.setDefaultConfigFile("parameters.ini");
+        rf.configure(0, nullptr);
+
+        Bottle* fallback_intrinsic = rf.findGroup("FALLBACK").find("intrinsic_" + cam_sel_).asList();
+        if (fallback_intrinsic)
+        {
+            yInfo() << log_ID_ << "[FALLBACK][CAM PARAMS]" << fallback_intrinsic->toString();
+
+            cam_width_  = fallback_intrinsic->get(0).asDouble();
+            cam_height_ = fallback_intrinsic->get(1).asDouble();
+            cam_fx_     = fallback_intrinsic->get(2).asDouble();
+            cam_cx_     = fallback_intrinsic->get(3).asDouble();
+            cam_fy_     = fallback_intrinsic->get(4).asDouble();
+            cam_cy_     = fallback_intrinsic->get(5).asDouble();
+        }
+        else
+        {
+            yWarning() << log_ID_ << "[CAM PARAMS]" << "No fallback values could be found in parameters.ini by the ctor for the intrinisc camera parameters. Falling (even more) back to iCub_SIM values.";
+            cam_width_  = 320;
+            cam_height_ = 240;
+            cam_fx_     = 257.34;
+            cam_cx_     = 160;
+            cam_fy_     = 120;
+            cam_cy_     = 257.34;
+        }
     }
     yInfo() << log_ID_ << "[CAM]" << "Running with:";
     yInfo() << log_ID_ << "[CAM]" << " - width:"  << cam_width_;
@@ -71,7 +95,6 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     cam_o_[3]   = 0;
 
     /* Comment/Uncomment to add/remove limbs */
-    ResourceFinder rf;
     rf.setDefaultContext(context + "/mesh");
 
     cad_obj_["palm"] = rf.findFileByName("r_palm.obj");
@@ -506,20 +529,6 @@ void VisualProprioception::superimpose(const Ref<const VectorXf>&  state, Mat& i
 
     si_cad_->setBackgroundOpt(false);
     si_cad_->setWireframeOpt(false);
-}
-
-
-void VisualProprioception::setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
-                                           const float cam_fx, const float cam_cx, const float cam_fy, const float cam_cy)
-{
-    cam_width_  = cam_width;
-    cam_height_ = cam_height;
-    cam_fx_     = cam_fx;
-    cam_cx_     = cam_cx;
-    cam_fy_     = cam_fy;
-    cam_cy_     = cam_cy;
-
-    si_cad_->setProjectionMatrix(cam_width_, cam_height_, cam_fx_, cam_fy_, cam_cx_, cam_cy_);
 }
 
 
