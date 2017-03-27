@@ -15,7 +15,14 @@
     <!-- REQUIRED MODULES -->
     <module>
         <name>hand-tracking</name>
-        <node>localhost</node>
+        <parameters>--robot icub --cam left --laterality right</parameters>
+        <node>yarprun</node>
+    </module>
+
+    <module>
+        <name>hand-tracking</name>
+        <parameters>--robot icub --cam right --laterality right</parameters>
+        <node>yarprun</node>
     </module>
 
     <module>
