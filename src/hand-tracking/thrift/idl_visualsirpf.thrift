@@ -17,14 +17,7 @@ service visualSIRParticleFilterIDL
      * @param status true/false to turn image stream on/off.
      * @return true activation/deactivation success, false otherwise.
      */
-    bool result_images(1:bool status);
-
-    /**
-     * Lock/Unlock the particle filter on the last received input.
-     * @param status true/false to lock/unlock input to the SIR particle filter.
-     * @return true activation/deactivation success, false otherwise.
-     */
-    bool lock_input(1:bool status);
+    bool stream_result(1:bool status);
 
     /**
      * Use/Don't use the analog values from the right hand to correct the finger
@@ -33,4 +26,9 @@ service visualSIRParticleFilterIDL
      * @return true activation/deactivation success, false otherwise.
      */
     bool use_analogs(1:bool status);
+
+    /**
+     * Gently close the application deallocating resources
+     */
+    void quit();
 }

@@ -159,7 +159,13 @@ void VisualParticleFilterCorrection::superimpose(const SuperImpose::ObjPoseMap& 
 }
 
 
-bool VisualParticleFilterCorrection::oglWindowShouldClose()
+bool VisualParticleFilterCorrection::getOglWindowShouldClose()
 {
-    return measurement_model_->oglWindowShouldClose();
+    return measurement_model_->getOglWindowShouldClose();
+}
+
+
+void VisualParticleFilterCorrection::setOglWindowShouldClose(bool should_close)
+{
+    measurement_model_->setOglWindowShouldClose(should_close);
 }

@@ -255,9 +255,15 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 }
 
 
-bool VisualProprioception::oglWindowShouldClose()
+bool VisualProprioception::getOglWindowShouldClose()
 {
-    return si_cad_->oglWindowShouldClose();
+    return si_cad_->getOglWindowShouldClose();
+}
+
+
+void VisualProprioception::setOglWindowShouldClose(bool should_close)
+{
+    si_cad_->setOglWindowShouldClose(should_close);
 }
 
 

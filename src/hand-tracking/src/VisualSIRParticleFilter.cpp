@@ -323,7 +323,7 @@ void VisualSIRParticleFilter::runFilter()
             port_estimates_out_.write();
 
             /* DEBUG ONLY */
-            if (stream_images_)
+            if (stream_)
             {
                 SuperImpose::ObjPoseMap hand_pose;
                 SuperImpose::ObjPose    pose;
@@ -437,7 +437,7 @@ bool VisualSIRParticleFilter::isRunning()
 
 bool VisualSIRParticleFilter::shouldStop()
 {
-    return correction_->oglWindowShouldClose();
+    return correction_->getOglWindowShouldClose();
 }
 
 
@@ -475,20 +475,11 @@ bool VisualSIRParticleFilter::setCommandPort()
 }
 
 
-bool VisualSIRParticleFilter::result_images(const bool status)
+bool VisualSIRParticleFilter::stream_result(const bool status)
 {
-    stream_images_ = status;
+    stream_ = status;
 
     return true;
-}
-
-
-bool VisualSIRParticleFilter::lock_input(const bool status)
-{
-    lock_data_ = status;
-
-    std::cerr << "lock_input not yet implemented!" << std::endl;
-    return false;
 }
 
 
@@ -524,6 +515,12 @@ bool VisualSIRParticleFilter::use_analogs(const bool status)
         return true;
     }
     else return false;
+}
+
+
+void VisualSIRParticleFilter::quit()
+{
+    correction_->setOglWindowShouldClose(true);
 }
 
 

@@ -51,7 +51,8 @@ public:
 
     void superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, cv::Mat& img);
 
-    bool oglWindowShouldClose();
+    bool getOglWindowShouldClose();
+    void setOglWindowShouldClose(bool should_close);
 
 
 protected:

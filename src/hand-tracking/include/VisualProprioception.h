@@ -35,7 +35,8 @@ public:
     /* Move assignment operator */
     VisualProprioception& operator=(VisualProprioception&& proprio) noexcept;
 
-    bool oglWindowShouldClose();
+    bool getOglWindowShouldClose();
+    void setOglWindowShouldClose(bool should_close);
 
     void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, cv::OutputArray observation) override;
 
