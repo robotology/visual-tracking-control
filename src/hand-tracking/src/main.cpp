@@ -45,7 +45,9 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << "[CUDA] Engine capability:"              << engine_count_to_string(gpu_dev.asyncEngineCount());
     yInfo() << log_ID << "[CUDA] Can have concurrent kernel:"     << gpu_dev.concurrentKernels();
     yInfo() << log_ID << "[CUDA] Streaming multiprocessor count:" << gpu_dev.multiProcessorCount();
-    yInfo() << log_ID << "[CUDA] Device can map host memory:"     << gpu_dev.canMapHostMemory();
+    yInfo() << log_ID << "[CUDA] Can map host memory:"            << gpu_dev.canMapHostMemory();
+    yInfo() << log_ID << "[CUDA] Clock:"                          << gpu_dev.clockRate();
+    yInfo() << log_ID << "[CUDA] Compute mode:"                   << gpu_dev.computeMode();
 
     ResourceFinder rf;
     rf.setVerbose();

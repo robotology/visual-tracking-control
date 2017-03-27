@@ -6,14 +6,10 @@
 #include <utility>
 
 #include <iCub/ctrl/math.h>
-#include <opencv2/core/eigen.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <yarp/os/ResourceFinder.h>
 #include <yarp/math/Math.h>
-#include <yarp/sig/Vector.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Property.h>
+#include <yarp/os/ResourceFinder.h>
 
 using namespace cv;
 using namespace Eigen;

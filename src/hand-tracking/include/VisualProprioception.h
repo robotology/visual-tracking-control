@@ -11,6 +11,7 @@
 #include <yarp/dev/IAnalogSensor.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/os/Bottle.h>
+#include <yarp/os/BufferedPort.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
