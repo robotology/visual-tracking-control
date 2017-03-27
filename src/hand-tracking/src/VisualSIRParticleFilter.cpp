@@ -37,12 +37,6 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<Prediction> pre
     cam_sel_(cam_sel), laterality_(laterality), num_particles_(num_particles),
     icub_kin_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")}
 {
-    icub_kin_eye_ = iCubEye(cam_sel+"_v2");
-    icub_kin_eye_.setAllConstraints(false);
-    icub_kin_eye_.releaseLink(0);
-    icub_kin_eye_.releaseLink(1);
-    icub_kin_eye_.releaseLink(2);
-
     icub_kin_arm_.setAllConstraints(false);
     icub_kin_arm_.releaseLink(0);
     icub_kin_arm_.releaseLink(1);
@@ -54,41 +48,15 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<Prediction> pre
 
     /* Left images:       /icub/camcalib/left/out
        Right images:      /icub/camcalib/right/out
-       Head encoders:     /icub/head/state:o
        Arm encoders:      /icub/right_arm/state:o
-       Torso encoders:    /icub/torso/state:o
-       Right hand analog: /hand-tracking/right_hand/analog:i */
-    port_image_in_left_.open    ("/hand-tracking/" + cam_sel_ + "_img:i");
-    port_head_enc_.open         ("/hand-tracking/head:i");
-    port_arm_enc_.open          ("/hand-tracking/" + laterality_ + "_arm:i");
-    port_torso_enc_.open        ("/hand-tracking/torso:i");
-    port_right_hand_analog_.open("/hand-tracking/right_hand/analog:i");
-
-    right_hand_analogs_bounds_ = yarp::sig::Matrix(15, 2);
-    
-    right_hand_analogs_bounds_(0, 0)  = 218.0; right_hand_analogs_bounds_(0, 1)  =  61.0;
-    right_hand_analogs_bounds_(1, 0)  = 210.0; right_hand_analogs_bounds_(1, 1)  =  20.0;
-    right_hand_analogs_bounds_(2, 0)  = 234.0; right_hand_analogs_bounds_(2, 1)  =  16.0;
-
-    right_hand_analogs_bounds_(3, 0)  = 224.0; right_hand_analogs_bounds_(3, 1)  =  15.0;
-    right_hand_analogs_bounds_(4, 0)  = 206.0; right_hand_analogs_bounds_(4, 1)  =  18.0;
-    right_hand_analogs_bounds_(5, 0)  = 237.0; right_hand_analogs_bounds_(5, 1)  =  23.0;
-
-    right_hand_analogs_bounds_(6, 0)  = 250.0; right_hand_analogs_bounds_(6, 1)  =   8.0;
-    right_hand_analogs_bounds_(7, 0)  = 195.0; right_hand_analogs_bounds_(7, 1)  =  21.0;
-    right_hand_analogs_bounds_(8, 0)  = 218.0; right_hand_analogs_bounds_(8, 1)  =   0.0;
-
-    right_hand_analogs_bounds_(9, 0)  = 220.0; right_hand_analogs_bounds_(9, 1)  =  39.0;
-    right_hand_analogs_bounds_(10, 0) = 160.0; right_hand_analogs_bounds_(10, 1) =  10.0;
-    right_hand_analogs_bounds_(11, 0) = 209.0; right_hand_analogs_bounds_(11, 1) = 101.0;
-    right_hand_analogs_bounds_(12, 0) = 224.0; right_hand_analogs_bounds_(12, 1) =  63.0;
-    right_hand_analogs_bounds_(13, 0) = 191.0; right_hand_analogs_bounds_(13, 1) =  36.0;
-    right_hand_analogs_bounds_(14, 0) = 232.0; right_hand_analogs_bounds_(14, 1) =  98.0;
-
-    port_estimates_out_.open  ("/hand-tracking/result/estimates:o");
+       Torso encoders:    /icub/torso/state:o      */
+    port_image_in_left_.open ("/hand-tracking/" + cam_sel_ + "/img:i");
+    port_arm_enc_.open       ("/hand-tracking/" + cam_sel_ + "/" + laterality_ + "_arm:i");
+    port_torso_enc_.open     ("/hand-tracking/" + cam_sel_ + "/torso:i");
+    port_estimates_out_.open ("/hand-tracking/" + cam_sel_ + "/result/estimates:o");
 
     /* DEBUG ONLY */
-    port_image_out_left_.open ("/hand-tracking/result/" + cam_sel_ + ":o");
+    port_image_out_left_.open("/hand-tracking/" + cam_sel_ + "/result/img:o");
     /* ********** */
 
     is_filter_init_ = false;
@@ -132,14 +100,7 @@ void VisualSIRParticleFilter::runFilter()
     cuda_hog->setGammaCorrection(true);
     cuda_hog->setWinStride(Size(img_width, img_height));
 
-    double left_cam_x[3];
-    double left_cam_o[4];
-    Vector left_eye_pose;
-    Vector right_eye_pose;
-
-    left_eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * readRootToEye(cam_sel_));
-    left_cam_x[0] = left_eye_pose(0); left_cam_x[1] = left_eye_pose(1); left_cam_x[2] = left_eye_pose(2);
-    left_cam_o[0] = left_eye_pose(3); left_cam_o[1] = left_eye_pose(4); left_cam_o[2] = left_eye_pose(5); left_cam_o[3] = left_eye_pose(6);
+    correction_->setMeasurementModelProperty("VP_PARAMS");
 
     is_filter_init_ = true;
 
@@ -149,7 +110,6 @@ void VisualSIRParticleFilter::runFilter()
     while(is_running_)
     {
         Vector             q;
-        Vector             analogs;
         std::vector<float> descriptors_cam_left (descriptor_length);
         cuda::GpuMat       cuda_img             (Size(img_width, img_height), CV_8UC3);
         cuda::GpuMat       cuda_img_alpha       (Size(img_width, img_height), CV_8UC4);
@@ -212,8 +172,6 @@ void VisualSIRParticleFilter::runFilter()
                 if (ang > 2.0 * M_PI) ang -= 2.0 * M_PI;
 //                if (ang >  M_PI) ang -= 2.0 * M_PI;
 //                if (ang < -M_PI) ang += 2.0 * M_PI;
-//                if (0      <= ang && ang < 0.002) ang =  0.002;
-//                if (-0.002 <  ang && ang < 0)     ang = -0.002;
                 init_particle.col(j).tail(3) *= ang;
 
                 if(init_weight(j) <= threshold)
@@ -221,37 +179,18 @@ void VisualSIRParticleFilter::runFilter()
             }
 
             /* Set parameters */
-            // FIXME: da decidere come sistemare
-            q = readRootToFingers();
+//            correction_->setMeasurementModelProperty("VP_PARAMS");
 
-            // FIXME: abduzione e apertura pollice fissata
-            q(10) = 32.0;
-            q(11) = 30.0;
-//            q(12) = 0.0;
-//            q(13) = 0.0;
-//            q(14) = 0.0;
-//            q(15) = 0.0;
-//            q(16) = 0.0;
-//            q(17) = 0.0;
-            if (analogs_)
-            {
-                analogs = readRightHandAnalogs();
-                itf_right_hand_analog_->read(analogs);
-                correction_->setArmJoints(q, analogs, right_hand_analogs_bounds_);
-            }
-            else correction_->setArmJoints(q);
-
-            VectorXf out_particle(6);
-
-            correction_->setCamXO(left_cam_x, left_cam_o);
             correction_->correct(init_particle, descriptors_cam_left, init_weight);
-
             init_weight /= init_weight.sum();
 
+
+            VectorXf out_particle(6);
             /* Extracting state estimate: weighted sum */
             out_particle = mean(init_particle, init_weight);
             /* Extracting state estimate: mode */
 //            out_particle = mode(init_particle, init_weight);
+
 
             /* DEBUG ONLY */
             std::cout << "Step: " << k << std::endl;
@@ -325,83 +264,7 @@ void VisualSIRParticleFilter::runFilter()
             /* DEBUG ONLY */
             if (stream_)
             {
-                SuperImpose::ObjPoseMap hand_pose;
-                SuperImpose::ObjPose    pose;
-                Vector ee_t(4);
-                Vector ee_o(4);
-                float ang;
-
-                icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
-                Vector chainjoints;
-                for (size_t i = 0; i < 3; ++i)
-                {
-                    if (analogs_) icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
-                    else          icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), chainjoints);
-                    icub_kin_finger_[i].setAng(chainjoints * (M_PI/180.0));
-                }
-
-                ee_t(0) = out_particle(0);
-                ee_t(1) = out_particle(1);
-                ee_t(2) = out_particle(2);
-                ee_t(3) = 1.0;
-                ang     = out_particle.tail(3).norm();
-                ee_o(0) = out_particle(3) / ang;
-                ee_o(1) = out_particle(4) / ang;
-                ee_o(2) = out_particle(5) / ang;
-                ee_o(3) = ang;
-
-                pose.assign(ee_t.data(), ee_t.data()+3);
-                pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
-                hand_pose.emplace("palm", pose);
-
-                yarp::sig::Matrix Ha = axis2dcm(ee_o);
-                Ha.setCol(3, ee_t);
-                // FIXME: middle finger only!
-                for (size_t fng = 0; fng < 3; ++fng)
-                {
-                    std::string finger_s;
-                    pose.clear();
-                    if (fng != 0)
-                    {
-                        Vector j_x = (Ha * (icub_kin_finger_[fng].getH0().getCol(3))).subVector(0, 2);
-                        Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH0());
-
-                        if      (fng == 1) { finger_s = "index0"; }
-                        else if (fng == 2) { finger_s = "medium0"; }
-
-                        pose.assign(j_x.data(), j_x.data()+3);
-                        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-                        hand_pose.emplace(finger_s, pose);
-                    }
-
-                    for (size_t i = 0; i < icub_kin_finger_[fng].getN(); ++i)
-                    {
-                        Vector j_x = (Ha * (icub_kin_finger_[fng].getH(i, true).getCol(3))).subVector(0, 2);
-                        Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH(i, true));
-
-                        if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
-                        else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
-                        else if (fng == 2) { finger_s = "medium"+std::to_string(i+1); }
-
-                        pose.assign(j_x.data(), j_x.data()+3);
-                        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-                        hand_pose.emplace(finger_s, pose);
-                    }
-                }
-
-//                yarp::sig::Matrix invH6 = Ha *
-//                                          getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_kin_arm_.getAng(9)) *
-//                                          getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_kin_arm_.getAng(8));
-//                Vector j_x = invH6.getCol(3).subVector(0, 2);
-//                Vector j_o = dcm2axis(invH6);
-//                pose.clear();
-//                pose.assign(j_x.data(), j_x.data()+3);
-//                pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-//                hand_pose.emplace("forearm", pose);
-
-                correction_->superimpose(hand_pose, measurement);
-
-                glfwPostEmptyEvent();
+                correction_->superimpose(out_particle, measurement);
                 port_image_out_left_.write();
             }
             /* ********** */
@@ -410,12 +273,10 @@ void VisualSIRParticleFilter::runFilter()
 
     // FIXME: queste close devono andare da un'altra parte. Simil RFModule.
     port_image_in_left_.close();
-    port_head_enc_.close();
     port_arm_enc_.close();
     port_torso_enc_.close();
     port_image_out_left_.close();
     port_estimates_out_.close();
-    if (analogs_) drv_right_hand_analog_.close();
 }
 
 
@@ -437,7 +298,7 @@ bool VisualSIRParticleFilter::isRunning()
 
 bool VisualSIRParticleFilter::shouldStop()
 {
-    return correction_->getOglWindowShouldClose();
+    return correction_->setMeasurementModelProperty("VP_OGL_STATUS");
 }
 
 
@@ -445,7 +306,6 @@ void VisualSIRParticleFilter::stopThread()
 {
     if (!is_filter_init_)
     {
-        port_head_enc_.interrupt();
         port_arm_enc_.interrupt();
         port_torso_enc_.interrupt();
     }
@@ -459,7 +319,7 @@ void VisualSIRParticleFilter::stopThread()
 bool VisualSIRParticleFilter::setCommandPort()
 {
     std::cout << "Opening RPC command port." << std::endl;
-    if (!port_rpc_command_.open("/hand-tracking/rpc"))
+    if (!port_rpc_command_.open("/hand-tracking/cmd:i"))
     {
         std::cerr << "Cannot open the RPC command port." << std::endl;
         return false;
@@ -485,42 +345,16 @@ bool VisualSIRParticleFilter::stream_result(const bool status)
 
 bool VisualSIRParticleFilter::use_analogs(const bool status)
 {
-    if (status && !analogs_)
-    {
-        opt_right_hand_analog_.put("device", "analogsensorclient");
-        opt_right_hand_analog_.put("remote", "/icub/right_hand/analog:o");
-        opt_right_hand_analog_.put("local",  "/hand-tracking/right_hand/analog:i");
-        if (!drv_right_hand_analog_.open(opt_right_hand_analog_))
-        {
-            std::cerr << "Cannot open right hand analog driver!" << std::endl;
-            return false;
-        }
-        if (!drv_right_hand_analog_.view(itf_right_hand_analog_))
-        {
-            std::cerr << "Cannot get right hand analog interface!" << std::endl;
-            drv_right_hand_analog_.close();
-            return false;
-        }
-
-        analogs_ = true;
-
-        return true;
-    }
-    else if (!status && analogs_)
-    {
-        drv_right_hand_analog_.close();
-
-        analogs_ = false;
-
-        return true;
-    }
-    else return false;
+    if (status)
+        return correction_->setMeasurementModelProperty("VP_ANALOGS_ON");
+    else
+        return correction_->setMeasurementModelProperty("VP_ANALOGS_OFF");
 }
 
 
 void VisualSIRParticleFilter::quit()
 {
-    correction_->setOglWindowShouldClose(true);
+    correction_->setMeasurementModelProperty("VP_OGL_CLOSE");
 }
 
 
@@ -544,53 +378,16 @@ Eigen::MatrixXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particl
 Vector VisualSIRParticleFilter::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
-    Vector torso_enc(3);
+    if (!b) return Vector(1, 0.0);
 
     yAssert(b->size() == 3);
 
+    Vector torso_enc(3);
     torso_enc(0) = b->get(2).asDouble();
     torso_enc(1) = b->get(1).asDouble();
     torso_enc(2) = b->get(0).asDouble();
 
     return torso_enc;
-}
-
-
-Vector VisualSIRParticleFilter::readRootToFingers()
-{
-    Bottle* b = port_arm_enc_.read();
-    if (!b) return Vector(1, 0.0);
-
-    yAssert(b->size() == 16);
-
-    Vector root_fingers_enc(19);
-    root_fingers_enc.setSubvector(0, readTorso());
-    for (size_t i = 0; i < 16; ++i)
-    {
-        root_fingers_enc(3+i) = b->get(i).asDouble();
-    }
-
-    return root_fingers_enc;
-}
-
-
-Vector VisualSIRParticleFilter::readRootToEye(const ConstString cam_sel)
-{
-    Bottle* b = port_head_enc_.read();
-    if (!b) return Vector(1, 0.0);
-
-    yAssert(b->size() == 6);
-
-    Vector root_eye_enc(8);
-    root_eye_enc.setSubvector(0, readTorso());
-    for (size_t i = 0; i < 4; ++i)
-    {
-        root_eye_enc(3+i) = b->get(i).asDouble();
-    }
-    if (cam_sel == "left")  root_eye_enc(7) = b->get(4).asDouble() + b->get(5).asDouble()/2.0;
-    if (cam_sel == "right") root_eye_enc(7) = b->get(4).asDouble() - b->get(5).asDouble()/2.0;
-
-    return root_eye_enc;
 }
 
 
@@ -609,22 +406,6 @@ Vector VisualSIRParticleFilter::readRootToEE()
     }
 
     return root_ee_enc;
-}
-
-Vector VisualSIRParticleFilter::readRightHandAnalogs()
-{
-    Bottle* b = port_right_hand_analog_.read();
-    if (!b) return Vector(1, 0.0);
-
-    yAssert(b->size() >= 15);
-
-    Vector analogs(b->size());
-    for (size_t i = 0; i < b->size(); ++i)
-    {
-        analogs(i) = b->get(i).asDouble();
-    }
-
-    return analogs;
 }
 
 

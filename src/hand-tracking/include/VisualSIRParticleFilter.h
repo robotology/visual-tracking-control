@@ -76,17 +76,10 @@ protected:
     const int                                                        num_particles_;
 
     /* INIT ONLY */
-    iCub::iKin::iCubEye                                              icub_kin_eye_;
     iCub::iKin::iCubArm                                              icub_kin_arm_;
     iCub::iKin::iCubFinger                                           icub_kin_finger_[3];
-    yarp::os::BufferedPort<yarp::os::Bottle>                         port_head_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_torso_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_arm_enc_;
-    yarp::os::Property                                               opt_right_hand_analog_;
-    yarp::dev::PolyDriver                                            drv_right_hand_analog_;
-    yarp::dev::IAnalogSensor                                       * itf_right_hand_analog_;
-    yarp::os::BufferedPort<yarp::os::Bottle>                         port_right_hand_analog_;
-    yarp::sig::Matrix                                                right_hand_analogs_bounds_;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_left_;
     /* OUTPUT */
     yarp::os::BufferedPort<yarp::sig::Vector>                        port_estimates_out_;
@@ -100,14 +93,12 @@ protected:
     yarp::os::Port port_rpc_command_;
     bool setCommandPort();
 
-    bool result_images(const bool status) override;
-    bool stream_images_ = true;
-
-    bool lock_input(const bool status) override;
-    bool lock_data_ = false;
+    bool stream_result(const bool status) override;
+    bool stream_ = true;
 
     bool use_analogs(const bool status) override;
-    bool analogs_ = false;
+
+    void quit() override;
 
     enum laterality
     {
@@ -123,13 +114,7 @@ private:
     /* THIS CALL SHOULD BE IN ANOTHER CLASS */
     yarp::sig::Vector readTorso();
 
-    yarp::sig::Vector readRootToFingers();
-
-    yarp::sig::Vector readRootToEye(const yarp::os::ConstString eye);
-
     yarp::sig::Vector readRootToEE();
-
-    yarp::sig::Vector readRightHandAnalogs();
 
     yarp::sig::Matrix getInvertedH(double a, double d, double alpha, double offset, double q);
     /* ************************************ */

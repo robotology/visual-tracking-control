@@ -52,18 +52,6 @@ VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<V
 VisualParticleFilterCorrection::~VisualParticleFilterCorrection() noexcept { }
 
 
-//VisualParticleFilterCorrection::VisualParticleFilterCorrection(VisualParticleFilterCorrection&& vpf_correction) noexcept :
-//measurement_model_(std::move(vpf_correction.measurement_model_)), num_particle_(std::move(vpf_correction.num_particle_)), num_image_stream_(std::move(vpf_correction.num_image_stream_)) { };
-//
-//
-//VisualParticleFilterCorrection& VisualParticleFilterCorrection::operator=(VisualParticleFilterCorrection&& vpf_correction) noexcept
-//{
-//    measurement_model_ = std::move(vpf_correction.measurement_model_);
-//
-//    return *this;
-//}
-
-
 void VisualParticleFilterCorrection::correct(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> cor_state)
 {
     VectorXf innovate(pred_state.cols());
@@ -113,6 +101,7 @@ void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_
             innovation(s * num_img_stream_ + i, 0) = sum_diff;
         }
     }
+    std::cout << innovation;
 }
 
 
@@ -127,45 +116,13 @@ void VisualParticleFilterCorrection::likelihood(const Ref<const MatrixXf>& innov
 }
 
 
-void VisualParticleFilterCorrection::setCamXO(double* cam_x, double* cam_o)
+bool VisualParticleFilterCorrection::setMeasurementModelProperty(std::string property)
 {
-    measurement_model_->setCamXO(cam_x, cam_o);
+    return measurement_model_->setProperty(property);
 }
 
 
-void VisualParticleFilterCorrection::setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
-                                                     const float cam_fx, const float cam_cx, const float cam_fy, const float cam_cy)
+void VisualParticleFilterCorrection::superimpose(const Ref<const VectorXf>& state, Mat& img)
 {
-    measurement_model_->setCamIntrinsic(cam_width, cam_height,
-                                        cam_fx, cam_cx, cam_fy, cam_cy);
-}
-
-
-void VisualParticleFilterCorrection::setArmJoints(const yarp::sig::Vector& q)
-{
-    measurement_model_->setArmJoints(q);
-}
-
-
-void VisualParticleFilterCorrection::setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds)
-{
-    measurement_model_->setArmJoints(q, analogs, analog_bounds);
-}
-
-
-void VisualParticleFilterCorrection::superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, cv::Mat& img)
-{
-    measurement_model_->superimpose(obj2pos_map, img);
-}
-
-
-bool VisualParticleFilterCorrection::getOglWindowShouldClose()
-{
-    return measurement_model_->getOglWindowShouldClose();
-}
-
-
-void VisualParticleFilterCorrection::setOglWindowShouldClose(bool should_close)
-{
-    measurement_model_->setOglWindowShouldClose(should_close);
+    measurement_model_->superimpose(state, img);
 }

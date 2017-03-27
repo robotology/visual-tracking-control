@@ -8,6 +8,7 @@
 #include <opencv2/core/core.hpp>
 #include <SuperImpose/SICAD.h>
 #include <yarp/dev/GazeControl.h>
+#include <yarp/dev/IAnalogSensor.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/ConstString.h>
@@ -35,25 +36,20 @@ public:
     /* Move assignment operator */
     VisualProprioception& operator=(VisualProprioception&& proprio) noexcept;
 
-    bool getOglWindowShouldClose();
-    void setOglWindowShouldClose(bool should_close);
-
     void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, cv::OutputArray observation) override;
 
-    void setCamXO(double* cam_x, double* cam_o);
+    bool setProperty(const std::string property);
+
+    /* TO BE DEPRECATED */
+    void superimpose(const Eigen::Ref<const Eigen::VectorXf>& state, cv::Mat& img);
 
     void setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
                          const float cam_fx, const float cam_cx, const float cam_fy, const float cam_cy);
+    /* **************** */
 
-    void setArmJoints(const yarp::sig::Vector& q);
-
-    void setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds);
-
-    void superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, cv::Mat& img);
-
-    int  getOGLTilesNumber();
-    int  getOGLTilesRows();
-    int  getOGLTilesCols();
+    int          getOGLTilesNumber();
+    int          getOGLTilesRows();
+    int          getOGLTilesCols();
 
     unsigned int getCamWidth();
     unsigned int getCamHeight();
@@ -67,11 +63,45 @@ protected:
 
     /* ICUB */
     yarp::os::ConstString    laterality_;
-    yarp::dev::PolyDriver    drv_gaze;
-    yarp::dev::IGazeControl* itf_gaze;
+    yarp::dev::PolyDriver    drv_gaze_;
+    yarp::dev::IGazeControl* itf_gaze_;
     yarp::os::Bottle         cam_info;
     iCub::iKin::iCubArm      icub_arm_;
     iCub::iKin::iCubFinger   icub_kin_finger_[3];
+
+    iCub::iKin::iCubEye                       icub_kin_eye_;
+    yarp::os::BufferedPort<yarp::os::Bottle>  port_head_enc_;
+    yarp::os::BufferedPort<yarp::os::Bottle>  port_torso_enc_;
+    yarp::os::BufferedPort<yarp::os::Bottle>  port_arm_enc_;
+    yarp::dev::PolyDriver                     drv_right_hand_analog_;
+    yarp::dev::IAnalogSensor                * itf_right_hand_analog_;
+    yarp::sig::Matrix                         right_hand_analogs_bounds_;
+
+    yarp::sig::Matrix getInvertedH(const double a, const double d, const double alpha, const double offset, const double q);
+
+    bool              openGazeController();
+
+    bool              openAnalogs();
+    bool              closeAnalogs();
+    bool              analogs_ = false;
+
+    bool              setiCubParams();
+
+    void              setCamXO(double* cam_x, double* cam_o);
+
+    void              setArmJoints(const yarp::sig::Vector& q);
+
+    void              setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds);
+
+    bool              getOglWindowShouldClose();
+    void              setOglWindowShouldClose(bool should_close);
+
+    void              getPoses(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, std::vector<SuperImpose::ObjPoseMap>& hand_poses);
+
+    yarp::sig::Vector readArmEncoders();
+    yarp::sig::Vector readTorso();
+    yarp::sig::Vector readRootToFingers();
+    yarp::sig::Vector readRootToEye(const yarp::os::ConstString cam_sel);
     /* **** */
 
     yarp::os::ConstString    cam_sel_;
@@ -84,17 +114,13 @@ protected:
     float                    cam_fy_;
     float                    cam_cy_;
 
-    SuperImpose::ObjFileMap  cad_hand_;
+    SuperImpose::ObjFileMap  cad_obj_;
     SICAD                  * si_cad_;
     int                      ogl_tiles_rows_;
     int                      ogl_tiles_cols_;
 
-
     bool file_found(const yarp::os::ConstString& file);
 
-    yarp::sig::Matrix getInvertedH(const double a, const double d, const double alpha, const double offset, const double q);
-
-    bool              setGazeController(yarp::dev::PolyDriver& drv_gaze, yarp::dev::IGazeControl*& itf_gaze, yarp::os::ConstString program_name);
 };
 
 #endif /* VISUALPROPRIOCEPTION_H */

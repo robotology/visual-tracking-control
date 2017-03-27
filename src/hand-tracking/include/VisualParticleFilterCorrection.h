@@ -3,6 +3,7 @@
 
 #include <condition_variable>
 #include <mutex>
+#include <string>
 #include <thread>
 
 #include <BayesFiltersLib/VisualCorrection.h>
@@ -28,32 +29,17 @@ public:
     /* Destructor */
     ~VisualParticleFilterCorrection() noexcept override;
 
-//    /* Move constructor */
-//    VisualParticleFilterCorrection(VisualParticleFilterCorrection&& vpf_correction) noexcept;
-//
-//    /* Move assignment operator */
-//    VisualParticleFilterCorrection& operator=(VisualParticleFilterCorrection&& vpf_correction) noexcept;
-
     void correct(const Eigen::Ref<const Eigen::MatrixXf>& pred_state, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> cor_state) override;
 
     void innovation(const Eigen::Ref<const Eigen::MatrixXf>& pred_state, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> innovation) override;
 
     void likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovation, Eigen::Ref<Eigen::MatrixXf> cor_state) override;
 
-    void setCamXO(double* cam_x, double* cam_o);
+    bool setMeasurementModelProperty(std::string property);
 
-    void setCamIntrinsic(const unsigned int cam_width, const unsigned int cam_height,
-                         const float cam_fx, const float cam_cx, const float cam_fy, const float cam_cy);
-
-    void setArmJoints(const yarp::sig::Vector& q);
-
-    void setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds);
-
-    void superimpose(const SuperImpose::ObjPoseMap& obj2pos_map, cv::Mat& img);
-
-    bool getOglWindowShouldClose();
-    void setOglWindowShouldClose(bool should_close);
-
+    /* TO BE DEPRECATED */
+    void superimpose(const Eigen::Ref<const Eigen::VectorXf>& state, cv::Mat& img);
+    /* **************** */
 
 protected:
     std::unique_ptr<VisualProprioception>  measurement_model_;
