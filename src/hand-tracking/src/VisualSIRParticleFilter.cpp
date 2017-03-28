@@ -100,8 +100,6 @@ void VisualSIRParticleFilter::runFilter()
     cuda_hog->setGammaCorrection(true);
     cuda_hog->setWinStride(Size(img_width, img_height));
 
-    correction_->setMeasurementModelProperty("VP_PARAMS");
-
     is_filter_init_ = true;
 
 
@@ -145,10 +143,8 @@ void VisualSIRParticleFilter::runFilter()
             double   delta_angle;
             delta_hand_pose.head(3) = new_arm_pose.head(3) - old_hand_pose.head(3);
             delta_angle             = new_arm_pose.tail(3).norm() - old_hand_pose.tail(3).norm();
-            // FIXME: provare a tenerlo tra 0 e 2PI come fatto dopo
             if (delta_angle > 2.0 * M_PI) delta_angle -= 2.0 * M_PI;
-//            if (delta_angle >  M_PI) delta_angle -= 2.0 * M_PI;
-//            if (delta_angle < -M_PI) delta_angle += 2.0 * M_PI;
+            if (delta_angle < 0.0       ) delta_angle += 2.0 * M_PI;
             delta_hand_pose.tail(3) = (new_arm_pose.tail(3) / new_arm_pose.tail(3).norm()) - (old_hand_pose.tail(3) / old_hand_pose.tail(3).norm());
 
             old_hand_pose = new_arm_pose;
@@ -170,8 +166,7 @@ void VisualSIRParticleFilter::runFilter()
 
                 ang += static_cast<float>(delta_angle);
                 if (ang > 2.0 * M_PI) ang -= 2.0 * M_PI;
-//                if (ang >  M_PI) ang -= 2.0 * M_PI;
-//                if (ang < -M_PI) ang += 2.0 * M_PI;
+                if (ang > 0.0       ) ang += 2.0 * M_PI;
                 init_particle.col(j).tail(3) *= ang;
 
                 if(init_weight(j) <= threshold)
@@ -179,7 +174,7 @@ void VisualSIRParticleFilter::runFilter()
             }
 
             /* Set parameters */
-//            correction_->setMeasurementModelProperty("VP_PARAMS");
+            correction_->setMeasurementModelProperty("VP_PARAMS");
 
             correction_->correct(init_particle, descriptors_cam_left, init_weight);
             init_weight /= init_weight.sum();
@@ -193,8 +188,7 @@ void VisualSIRParticleFilter::runFilter()
 
 
             /* DEBUG ONLY */
-            std::cout << "Step: " << k << std::endl;
-            std::cout << "Neff: " << resampling_->neff(init_weight) << std::endl;
+            std::cout << "Step: " << k << "\nNeff: " << resampling_->neff(init_weight) << std::endl;
             /* ********** */
 
             if (resampling_->neff(init_weight) < std::round(num_particles_ / 5.f))
@@ -358,13 +352,27 @@ void VisualSIRParticleFilter::quit()
 }
 
 
-Eigen::MatrixXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
+VectorXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
 {
-    return (particles.array().rowwise() * weights.array().transpose()).rowwise().sum();
+    VectorXf out_particle = VectorXf::Zero(6);
+    float    s_ang        = 0;
+    float    c_ang        = 0;
+
+    for (int i = 0; i < particles.cols(); ++i)
+    {
+        out_particle.head<3>() += weights(i) * particles.col(i).head<3>();
+        out_particle.tail<3>() += weights(i) * particles.col(i).tail<3>().normalized();
+        s_ang                  += weights(i) * std::sin(particles.col(i).tail<3>().norm());
+        c_ang                  += weights(i) * std::cos(particles.col(i).tail<3>().norm());
+    }
+
+    out_particle.tail<3>() = out_particle.tail<3>().normalized() * std::atan2(s_ang, c_ang);
+
+    return out_particle;
 }
 
 
-Eigen::MatrixXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
+VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
 {
     MatrixXf::Index maxRow;
     MatrixXf::Index maxCol;
