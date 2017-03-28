@@ -66,7 +66,14 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<Prediction> pre
 }
 
 
-VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept { }
+VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
+{
+    port_image_in_left_.close();
+    port_arm_enc_.close();
+    port_torso_enc_.close();
+    port_image_out_left_.close();
+    port_estimates_out_.close();
+}
 
 
 void VisualSIRParticleFilter::runFilter()
@@ -264,13 +271,6 @@ void VisualSIRParticleFilter::runFilter()
             /* ********** */
         }
     }
-
-    // FIXME: queste close devono andare da un'altra parte. Simil RFModule.
-    port_image_in_left_.close();
-    port_arm_enc_.close();
-    port_torso_enc_.close();
-    port_image_out_left_.close();
-    port_estimates_out_.close();
 }
 
 
