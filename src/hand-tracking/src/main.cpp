@@ -46,8 +46,7 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << "[CUDA] Can have concurrent kernel:"     << gpu_dev.concurrentKernels();
     yInfo() << log_ID << "[CUDA] Streaming multiprocessor count:" << gpu_dev.multiProcessorCount();
     yInfo() << log_ID << "[CUDA] Can map host memory:"            << gpu_dev.canMapHostMemory();
-    yInfo() << log_ID << "[CUDA] Clock:"                          << gpu_dev.clockRate();
-    yInfo() << log_ID << "[CUDA] Compute mode:"                   << gpu_dev.computeMode();
+    yInfo() << log_ID << "[CUDA] Clock:"                          << gpu_dev.clockRate() << "KHz";
 
     ResourceFinder rf;
     rf.setVerbose();
