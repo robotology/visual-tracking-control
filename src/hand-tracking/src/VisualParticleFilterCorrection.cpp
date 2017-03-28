@@ -101,7 +101,6 @@ void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_
             innovation(s * num_img_stream_ + i, 0) = sum_diff;
         }
     }
-    std::cout << innovation;
 }
 
 
