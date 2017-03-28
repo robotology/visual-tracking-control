@@ -45,6 +45,7 @@ protected:
     float                                 q_z_;         /* Noise standard deviation for x-y 3D position */
     float                                 theta_;       /* Noise standard deviation for axis-angle rotation */
     float                                 cone_angle_;  /* Noise standard deviation for axis-angle axis cone */
+    Eigen::Vector4f                       cone_dir_;    /* Cone direction of rotation */
 
     std::mt19937_64                       generator_;
     std::normal_distribution<float>       distribution_pos_xy_;
@@ -55,6 +56,8 @@ protected:
     std::function<float()>                gaussian_random_pos_z_;
     std::function<float()>                gaussian_random_theta_;
     std::function<float()>                gaussian_random_cone_;
+
+    void setConeDirection(const Eigen::Ref<const Eigen::Vector3f>& cur_state);
 };
 
 #endif /* BROWNIANMOTION_H */
