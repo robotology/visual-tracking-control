@@ -37,7 +37,7 @@ public:
 
     void noiseSample(Eigen::Ref<Eigen::VectorXf> sample) override;
 
-    void motion(const Eigen::Ref<const Eigen::VectorXf>& cur_state, Eigen::Ref<Eigen::VectorXf> next_state);
+    bool setProperty(const std::string& property) override { return false; };
 
 protected:
     Eigen::MatrixXf                       F_;           /* State transition matrix */

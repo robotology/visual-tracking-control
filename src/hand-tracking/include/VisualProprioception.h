@@ -39,7 +39,7 @@ public:
 
     void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, cv::OutputArray observation) override;
 
-    bool setProperty(const std::string property);
+    bool setProperty(const std::string property) override;
 
     /* TO BE DEPRECATED */
     void superimpose(const Eigen::Ref<const Eigen::VectorXf>& state, cv::Mat& img);
@@ -60,13 +60,12 @@ protected:
     yarp::os::ConstString    log_ID_ = "[VisualProprioception]";
 
     /* ICUB */
-    yarp::os::ConstString    laterality_;
-    yarp::dev::PolyDriver    drv_gaze_;
-    yarp::dev::IGazeControl* itf_gaze_;
-    yarp::os::Bottle         cam_info;
-    iCub::iKin::iCubArm      icub_arm_;
-    iCub::iKin::iCubFinger   icub_kin_finger_[3];
-
+    yarp::os::ConstString                     laterality_;
+    yarp::dev::PolyDriver                     drv_gaze_;
+    yarp::dev::IGazeControl*                  itf_gaze_;
+    yarp::os::Bottle                          cam_info;
+    iCub::iKin::iCubArm                       icub_arm_;
+    iCub::iKin::iCubFinger                    icub_kin_finger_[3];
     iCub::iKin::iCubEye                       icub_kin_eye_;
     yarp::os::BufferedPort<yarp::os::Bottle>  port_head_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle>  port_torso_enc_;
@@ -85,14 +84,11 @@ protected:
 
     bool              setiCubParams();
 
-    void              setCamXO(double* cam_x, double* cam_o);
+    void              setCamPose(double* cam_x, double* cam_o);
 
     void              setArmJoints(const yarp::sig::Vector& q);
 
     void              setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds);
-
-    bool              getOglWindowShouldClose();
-    void              setOglWindowShouldClose(bool should_close);
 
     void              getPoses(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, std::vector<SuperImpose::ObjPoseMap>& hand_poses);
 

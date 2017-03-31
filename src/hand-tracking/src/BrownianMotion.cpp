@@ -8,12 +8,16 @@ using namespace Eigen;
 
 
 BrownianMotion::BrownianMotion(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept :
-    F_(MatrixXf::Identity(6, 6)), q_xy_(q_xy), q_z_(q_z), theta_(theta * (M_PI/180.0)), cone_angle_(cone_angle * (M_PI/180.0)), cone_dir_(Vector4f(0.0, 0.0, 1.0, 0.0)),
+    q_xy_(q_xy), q_z_(q_z), theta_(theta * (M_PI/180.0)), cone_angle_(cone_angle * (M_PI/180.0)), cone_dir_(Vector4f(0.0, 0.0, 1.0, 0.0)),
     generator_(std::mt19937_64(seed)),
     distribution_pos_xy_(std::normal_distribution<float>(0.0, q_xy)), distribution_pos_z_(std::normal_distribution<float>(0.0, q_z)),
     distribution_theta_(std::normal_distribution<float>(0.0, theta_)), distribution_cone_(std::uniform_real_distribution<float>(0.0, 1.0)),
     gaussian_random_pos_xy_([&] { return (distribution_pos_xy_)(generator_); }), gaussian_random_pos_z_([&] { return (distribution_pos_z_)(generator_); }),
-    gaussian_random_theta_([&] { return (distribution_theta_)(generator_); }), gaussian_random_cone_([&] { return (distribution_cone_)(generator_); }) { }
+    gaussian_random_theta_([&] { return (distribution_theta_)(generator_); }), gaussian_random_cone_([&] { return (distribution_cone_)(generator_); })
+{
+    F_ = MatrixXf::Zero(6, 6);
+    F_.block<3, 3>(0, 0) = MatrixXf::Identity(3, 3);
+}
 
 
 BrownianMotion::BrownianMotion(const float q_xy, const float q_z, const float theta, const float cone_angle) noexcept :
@@ -82,6 +86,8 @@ BrownianMotion& BrownianMotion::operator=(BrownianMotion&& brown) noexcept
 
 void BrownianMotion::propagate(const Ref<const VectorXf> & cur_state, Ref<VectorXf> prop_state)
 {
+    setConeDirection(cur_state.tail<3>());
+
     prop_state = F_ * cur_state;
 }
 
@@ -115,24 +121,11 @@ void BrownianMotion::noiseSample(Ref<VectorXf> sample)
 
     /* Rotate [x y z]' from north pole to 'cone_dir_' */
     Vector3f r_to_rotate(x, y, z);
-    Vector3f r = R * r_to_rotate;
 
-    float ang         =  static_cast<float>(cone_dir_(3)) + gaussian_random_theta_();
-    sample.tail<3>()  =  r;
-    sample.tail<3>(3) *= ang;
-}
+    Vector3f r   = R * r_to_rotate;
+    float    ang = static_cast<float>(cone_dir_(3)) + gaussian_random_theta_();
 
-
-void BrownianMotion::motion(const Ref<const VectorXf>& cur_state, Ref<VectorXf> next_state)
-{
-    propagate(cur_state, next_state);
-
-    setConeDirection(next_state.tail<3>());
-    VectorXf sample(VectorXf::Zero(6, 1));
-    noiseSample(sample);
-
-    next_state.head<3>() += sample.head<3>();
-    next_state.tail<3>() =  sample.tail<3>();
+    sample.tail<3>() = ang * r;
 }
 
 

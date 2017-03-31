@@ -318,18 +318,6 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 }
 
 
-bool VisualProprioception::getOglWindowShouldClose()
-{
-    return si_cad_->getOglWindowShouldClose();
-}
-
-
-void VisualProprioception::setOglWindowShouldClose(bool should_close)
-{
-    si_cad_->setOglWindowShouldClose(should_close);
-}
-
-
 void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::vector<SuperImpose::ObjPoseMap>& hand_poses)
 {
     for (int j = 0; j < cur_state.cols(); ++j)
@@ -390,16 +378,16 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
             }
         }
         /* Comment/Uncomment to add/remove limbs */
-        //        yarp::sig::Matrix invH6 = Ha *
-        //                                  getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
-        //                                  getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
-        //        Vector j_x = invH6.getCol(3).subVector(0, 2);
-        //        Vector j_o = dcm2axis(invH6);
-        //        pose.clear();
-        //        pose.assign(j_x.data(), j_x.data()+3);
-        //        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-        //        hand_pose.emplace("forearm", pose);
-        
+//        yarp::sig::Matrix invH6 = Ha *
+//                                  getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
+//                                  getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
+//        Vector j_x = invH6.getCol(3).subVector(0, 2);
+//        Vector j_o = dcm2axis(invH6);
+//        pose.clear();
+//        pose.assign(j_x.data(), j_x.data()+3);
+//        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+//        hand_pose.emplace("forearm", pose);
+
         hand_poses.push_back(hand_pose);
     }
 }
@@ -429,15 +417,6 @@ bool VisualProprioception::setProperty(const std::string property)
     if (property == "VP_ANALOGS_OFF")
         return closeAnalogs();
 
-    if (property == "VP_OGL_CLOSE")
-    {
-        setOglWindowShouldClose(true);
-        return true;
-    }
-
-    if (property == "VP_OGL_STATUS")
-        return getOglWindowShouldClose();
-
     return false;
 }
 
@@ -453,19 +432,18 @@ bool VisualProprioception::setiCubParams()
     left_cam_x[0] = left_eye_pose(0); left_cam_x[1] = left_eye_pose(1); left_cam_x[2] = left_eye_pose(2);
     left_cam_o[0] = left_eye_pose(3); left_cam_o[1] = left_eye_pose(4); left_cam_o[2] = left_eye_pose(5); left_cam_o[3] = left_eye_pose(6);
 
-    setCamXO(left_cam_x, left_cam_o);
+    setCamPose(left_cam_x, left_cam_o);
 
     Vector q = readRootToFingers();
 
-    // FIXME: abduzione e apertura pollice fissata
     q(10) = 32.0;
     q(11) = 30.0;
-    //    q(12) = 0.0;
-    //    q(13) = 0.0;
-    //    q(14) = 0.0;
-    //    q(15) = 0.0;
-    //    q(16) = 0.0;
-    //    q(17) = 0.0;
+//    q(12) = 0.0;
+//    q(13) = 0.0;
+//    q(14) = 0.0;
+//    q(15) = 0.0;
+//    q(16) = 0.0;
+//    q(17) = 0.0;
 
 
     if (analogs_)
@@ -480,7 +458,7 @@ bool VisualProprioception::setiCubParams()
 }
 
 
-void VisualProprioception::setCamXO(double* cam_x, double* cam_o)
+void VisualProprioception::setCamPose(double* cam_x, double* cam_o)
 {
     memcpy(cam_x_, cam_x, 3 * sizeof(double));
     memcpy(cam_o_, cam_o, 4 * sizeof(double));
@@ -658,14 +636,14 @@ bool VisualProprioception::openGazeController()
         drv_gaze_.view(itf_gaze_);
         if (!itf_gaze_)
         {
-            yError() << log_ID_ << "Cannot get right hand gazecontrollerclient interface!";
+            yError() << log_ID_ << "Cannot get head gazecontrollerclient interface!";
             drv_gaze_.close();
             return false;
         }
     }
     else
     {
-        yError() << log_ID_ << "Cannot open right hand gazecontrollerclient!";
+        yError() << log_ID_ << "Cannot open head gazecontrollerclient!";
         return false;
     }
 
@@ -723,7 +701,7 @@ bool VisualProprioception::closeAnalogs()
 Vector VisualProprioception::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
-    if (!b) return Vector(1, 0.0);
+    if (!b) return Vector(3, 0.0);
 
     yAssert(b->size() == 3);
 
@@ -739,7 +717,7 @@ Vector VisualProprioception::readTorso()
 Vector VisualProprioception::readRootToFingers()
 {
     Bottle* b = port_arm_enc_.read();
-    if (!b) return Vector(1, 0.0);
+    if (!b) return Vector(19, 0.0);
 
     yAssert(b->size() == 16);
 
@@ -757,7 +735,7 @@ Vector VisualProprioception::readRootToFingers()
 Vector VisualProprioception::readRootToEye(const ConstString cam_sel)
 {
     Bottle* b = port_head_enc_.read();
-    if (!b) return Vector(1, 0.0);
+    if (!b) return Vector(8, 0.0);
 
     yAssert(b->size() == 6);
 

@@ -79,9 +79,6 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
 void VisualSIRParticleFilter::runFilter()
 {
     /* INITIALIZATION */
-    // FIXME: page locked dovrebbe essere più veloce da utilizzate con CUDA, non sembra essere il caso.
-//    Mat::setDefaultAllocator(cuda::HostMem::getAllocator(cuda::HostMem::PAGE_LOCKED));
-
     unsigned int  k = 0;
 
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
@@ -133,6 +130,7 @@ void VisualSIRParticleFilter::runFilter()
             VectorXf temp_weight(num_particles_, 1);
             VectorXf temp_parent(num_particles_, 1);
 
+            /* PROCESS CURRENT MEASUREMENT */
             Mat measurement;
 
             measurement = cvarrToMat(imgout_left.getIplImage());
@@ -141,63 +139,32 @@ void VisualSIRParticleFilter::runFilter()
             cuda_hog->compute(cuda_img_alpha, descriptors_cam_cuda);
             descriptors_cam_cuda.download(descriptors_cam_left);
 
-            // FIXME: move the hand over time
-            Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
-            Map<VectorXd> new_arm_pose(ee_pose.data(), 6, 1);
-            new_arm_pose.tail(3) *= ee_pose(6);
-
-            VectorXd delta_hand_pose(6);
-            double   delta_angle;
-            delta_hand_pose.head(3) = new_arm_pose.head(3) - old_hand_pose.head(3);
-            delta_angle             = new_arm_pose.tail(3).norm() - old_hand_pose.tail(3).norm();
-            if (delta_angle > 2.0 * M_PI) delta_angle -= 2.0 * M_PI;
-            if (delta_angle < 0.0       ) delta_angle += 2.0 * M_PI;
-            delta_hand_pose.tail(3) = (new_arm_pose.tail(3) / new_arm_pose.tail(3).norm()) - (old_hand_pose.tail(3) / old_hand_pose.tail(3).norm());
-
-            old_hand_pose = new_arm_pose;
-
+            /* PREDICTION */
             VectorXf sorted_pred = init_weight;
             std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
-
             float threshold = sorted_pred.tail(6)(0);
+
+            prediction_->setMotionModelProperty("ICFW_DELTA");
             for (int j = 0; j < num_particles_; ++j)
             {
-                init_particle.col(j).head(3) += delta_hand_pose.head(3).cast<float>();
-
-                float ang;
-                ang = init_particle.col(j).tail(3).norm();
-                init_particle.col(j).tail(3) /= ang;
-
-                init_particle.col(j).tail(3) += delta_hand_pose.tail(3).cast<float>();
-                init_particle.col(j).tail(3) /= init_particle.col(j).tail(3).norm();
-
-                ang += static_cast<float>(delta_angle);
-                if (ang > 2.0 * M_PI) ang -= 2.0 * M_PI;
-                if (ang < 0.0       ) ang += 2.0 * M_PI;
-                init_particle.col(j).tail(3) *= ang;
-
                 if(init_weight(j) <= threshold)
                     prediction_->predict(init_particle.col(j), init_particle.col(j));
             }
 
-            /* Set parameters */
+            /* CORRECTION */
             correction_->setMeasurementModelProperty("VP_PARAMS");
-
             correction_->correct(init_particle, descriptors_cam_left, init_weight);
             init_weight /= init_weight.sum();
 
-
+            /* ESTIMATE EXTRACTION */
             VectorXf out_particle(6);
             /* Extracting state estimate: weighted sum */
             out_particle = mean(init_particle, init_weight);
             /* Extracting state estimate: mode */
 //            out_particle = mode(init_particle, init_weight);
 
-
-            /* DEBUG ONLY */
+            /* RESAMPLING */
             std::cout << "Step: " << k << "\nNeff: " << resampling_->neff(init_weight) << std::endl;
-            /* ********** */
-
             if (resampling_->neff(init_weight) < std::round(num_particles_ / 5.f))
             {
                 std::cout << "Resampling!" << std::endl;
@@ -290,26 +257,6 @@ bool VisualSIRParticleFilter::isRunning()
 }
 
 
-bool VisualSIRParticleFilter::shouldStop()
-{
-    return correction_->setMeasurementModelProperty("VP_OGL_STATUS");
-}
-
-
-void VisualSIRParticleFilter::stopThread()
-{
-    if (!is_filter_init_)
-    {
-        port_arm_enc_.interrupt();
-        port_torso_enc_.interrupt();
-    }
-
-    port_image_in_left_.interrupt();
-
-    is_running_ = false;
-}
-
-
 bool VisualSIRParticleFilter::setCommandPort()
 {
     std::cout << "Opening RPC command port." << std::endl;
@@ -348,7 +295,15 @@ bool VisualSIRParticleFilter::use_analogs(const bool status)
 
 void VisualSIRParticleFilter::quit()
 {
-    correction_->setMeasurementModelProperty("VP_OGL_CLOSE");
+    if (!is_filter_init_)
+    {
+        port_arm_enc_.interrupt();
+        port_torso_enc_.interrupt();
+    }
+
+    port_image_in_left_.interrupt();
+
+    is_running_ = false;
 }
 
 
@@ -362,8 +317,10 @@ VectorXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, con
     {
         out_particle.head<3>() += weights(i) * particles.col(i).head<3>();
         out_particle.tail<3>() += weights(i) * particles.col(i).tail<3>().normalized();
-        s_ang                  += weights(i) * std::sin(particles.col(i).tail<3>().norm());
-        c_ang                  += weights(i) * std::cos(particles.col(i).tail<3>().norm());
+
+        float ang = particles.col(i).tail<3>().norm();
+        s_ang                  += weights(i) * std::sin(ang);
+        c_ang                  += weights(i) * std::cos(ang);
     }
 
     out_particle.tail<3>() = out_particle.tail<3>().normalized() * std::atan2(s_ang, c_ang);
@@ -382,11 +339,10 @@ VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, con
 
 
 /* THIS CALL SHOULD BE IN OTHER CLASSES */
-
 Vector VisualSIRParticleFilter::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
-    if (!b) return Vector(1, 0.0);
+    if (!b) return Vector(3, 0.0);
 
     yAssert(b->size() == 3);
 
@@ -402,7 +358,7 @@ Vector VisualSIRParticleFilter::readTorso()
 Vector VisualSIRParticleFilter::readRootToEE()
 {
     Bottle* b = port_arm_enc_.read();
-    if (!b) return Vector(1, 0.0);
+    if (!b) return Vector(10, 0.0);
 
     yAssert(b->size() == 16);
 
@@ -414,39 +370,5 @@ Vector VisualSIRParticleFilter::readRootToEE()
     }
 
     return root_ee_enc;
-}
-
-
-yarp::sig::Matrix VisualSIRParticleFilter::getInvertedH(double a, double d, double alpha, double offset, double q)
-{
-    yarp::sig::Matrix H(4, 4);
-
-    double theta = offset + q;
-    double c_th  = cos(theta);
-    double s_th  = sin(theta);
-    double c_al  = cos(alpha);
-    double s_al  = sin(alpha);
-
-    H(0,0) =        c_th;
-    H(0,1) =       -s_th;
-    H(0,2) =           0;
-    H(0,3) =           a;
-
-    H(1,0) = s_th * c_al;
-    H(1,1) = c_th * c_al;
-    H(1,2) =       -s_al;
-    H(1,3) =   -d * s_al;
-
-    H(2,0) = s_th * s_al;
-    H(2,1) = c_th * s_al;
-    H(2,2) =        c_al;
-    H(2,3) =    d * c_al;
-
-    H(3,0) =           0;
-    H(3,1) =           0;
-    H(3,2) =           0;
-    H(3,3) =           1;
-    
-    return H;
 }
 /* ************************************ */

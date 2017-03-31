@@ -27,6 +27,8 @@ include(YarpInstallationHelpers)
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotion.h
+        include/iCubFwdKinMotion.h
+        include/playFwdKinMotion.h
         include/VisualProprioception.h
         include/VisualParticleFilterCorrection.h
         include/VisualSIRParticleFilter.h)
@@ -34,6 +36,8 @@ set(${EXE_TARGET_NAME}_HDR
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
         src/BrownianMotion.cpp
+        src/iCubFwdKinMotion.cpp
+        src/playFwdKinMotion.cpp
         src/VisualProprioception.cpp
         src/VisualParticleFilterCorrection.cpp
         src/VisualSIRParticleFilter.cpp)

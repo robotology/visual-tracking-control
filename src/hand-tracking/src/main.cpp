@@ -1,6 +1,7 @@
 #include <chrono>
 #include <future>
 #include <iostream>
+#include <memory>
 
 #include <BayesFiltersLib/FilteringContext.h>
 #include <BayesFiltersLib/FilteringFunction.h>
@@ -10,9 +11,12 @@
 #include <yarp/os/Network.h>
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/os/Value.h>
+#include <opencv2/core/core.hpp>
 #include <opencv2/core/cuda.hpp>
 
 #include "BrownianMotion.h"
+#include "iCubFwdKinMotion.h"
+#include "playFwdKinMotion.h"
 #include "VisualProprioception.h"
 #include "VisualParticleFilterCorrection.h"
 #include "VisualSIRParticleFilter.h"
@@ -41,6 +45,9 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    // FIXME: page locked dovrebbe essere più veloce da utilizzate con CUDA, non sembra essere il caso.
+//    Mat::setDefaultAllocator(cuda::HostMem::getAllocator(cuda::HostMem::PAGE_LOCKED));
+
     cuda::DeviceInfo gpu_dev;
     yInfo() << log_ID << "[CUDA] Engine capability:"              << engine_count_to_string(gpu_dev.asyncEngineCount());
     yInfo() << log_ID << "[CUDA] Can have concurrent kernel:"     << gpu_dev.concurrentKernels();
@@ -57,6 +64,7 @@ int main(int argc, char *argv[])
     ConstString robot_name       = rf.find("robot").asString();
     ConstString robot_cam_sel    = rf.find("cam").asString();
     ConstString robot_laterality = rf.find("laterality").asString();
+    bool        play             = rf.find("play").asBool();
     const int   num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
 
     if (robot_name.empty())
@@ -70,12 +78,26 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - robot name:"          << robot_name;
     yInfo() << log_ID << " - robot camera:"        << robot_cam_sel;
     yInfo() << log_ID << " - robot laterality:"    << robot_laterality;
+    yInfo() << log_ID << " - use data from ports:" << (play ? "true" : "false");
     yInfo() << log_ID << " - number of particles:" << num_particles;
 
     /* Initialize filtering functions */
+    // FIXME: passare robot name ai metodi
     std::unique_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 0.005, 3.0, 1.5, 1));
+    std::unique_ptr<StateModel>     icub_motion;
+    if (!play)
+    {
+        std::unique_ptr<iCubFwdKinMotion> icub_fwdkin(new iCubFwdKinMotion(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
+        icub_motion = std::move(icub_fwdkin);
+    }
+    else
+    {
+        std::unique_ptr<playFwdKinMotion> play_fwdkin(new playFwdKinMotion(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
+        icub_motion = std::move(play_fwdkin);
+    }
 
-    std::unique_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(std::move(brown)));
+
+    std::unique_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(std::move(icub_motion)));
 
     std::unique_ptr<VisualProprioception> proprio;
     try
@@ -99,16 +121,10 @@ int main(int argc, char *argv[])
                                     robot_cam_sel, robot_laterality, num_particles);
 
     std::future<void> thr_vpf = vsir_pf.spawn();
-    while (vsir_pf.isRunning())
-    {
-        if (vsir_pf.shouldStop())
-        {
-            vsir_pf.stopThread();
-            yInfo() << log_ID << "Joining filthering thread...";
-            while (thr_vpf.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) glfwPollEvents();
-        }
-        else glfwWaitEvents();
-    }
+    while (vsir_pf.isRunning()) glfwWaitEventsTimeout(1.0);
+
+    yInfo() << log_ID << "Joining filthering thread...";
+    while (thr_vpf.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) glfwPollEvents();
 
     glfwMakeContextCurrent(NULL);
     glfwTerminate();

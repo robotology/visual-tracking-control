@@ -60,12 +60,7 @@ public:
     void getResult() override;
 
     std::future<void> spawn();
-
-    bool isRunning();
-
-    bool shouldStop();
-
-    void stopThread();
+    bool              isRunning();
 
 protected:
     std::unique_ptr<bfl::Prediction>                                 prediction_;
@@ -115,8 +110,6 @@ private:
     yarp::sig::Vector readTorso();
 
     yarp::sig::Vector readRootToEE();
-
-    yarp::sig::Matrix getInvertedH(double a, double d, double alpha, double offset, double q);
     /* ************************************ */
 };
 

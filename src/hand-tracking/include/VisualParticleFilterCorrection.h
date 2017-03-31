@@ -42,18 +42,18 @@ public:
     /* **************** */
 
 protected:
-    std::unique_ptr<VisualProprioception>  measurement_model_;
+    std::unique_ptr<VisualProprioception> measurement_model_;
 
-    cv::Ptr<cv::cuda::HOG>                 cuda_hog_;
+    cv::Ptr<cv::cuda::HOG>                cuda_hog_;
 
-    const int                              num_cuda_stream_;
-    const int                              num_img_stream_;
-    std::vector<cv::cuda::Stream>          cuda_stream_;
-    std::vector<cv::Mat>                   hand_rendered_;
-    std::vector<cv::cuda::GpuMat>          cuda_img_;
-    std::vector<cv::cuda::GpuMat>          cuda_img_alpha_;
-    std::vector<cv::cuda::GpuMat>          cuda_descriptors_;
-    std::vector<cv::Mat>                   cpu_descriptors_;
+    const int                             num_cuda_stream_;
+    const int                             num_img_stream_;
+    std::vector<cv::cuda::Stream>         cuda_stream_;
+    std::vector<cv::Mat>                  hand_rendered_;
+    std::vector<cv::cuda::GpuMat>         cuda_img_;
+    std::vector<cv::cuda::GpuMat>         cuda_img_alpha_;
+    std::vector<cv::cuda::GpuMat>         cuda_descriptors_;
+    std::vector<cv::Mat>                  cpu_descriptors_;
 };
 
 #endif /* VISUALPARTICLEFILTERCORRECTION_H */

@@ -5,7 +5,7 @@
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking-BATCH</name>
     <description>Offline visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -91,6 +91,32 @@
     <connection>
         <from>/hand-tracking/right/result/img:o</from>
         <to>/view/result/right</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+
+    <!-- playFwdKinMotion -->
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/playFwdKinMotion/left/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/playFwdKinMotion/right/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/playFwdKinMotion/left/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/playFwdKinMotion/right/right_arm:i</to>
         <protocol>tcp</protocol>
     </connection>
 
