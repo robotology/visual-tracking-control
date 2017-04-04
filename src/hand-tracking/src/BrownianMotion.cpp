@@ -82,8 +82,6 @@ BrownianMotion& BrownianMotion::operator=(BrownianMotion&& brown) noexcept
 
 void BrownianMotion::propagate(const Ref<const VectorXf> & cur_state, Ref<VectorXf> prop_state)
 {
-//    setConeDirection(cur_state.tail<3>());
-
     prop_state = F_ * cur_state;
 }
 
@@ -102,38 +100,7 @@ void BrownianMotion::noiseSample(Ref<VectorXf> sample)
     float x   = sqrt(1 - (z * z)) * cos(phi);
     float y   = sqrt(1 - (z * z)) * sin(phi);
 
-//    /* Find the rotation axis 'u' and rotation angle 'rot' [1] */
-//    Vector3f def_dir(0.0, 0.0, 1.0);
-//    Vector3f u = def_dir.cross(cone_dir_.head<3>()).normalized();
-//    float rot = static_cast<float>(acos(cone_dir_.head<3>().dot(def_dir)));
-//
-//    /* Convert rotation axis and angle to 3x3 rotation matrix [2] */
-//    /* [2] https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle */
-//    Matrix3f cross_matrix;
-//    cross_matrix <<     0,  -u(2),   u(1),
-//                     u(2),      0,  -u(0),
-//                    -u(1),   u(0),      0;
-//    Matrix3f R = cos(rot) * Matrix3f::Identity() + sin(rot) * cross_matrix + (1 - cos(rot)) * (u * u.transpose());
-//
-//    /* Rotate [x y z]' from north pole to 'cone_dir_' */
-//    Vector3f r_to_rotate(x, y, z);
-//    Vector3f r = R * r_to_rotate;
-
     /* Generate random rotation angle */
-//    float ang = static_cast<float>(cone_dir_(3)) + gaussian_random_theta_();
-
-//    sample.tail<3>() = ang * r;
-
-    /* Generate random rotation angle */
-    float ang = gaussian_random_theta_();
-
     sample.middleRows<3>(3) = Vector3f(x, y, z);
-    sample(6) = ang;
-}
-
-
-void BrownianMotion::setConeDirection(const Eigen::Ref<const Eigen::Vector3f>& cone_dir)
-{
-    cone_dir_(3)        = cone_dir.norm();
-    cone_dir_.head<3>() = cone_dir.normalized();
+    sample(6) = gaussian_random_theta_();
 }

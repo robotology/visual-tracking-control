@@ -56,8 +56,6 @@ protected:
     std::function<float()>                gaussian_random_pos_z_;
     std::function<float()>                gaussian_random_theta_;
     std::function<float()>                gaussian_random_cone_;
-
-    void setConeDirection(const Eigen::Ref<const Eigen::Vector3f>& cur_state);
 };
 
 #endif /* BROWNIANMOTION_H */
