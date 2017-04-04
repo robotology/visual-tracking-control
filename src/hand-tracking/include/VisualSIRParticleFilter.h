@@ -8,7 +8,7 @@
 
 #include <BayesFiltersLib/FilteringAlgorithm.h>
 #include <BayesFiltersLib/StateModel.h>
-#include <BayesFiltersLib/Prediction.h>
+#include <BayesFiltersLib/ParticleFilterPrediction.h>
 #include <BayesFiltersLib/VisualObservationModel.h>
 #include <BayesFiltersLib/VisualCorrection.h>
 #include <BayesFiltersLib/Resampling.h>
@@ -36,7 +36,7 @@ public:
     VisualSIRParticleFilter() = delete;
 
     /* VisualSIR complete constructor */
-    VisualSIRParticleFilter(std::unique_ptr<bfl::Prediction> prediction, std::unique_ptr<VisualParticleFilterCorrection> correction,
+    VisualSIRParticleFilter(std::unique_ptr<bfl::ParticleFilterPrediction> prediction, std::unique_ptr<VisualParticleFilterCorrection> correction,
                             std::unique_ptr<bfl::Resampling> resampling,
                             yarp::os::ConstString cam_sel, yarp::os::ConstString laterality, const int num_particles);
 
@@ -63,7 +63,7 @@ public:
     bool              isRunning();
 
 protected:
-    std::unique_ptr<bfl::Prediction>                                 prediction_;
+    std::unique_ptr<bfl::ParticleFilterPrediction>                   prediction_;
     std::unique_ptr<VisualParticleFilterCorrection>                  correction_;
     std::unique_ptr<bfl::Resampling>                                 resampling_;
     yarp::os::ConstString                                            cam_sel_;

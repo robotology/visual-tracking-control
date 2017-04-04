@@ -3,7 +3,6 @@
 #include <iostream>
 #include <memory>
 
-#include <BayesFiltersLib/FilteringContext.h>
 #include <BayesFiltersLib/FilteringFunction.h>
 #include <BayesFiltersLib/SIRParticleFilter.h>
 #include <yarp/os/ConstString.h>
@@ -15,6 +14,7 @@
 #include <opencv2/core/cuda.hpp>
 
 #include "BrownianMotion.h"
+#include "DrawPoseParticle.h"
 #include "iCubFwdKinMotion.h"
 #include "playFwdKinMotion.h"
 #include "VisualProprioception.h"
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     }
 
 
-    std::unique_ptr<ParticleFilterPrediction> pf_prediction(new ParticleFilterPrediction(std::move(icub_motion)));
+    std::unique_ptr<DrawPoseParticle> pf_prediction(new DrawPoseParticle(std::move(icub_motion)));
 
     std::unique_ptr<VisualProprioception> proprio;
     try

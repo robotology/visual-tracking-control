@@ -29,11 +29,10 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<Prediction> prediction, std::unique_ptr<VisualParticleFilterCorrection> correction,
+VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<ParticleFilterPrediction> prediction, std::unique_ptr<VisualParticleFilterCorrection> correction,
                                                  std::unique_ptr<Resampling> resampling,
                                                  ConstString cam_sel, ConstString laterality, const int num_particles) :
-    prediction_(std::move(prediction)), correction_(std::move(correction)),
-    resampling_(std::move(resampling)),
+    prediction_(std::move(prediction)), correction_(std::move(correction)), resampling_(std::move(resampling)),
     cam_sel_(cam_sel), laterality_(laterality), num_particles_(num_particles),
     icub_kin_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")}
 {
@@ -149,6 +148,8 @@ void VisualSIRParticleFilter::runFilter()
             {
                 if(init_weight(j) <= threshold)
                     prediction_->predict(init_particle.col(j), init_particle.col(j));
+                else
+                    prediction_->motion(init_particle.col(j), init_particle.col(j));
             }
 
             /* CORRECTION */
