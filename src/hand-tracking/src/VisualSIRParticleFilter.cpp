@@ -84,8 +84,6 @@ void VisualSIRParticleFilter::runFilter()
     Map<VectorXd> init_hand_pose(ee_pose.data(), 6, 1);
     init_hand_pose.tail(3) *= ee_pose(6);
 
-    VectorXd old_hand_pose = init_hand_pose;
-
     MatrixXf init_particle(6, num_particles_);
     for (int i = 0; i < num_particles_; ++i)
         init_particle.col(i) = init_hand_pose.cast<float>();
@@ -102,6 +100,8 @@ void VisualSIRParticleFilter::runFilter()
     cuda_hog->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
     cuda_hog->setGammaCorrection(true);
     cuda_hog->setWinStride(Size(img_width, img_height));
+
+    prediction_->setMotionModelProperty("ICFW_INIT");
 
     is_filter_init_ = true;
 

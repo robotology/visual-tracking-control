@@ -15,6 +15,8 @@ public:
     /* Constructor */
     playFwdKinMotion(std::unique_ptr<StateModel> state_model, const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
+    playFwdKinMotion(std::unique_ptr<StateModel> state_model, const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix, bool init_pose) noexcept;
+
     /* Default constructor, disabled */
     playFwdKinMotion() = delete;
 
@@ -43,6 +45,7 @@ protected:
 
     yarp::sig::Vector readTorso();
     yarp::sig::Vector readRootToEE();
+    bool              setInitialPose();
     bool              setDeltaMotion();
 
 private:
