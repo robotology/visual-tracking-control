@@ -173,7 +173,7 @@ void VisualSIRParticleFilter::runFilter()
 
                 ang += static_cast<float>(delta_angle);
                 if (ang > 2.0 * M_PI) ang -= 2.0 * M_PI;
-                if (ang > 0.0       ) ang += 2.0 * M_PI;
+                if (ang < 0.0       ) ang += 2.0 * M_PI;
                 init_particle.col(j).tail(3) *= ang;
 
                 if(init_weight(j) <= threshold)
