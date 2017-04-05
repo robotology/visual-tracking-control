@@ -85,8 +85,8 @@ void playFwdKinMotion::propagate(const Ref<const VectorXf>& cur_state, Ref<Vecto
     prop_state.tail<3>() = prop_state.tail<3>().normalized();
 
     ang += static_cast<float>(delta_angle_);
-    if (ang >   M_PI) ang -= 2.0 * M_PI;
-    if (ang <= -M_PI) ang += 2.0 * M_PI;
+    if (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
+    if (ang <=        0.0) ang += 2.0 * M_PI;
     prop_state.tail<3>() *= ang;
 
     bfl::StateModelDecorator::propagate(prop_state, prop_state);
@@ -167,8 +167,8 @@ bool playFwdKinMotion::setDeltaMotion()
 
     delta_hand_pose_.head<3>() = cur_ee_pose.head<3>() - prev_ee_pose_.head<3>();
     delta_angle_               = cur_ee_pose.tail<3>().norm() - prev_ee_pose_.tail<3>().norm();
-    if (delta_angle_ >   M_PI) delta_angle_ -= 2.0 * M_PI;
-    if (delta_angle_ <= -M_PI) delta_angle_ += 2.0 * M_PI;
+    if (delta_angle_ >  2.0 * M_PI) delta_angle_ -= 2.0 * M_PI;
+    if (delta_angle_ <= 0.0       ) delta_angle_ += 2.0 * M_PI;
     delta_hand_pose_.tail<3>() = cur_ee_pose.tail<3>().normalized() - prev_ee_pose_.tail<3>().normalized();
 
     prev_ee_pose_ = cur_ee_pose;

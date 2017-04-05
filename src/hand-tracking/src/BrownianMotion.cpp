@@ -102,5 +102,7 @@ void BrownianMotion::noiseSample(Ref<VectorXf> sample)
 
     /* Generate random rotation angle */
     sample.middleRows<3>(3) = Vector3f(x, y, z);
-    sample(6) = gaussian_random_theta_();
+    float ang = gaussian_random_theta_();
+    if (ang <=        0.0) ang += 2.0 * M_PI;
+    sample(6) = ang;
 }

@@ -51,8 +51,8 @@ void DrawPoseParticle::predict(const Ref<const VectorXf>& prev_state, Ref<Vector
     addAxisangleDisturbance(pred_state.tail<3>().normalized(), sample.middleRows<3>(3), rotated_vec);
 
     float ang = pred_state.tail<3>().norm() + sample(6);
-    if (ang >   M_PI) ang -= 2.0 * M_PI;
-    if (ang <= -M_PI) ang += 2.0 * M_PI;
+    if (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
+    if (ang <=        0.0) ang += 2.0 * M_PI;
 
     pred_state.tail<3>() = ang * rotated_vec;
 }

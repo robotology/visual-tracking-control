@@ -320,9 +320,15 @@ VectorXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, con
         out_particle.tail<3>() += weights(i) * particles.col(i).tail<3>().normalized();
 
         float ang = particles.col(i).tail<3>().norm();
+        if (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
+        if (ang <=        0.0) ang += 2.0 * M_PI;
         s_ang                  += weights(i) * std::sin(ang);
         c_ang                  += weights(i) * std::cos(ang);
     }
+
+    float ang = std::atan2(s_ang, c_ang) + M_PI;
+    if (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
+    if (ang <=        0.0) ang += 2.0 * M_PI;
 
     out_particle.tail<3>() = out_particle.tail<3>().normalized() * std::atan2(s_ang, c_ang);
 
