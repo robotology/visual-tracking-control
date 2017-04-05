@@ -4,8 +4,8 @@
 
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking-BATCH</name>
-    <description>Visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
-    <version>0.1.0</version>
+    <description>Offline visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
+    <version>0.4.1</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -15,6 +15,13 @@
     <!-- REQUIRED MODULES -->
     <module>
         <name>hand-tracking</name>
+        <parameters>--robot icub --cam left --laterality right</parameters>
+        <node>yarprun</node>
+    </module>
+
+    <module>
+        <name>hand-tracking</name>
+        <parameters>--robot icub --cam right --laterality right</parameters>
         <node>yarprun</node>
     </module>
 
@@ -26,39 +33,128 @@
 
     <module>
         <name>yarpview</name>
-        <parameters>--name /view/result --x 20 --y 0 --RefreshTime 30</parameters>
+        <parameters>--name /view/result/left --x 20 --y 0 --RefreshTime 30</parameters>
+        <node>yarprun</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/result/right --x 340 --y 0 --RefreshTime 30</parameters>
         <node>yarprun</node>
     </module>
 
 
     <!-- REQUIRED CONNECTIONS -->
-    <connection persist="true">
+    <!-- Particle filter connections -->
+    <connection>
         <from>/icub/camcalib/left/out</from>
-        <to>/hand-tracking/left_img:i</to>
+        <to>/hand-tracking/left/img:i</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
-        <from>/icub/head/state:o</from>
-        <to>/hand-tracking/head:i</to>
+    <connection>
+        <from>/icub/camcalib/right/out</from>
+        <to>/hand-tracking/right/img:i</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
+    <connection>
         <from>/icub/right_arm/state:o</from>
-        <to>/hand-tracking/right_arm:i</to>
+        <to>/hand-tracking/left/right_arm:i</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/right/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
         <from>/icub/torso/state:o</from>
-        <to>/hand-tracking/torso:i</to>
+        <to>/hand-tracking/left/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
 
-    <connection persist="true">
-        <from>/hand-tracking/result:o</from>
-        <to>/view/result</to>
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/right/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/hand-tracking/left/result/img:o</from>
+        <to>/view/result/left</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/hand-tracking/right/result/img:o</from>
+        <to>/view/result/right</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+
+    <!-- playFwdKinMotion -->
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/playFwdKinMotion/left/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/playFwdKinMotion/right/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/playFwdKinMotion/left/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/playFwdKinMotion/right/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+
+    <!-- VisualProprioception connections -->
+    <connection>
+        <from>/icub/head/state:o</from>
+        <to>/hand-tracking/VisualProprioception/left/head:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/head/state:o</from>
+        <to>/hand-tracking/VisualProprioception/right/head:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/VisualProprioception/left/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/VisualProprioception/right/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/VisualProprioception/left/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/VisualProprioception/right/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
 
