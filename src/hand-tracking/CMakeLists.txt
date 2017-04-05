@@ -27,6 +27,9 @@ include(YarpInstallationHelpers)
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotion.h
+        include/DrawPoseParticle.h
+        include/iCubFwdKinMotion.h
+        include/playFwdKinMotion.h
         include/VisualProprioception.h
         include/VisualParticleFilterCorrection.h
         include/VisualSIRParticleFilter.h)
@@ -34,6 +37,9 @@ set(${EXE_TARGET_NAME}_HDR
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
         src/BrownianMotion.cpp
+        src/DrawPoseParticle.cpp
+        src/iCubFwdKinMotion.cpp
+        src/playFwdKinMotion.cpp
         src/VisualProprioception.cpp
         src/VisualParticleFilterCorrection.cpp
         src/VisualSIRParticleFilter.cpp)
@@ -76,16 +82,18 @@ set(${EXE_TARGET_NAME}_APP
         ${PROJECT_SOURCE_DIR}/app/hand-tracking-BATCH.xml
         ${PROJECT_SOURCE_DIR}/app/hand-tracking-SIM.xml)
 
-set(SHADERS_VERT_FILES
+set(${EXE_TARGET_NAME}_CONF
+        ${PROJECT_SOURCE_DIR}/config/parameters.ini)
+
+set(${EXE_TARGET_NAME}_SHADER_VERT
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.vert
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_background.vert)
 
-set(SHADERS_FRAG_FILES
+set(${EXE_TARGET_NAME}_SHADER_FRAG
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.frag
-        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model_simple.frag
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_background.frag)
 
-set(ICUB_HAND_FILES
+set(${EXE_TARGET_NAME}_MESH
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_palm.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail0.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail1.obj
@@ -101,7 +109,6 @@ set(ICUB_HAND_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml1.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml2.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml3.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_palm.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl0.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl1.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl2.obj
@@ -109,10 +116,13 @@ set(ICUB_HAND_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl4.obj)
 
 add_custom_command(TARGET  ${EXE_TARGET_NAME} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E make_directory             $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
-                   COMMAND ${CMAKE_COMMAND} -E copy ${SHADERS_VERT_FILES} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
-                   COMMAND ${CMAKE_COMMAND} -E copy ${SHADERS_FRAG_FILES} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
-                   COMMAND ${CMAKE_COMMAND} -E copy ${ICUB_HAND_FILES}    $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>)
+                   COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_SHADER_VERT} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
+                   COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_SHADER_FRAG} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
+                   COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_MESH}        $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>)
 
-install(TARGETS ${EXE_TARGET_NAME}        DESTINATION bin)
-install(FILES   ${${EXE_TARGET_NAME}_APP} DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR})
+install(TARGETS ${EXE_TARGET_NAME}                DESTINATION bin)
+install(FILES   ${${EXE_TARGET_NAME}_APP}         DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR})
+install(FILES   ${${EXE_TARGET_NAME}_CONF}        DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/${EXE_TARGET_NAME})
+install(FILES   ${${EXE_TARGET_NAME}_SHADER_VERT} DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/${EXE_TARGET_NAME}/shader)
+install(FILES   ${${EXE_TARGET_NAME}_SHADER_FRAG} DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/${EXE_TARGET_NAME}/shader)
+install(FILES   ${${EXE_TARGET_NAME}_MESH}        DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/${EXE_TARGET_NAME}/mesh)

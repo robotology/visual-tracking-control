@@ -37,7 +37,7 @@ public:
 
     void noiseSample(Eigen::Ref<Eigen::VectorXf> sample) override;
 
-    void motion(const Eigen::Ref<const Eigen::VectorXf>& cur_state, Eigen::Ref<Eigen::VectorXf> next_state) override;
+    bool setProperty(const std::string& property) override { return false; };
 
 protected:
     Eigen::MatrixXf                       F_;           /* State transition matrix */
@@ -45,6 +45,7 @@ protected:
     float                                 q_z_;         /* Noise standard deviation for x-y 3D position */
     float                                 theta_;       /* Noise standard deviation for axis-angle rotation */
     float                                 cone_angle_;  /* Noise standard deviation for axis-angle axis cone */
+    Eigen::Vector4f                       cone_dir_;    /* Cone direction of rotation */
 
     std::mt19937_64                       generator_;
     std::normal_distribution<float>       distribution_pos_xy_;
