@@ -1,4 +1,5 @@
 #include <utility>
+#include <iostream>
 
 #include "DrawPoseParticle.h"
 
@@ -50,8 +51,8 @@ void DrawPoseParticle::predict(const Ref<const VectorXf>& prev_state, Ref<Vector
     addAxisangleDisturbance(pred_state.tail<3>().normalized(), sample.middleRows<3>(3), rotated_vec);
 
     float ang = pred_state.tail<3>().norm() + sample(6);
-    if (ang >  M_PI) ang -= 2.0 * M_PI;
-    if (ang < -M_PI) ang += 2.0 * M_PI;
+    if (ang >   M_PI) ang -= 2.0 * M_PI;
+    if (ang <= -M_PI) ang += 2.0 * M_PI;
 
     pred_state.tail<3>() = ang * rotated_vec;
 }
@@ -67,7 +68,7 @@ void DrawPoseParticle::addAxisangleDisturbance(const Ref<const Vector3f>& curren
     /* Find the rotation axis 'u' and rotation angle 'rot' [1] */
     Vector3f def_dir(0.0, 0.0, 1.0);
     Vector3f u = def_dir.cross(current_vec).normalized();
-    float rot = static_cast<float>(acos(current_vec.dot(def_dir)));
+    float rot  = static_cast<float>(acos(current_vec.dot(def_dir)));
 
     /* Convert rotation axis and angle to 3x3 rotation matrix [2] */
     /* [2] https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle */
@@ -77,5 +78,5 @@ void DrawPoseParticle::addAxisangleDisturbance(const Ref<const Vector3f>& curren
                     -u(1),   u(0),      0;
     Matrix3f R = cos(rot) * Matrix3f::Identity() + sin(rot) * cross_matrix + (1 - cos(rot)) * (u * u.transpose());
 
-    rotated_vec = R * disturbance_vec;
+    rotated_vec = (R * disturbance_vec).normalized();
 }
