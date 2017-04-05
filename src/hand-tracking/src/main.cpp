@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     ConstString robot_cam_sel    = rf.find("cam").asString();
     ConstString robot_laterality = rf.find("laterality").asString();
     bool        play             = rf.find("play").asBool();
-    const int   num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
+    int         num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
 
     if (robot_name.empty())
         robot_name       = "icub";
@@ -105,6 +105,7 @@ int main(int argc, char *argv[])
         std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality, rf.getContext()));
 
         proprio = std::move(vp);
+        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * gpu_dev.multiProcessorCount();
     }
     catch (const std::runtime_error& e)
     {
