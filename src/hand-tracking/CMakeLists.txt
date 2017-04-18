@@ -57,7 +57,7 @@ target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE
                                                       ${EIGEN3_INCLUDE_DIRS}
                                                       ${ICUB_INCLUDE_DIRS}
                                                       ${YARP_INCLUDE_DIRS}
-						      ${GLEW_INCLUDE_DIR})
+                                                      ${GLEW_INCLUDE_DIR})
 
 target_link_libraries(${EXE_TARGET_NAME} BayesFiltersLib::BayesFiltersLib
                                          ctrlLib
