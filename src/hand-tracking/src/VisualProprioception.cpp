@@ -402,8 +402,6 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputA
     Mat hand_ogl = observation.getMat();
 
     si_cad_->superimpose(hand_poses, cam_x_, cam_o_, hand_ogl);
-
-    glfwPostEmptyEvent();
 }
 
 
@@ -501,8 +499,6 @@ void VisualProprioception::superimpose(const Ref<const VectorXf>&  state, Mat& i
     getPoses(state, hand_poses);
 
     si_cad_->superimpose(hand_poses[0], cam_x_, cam_o_, img);
-    
-    glfwPostEmptyEvent();
 
 
     si_cad_->setBackgroundOpt(false);

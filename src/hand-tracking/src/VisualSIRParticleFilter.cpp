@@ -77,6 +77,8 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
 
 void VisualSIRParticleFilter::runFilter()
 {
+    is_running_ = true;
+
     /* INITIALIZATION */
     unsigned int  k = 0;
 
@@ -247,7 +249,6 @@ void VisualSIRParticleFilter::getResult() { }
 
 std::future<void> VisualSIRParticleFilter::spawn()
 {
-    is_running_ = true;
     return std::async(std::launch::async, &VisualSIRParticleFilter::runFilter, this);
 }
 
