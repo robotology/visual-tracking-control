@@ -1,6 +1,7 @@
 #ifndef DRAWPOSEPARTICLE_H
 #define DRAWPOSEPARTICLE_H
 
+#include <memory>
 #include <random>
 
 #include <BayesFiltersLib/ParticleFilterPrediction.h>
