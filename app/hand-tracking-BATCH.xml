@@ -16,31 +16,31 @@
     <module>
         <name>hand-tracking</name>
         <parameters>--robot icub --cam left --laterality right</parameters>
-        <node>yarprun</node>
+        <node>localhost</node>
     </module>
 
     <module>
         <name>hand-tracking</name>
         <parameters>--robot icub --cam right --laterality right</parameters>
-        <node>yarprun</node>
+        <node>localhost</node>
     </module>
 
     <module>
         <name>yarpdataplayer</name>
         <parameters>--withExtraTimeCol 2</parameters>
-        <node>yarprun</node>
+        <node>localhost</node>
     </module>
 
     <module>
         <name>yarpview</name>
         <parameters>--name /view/result/left --x 20 --y 0 --RefreshTime 30</parameters>
-        <node>yarprun</node>
+        <node>localhost</node>
     </module>
 
     <module>
         <name>yarpview</name>
         <parameters>--name /view/result/right --x 340 --y 0 --RefreshTime 30</parameters>
-        <node>yarprun</node>
+        <node>localhost</node>
     </module>
 
 
