@@ -145,18 +145,14 @@ void VisualSIRParticleFilter::runFilter()
             std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
             float threshold = sorted_pred.tail(6)(0);
 
-            std::cout << "Before prediction:\n" << init_particle << std::endl;
-
-            prediction_->setMotionModelProperty("ICFW_DELTA");
-            for (int j = 0; j < num_particles_; ++j)
-            {
-                if(init_weight(j) <= threshold)
-                    prediction_->predict(init_particle.col(j), init_particle.col(j));
-                else
-                    prediction_->motion(init_particle.col(j), init_particle.col(j));
-            }
-
-            std::cout << "After prediction:\n" << init_particle << std::endl;
+//            prediction_->setMotionModelProperty("ICFW_DELTA");
+//            for (int j = 0; j < num_particles_; ++j)
+//            {
+//                if(init_weight(j) <= threshold)
+//                    prediction_->predict(init_particle.col(j), init_particle.col(j));
+//                else
+//                    prediction_->motion(init_particle.col(j), init_particle.col(j));
+//            }
 
             /* CORRECTION */
             correction_->setMeasurementModelProperty("VP_PARAMS");
@@ -171,7 +167,6 @@ void VisualSIRParticleFilter::runFilter()
 //            out_particle = mode(init_particle, init_weight);
 
             std::cout << "Extracted:\n" << out_particle << std::endl;
-            std::cin.ignore();
 
             /* RESAMPLING */
             std::cout << "Step: " << k << "\nNeff: " << resampling_->neff(init_weight) << std::endl;
