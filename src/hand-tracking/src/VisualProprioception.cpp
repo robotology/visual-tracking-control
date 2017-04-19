@@ -339,9 +339,6 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
         ee_o(2) = cur_state(5, j) / ang;
         ee_o(3) = ang;
 
-        std::cout << "ee_t:\n" << ee_t.toString() << std::endl;
-        std::cout << "ee_o:\n" << ee_o.toString() << std::endl;
-
         pose.assign(ee_t.data(), ee_t.data()+3);
         pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
         hand_pose.emplace("palm", pose);
@@ -358,9 +355,6 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
                 Vector j_x = (Ha * (icub_kin_finger_[fng].getH0().getCol(3))).subVector(0, 2);
                 Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH0());
 
-                std::cout << "j_x:\n" << j_x.toString() << std::endl;
-                std::cout << "j_o:\n" << j_o.toString() << std::endl;
-
                 if      (fng == 1) { finger_s = "index0"; }
                 else if (fng == 2) { finger_s = "medium0"; }
 
@@ -373,9 +367,6 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
             {
                 Vector j_x = (Ha * (icub_kin_finger_[fng].getH(i, true).getCol(3))).subVector(0, 2);
                 Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH(i, true));
-
-                std::cout << "j_x:\n" << j_x.toString() << std::endl;
-                std::cout << "j_o:\n" << j_o.toString() << std::endl;
 
                 if      (fng == 0) { finger_s = "thumb"+std::to_string(i+1); }
                 else if (fng == 1) { finger_s = "index"+std::to_string(i+1); }
@@ -398,8 +389,6 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
 //        hand_pose.emplace("forearm", pose);
 
         hand_poses.push_back(hand_pose);
-
-        std::cin.ignore();
     }
 }
 
