@@ -421,16 +421,11 @@ bool VisualProprioception::setProperty(const std::string property)
 
 bool VisualProprioception::setiCubParams()
 {
-    double left_cam_x[3];
-    double left_cam_o[4];
-    Vector left_eye_pose;
-    Vector right_eye_pose;
+    Vector left_eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * readRootToEye(cam_sel_));
 
-    left_eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * readRootToEye(cam_sel_));
-    left_cam_x[0] = left_eye_pose(0); left_cam_x[1] = left_eye_pose(1); left_cam_x[2] = left_eye_pose(2);
-    left_cam_o[0] = left_eye_pose(3); left_cam_o[1] = left_eye_pose(4); left_cam_o[2] = left_eye_pose(5); left_cam_o[3] = left_eye_pose(6);
+    cam_x_[0] = left_eye_pose(0); cam_x_[1] = left_eye_pose(1); cam_x_[2] = left_eye_pose(2);
+    cam_o_[0] = left_eye_pose(3); cam_o_[1] = left_eye_pose(4); cam_o_[2] = left_eye_pose(5); cam_o_[3] = left_eye_pose(6);
 
-    setCamPose(left_cam_x, left_cam_o);
 
     Vector q = readRootToFingers();
 
@@ -453,13 +448,6 @@ bool VisualProprioception::setiCubParams()
     else setArmJoints(q);
 
     return true;
-}
-
-
-void VisualProprioception::setCamPose(double* cam_x, double* cam_o)
-{
-    memcpy(cam_x_, cam_x, 3 * sizeof(double));
-    memcpy(cam_o_, cam_o, 4 * sizeof(double));
 }
 
 
