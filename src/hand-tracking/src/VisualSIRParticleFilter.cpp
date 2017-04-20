@@ -91,7 +91,7 @@ void VisualSIRParticleFilter::runFilter()
         init_particle.col(i) = init_hand_pose.cast<float>();
 
     VectorXf init_weight(num_particles_, 1);
-    init_weight.setConstant(1.0/num_particles_);
+    init_weight.fill(1.0/num_particles_);
 
     const int          block_size = 16;
     const int          img_width  = 320;
@@ -112,7 +112,6 @@ void VisualSIRParticleFilter::runFilter()
     ImageOf<PixelRgb>* imgin_left  = YARP_NULLPTR;
     while(is_running_)
     {
-        Vector             q;
         std::vector<float> descriptors_cam_left (descriptor_length);
         cuda::GpuMat       cuda_img             (Size(img_width, img_height), CV_8UC3);
         cuda::GpuMat       cuda_img_alpha       (Size(img_width, img_height), CV_8UC4);
@@ -145,14 +144,14 @@ void VisualSIRParticleFilter::runFilter()
             std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
             float threshold = sorted_pred.tail(6)(0);
 
-//            prediction_->setMotionModelProperty("ICFW_DELTA");
-//            for (int j = 0; j < num_particles_; ++j)
-//            {
-//                if(init_weight(j) <= threshold)
-//                    prediction_->predict(init_particle.col(j), init_particle.col(j));
-//                else
-//                    prediction_->motion(init_particle.col(j), init_particle.col(j));
-//            }
+            prediction_->setMotionModelProperty("ICFW_DELTA");
+            for (int j = 0; j < num_particles_; ++j)
+            {
+                if(init_weight(j) <= threshold)
+                    prediction_->predict(init_particle.col(j), init_particle.col(j));
+                else
+                    prediction_->motion(init_particle.col(j), init_particle.col(j));
+            }
 
             /* CORRECTION */
             correction_->setMeasurementModelProperty("VP_PARAMS");
@@ -165,8 +164,6 @@ void VisualSIRParticleFilter::runFilter()
             out_particle = mean(init_particle, init_weight);
             /* Extracting state estimate: mode */
 //            out_particle = mode(init_particle, init_weight);
-
-            std::cout << "Extracted:\n" << out_particle << std::endl;
 
             /* RESAMPLING */
             std::cout << "Step: " << k << "\nNeff: " << resampling_->neff(init_weight) << std::endl;
@@ -186,6 +183,7 @@ void VisualSIRParticleFilter::runFilter()
 
             /* STATE ESTIMATE OUTPUT */
             /* INDEX FINGERTIP */
+//            Vector q = readRootToEE();
 //            icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
 //            Vector chainjoints;
 //            if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
