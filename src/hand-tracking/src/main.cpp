@@ -104,10 +104,12 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality, rf.getContext()));
+        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles, robot_cam_sel, robot_laterality, rf.getContext()));
+//        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality, rf.getContext()));
 
         proprio = std::move(vp);
-        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * gpu_dev.multiProcessorCount();
+        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols();
+//        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * gpu_dev.multiProcessorCount();
     }
     catch (const std::runtime_error& e)
     {
@@ -115,7 +117,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
+    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), 1));
+//    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
 
     std::unique_ptr<Resampling> resampling(new Resampling());
 
