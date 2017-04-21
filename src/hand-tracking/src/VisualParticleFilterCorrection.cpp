@@ -18,7 +18,7 @@ using namespace Eigen;
 
 
 VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> measurement_model) noexcept :
-    VisualParticleFilterCorrection(std::move(measurement_model), 1) { };
+    VisualParticleFilterCorrection(std::move(measurement_model), 1) { }
 
 
 VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> measurement_model, const int num_cuda_stream) noexcept :

@@ -77,6 +77,8 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
 
 void VisualSIRParticleFilter::runFilter()
 {
+    is_running_ = true;
+
     /* INITIALIZATION */
     unsigned int  k = 0;
 
@@ -89,7 +91,7 @@ void VisualSIRParticleFilter::runFilter()
         init_particle.col(i) = init_hand_pose.cast<float>();
 
     VectorXf init_weight(num_particles_, 1);
-    init_weight.setConstant(1.0/num_particles_);
+    init_weight.fill(1.0/num_particles_);
 
     const int          block_size = 16;
     const int          img_width  = 320;
@@ -110,7 +112,6 @@ void VisualSIRParticleFilter::runFilter()
     ImageOf<PixelRgb>* imgin_left  = YARP_NULLPTR;
     while(is_running_)
     {
-        Vector             q;
         std::vector<float> descriptors_cam_left (descriptor_length);
         cuda::GpuMat       cuda_img             (Size(img_width, img_height), CV_8UC3);
         cuda::GpuMat       cuda_img_alpha       (Size(img_width, img_height), CV_8UC4);
@@ -182,6 +183,7 @@ void VisualSIRParticleFilter::runFilter()
 
             /* STATE ESTIMATE OUTPUT */
             /* INDEX FINGERTIP */
+//            Vector q = readRootToEE();
 //            icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
 //            Vector chainjoints;
 //            if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
@@ -247,7 +249,6 @@ void VisualSIRParticleFilter::getResult() { }
 
 std::future<void> VisualSIRParticleFilter::spawn()
 {
-    is_running_ = true;
     return std::async(std::launch::async, &VisualSIRParticleFilter::runFilter, this);
 }
 

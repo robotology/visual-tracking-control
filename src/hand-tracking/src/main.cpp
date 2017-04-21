@@ -5,6 +5,8 @@
 
 #include <BayesFiltersLib/FilteringFunction.h>
 #include <BayesFiltersLib/SIRParticleFilter.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
@@ -102,10 +104,12 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality, rf.getContext()));
+        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles, robot_cam_sel, robot_laterality, rf.getContext()));
+//        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality, rf.getContext()));
 
         proprio = std::move(vp);
-        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * gpu_dev.multiProcessorCount();
+        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols();
+//        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * gpu_dev.multiProcessorCount();
     }
     catch (const std::runtime_error& e)
     {
@@ -113,7 +117,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
+    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), 1));
+//    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
 
     std::unique_ptr<Resampling> resampling(new Resampling());
 
@@ -121,18 +126,13 @@ int main(int argc, char *argv[])
                                     std::move(resampling),
                                     robot_cam_sel, robot_laterality, num_particles);
 
-    std::future<void> thr_vpf = vsir_pf.spawn();
-    while (vsir_pf.isRunning()) glfwWaitEventsTimeout(1.0);
+    vsir_pf.runFilter();
 
-    yInfo() << log_ID << "Joining filthering thread...";
-    while (thr_vpf.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) glfwPollEvents();
-
+    yInfo() << log_ID << "Terminating OpenGL...";
     glfwMakeContextCurrent(NULL);
     glfwTerminate();
 
-    yInfo() << log_ID << "Main returning.";
-    yInfo() << log_ID << "Application closed.";
-
+    yInfo() << log_ID << "Application closed succesfully.";
     return EXIT_SUCCESS;
 }
 
