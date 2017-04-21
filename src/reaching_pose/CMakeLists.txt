@@ -1,5 +1,6 @@
 set(EXE_TARGET_NAME reaching_pose)
 
+find_package(glew        REQUIRED)
 find_package(ICUB        REQUIRED)
 find_package(OpenCV      REQUIRED)
 find_package(SuperImpose REQUIRED)

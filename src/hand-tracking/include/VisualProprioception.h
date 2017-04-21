@@ -84,8 +84,6 @@ protected:
 
     bool              setiCubParams();
 
-    void              setCamPose(double* cam_x, double* cam_o);
-
     void              setArmJoints(const yarp::sig::Vector& q);
 
     void              setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds);
