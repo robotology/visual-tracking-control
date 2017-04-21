@@ -60,7 +60,7 @@ target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE
 
 target_link_libraries(${EXE_TARGET_NAME} BayesFiltersLib::BayesFiltersLib
                                          ctrlLib
-                                         GLEW::glew
+                                         GLEW::GLEW
                                          glfw
                                          ${ICUB_LIBRARIES}
                                          iKin
