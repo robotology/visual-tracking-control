@@ -351,8 +351,8 @@ public:
 
 
         double Ts    = 0.1;   // controller's sample time [s]
-        double K_x   = 0.5;  // visual servoing proportional gain
-        double K_o   = 0.5;  // visual servoing proportional gain
+        double K_x   = 1;  // visual servoing proportional gain
+        double K_o   = 1;  // visual servoing proportional gain
 //        double v_max = 0.0005; // max cartesian velocity [m/s]
 
         bool done = false;
@@ -408,16 +408,27 @@ public:
             vel_o.push_back(ang);
             yInfo() << "axis-angle vel_o = [" << vel_o.toString() << "]";
 
-            vel_x    *= K_x;
+            double K_ctrl_x = 0;
+            if (vel_o(3) > (3.0 * CTRL_DEG2RAD)) K_ctrl_x = exp(-(vel_o(3) - (3.0 * CTRL_DEG2RAD)) / 0.1);
+            else                                 K_ctrl_x = 1.0;
+            yInfo() << "K_ctrl_x: " << K_ctrl_x;
+
+            /* Visual control law */
+            /* SIM */
+            vel_x    *= (K_x * K_ctrl_x);
+//            vel_x    *= K_x;
             vel_o(3) *= K_o;
+            /* Real robot - Pose */
 //            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+            /* Real robot - Orientation */
 //            itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
+            /* Real robot - Translation */
 //            itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
 
-            yInfo() << "Pixel error: " << std::abs(px_des(0) - px_ee_now(0)) << std::abs(px_des(1)  - px_ee_now(1))  << std::abs(px_des(2)  - px_ee_now(2))
-                                       << std::abs(px_des(3) - px_ee_now(3)) << std::abs(px_des(4)  - px_ee_now(4))  << std::abs(px_des(5)  - px_ee_now(5))
-                                       << std::abs(px_des(6) - px_ee_now(6)) << std::abs(px_des(7)  - px_ee_now(7))  << std::abs(px_des(8)  - px_ee_now(8))
-                                       << std::abs(px_des(9) - px_ee_now(9)) << std::abs(px_des(10) - px_ee_now(10)) << std::abs(px_des(11) - px_ee_now(11));
+            yInfo() << "Pixel errors: " << std::abs(px_des(0) - px_ee_now(0)) << std::abs(px_des(1)  - px_ee_now(1))  << std::abs(px_des(2)  - px_ee_now(2))
+                                        << std::abs(px_des(3) - px_ee_now(3)) << std::abs(px_des(4)  - px_ee_now(4))  << std::abs(px_des(5)  - px_ee_now(5))
+                                        << std::abs(px_des(6) - px_ee_now(6)) << std::abs(px_des(7)  - px_ee_now(7))  << std::abs(px_des(8)  - px_ee_now(8))
+                                        << std::abs(px_des(9) - px_ee_now(9)) << std::abs(px_des(10) - px_ee_now(10)) << std::abs(px_des(11) - px_ee_now(11));
 
             Time::delay(Ts);
 
@@ -433,10 +444,10 @@ public:
             }
             else
             {
-//                /* Get the new end-effector pose from hand-tracking */
+                /* Get the new end-effector pose from hand-tracking */
 //                estimates = port_estimates_in_.read(true);
-//
-//                /* If the end-effector pose is taken from the direct kinematics, then the pose is replicated */
+
+                /* If the end-effector pose is taken from the direct kinematics, then the pose is replicated */
 //                est_copy = Vector(*estimates);
 //                if (est_copy.size() == 7)
 //                {
@@ -1016,7 +1027,7 @@ public:
                 take_estimates_ = true;
                 should_stop_    = true;
 
-                this->interruptModule();
+                this->stopModule();
 
                 reply = command;
                 
@@ -1355,7 +1366,7 @@ private:
         p1 = H_ee_to_root * p;
 
         p(0) = -0.035;
-        p(1) = -0.015;
+        p(1) =  0.015;
         p(2) =  0;
         p(3) =  1.0;
 
@@ -1363,7 +1374,7 @@ private:
         p2 = H_ee_to_root * p;
 
         p(0) = -0.035;
-        p(1) =  0.015;
+        p(1) = -0.015;
         p(2) =  0;
         p(3) =  1.0;
 
