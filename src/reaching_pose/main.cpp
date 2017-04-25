@@ -407,11 +407,11 @@ public:
 
             /* Visual control law */
             /* SIM */
-            vel_x    *= (K_x * K_ctrl_x);
 //            vel_x    *= K_x;
+            vel_x    *= (K_x * K_ctrl_x);
             vel_o(3) *= K_o;
             /* Real robot - Pose */
-//            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
             /* Real robot - Orientation */
 //            itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
             /* Real robot - Translation */
@@ -437,50 +437,53 @@ public:
             else
             {
                 /* Get the new end-effector pose from hand-tracking */
-//                estimates = port_estimates_in_.read(true);
+                estimates = port_estimates_in_.read(true);
 
                 /* If the end-effector pose is taken from the direct kinematics, then the pose is replicated */
-//                est_copy = Vector(*estimates);
-//                if (est_copy.size() == 7)
-//                {
-//                    double ang = est_copy(6);
-//                    est_copy.setSubvector(3, est_copy.subVector(3, 5) * ang);
+                est_copy = Vector(*estimates);
+                if (est_copy.size() == 7)
+                {
+                    double ang = est_copy(6);
+                    est_copy.setSubvector(3, est_copy.subVector(3, 5) * ang);
+
+                    est_copy(6) = est_copy(0);
+                    for (int i = 1; i < 6; ++i)
+                    {
+                        est_copy.push_back(est_copy(i));
+                    }
+                }
+
+                /* SIM */
+//                /* Simulate reaching starting from the initial position */
+//                /* Comment any previous write on variable 'estimates' */
+//                yInfo() << "EE L now: " << est_copy.subVector(0, 2).toString();
+//                yInfo() << "EE R now: " << est_copy.subVector(6, 8).toString() << "\n";
 //
-//                    est_copy(6) = est_copy(0);
-//                    for (int i = 1; i < 6; ++i)
-//                    {
-//                        est_copy.push_back(est_copy(i));
-//                    }
-//                }
-
-                /* Simulate reaching starting from the initial position */
-                /* Comment any previous write on variable 'estimates' */
-                yInfo() << "EE L now: " << est_copy.subVector(0, 2).toString();
-                yInfo() << "EE R now: " << est_copy.subVector(6, 8).toString() << "\n";
-
-                Vector l_o = getAxisAngle(est_copy.subVector(3, 5));
-                Matrix l_R = axis2dcm(l_o);
-                Vector r_o = getAxisAngle(est_copy.subVector(9, 11));
-                Matrix r_R = axis2dcm(r_o);
-
-                vel_o[3] *= Ts;
-                l_R = axis2dcm(vel_o) * l_R;
-                r_R = axis2dcm(vel_o) * r_R;
-
-                Vector l_new_o = dcm2axis(l_R);
-                double l_ang = l_new_o(3);
-                l_new_o.pop_back();
-                l_new_o *= l_ang;
-
-                Vector r_new_o = dcm2axis(r_R);
-                double r_ang = r_new_o(3);
-                r_new_o.pop_back();
-                r_new_o *= r_ang;
-
-                est_copy.setSubvector(0, est_copy.subVector(0, 2)  + vel_x * Ts);
-                est_copy.setSubvector(3, l_new_o);
-                est_copy.setSubvector(6, est_copy.subVector(6, 8)  + vel_x * Ts);
-                est_copy.setSubvector(9, r_new_o);
+//                /* Evaluate the new orientation vector from axis-angle representation */
+//                /* The following code is a copy of the setTaskVelocities() code */
+//                Vector l_o = getAxisAngle(est_copy.subVector(3, 5));
+//                Matrix l_R = axis2dcm(l_o);
+//                Vector r_o = getAxisAngle(est_copy.subVector(9, 11));
+//                Matrix r_R = axis2dcm(r_o);
+//
+//                vel_o[3] *= Ts;
+//                l_R = axis2dcm(vel_o) * l_R;
+//                r_R = axis2dcm(vel_o) * r_R;
+//
+//                Vector l_new_o = dcm2axis(l_R);
+//                double l_ang = l_new_o(3);
+//                l_new_o.pop_back();
+//                l_new_o *= l_ang;
+//
+//                Vector r_new_o = dcm2axis(r_R);
+//                double r_ang = r_new_o(3);
+//                r_new_o.pop_back();
+//                r_new_o *= r_ang;
+//
+//                est_copy.setSubvector(0, est_copy.subVector(0, 2)  + vel_x * Ts);
+//                est_copy.setSubvector(3, l_new_o);
+//                est_copy.setSubvector(6, est_copy.subVector(6, 8)  + vel_x * Ts);
+//                est_copy.setSubvector(9, r_new_o);
                 /* **************************************************** */
 
                 yInfo() << "EE L coord: " << est_copy.subVector(0, 2).toString();
@@ -706,9 +709,12 @@ public:
 //                    init_pos[2] =  0.064;
 
                     /* SIM init */
-                    init_pos[0] = -0.416;
-                    init_pos[1] =  0.024 + 0.1;
-                    init_pos[2] =  0.055;
+//                    init_pos[0] = -0.416;
+//                    init_pos[1] =  0.024 + 0.1;
+//                    init_pos[2] =  0.055;
+                    init_pos[0] = -0.35;
+                    init_pos[1] =  0.025 + 0.05;
+                    init_pos[2] =  0.10;
 
 
                     setTorsoDOF();
@@ -936,9 +942,12 @@ public:
 //                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
 
                 Vector p = zeros(7);
-                p(0) = -0.416;
-                p(1) =  0.024;
-                p(2) =  0.055;
+//                p(0) = -0.416;
+//                p(1) =  0.024;
+//                p(2) =  0.055;
+                p(0) = -0.35;
+                p(1) =  0.025;
+                p(2) =  0.10;
                 p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
 
                 Vector p0 = zeros(4);
