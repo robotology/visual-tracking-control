@@ -1019,10 +1019,8 @@ public:
                 take_estimates_ = true;
                 should_stop_    = true;
 
-                this->stopModule();
-
                 reply = command;
-                
+
                 break;
             }
             default:
