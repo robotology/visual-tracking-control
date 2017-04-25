@@ -370,19 +370,11 @@ public:
 
                 if (i == 1 || i == 4 || i == 7 || i == 10)
                 {
-//                    Vector delta_o = r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
-//                    vel_x += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2) - cross(delta_o, r_H_eye_to_r_.getCol(3).subVector(0, 2));
-//                    vel_o += delta_o;
-
                     vel_x += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2);
                     vel_o += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
                 }
                 else
                 {
-//                    Vector delta_o = l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
-//                    vel_x += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2) - cross(delta_o, l_H_eye_to_r_.getCol(3).subVector(0, 2));
-//                    vel_o += delta_o;
-
                     vel_x += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2);
                     vel_o += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
                 }
