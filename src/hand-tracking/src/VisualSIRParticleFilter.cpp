@@ -262,7 +262,7 @@ bool VisualSIRParticleFilter::isRunning()
 bool VisualSIRParticleFilter::setCommandPort()
 {
     std::cout << "Opening RPC command port." << std::endl;
-    if (!port_rpc_command_.open("/hand-tracking/cmd:i"))
+    if (!port_rpc_command_.open("/hand-tracking/" + cam_sel_ + "/cmd:i"))
     {
         std::cerr << "Cannot open the RPC command port." << std::endl;
         return false;
