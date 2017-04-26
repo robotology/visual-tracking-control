@@ -211,10 +211,12 @@ public:
 
         /* Get the initial end-effector pose from left eye particle filter */
         Vector* estimates = port_estimates_left_in_.read(true);
+        yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
         est_copy.setSubvector(0, *estimates);
 
         /* Get the initial end-effector pose from right eye particle filter */
         estimates = port_estimates_right_in_.read(true);
+        yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
         est_copy.setSubvector(6, *estimates);
 
 
@@ -439,9 +441,11 @@ public:
             {
                 /* Get the new end-effector pose from left eye particle filter */
                 estimates = port_estimates_left_in_.read(true);
+                yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
                 est_copy.setSubvector(0, *estimates);
 
                 /* Get the new end-effector pose from right eye particle filter */
+                yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
                 estimates = port_estimates_right_in_.read(true);
                 est_copy.setSubvector(6, *estimates);
 
