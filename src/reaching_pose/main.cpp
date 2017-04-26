@@ -43,9 +43,15 @@ public:
             return false;
         }
 
-        if (!port_estimates_in_.open("/reaching_pose/estimates:i"))
+        if (!port_estimates_left_in_.open("/reaching_pose/estimates/left:i"))
         {
-            yError() << "Could not open /reaching_pose/estimates:i port! Closing.";
+            yError() << "Could not open /reaching_pose/estimates/left:i port! Closing.";
+            return false;
+        }
+
+        if (!port_estimates_right_in_.open("/reaching_pose/estimates/right:i"))
+        {
+            yError() << "Could not open /reaching_pose/estimates/right:i port! Closing.";
             return false;
         }
 
@@ -200,22 +206,17 @@ public:
 
         if (should_stop_) return false;
 
-        /* Get the initial end-effector pose from hand-tracking */
-        Vector* estimates = port_estimates_in_.read(true);
 
-        /* If the end-effector pose is taken from the direct kinematics, then the pose is replicated */
-        Vector est_copy(*estimates);
-        if (est_copy.size() == 7)
-        {
-            double ang = est_copy(6);
-            est_copy.setSubvector(3, est_copy.subVector(3, 5) * ang);
+        Vector est_copy(12);
 
-            est_copy(6) = est_copy(0);
-            for (int i = 1; i < 6; ++i)
-            {
-                est_copy.push_back(est_copy(i));
-            }
-        }
+        /* Get the initial end-effector pose from left eye particle filter */
+        Vector* estimates = port_estimates_left_in_.read(true);
+        est_copy.setSubvector(0, *estimates);
+
+        /* Get the initial end-effector pose from right eye particle filter */
+        estimates = port_estimates_right_in_.read(true);
+        est_copy.setSubvector(6, *estimates);
+
 
         yInfo() << "RUNNING!\n";
 
@@ -436,8 +437,13 @@ public:
             }
             else
             {
-                /* Get the new end-effector pose from hand-tracking */
-                estimates = port_estimates_in_.read(true);
+                /* Get the new end-effector pose from left eye particle filter */
+                estimates = port_estimates_left_in_.read(true);
+                est_copy.setSubvector(0, *estimates);
+
+                /* Get the new end-effector pose from right eye particle filter */
+                estimates = port_estimates_right_in_.read(true);
+                est_copy.setSubvector(6, *estimates);
 
                 /* If the end-effector pose is taken from the direct kinematics, then the pose is replicated */
                 est_copy = Vector(*estimates);
@@ -1077,7 +1083,8 @@ public:
         Time::delay(3.0);
 
         yInfo() << "...port cleanup...";
-        port_estimates_in_.interrupt();
+        port_estimates_left_in_.interrupt();
+        port_estimates_right_in_.interrupt();
         port_image_left_in_.interrupt();
         port_image_left_out_.interrupt();
         port_click_left_.interrupt();
@@ -1094,7 +1101,8 @@ public:
     {
         yInfo() << "Calling close functions...";
 
-        port_estimates_in_.close();
+        port_estimates_left_in_.close();
+        port_estimates_right_in_.close();
         port_image_left_in_.close();
         port_image_left_out_.close();
         port_click_left_.close();
@@ -1122,7 +1130,8 @@ private:
     SISkeleton                     * l_si_skel_;
     SISkeleton                     * r_si_skel_;
 
-    BufferedPort<Vector>             port_estimates_in_;
+    BufferedPort<Vector>             port_estimates_left_in_;
+    BufferedPort<Vector>             port_estimates_right_in_;
 
     BufferedPort<ImageOf<PixelRgb>>  port_image_left_in_;
     BufferedPort<ImageOf<PixelRgb>>  port_image_left_out_;
