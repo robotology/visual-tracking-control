@@ -658,11 +658,12 @@ public:
 //                Vector od = dcm2axis(Od);
 
                 /* KARATE */
-//                Matrix Od = zeros(3, 3);
-//                Od(0, 0) = -1.0;
-//                Od(2, 1) = -1.0;
-//                Od(1, 2) = -1.0;
-//                Vector od = dcm2axis(Od);
+                // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
+                Matrix Od = zeros(3, 3);
+                Od(0, 0) = -1.0;
+                Od(2, 1) = -1.0;
+                Od(1, 2) = -1.0;
+                Vector od = dcm2axis(Od);
 
                 /* GRASPING */
 //                Vector od = zeros(4);
@@ -672,11 +673,11 @@ public:
 //                od(4) =  3.012;
 
                 /* SIM */
-                Matrix Od(3, 3);
-                Od(0, 0) = -1.0;
-                Od(1, 1) = -1.0;
-                Od(2, 2) =  1.0;
-                Vector od = dcm2axis(Od);
+//                Matrix Od(3, 3);
+//                Od(0, 0) = -1.0;
+//                Od(1, 1) = -1.0;
+//                Od(2, 2) =  1.0;
+//                Vector od = dcm2axis(Od);
 
 
                 double traj_time = 0.0;
@@ -701,29 +702,37 @@ public:
 //                    init_pos[2] =  0.089;
 
                     /* KARATE init */
-                    // FIXME: to implement
+                    // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
+                    init_pos[0] = -0.319;
+                    init_pos[1] =  0.128;
+                    init_pos[2] =  0.075;
 
                     /* GRASPING init */
 //                    init_pos[0] = -0.370;
 //                    init_pos[1] =  0.103;
 //                    init_pos[2] =  0.064;
 
-                    /* SIM init */
+                    /* SIM init 1 */
 //                    init_pos[0] = -0.416;
 //                    init_pos[1] =  0.024 + 0.1;
 //                    init_pos[2] =  0.055;
-                    init_pos[0] = -0.35;
-                    init_pos[1] =  0.025 + 0.05;
-                    init_pos[2] =  0.10;
+
+                    /* SIM init 2 */
+//                    init_pos[0] = -0.35;
+//                    init_pos[1] =  0.025 + 0.05;
+//                    init_pos[2] =  0.10;
+
+                    yInfo() << "Init: " << init_pos.toString() << " " << od.toString();
 
 
                     setTorsoDOF();
 
                     Vector gaze_loc(3);
-                    gaze_loc(0) = -0.660;
-                    gaze_loc(1) =  0.115;
-                    gaze_loc(2) = -0.350;
+                    gaze_loc[0] = init_pos[0];
+                    gaze_loc[1] = init_pos[1];
+                    gaze_loc[2] = init_pos[2];
 
+                    yInfo() << "Fixation point: " << gaze_loc.toString();
 
                     int ctxt;
                     itf_rightarm_cart_->storeContext(&ctxt);
@@ -742,9 +751,16 @@ public:
                     itf_rightarm_cart_->restoreContext(ctxt);
                     itf_rightarm_cart_->deleteContext(ctxt);
                     
+
+                    itf_rightarm_cart_->storeContext(&ctxt);
+
                     itf_gaze_->lookAtFixationPointSync(gaze_loc);
                     itf_gaze_->waitMotionDone(0.1, 10.0);
                     itf_gaze_->stopControl();
+
+                    itf_rightarm_cart_->restoreContext(ctxt);
+                    itf_rightarm_cart_->deleteContext(ctxt);
+
                     
                     unsetTorsoDOF();
                     itf_rightarm_cart_->removeTipFrame();
@@ -928,27 +944,36 @@ public:
                 r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
 
 
+                /* Hand pointing forward, palm looking down */
                 Matrix R_ee = zeros(3, 3);
                 R_ee(0, 0) = -1.0;
                 R_ee(1, 1) =  1.0;
                 R_ee(2, 2) = -1.0;
                 Vector ee_o = dcm2axis(R_ee);
 
+                /* KARATE */
+                Vector p = zeros(7);
+                p[0] = -0.319;
+                p[1] =  0.128;
+                p[2] =  0.075;
+                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+                /* SIM init 1 */
                 // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
 //                Vector p = zeros(7);
-//                p(0) = -0.416;
-//                p(1) = -0.026;
-//                p(2) =  0.055;
+//                p[0] = -0.416;
+//                p[1] = -0.024;
+//                p[2] =  0.055;
 //                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
 
-                Vector p = zeros(7);
-//                p(0) = -0.416;
-//                p(1) =  0.024;
-//                p(2) =  0.055;
-                p(0) = -0.35;
-                p(1) =  0.025;
-                p(2) =  0.10;
-                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+                /* SIM init 2 */
+//                Vector p = zeros(7);
+//                p[0] = -0.35;
+//                p[1] =  0.025;
+//                p[2] =  0.10;
+//                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+                yInfo() << "Goal: " << p.toString();
 
                 Vector p0 = zeros(4);
                 Vector p1 = zeros(4);
@@ -956,7 +981,7 @@ public:
                 Vector p3 = zeros(4);
                 getPalmPoints(p, p0, p1, p2, p3);
 
-                yInfo() << "goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
+                yInfo() << "Goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
 
 
                 Vector l_px0 = l_H_r_to_cam_ * p0;
@@ -1043,10 +1068,15 @@ public:
 
     bool interruptModule()
     {
-        yInfo() << "Interrupting module.\nPort cleanup...";
+        yInfo() << "Interrupting module...";
+
+        yInfo() << "...blocking controllers...";
+        itf_rightarm_cart_->stopControl();
+        itf_gaze_->stopControl();
 
         Time::delay(3.0);
 
+        yInfo() << "...port cleanup...";
         port_estimates_in_.interrupt();
         port_image_left_in_.interrupt();
         port_image_left_out_.interrupt();
@@ -1056,6 +1086,7 @@ public:
         port_click_right_.interrupt();
         handler_port_.interrupt();
 
+        yInfo() << "...done!";
         return true;
     }
 
@@ -1078,6 +1109,7 @@ public:
 
         handler_port_.close();
 
+        yInfo() << "...done!";
         return true;
     }
 
