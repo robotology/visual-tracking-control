@@ -449,20 +449,6 @@ public:
                 estimates = port_estimates_right_in_.read(true);
                 est_copy.setSubvector(6, *estimates);
 
-                /* If the end-effector pose is taken from the direct kinematics, then the pose is replicated */
-                est_copy = Vector(*estimates);
-                if (est_copy.size() == 7)
-                {
-                    double ang = est_copy(6);
-                    est_copy.setSubvector(3, est_copy.subVector(3, 5) * ang);
-
-                    est_copy(6) = est_copy(0);
-                    for (int i = 1; i < 6; ++i)
-                    {
-                        est_copy.push_back(est_copy(i));
-                    }
-                }
-
                 /* SIM */
 //                /* Simulate reaching starting from the initial position */
 //                /* Comment any previous write on variable 'estimates' */
