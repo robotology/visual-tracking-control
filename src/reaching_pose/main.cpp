@@ -1078,8 +1078,8 @@ public:
                 itf_rightarm_cart_->stopControl();
                 itf_gaze_->stopControl();
 
-                take_estimates_ = true;
                 should_stop_    = true;
+                take_estimates_ = true;
 
                 reply = command;
 
