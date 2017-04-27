@@ -653,13 +653,21 @@ public:
 //                Od(2, 2) = -1.0;
 //                Vector od = dcm2axis(Od);
 
+                /* Trial 27/04/17 */
+                // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
+                Vector od(4);
+                od[0] =  0.140;
+                od[1] = -0.989;
+                od[2] =  0.026;
+                od[3] =  2.693;
+
                 /* KARATE */
-                // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
-                Matrix Od = zeros(3, 3);
-                Od(0, 0) = -1.0;
-                Od(2, 1) = -1.0;
-                Od(1, 2) = -1.0;
-                Vector od = dcm2axis(Od);
+//                // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
+//                Matrix Od = zeros(3, 3);
+//                Od(0, 0) = -1.0;
+//                Od(2, 1) = -1.0;
+//                Od(1, 2) = -1.0;
+//                Vector od = dcm2axis(Od);
 
                 /* GRASPING */
 //                Vector od = zeros(4);
@@ -697,11 +705,17 @@ public:
 //                    init_pos[1] =  0.139;
 //                    init_pos[2] =  0.089;
 
-                    /* KARATE init */
-                    // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
-                    init_pos[0] = -0.319;
-                    init_pos[1] =  0.128;
-                    init_pos[2] =  0.075;
+                    /* Trial 27/04/17 */
+                    // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
+                    init_pos[0] = -0.346;
+                    init_pos[1] =  0.133;
+                    init_pos[2] =  0.162;
+
+//                    /* KARATE init */
+//                    // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
+//                    init_pos[0] = -0.319;
+//                    init_pos[1] =  0.128;
+//                    init_pos[2] =  0.075;
 
                     /* GRASPING init */
 //                    init_pos[0] = -0.370;
@@ -721,12 +735,20 @@ public:
                     yInfo() << "Init: " << init_pos.toString() << " " << od.toString();
 
 
-                    setTorsoDOF();
+//                    setTorsoDOF();
 
+                    /* Normal trials */
+//                    Vector gaze_loc(3);
+//                    gaze_loc[0] = init_pos[0];
+//                    gaze_loc[1] = init_pos[1];
+//                    gaze_loc[2] = init_pos[2];
+
+                    /* Trial 27/04/17 */
+                    // -6.706 1.394 -3.618
                     Vector gaze_loc(3);
-                    gaze_loc[0] = init_pos[0];
-                    gaze_loc[1] = init_pos[1];
-                    gaze_loc[2] = init_pos[2];
+                    gaze_loc[0] = -6.706;
+                    gaze_loc[1] =  1.394;
+                    gaze_loc[2] = -3.618;
 
                     yInfo() << "Fixation point: " << gaze_loc.toString();
 
@@ -758,7 +780,7 @@ public:
                     itf_rightarm_cart_->deleteContext(ctxt);
 
                     
-                    unsetTorsoDOF();
+//                    unsetTorsoDOF();
                     itf_rightarm_cart_->removeTipFrame();
 
                     reply.addString("ack");
@@ -940,19 +962,29 @@ public:
                 r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
 
 
-                /* Hand pointing forward, palm looking down */
-                Matrix R_ee = zeros(3, 3);
-                R_ee(0, 0) = -1.0;
-                R_ee(1, 1) =  1.0;
-                R_ee(2, 2) = -1.0;
-                Vector ee_o = dcm2axis(R_ee);
+//                /* Hand pointing forward, palm looking down */
+//                Matrix R_ee = zeros(3, 3);
+//                R_ee(0, 0) = -1.0;
+//                R_ee(1, 1) =  1.0;
+//                R_ee(2, 2) = -1.0;
+//                Vector ee_o = dcm2axis(R_ee);
+
+                /* Trial 27/04/17 */
+                // -0.323 0.018 0.121 0.310 -0.873 0.374 3.008
+                Vector p = zeros(6);
+                p[0] = -0.323;
+                p[1] =  0.018;
+                p[2] =  0.121;
+                p[3] =  0.310 * 3.008;
+                p[4] = -0.873 * 3.008;
+                p[5] =  0.374 * 3.008;
 
                 /* KARATE */
-                Vector p = zeros(7);
-                p[0] = -0.319;
-                p[1] =  0.128;
-                p[2] =  0.075;
-                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+//                Vector p = zeros(6);
+//                p[0] = -0.319;
+//                p[1] =  0.128;
+//                p[2] =  0.075;
+//                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
 
                 /* SIM init 1 */
                 // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
