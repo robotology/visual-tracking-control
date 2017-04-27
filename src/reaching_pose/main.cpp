@@ -988,14 +988,14 @@ public:
 
                 /* SIM init 1 */
                 // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
-//                Vector p = zeros(7);
+//                Vector p = zeros(6);
 //                p[0] = -0.416;
 //                p[1] = -0.024;
 //                p[2] =  0.055;
 //                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
 
                 /* SIM init 2 */
-//                Vector p = zeros(7);
+//                Vector p = zeros(6);
 //                p[0] = -0.35;
 //                p[1] =  0.025;
 //                p[2] =  0.10;
