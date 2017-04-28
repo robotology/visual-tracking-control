@@ -43,9 +43,15 @@ public:
             return false;
         }
 
-        if (!port_estimates_in_.open("/reaching_pose/estimates:i"))
+        if (!port_estimates_left_in_.open("/reaching_pose/estimates/left:i"))
         {
-            yError() << "Could not open /reaching_pose/estimates:i port! Closing.";
+            yError() << "Could not open /reaching_pose/estimates/left:i port! Closing.";
+            return false;
+        }
+
+        if (!port_estimates_right_in_.open("/reaching_pose/estimates/right:i"))
+        {
+            yError() << "Could not open /reaching_pose/estimates/right:i port! Closing.";
             return false;
         }
 
@@ -200,22 +206,19 @@ public:
 
         if (should_stop_) return false;
 
-        /* Get the initial end-effector pose from hand-tracking */
-        Vector* estimates = port_estimates_in_.read(true);
 
-        /* If the end-effector pose is taken from the direct kinematics, then the pose is replicated */
-        Vector est_copy(*estimates);
-        if (est_copy.size() == 7)
-        {
-            double ang = est_copy(6);
-            est_copy.setSubvector(3, est_copy.subVector(3, 5) * ang);
+        Vector est_copy(12);
 
-            est_copy(6) = est_copy(0);
-            for (int i = 1; i < 6; ++i)
-            {
-                est_copy.push_back(est_copy(i));
-            }
-        }
+        /* Get the initial end-effector pose from left eye particle filter */
+        Vector* estimates = port_estimates_left_in_.read(true);
+        yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
+        est_copy.setSubvector(0, *estimates);
+
+        /* Get the initial end-effector pose from right eye particle filter */
+        estimates = port_estimates_right_in_.read(true);
+        yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
+        est_copy.setSubvector(6, *estimates);
+
 
         yInfo() << "RUNNING!\n";
 
@@ -370,19 +373,11 @@ public:
 
                 if (i == 1 || i == 4 || i == 7 || i == 10)
                 {
-//                    Vector delta_o = r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
-//                    vel_x += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2) - cross(delta_o, r_H_eye_to_r_.getCol(3).subVector(0, 2));
-//                    vel_o += delta_o;
-
                     vel_x += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2);
                     vel_o += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
                 }
                 else
                 {
-//                    Vector delta_o = l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
-//                    vel_x += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2) - cross(delta_o, l_H_eye_to_r_.getCol(3).subVector(0, 2));
-//                    vel_o += delta_o;
-
                     vel_x += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2);
                     vel_o += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
                 }
@@ -408,16 +403,27 @@ public:
             vel_o.push_back(ang);
             yInfo() << "axis-angle vel_o = [" << vel_o.toString() << "]";
 
-            vel_x    *= K_x;
+            double K_ctrl_x = 0;
+            if (vel_o(3) > (3.0 * CTRL_DEG2RAD)) K_ctrl_x = exp(-(vel_o(3) - (3.0 * CTRL_DEG2RAD)) / 0.1);
+            else                                 K_ctrl_x = 1.0;
+            yInfo() << "K_ctrl_x: " << K_ctrl_x;
+
+            /* Visual control law */
+            /* SIM */
+//            vel_x    *= K_x;
+            vel_x    *= (K_x * K_ctrl_x);
             vel_o(3) *= K_o;
-//            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+            /* Real robot - Pose */
+            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+            /* Real robot - Orientation */
 //            itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
+            /* Real robot - Translation */
 //            itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
 
-            yInfo() << "Pixel error: " << std::abs(px_des(0) - px_ee_now(0)) << std::abs(px_des(1)  - px_ee_now(1))  << std::abs(px_des(2)  - px_ee_now(2))
-                                       << std::abs(px_des(3) - px_ee_now(3)) << std::abs(px_des(4)  - px_ee_now(4))  << std::abs(px_des(5)  - px_ee_now(5))
-                                       << std::abs(px_des(6) - px_ee_now(6)) << std::abs(px_des(7)  - px_ee_now(7))  << std::abs(px_des(8)  - px_ee_now(8))
-                                       << std::abs(px_des(9) - px_ee_now(9)) << std::abs(px_des(10) - px_ee_now(10)) << std::abs(px_des(11) - px_ee_now(11));
+            yInfo() << "Pixel errors: " << std::abs(px_des(0) - px_ee_now(0)) << std::abs(px_des(1)  - px_ee_now(1))  << std::abs(px_des(2)  - px_ee_now(2))
+                                        << std::abs(px_des(3) - px_ee_now(3)) << std::abs(px_des(4)  - px_ee_now(4))  << std::abs(px_des(5)  - px_ee_now(5))
+                                        << std::abs(px_des(6) - px_ee_now(6)) << std::abs(px_des(7)  - px_ee_now(7))  << std::abs(px_des(8)  - px_ee_now(8))
+                                        << std::abs(px_des(9) - px_ee_now(9)) << std::abs(px_des(10) - px_ee_now(10)) << std::abs(px_des(11) - px_ee_now(11));
 
             Time::delay(Ts);
 
@@ -433,51 +439,47 @@ public:
             }
             else
             {
-//                /* Get the new end-effector pose from hand-tracking */
-//                estimates = port_estimates_in_.read(true);
+                /* Get the new end-effector pose from left eye particle filter */
+                estimates = port_estimates_left_in_.read(true);
+                yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
+                est_copy.setSubvector(0, *estimates);
+
+                /* Get the new end-effector pose from right eye particle filter */
+                yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
+                estimates = port_estimates_right_in_.read(true);
+                est_copy.setSubvector(6, *estimates);
+
+                /* SIM */
+//                /* Simulate reaching starting from the initial position */
+//                /* Comment any previous write on variable 'estimates' */
+//                yInfo() << "EE L now: " << est_copy.subVector(0, 2).toString();
+//                yInfo() << "EE R now: " << est_copy.subVector(6, 8).toString() << "\n";
 //
-//                /* If the end-effector pose is taken from the direct kinematics, then the pose is replicated */
-//                est_copy = Vector(*estimates);
-//                if (est_copy.size() == 7)
-//                {
-//                    double ang = est_copy(6);
-//                    est_copy.setSubvector(3, est_copy.subVector(3, 5) * ang);
+//                /* Evaluate the new orientation vector from axis-angle representation */
+//                /* The following code is a copy of the setTaskVelocities() code */
+//                Vector l_o = getAxisAngle(est_copy.subVector(3, 5));
+//                Matrix l_R = axis2dcm(l_o);
+//                Vector r_o = getAxisAngle(est_copy.subVector(9, 11));
+//                Matrix r_R = axis2dcm(r_o);
 //
-//                    est_copy(6) = est_copy(0);
-//                    for (int i = 1; i < 6; ++i)
-//                    {
-//                        est_copy.push_back(est_copy(i));
-//                    }
-//                }
-
-                /* Simulate reaching starting from the initial position */
-                /* Comment any previous write on variable 'estimates' */
-                yInfo() << "EE L now: " << est_copy.subVector(0, 2).toString();
-                yInfo() << "EE R now: " << est_copy.subVector(6, 8).toString() << "\n";
-
-                Vector l_o = getAxisAngle(est_copy.subVector(3, 5));
-                Matrix l_R = axis2dcm(l_o);
-                Vector r_o = getAxisAngle(est_copy.subVector(9, 11));
-                Matrix r_R = axis2dcm(r_o);
-
-                vel_o[3] *= Ts;
-                l_R = axis2dcm(vel_o) * l_R;
-                r_R = axis2dcm(vel_o) * r_R;
-
-                Vector l_new_o = dcm2axis(l_R);
-                double l_ang = l_new_o(3);
-                l_new_o.pop_back();
-                l_new_o *= l_ang;
-
-                Vector r_new_o = dcm2axis(r_R);
-                double r_ang = r_new_o(3);
-                r_new_o.pop_back();
-                r_new_o *= r_ang;
-
-                est_copy.setSubvector(0, est_copy.subVector(0, 2)  + vel_x * Ts);
-                est_copy.setSubvector(3, l_new_o);
-                est_copy.setSubvector(6, est_copy.subVector(6, 8)  + vel_x * Ts);
-                est_copy.setSubvector(9, r_new_o);
+//                vel_o[3] *= Ts;
+//                l_R = axis2dcm(vel_o) * l_R;
+//                r_R = axis2dcm(vel_o) * r_R;
+//
+//                Vector l_new_o = dcm2axis(l_R);
+//                double l_ang = l_new_o(3);
+//                l_new_o.pop_back();
+//                l_new_o *= l_ang;
+//
+//                Vector r_new_o = dcm2axis(r_R);
+//                double r_ang = r_new_o(3);
+//                r_new_o.pop_back();
+//                r_new_o *= r_ang;
+//
+//                est_copy.setSubvector(0, est_copy.subVector(0, 2)  + vel_x * Ts);
+//                est_copy.setSubvector(3, l_new_o);
+//                est_copy.setSubvector(6, est_copy.subVector(6, 8)  + vel_x * Ts);
+//                est_copy.setSubvector(9, r_new_o);
                 /* **************************************************** */
 
                 yInfo() << "EE L coord: " << est_copy.subVector(0, 2).toString();
@@ -651,7 +653,16 @@ public:
 //                Od(2, 2) = -1.0;
 //                Vector od = dcm2axis(Od);
 
+                /* Trial 27/04/17 */
+                // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
+                Vector od(4);
+                od[0] =  0.140;
+                od[1] = -0.989;
+                od[2] =  0.026;
+                od[3] =  2.693;
+
                 /* KARATE */
+//                // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
 //                Matrix Od = zeros(3, 3);
 //                Od(0, 0) = -1.0;
 //                Od(2, 1) = -1.0;
@@ -666,11 +677,11 @@ public:
 //                od(4) =  3.012;
 
                 /* SIM */
-                Matrix Od(3, 3);
-                Od(0, 0) = -1.0;
-                Od(1, 1) = -1.0;
-                Od(2, 2) =  1.0;
-                Vector od = dcm2axis(Od);
+//                Matrix Od(3, 3);
+//                Od(0, 0) = -1.0;
+//                Od(1, 1) = -1.0;
+//                Od(2, 2) =  1.0;
+//                Vector od = dcm2axis(Od);
 
 
                 double traj_time = 0.0;
@@ -694,27 +705,52 @@ public:
 //                    init_pos[1] =  0.139;
 //                    init_pos[2] =  0.089;
 
-                    /* KARATE init */
-                    // FIXME: to implement
+                    /* Trial 27/04/17 */
+                    // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
+                    init_pos[0] = -0.346;
+                    init_pos[1] =  0.133;
+                    init_pos[2] =  0.162;
+
+//                    /* KARATE init */
+//                    // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
+//                    init_pos[0] = -0.319;
+//                    init_pos[1] =  0.128;
+//                    init_pos[2] =  0.075;
 
                     /* GRASPING init */
 //                    init_pos[0] = -0.370;
 //                    init_pos[1] =  0.103;
 //                    init_pos[2] =  0.064;
 
-                    /* SIM init */
-                    init_pos[0] = -0.416;
-                    init_pos[1] =  0.024 + 0.1;
-                    init_pos[2] =  0.055;
+                    /* SIM init 1 */
+//                    init_pos[0] = -0.416;
+//                    init_pos[1] =  0.024 + 0.1;
+//                    init_pos[2] =  0.055;
+
+                    /* SIM init 2 */
+//                    init_pos[0] = -0.35;
+//                    init_pos[1] =  0.025 + 0.05;
+//                    init_pos[2] =  0.10;
+
+                    yInfo() << "Init: " << init_pos.toString() << " " << od.toString();
 
 
-                    setTorsoDOF();
+//                    setTorsoDOF();
 
+                    /* Normal trials */
+//                    Vector gaze_loc(3);
+//                    gaze_loc[0] = init_pos[0];
+//                    gaze_loc[1] = init_pos[1];
+//                    gaze_loc[2] = init_pos[2];
+
+                    /* Trial 27/04/17 */
+                    // -6.706 1.394 -3.618
                     Vector gaze_loc(3);
-                    gaze_loc(0) = -0.660;
-                    gaze_loc(1) =  0.115;
-                    gaze_loc(2) = -0.350;
+                    gaze_loc[0] = -6.706;
+                    gaze_loc[1] =  1.394;
+                    gaze_loc[2] = -3.618;
 
+                    yInfo() << "Fixation point: " << gaze_loc.toString();
 
                     int ctxt;
                     itf_rightarm_cart_->storeContext(&ctxt);
@@ -733,11 +769,18 @@ public:
                     itf_rightarm_cart_->restoreContext(ctxt);
                     itf_rightarm_cart_->deleteContext(ctxt);
                     
+
+                    itf_rightarm_cart_->storeContext(&ctxt);
+
                     itf_gaze_->lookAtFixationPointSync(gaze_loc);
                     itf_gaze_->waitMotionDone(0.1, 10.0);
                     itf_gaze_->stopControl();
+
+                    itf_rightarm_cart_->restoreContext(ctxt);
+                    itf_rightarm_cart_->deleteContext(ctxt);
+
                     
-                    unsetTorsoDOF();
+//                    unsetTorsoDOF();
                     itf_rightarm_cart_->removeTipFrame();
 
                     reply.addString("ack");
@@ -919,24 +962,46 @@ public:
                 r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
 
 
-                Matrix R_ee = zeros(3, 3);
-                R_ee(0, 0) = -1.0;
-                R_ee(1, 1) =  1.0;
-                R_ee(2, 2) = -1.0;
-                Vector ee_o = dcm2axis(R_ee);
+//                /* Hand pointing forward, palm looking down */
+//                Matrix R_ee = zeros(3, 3);
+//                R_ee(0, 0) = -1.0;
+//                R_ee(1, 1) =  1.0;
+//                R_ee(2, 2) = -1.0;
+//                Vector ee_o = dcm2axis(R_ee);
 
-                // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
-//                Vector p = zeros(7);
-//                p(0) = -0.416;
-//                p(1) = -0.026;
-//                p(2) =  0.055;
+                /* Trial 27/04/17 */
+                // -0.323 0.018 0.121 0.310 -0.873 0.374 3.008
+                Vector p = zeros(6);
+                p[0] = -0.323;
+                p[1] =  0.018;
+                p[2] =  0.121;
+                p[3] =  0.310 * 3.008;
+                p[4] = -0.873 * 3.008;
+                p[5] =  0.374 * 3.008;
+
+                /* KARATE */
+//                Vector p = zeros(6);
+//                p[0] = -0.319;
+//                p[1] =  0.128;
+//                p[2] =  0.075;
 //                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
 
-                Vector p = zeros(7);
-                p(0) = -0.416;
-                p(1) =  0.024;
-                p(2) =  0.055;
-                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+                /* SIM init 1 */
+                // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
+//                Vector p = zeros(6);
+//                p[0] = -0.416;
+//                p[1] = -0.024;
+//                p[2] =  0.055;
+//                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+                /* SIM init 2 */
+//                Vector p = zeros(6);
+//                p[0] = -0.35;
+//                p[1] =  0.025;
+//                p[2] =  0.10;
+//                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+                yInfo() << "Goal: " << p.toString();
 
                 Vector p0 = zeros(4);
                 Vector p1 = zeros(4);
@@ -944,7 +1009,7 @@ public:
                 Vector p3 = zeros(4);
                 getPalmPoints(p, p0, p1, p2, p3);
 
-                yInfo() << "goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
+                yInfo() << "Goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
 
 
                 Vector l_px0 = l_H_r_to_cam_ * p0;
@@ -1013,13 +1078,11 @@ public:
                 itf_rightarm_cart_->stopControl();
                 itf_gaze_->stopControl();
 
-                take_estimates_ = true;
                 should_stop_    = true;
-
-                this->interruptModule();
+                take_estimates_ = true;
 
                 reply = command;
-                
+
                 break;
             }
             default:
@@ -1033,11 +1096,17 @@ public:
 
     bool interruptModule()
     {
-        yInfo() << "Interrupting module.\nPort cleanup...";
+        yInfo() << "Interrupting module...";
+
+        yInfo() << "...blocking controllers...";
+        itf_rightarm_cart_->stopControl();
+        itf_gaze_->stopControl();
 
         Time::delay(3.0);
 
-        port_estimates_in_.interrupt();
+        yInfo() << "...port cleanup...";
+        port_estimates_left_in_.interrupt();
+        port_estimates_right_in_.interrupt();
         port_image_left_in_.interrupt();
         port_image_left_out_.interrupt();
         port_click_left_.interrupt();
@@ -1046,6 +1115,7 @@ public:
         port_click_right_.interrupt();
         handler_port_.interrupt();
 
+        yInfo() << "...done!";
         return true;
     }
 
@@ -1053,7 +1123,8 @@ public:
     {
         yInfo() << "Calling close functions...";
 
-        port_estimates_in_.close();
+        port_estimates_left_in_.close();
+        port_estimates_right_in_.close();
         port_image_left_in_.close();
         port_image_left_out_.close();
         port_click_left_.close();
@@ -1068,6 +1139,7 @@ public:
 
         handler_port_.close();
 
+        yInfo() << "...done!";
         return true;
     }
 
@@ -1080,7 +1152,8 @@ private:
     SISkeleton                     * l_si_skel_;
     SISkeleton                     * r_si_skel_;
 
-    BufferedPort<Vector>             port_estimates_in_;
+    BufferedPort<Vector>             port_estimates_left_in_;
+    BufferedPort<Vector>             port_estimates_right_in_;
 
     BufferedPort<ImageOf<PixelRgb>>  port_image_left_in_;
     BufferedPort<ImageOf<PixelRgb>>  port_image_left_out_;
@@ -1355,7 +1428,7 @@ private:
         p1 = H_ee_to_root * p;
 
         p(0) = -0.035;
-        p(1) = -0.015;
+        p(1) =  0.015;
         p(2) =  0;
         p(3) =  1.0;
 
@@ -1363,7 +1436,7 @@ private:
         p2 = H_ee_to_root * p;
 
         p(0) = -0.035;
-        p(1) =  0.015;
+        p(1) = -0.015;
         p(2) =  0;
         p(3) =  1.0;
 
