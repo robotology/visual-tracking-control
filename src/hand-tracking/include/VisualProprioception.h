@@ -17,7 +17,8 @@
 #include <yarp/sig/Vector.h>
 
 
-class VisualProprioception : public bfl::VisualObservationModel {
+class VisualProprioception : public bfl::VisualObservationModel
+{
 public:
     /* VisualProprioception constructor */
     VisualProprioception(const int num_images, const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const yarp::os::ConstString& context);

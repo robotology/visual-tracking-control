@@ -15,7 +15,8 @@
 #include "VisualProprioception.h"
 
 
-class VisualParticleFilterCorrection : public bfl::VisualCorrection {
+class VisualParticleFilterCorrection : public bfl::VisualCorrection
+{
 public:
     /* Default constructor, disabled */
     VisualParticleFilterCorrection() = delete;

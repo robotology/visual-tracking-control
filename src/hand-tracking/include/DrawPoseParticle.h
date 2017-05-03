@@ -7,8 +7,7 @@
 #include <BayesFiltersLib/ParticleFilterPrediction.h>
 #include <BayesFiltersLib/StateModel.h>
 
-namespace bfl
-{
+namespace bfl {
     class DrawPoseParticle;
 }
 
