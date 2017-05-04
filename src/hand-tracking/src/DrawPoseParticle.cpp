@@ -57,7 +57,7 @@ void DrawPoseParticle::predict(const Ref<const VectorXf>& prev_state, Ref<Vector
     pred_state.tail<3>() = ang * rotated_vec;
 }
 
-bool DrawPoseParticle::setMotionModelProperty(const std::string& property)
+bool DrawPoseParticle::setStateModelProperty(const std::string& property)
 {
     return state_model_->setProperty(property);
 }

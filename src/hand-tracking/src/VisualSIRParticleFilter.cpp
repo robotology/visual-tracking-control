@@ -103,7 +103,7 @@ void VisualSIRParticleFilter::runFilter()
     cuda_hog->setGammaCorrection(true);
     cuda_hog->setWinStride(Size(img_width, img_height));
 
-    prediction_->setMotionModelProperty("ICFW_INIT");
+    prediction_->setStateModelProperty("ICFW_INIT");
 
     is_filter_init_ = true;
 
@@ -144,7 +144,7 @@ void VisualSIRParticleFilter::runFilter()
             std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
             float threshold = sorted_pred.tail(6)(0);
 
-            prediction_->setMotionModelProperty("ICFW_DELTA");
+            prediction_->setStateModelProperty("ICFW_DELTA");
             for (int j = 0; j < num_particles_; ++j)
             {
                 if(init_weight(j) <= threshold)
