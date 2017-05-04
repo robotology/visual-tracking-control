@@ -12,7 +12,7 @@ namespace bfl {
 }
 
 
-class bfl::DrawPoseParticle: public ParticleFilterPrediction
+class bfl::DrawPoseParticle : public ParticleFilterPrediction
 {
 public:
     /* Default constructor, disabled */
@@ -40,7 +40,7 @@ public:
 
 protected:
     std::unique_ptr<StateModel> state_model_;
-    
+
     void addAxisangleDisturbance(const Eigen::Ref<const Eigen::Vector3f>& current_vec, const Eigen::Ref<const Eigen::Vector3f>& disturbance_vec, Eigen::Ref<Eigen::Vector3f> rotated_vec);
 };
 
