@@ -12,7 +12,7 @@ namespace bfl {
 }
 
 
-class bfl::DrawPoseParticle : public ParticleFilterPrediction
+class bfl::DrawPoseParticle : public bfl::ParticleFilterPrediction
 {
 public:
     /* Default constructor, disabled */
