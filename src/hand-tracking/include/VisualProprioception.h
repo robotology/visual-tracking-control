@@ -17,6 +17,7 @@
 #include <yarp/sig/Vector.h>
 
 
+// FIXME: riscrivere rispettando l'interfaccia, altrimenti salta decorator.
 class VisualProprioception : public bfl::VisualObservationModel
 {
 public:
