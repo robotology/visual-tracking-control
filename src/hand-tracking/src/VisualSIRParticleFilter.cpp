@@ -154,7 +154,7 @@ void VisualSIRParticleFilter::runFilter()
             }
 
             /* CORRECTION */
-            correction_->setMeasurementModelProperty("VP_PARAMS");
+            correction_->setObservationModelProperty("VP_PARAMS");
             correction_->correct(init_particle, descriptors_cam_left, init_weight);
             init_weight /= init_weight.sum();
 
@@ -289,9 +289,9 @@ bool VisualSIRParticleFilter::stream_result(const bool status)
 bool VisualSIRParticleFilter::use_analogs(const bool status)
 {
     if (status)
-        return correction_->setMeasurementModelProperty("VP_ANALOGS_ON");
+        return correction_->setObservationModelProperty("VP_ANALOGS_ON");
     else
-        return correction_->setMeasurementModelProperty("VP_ANALOGS_OFF");
+        return correction_->setObservationModelProperty("VP_ANALOGS_OFF");
 }
 
 

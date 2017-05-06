@@ -34,7 +34,7 @@ public:
 
     void likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovation, Eigen::Ref<Eigen::MatrixXf> cor_state) override;
 
-    bool setMeasurementModelProperty(std::string property);
+    bool setObservationModelProperty(const std::string& property) override;
 
     /* TO BE DEPRECATED */
     void superimpose(const Eigen::Ref<const Eigen::VectorXf>& state, cv::Mat& img);
