@@ -1,18 +1,16 @@
 #ifndef VISUALPARTICLEFILTERCORRECTION_H
 #define VISUALPARTICLEFILTERCORRECTION_H
 
+#include "VisualProprioception.h"
+
 #include <condition_variable>
 #include <mutex>
-#include <string>
 #include <thread>
 
 #include <BayesFiltersLib/VisualCorrection.h>
-#include <BayesFiltersLib/VisualObservationModel.h>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaobjdetect.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
-
-#include "VisualProprioception.h"
 
 
 class VisualParticleFilterCorrection : public bfl::VisualCorrection
