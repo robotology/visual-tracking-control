@@ -83,6 +83,7 @@ int main(int argc, char *argv[])
 
     /* Initialize filtering functions */
     // FIXME: passare robot name ai metodi
+    // ???: std::unique_ptr<BrownianMotion> -> std::unique_ptr<StateModel>?
     std::unique_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 0.005, 3.0, 1.5, 1));
     std::unique_ptr<StateModel>     icub_motion;
     if (!play)
