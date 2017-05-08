@@ -5,8 +5,6 @@
 
 #include <BayesFiltersLib/FilteringFunction.h>
 #include <BayesFiltersLib/SIRParticleFilter.h>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
@@ -127,10 +125,6 @@ int main(int argc, char *argv[])
                                     robot_cam_sel, robot_laterality, num_particles);
 
     vsir_pf.runFilter();
-
-    yInfo() << log_ID << "Terminating OpenGL...";
-    glfwMakeContextCurrent(NULL);
-    glfwTerminate();
 
     yInfo() << log_ID << "Application closed succesfully.";
     return EXIT_SUCCESS;
