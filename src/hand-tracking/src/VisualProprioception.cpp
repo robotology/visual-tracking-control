@@ -445,7 +445,8 @@ bool VisualProprioception::setiCubParams()
         itf_right_hand_analog_->read(analogs);
         setArmJoints(q, analogs, right_hand_analogs_bounds_);
     }
-    else setArmJoints(q);
+    else
+        setArmJoints(q);
 
     return true;
 }

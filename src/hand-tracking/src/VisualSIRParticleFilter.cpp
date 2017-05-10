@@ -147,7 +147,7 @@ void VisualSIRParticleFilter::runFilter()
             prediction_->setStateModelProperty("ICFW_DELTA");
             for (int j = 0; j < num_particles_; ++j)
             {
-                if(init_weight(j) <= threshold)
+                if (init_weight(j) <= threshold)
                     prediction_->predict(init_particle.col(j), init_particle.col(j));
                 else
                     prediction_->motion(init_particle.col(j), init_particle.col(j));
