@@ -29,7 +29,7 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<ParticleFilterPrediction> prediction, std::unique_ptr<VisualParticleFilterCorrection> correction,
+VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<ParticleFilterPrediction> prediction, std::unique_ptr<VisualCorrection> correction,
                                                  std::unique_ptr<Resampling> resampling,
                                                  ConstString cam_sel, ConstString laterality, const int num_particles) :
     prediction_(std::move(prediction)), correction_(std::move(correction)), resampling_(std::move(resampling)),

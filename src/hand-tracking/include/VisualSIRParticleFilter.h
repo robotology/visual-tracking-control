@@ -25,8 +25,6 @@
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
 
-#include "VisualParticleFilterCorrection.h"
-
 
 class VisualSIRParticleFilter: public bfl::FilteringAlgorithm,
                                public visualSIRParticleFilterIDL
@@ -36,7 +34,7 @@ public:
     VisualSIRParticleFilter() = delete;
 
     /* VisualSIR complete constructor */
-    VisualSIRParticleFilter(std::unique_ptr<bfl::ParticleFilterPrediction> prediction, std::unique_ptr<VisualParticleFilterCorrection> correction,
+    VisualSIRParticleFilter(std::unique_ptr<bfl::ParticleFilterPrediction> prediction, std::unique_ptr<bfl::VisualCorrection> correction,
                             std::unique_ptr<bfl::Resampling> resampling,
                             yarp::os::ConstString cam_sel, yarp::os::ConstString laterality, const int num_particles);
 
@@ -64,7 +62,7 @@ public:
 
 protected:
     std::unique_ptr<bfl::ParticleFilterPrediction>                   prediction_;
-    std::unique_ptr<VisualParticleFilterCorrection>                  correction_;
+    std::unique_ptr<bfl::VisualCorrection>                           correction_;
     std::unique_ptr<bfl::Resampling>                                 resampling_;
     yarp::os::ConstString                                            cam_sel_;
     yarp::os::ConstString                                            laterality_;
