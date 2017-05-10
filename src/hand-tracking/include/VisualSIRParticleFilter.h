@@ -78,9 +78,7 @@ protected:
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_left_;
     /* OUTPUT */
     yarp::os::BufferedPort<yarp::sig::Vector>                        port_estimates_out_;
-    /* DEBUG ONLY */
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_out_left_;
-    /* ******************* */
+    /* ********* */
 
     bool                                                             is_filter_init_;
     bool                                                             is_running_;

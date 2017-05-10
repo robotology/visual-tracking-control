@@ -119,9 +119,3 @@ bool VisualParticleFilterCorrection::setObservationModelProperty(const std::stri
 {
     return measurement_model_->setProperty(property);
 }
-
-
-void VisualParticleFilterCorrection::superimpose(const Ref<const VectorXf>& state, Mat& img)
-{
-    measurement_model_->superimpose(state, img);
-}

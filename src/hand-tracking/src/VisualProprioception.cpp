@@ -478,23 +478,6 @@ void VisualProprioception::setArmJoints(const Vector& q, const Vector& analogs, 
 }
 
 
-void VisualProprioception::superimpose(const Ref<const VectorXf>&  state, Mat& img)
-{
-    si_cad_->setBackgroundOpt(true);
-    si_cad_->setWireframeOpt(true);
-
-
-    std::vector<SuperImpose::ObjPoseMap> hand_poses;
-    getPoses(state, hand_poses);
-
-    si_cad_->superimpose(hand_poses[0], cam_x_, cam_o_, img);
-
-
-    si_cad_->setBackgroundOpt(false);
-    si_cad_->setWireframeOpt(false);
-}
-
-
 bool VisualProprioception::file_found(const ConstString& file)
 {
     if (!file.empty())

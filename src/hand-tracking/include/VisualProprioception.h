@@ -43,9 +43,6 @@ public:
 
     bool setProperty(const std::string property) override;
 
-    /* TO BE DEPRECATED */
-    void superimpose(const Eigen::Ref<const Eigen::VectorXf>& state, cv::Mat& img);
-    /* **************** */
 
     int          getOGLTilesNumber();
     int          getOGLTilesRows();

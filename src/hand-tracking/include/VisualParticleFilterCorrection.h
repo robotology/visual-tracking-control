@@ -36,10 +36,6 @@ public:
 
     bool setObservationModelProperty(const std::string& property) override;
 
-    /* TO BE DEPRECATED */
-    void superimpose(const Eigen::Ref<const Eigen::VectorXf>& state, cv::Mat& img);
-    /* **************** */
-
 protected:
     std::unique_ptr<VisualProprioception> measurement_model_;
 

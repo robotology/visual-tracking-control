@@ -54,10 +54,6 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<ParticleFilterP
     port_torso_enc_.open     ("/hand-tracking/" + cam_sel_ + "/torso:i");
     port_estimates_out_.open ("/hand-tracking/" + cam_sel_ + "/result/estimates:o");
 
-    /* DEBUG ONLY */
-    port_image_out_left_.open("/hand-tracking/" + cam_sel_ + "/result/img:o");
-    /* ********** */
-
     is_filter_init_ = false;
     is_running_     = false;
 
@@ -70,7 +66,6 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
     port_image_in_left_.close();
     port_arm_enc_.close();
     port_torso_enc_.close();
-    port_image_out_left_.close();
     port_estimates_out_.close();
 }
 
@@ -118,14 +113,8 @@ void VisualSIRParticleFilter::runFilter()
         cuda::GpuMat       descriptors_cam_cuda (Size(descriptor_length, 1),  CV_32F );
 
         imgin_left = port_image_in_left_.read(true);
-
         if (imgin_left != YARP_NULLPTR)
         {
-            Vector& estimates_out = port_estimates_out_.prepare();
-
-            ImageOf<PixelRgb>& imgout_left = port_image_out_left_.prepare();
-            imgout_left = *imgin_left;
-
             MatrixXf temp_particle(6, num_particles_);
             VectorXf temp_weight(num_particles_, 1);
             VectorXf temp_parent(num_particles_, 1);
@@ -133,7 +122,7 @@ void VisualSIRParticleFilter::runFilter()
             /* PROCESS CURRENT MEASUREMENT */
             Mat measurement;
 
-            measurement = cvarrToMat(imgout_left.getIplImage());
+            measurement = cvarrToMat(imgin_left->getIplImage());
             cuda_img.upload(measurement);
             cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);
             cuda_hog->compute(cuda_img_alpha, descriptors_cam_cuda);
@@ -181,62 +170,62 @@ void VisualSIRParticleFilter::runFilter()
 
             k++;
 
-            /* STATE ESTIMATE OUTPUT */
-            /* INDEX FINGERTIP */
-//            Vector q = readRootToEE();
-//            icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
-//            Vector chainjoints;
-//            if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
-//            else          icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), chainjoints);
-//            icub_kin_finger_[1].setAng(chainjoints * (M_PI/180.0));
-//
-//            Vector l_ee_t(3);
-//            toEigen(l_ee_t) = out_particle.col(0).head(3).cast<double>();
-//            l_ee_t.push_back(1.0);
-//
-//            Vector l_ee_o(3);
-//            toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
-//            l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
-//
-//            yarp::sig::Matrix l_Ha = axis2dcm(l_ee_o);
-//            l_Ha.setCol(3, l_ee_t);
-//            Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
-//            Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
-//            l_i_o.setSubvector(0, l_i_o.subVector(0, 2) * l_i_o[3]);
-//
-//
-//            Vector r_ee_t(3);
-//            toEigen(r_ee_t) = out_particle.col(1).head(3).cast<double>();
-//            r_ee_t.push_back(1.0);
-//
-//            Vector r_ee_o(3);
-//            toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
-//            r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
-//
-//            yarp::sig::Matrix r_Ha = axis2dcm(r_ee_o);
-//            r_Ha.setCol(3, r_ee_t);
-//            Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
-//            Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
-//            r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
-//
-//
-//            estimates_out.resize(12);
-//            estimates_out.setSubvector(0, l_i_x);
-//            estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
-//            estimates_out.setSubvector(6, r_i_x);
-//            estimates_out.setSubvector(9, r_i_o.subVector(0, 2));
-//            port_estimates_out_.write();
-
-            /* PALM */
-            estimates_out.resize(6);
-            toEigen(estimates_out) = out_particle.cast<double>();
-            port_estimates_out_.write();
-
             /* DEBUG ONLY */
             if (stream_)
             {
-                correction_->superimpose(out_particle, measurement);
-                port_image_out_left_.write();
+                /* STATE ESTIMATE OUTPUT */
+                /* INDEX FINGERTIP */
+//                Vector q = readRootToEE();
+//                icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
+//                Vector chainjoints;
+//                if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
+//                else          icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), chainjoints);
+//                icub_kin_finger_[1].setAng(chainjoints * (M_PI/180.0));
+//
+//                Vector l_ee_t(3);
+//                toEigen(l_ee_t) = out_particle.col(0).head(3).cast<double>();
+//                l_ee_t.push_back(1.0);
+//
+//                Vector l_ee_o(3);
+//                toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
+//                l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
+//
+//                yarp::sig::Matrix l_Ha = axis2dcm(l_ee_o);
+//                l_Ha.setCol(3, l_ee_t);
+//                Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
+//                Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
+//                l_i_o.setSubvector(0, l_i_o.subVector(0, 2) * l_i_o[3]);
+//
+//
+//                Vector r_ee_t(3);
+//                toEigen(r_ee_t) = out_particle.col(1).head(3).cast<double>();
+//                r_ee_t.push_back(1.0);
+//
+//                Vector r_ee_o(3);
+//                toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
+//                r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
+//
+//                yarp::sig::Matrix r_Ha = axis2dcm(r_ee_o);
+//                r_Ha.setCol(3, r_ee_t);
+//                Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
+//                Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
+//                r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
+//
+//
+//                Vector& estimates_out = port_estimates_out_.prepare();
+//                estimates_out.resize(12);
+//                estimates_out.setSubvector(0, l_i_x);
+//                estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
+//                estimates_out.setSubvector(6, r_i_x);
+//                estimates_out.setSubvector(9, r_i_o.subVector(0, 2));
+//                port_estimates_out_.write();
+
+                /* PALM */
+                Vector& estimates_out = port_estimates_out_.prepare();
+                estimates_out.resize(6);
+                toEigen(estimates_out) = out_particle.cast<double>();
+                port_estimates_out_.write();
+
             }
             /* ********** */
         }
