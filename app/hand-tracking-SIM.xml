@@ -5,7 +5,7 @@
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking-SIM</name>
     <description>Visual tracking of the iCub_SIM hand by means of a 3D model-aided particle filter</description>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -73,18 +73,6 @@
     <connection>
         <from>/icubSim/torso/state:o</from>
         <to>/hand-tracking/right/torso:i</to>
-        <protocol>tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/hand-tracking/left/result/img:o</from>
-        <to>/view/result/left</to>
-        <protocol>tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/hand-tracking/right/result/img:o</from>
-        <to>/view/result/right</to>
         <protocol>tcp</protocol>
     </connection>
 
