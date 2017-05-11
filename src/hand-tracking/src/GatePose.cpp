@@ -54,7 +54,7 @@ void GatePose::likelihood(const Ref<const MatrixXf>& innovation, Ref<MatrixXf> c
 
 bool GatePose::setObservationModelProperty(const std::string& property)
 {
-    return false;
+    return VisualCorrectionDecorator::setObservationModelProperty(property);
 }
 
 
