@@ -5,7 +5,7 @@
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking-BATCH</name>
     <description>Offline visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
-    <version>0.6.0</version>
+    <version>0.6.1</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -28,18 +28,6 @@
     <module>
         <name>yarpdataplayer</name>
         <parameters>--withExtraTimeCol 2</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpview</name>
-        <parameters>--name /view/result/left --x 20 --y 0 --RefreshTime 30</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpview</name>
-        <parameters>--name /view/result/right --x 340 --y 0 --RefreshTime 30</parameters>
         <node>localhost</node>
     </module>
 
@@ -82,7 +70,6 @@
         <protocol>tcp</protocol>
     </connection>
 
-
     <!-- playFwdKinMotion -->
     <connection>
         <from>/icub/torso/state:o</from>
@@ -108,7 +95,6 @@
         <protocol>tcp</protocol>
     </connection>
 
-
     <!-- playGatePose -->
     <connection>
         <from>/icub/torso/state:o</from>
@@ -133,7 +119,6 @@
         <to>/hand-tracking/playGatePose/right/right_arm:i</to>
         <protocol>tcp</protocol>
     </connection>
-
 
     <!-- VisualProprioception connections -->
     <connection>
@@ -171,5 +156,30 @@
         <to>/hand-tracking/VisualProprioception/right/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
+
+    <!-- iCubProprioception connection for displaying results -->
+    <connection>
+        <from>/hand-tracking/left/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/estimates/mean:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <!--connection>
+        <from>/hand-tracking/right/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/estimates/mean:i</to>
+        <protocol>tcp</protocol>
+    </connection-->
+
+    <!--connection>
+        <from>/hand-tracking/left/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/estimates/mode:i</to>
+        <protocol>tcp</protocol>
+    </connection-->
+
+    <!--connection>
+        <from>/hand-tracking/right/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/estimates/mode:i</to>
+        <protocol>tcp</protocol>
+    </connection-->
 
 </application>

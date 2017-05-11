@@ -5,7 +5,7 @@
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking-SIM</name>
     <description>Visual tracking of the iCub_SIM hand by means of a 3D model-aided particle filter</description>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -76,7 +76,6 @@
         <protocol>tcp</protocol>
     </connection>
 
-
     <!-- VisualProprioception connections -->
     <connection>
         <from>/icubSim/head/state:o</from>
@@ -113,5 +112,30 @@
         <to>/hand-tracking/VisualProprioception/right/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
+
+    <!-- iCubProprioception connection for displaying results -->
+    <connection>
+        <from>/hand-tracking/left/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/estimates/mean:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <!--connection>
+        <from>/hand-tracking/right/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/estimates/mean:i</to>
+        <protocol>tcp</protocol>
+    </connection-->
+
+    <!--connection>
+        <from>/hand-tracking/left/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/estimates/mode:i</to>
+        <protocol>tcp</protocol>
+    </connection-->
+
+    <!--connection>
+        <from>/hand-tracking/right/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/estimates/mode:i</to>
+        <protocol>tcp</protocol>
+    </connection-->
 
 </application>
