@@ -42,7 +42,9 @@ protected:
     iCub::iKin::iCubArm    icub_kin_arm_;
 
     yarp::sig::Vector      readTorso();
+
     yarp::sig::Vector      readRootToEE();
+
     bool                   setDeltaMotion();
 
 private:

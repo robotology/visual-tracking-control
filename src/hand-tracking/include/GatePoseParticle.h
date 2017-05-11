@@ -50,10 +50,15 @@ protected:
     yarp::dev::IEncoders * itf_torso_enc_;
 
     yarp::sig::Vector      readTorso();
+
     yarp::sig::Vector      readRootToEE();
+
     bool                   setPose();
+
     bool                   isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXf>& state);
+
     bool                   isWithinRotation(float rot_angle);
+
     bool                   isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state);
 
 private:

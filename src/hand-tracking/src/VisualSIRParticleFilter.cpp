@@ -98,6 +98,7 @@ void VisualSIRParticleFilter::runFilter()
     cuda_hog->setGammaCorrection(true);
     cuda_hog->setWinStride(Size(img_width, img_height));
 
+    // !!!: In generale si potrebbe prevedere, per ogni step dell'algoritmo, un passo INIT (senza prefissi), così da essere generico.
     prediction_->setStateModelProperty("ICFW_INIT");
 
     is_filter_init_ = true;
