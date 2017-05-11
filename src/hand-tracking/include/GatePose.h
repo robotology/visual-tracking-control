@@ -16,11 +16,9 @@ public:
     /* Constructor */
     GatePose(std::unique_ptr<VisualCorrection> visual_correction,
              double gate_x, double gate_y, double gate_z,
-             double gate_aperture, double gate_rotation,
-             const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+             double gate_aperture, double gate_rotation) noexcept;
 
-    GatePose(std::unique_ptr<VisualCorrection> visual_correction,
-             const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+    GatePose(std::unique_ptr<VisualCorrection> visual_correction) noexcept;
 
     /* Default constructor, disabled */
     GatePose() = delete;
@@ -43,23 +41,13 @@ public:
     bool setObservationModelProperty(const std::string& property) override;
 
 protected:
-    yarp::dev::PolyDriver  drv_arm_enc_;
-    yarp::dev::IEncoders * itf_arm_enc_;
-    iCub::iKin::iCubArm    icub_kin_arm_;
-    yarp::dev::PolyDriver  drv_torso_enc_;
-    yarp::dev::IEncoders * itf_torso_enc_;
+    virtual Eigen::VectorXd readPose() = 0;
 
-    yarp::sig::Vector      readTorso();
+    bool isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXf>& state);
 
-    yarp::sig::Vector      readRootToEE();
+    bool isWithinRotation(float rot_angle);
 
-    bool                   setPose();
-
-    bool                   isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXf>& state);
-
-    bool                   isWithinRotation(float rot_angle);
-
-    bool                   isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state);
+    bool isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state);
 
 private:
     yarp::os::ConstString  ID_     = "GatePose";
@@ -71,11 +59,7 @@ private:
     double gate_aperture_;
     double gate_rotation_;
 
-    yarp::os::ConstString  robot_;
-    yarp::os::ConstString  laterality_;
-    yarp::os::ConstString  port_prefix_;
-
-    Eigen::VectorXd        ee_pose_;
+    Eigen::VectorXd ee_pose_;
 };
 
 #endif /* GATEPOSE_H */

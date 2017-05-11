@@ -15,7 +15,7 @@
 
 #include "BrownianMotion.h"
 #include "DrawPose.h"
-#include "GatePose.h"
+#include "iCubGatePose.h"
 #include "iCubFwdKinMotion.h"
 #include "playFwdKinMotion.h"
 #include "VisualProprioception.h"
@@ -121,9 +121,9 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), 1));
 //    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
 
-    std::unique_ptr<GatePose> vpf_correction_gated(new GatePose(std::move(vpf_correction),
-                                                                0.1, 0.1, 0.1, 30, 5,
-                                                                robot_name, robot_laterality, robot_cam_sel));
+    std::unique_ptr<GatePose> vpf_correction_gated(new iCubGatePose(std::move(vpf_correction),
+                                                                    0.1, 0.1, 0.1, 30, 5,
+                                                                    robot_name, robot_laterality, robot_cam_sel));
 
 
     /* RESAMPLING */
