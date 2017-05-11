@@ -32,9 +32,9 @@ void GatePose::correct(const Ref<const MatrixXf>& pred_state, InputArray measure
 
     for (int i = 0; i < pred_state.cols(); ++i)
     {
-        if (!isInsideEllipsoid(pred_state.block<3, 1>(0, i)) ||
-            !isWithinRotation (pred_state(6, i))             ||
-            !isInsideCone     (pred_state.block<3, 1>(3, i))   )
+        if (!isInsideEllipsoid(pred_state.block<3, 1>(0, i))              ||
+            !isWithinRotation (pred_state.block<3, 1>(3, i).norm())       ||
+            !isInsideCone     (pred_state.block<3, 1>(3, i).normalized())   )
             cor_state(i, 0) = std::numeric_limits<float>::min();
     }
 }
