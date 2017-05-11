@@ -1,5 +1,5 @@
-#ifndef GATEPOSEPARTICLE_H
-#define GATEPOSEPARTICLE_H
+#ifndef GATEPOSE_H
+#define GATEPOSE_H
 
 #include <BayesFiltersLib/VisualCorrectionDecorator.h>
 #include <BayesFiltersLib/StateModel.h>
@@ -10,29 +10,29 @@
 #include <yarp/sig/Vector.h>
 
 
-class GatePoseParticle : public bfl::VisualCorrectionDecorator
+class GatePose : public bfl::VisualCorrectionDecorator
 {
 public:
     /* Constructor */
-    GatePoseParticle(std::unique_ptr<VisualCorrection> visual_correction,
-                     double gate_x, double gate_y, double gate_z,
-                     double gate_aperture, double gate_rotation,
-                     const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+    GatePose(std::unique_ptr<VisualCorrection> visual_correction,
+             double gate_x, double gate_y, double gate_z,
+             double gate_aperture, double gate_rotation,
+             const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
-    GatePoseParticle(std::unique_ptr<VisualCorrection> visual_correction,
-                     const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+    GatePose(std::unique_ptr<VisualCorrection> visual_correction,
+             const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
     /* Default constructor, disabled */
-    GatePoseParticle() = delete;
+    GatePose() = delete;
 
     /* Destructor */
-    ~GatePoseParticle() noexcept override;
+    ~GatePose() noexcept override;
 
     /* Move constructor, disabled */
-    GatePoseParticle(GatePoseParticle&& visual_correction) = delete;
+    GatePose(GatePose&& visual_correction) = delete;
 
     /* Move assignment operator, disabled */
-    GatePoseParticle& operator=(GatePoseParticle&& visual_correction) = delete;
+    GatePose& operator=(GatePose&& visual_correction) = delete;
 
     void correct(const Eigen::Ref<const Eigen::MatrixXf>& pred_state, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> cor_state) override;
 
@@ -62,7 +62,7 @@ protected:
     bool                   isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state);
 
 private:
-    yarp::os::ConstString  ID_     = "GatePoseParticle";
+    yarp::os::ConstString  ID_     = "GatePose";
     yarp::os::ConstString  log_ID_ = "[" + ID_ + "]";
 
     double gate_x_;
@@ -78,4 +78,4 @@ private:
     Eigen::VectorXd        ee_pose_;
 };
 
-#endif /* GATEPOSEPARTICLE_H */
+#endif /* GATEPOSE_H */

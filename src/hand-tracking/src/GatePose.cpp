@@ -1,4 +1,4 @@
-#include "GatePoseParticle.h"
+#include "GatePose.h"
 
 #include <iCub/ctrl/math.h>
 #include <yarp/os/LogStream.h>
@@ -14,10 +14,10 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-GatePoseParticle::GatePoseParticle(std::unique_ptr<VisualCorrection> visual_correction,
-                                   double gate_x, double gate_y, double gate_z,
-                                   double gate_aperture, double gate_rotation,
-                                   const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
+GatePose::GatePose(std::unique_ptr<VisualCorrection> visual_correction,
+                   double gate_x, double gate_y, double gate_z,
+                   double gate_aperture, double gate_rotation,
+                   const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
     VisualCorrectionDecorator(std::move(visual_correction)),
     gate_x_(gate_x), gate_y_(gate_y), gate_z_(gate_z), gate_aperture_(gate_aperture), gate_rotation_(gate_rotation)
 {
@@ -85,15 +85,15 @@ GatePoseParticle::GatePoseParticle(std::unique_ptr<VisualCorrection> visual_corr
 }
 
 
-GatePoseParticle::GatePoseParticle(std::unique_ptr<VisualCorrection> visual_correction,
-                                   const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
-    GatePoseParticle(std::move(visual_correction), 0.1, 0.1, 0.1, 30, 5, robot, laterality, port_prefix) { }
+GatePose::GatePose(std::unique_ptr<VisualCorrection> visual_correction,
+                   const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
+    GatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 30, 5, robot, laterality, port_prefix) { }
 
 
-GatePoseParticle::~GatePoseParticle() noexcept { }
+GatePose::~GatePose() noexcept { }
 
 
-void GatePoseParticle::correct(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> cor_state)
+void GatePose::correct(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> cor_state)
 {
     VisualCorrectionDecorator::correct(pred_state, measurements, cor_state);
 
@@ -107,19 +107,19 @@ void GatePoseParticle::correct(const Ref<const MatrixXf>& pred_state, InputArray
 }
 
 
-void GatePoseParticle::innovation(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> innovation)
+void GatePose::innovation(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> innovation)
 {
     VisualCorrectionDecorator::innovation(pred_state, measurements, innovation);
 }
 
 
-void GatePoseParticle::likelihood(const Ref<const MatrixXf>& innovation, Ref<MatrixXf> cor_state)
+void GatePose::likelihood(const Ref<const MatrixXf>& innovation, Ref<MatrixXf> cor_state)
 {
     VisualCorrectionDecorator::likelihood(innovation, cor_state);
 }
 
 
-bool GatePoseParticle::setObservationModelProperty(const std::string& property)
+bool GatePose::setObservationModelProperty(const std::string& property)
 {
     if (!VisualCorrectionDecorator::setObservationModelProperty(property))
         if (property == "ICGPP_POSE")
@@ -129,7 +129,7 @@ bool GatePoseParticle::setObservationModelProperty(const std::string& property)
 }
 
 
-Vector GatePoseParticle::readTorso()
+Vector GatePose::readTorso()
 {
     int torso_enc_num;
     itf_arm_enc_->getAxes(&torso_enc_num);
@@ -143,7 +143,7 @@ Vector GatePoseParticle::readTorso()
 }
 
 
-Vector GatePoseParticle::readRootToEE()
+Vector GatePose::readRootToEE()
 {
     int arm_enc_num;
     itf_arm_enc_->getAxes(&arm_enc_num);
@@ -161,7 +161,7 @@ Vector GatePoseParticle::readRootToEE()
 }
 
 
-bool GatePoseParticle::setPose()
+bool GatePose::setPose()
 {
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     ee_pose_ = Map<VectorXd>(ee_pose.data(), 7, 1);
@@ -170,7 +170,7 @@ bool GatePoseParticle::setPose()
 }
 
 
-bool GatePoseParticle::isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXf>& state)
+bool GatePose::isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXf>& state)
 {
     return ( (abs(state(0) - ee_pose_(0)) < gate_x_) &&
              (abs(state(1) - ee_pose_(1)) < gate_y_) &&
@@ -178,7 +178,7 @@ bool GatePoseParticle::isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXf>
 }
 
 
-bool GatePoseParticle::isWithinRotation(float rot_angle)
+bool GatePose::isWithinRotation(float rot_angle)
 {
     float ang_diff = rot_angle - ee_pose_(6);
     if (ang_diff >  2.0 * M_PI) ang_diff -= 2.0 * M_PI;
@@ -188,7 +188,7 @@ bool GatePoseParticle::isWithinRotation(float rot_angle)
 }
 
 
-bool GatePoseParticle::isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state)
+bool GatePose::isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state)
 {
     double   half_aperture    = CTRL_DEG2RAD * (gate_aperture_ / 2.0);
 

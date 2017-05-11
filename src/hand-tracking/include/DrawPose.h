@@ -1,5 +1,5 @@
-#ifndef DRAWPOSEPARTICLE_H
-#define DRAWPOSEPARTICLE_H
+#ifndef DRAWPOSE_H
+#define DRAWPOSE_H
 
 #include <memory>
 #include <random>
@@ -8,27 +8,27 @@
 #include <BayesFiltersLib/StateModel.h>
 
 namespace bfl {
-    class DrawPoseParticle;
+    class DrawPose;
 }
 
 
-class bfl::DrawPoseParticle : public bfl::ParticleFilterPrediction
+class bfl::DrawPose : public bfl::ParticleFilterPrediction
 {
 public:
     /* Default constructor, disabled */
-    DrawPoseParticle() = delete;
+    DrawPose() = delete;
 
     /* PF prediction constructor */
-    DrawPoseParticle(std::unique_ptr<StateModel> transition_model) noexcept;
+    DrawPose(std::unique_ptr<StateModel> transition_model) noexcept;
 
     /* Destructor */
-    ~DrawPoseParticle() noexcept override;
+    ~DrawPose() noexcept override;
 
     /* Move constructor */
-    DrawPoseParticle(DrawPoseParticle&& pf_prediction) noexcept;
+    DrawPose(DrawPose&& pf_prediction) noexcept;
 
     /* Move assignment operator */
-    DrawPoseParticle& operator=(DrawPoseParticle&& pf_prediction) noexcept;
+    DrawPose& operator=(DrawPose&& pf_prediction) noexcept;
 
     void predict(const Eigen::Ref<const Eigen::VectorXf>& prev_state, Eigen::Ref<Eigen::VectorXf> pred_state) override;
 
@@ -44,4 +44,4 @@ protected:
     void addAxisangleDisturbance(const Eigen::Ref<const Eigen::Vector3f>& current_vec, const Eigen::Ref<const Eigen::Vector3f>& disturbance_vec, Eigen::Ref<Eigen::Vector3f> rotated_vec);
 };
 
-#endif /* DRAWPOSEPARTICLE_H */
+#endif /* DRAWPOSE_H */
