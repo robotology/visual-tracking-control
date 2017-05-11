@@ -1,13 +1,10 @@
 #ifndef GATEPOSE_H
 #define GATEPOSE_H
 
+#include <string>
+
 #include <BayesFiltersLib/VisualCorrectionDecorator.h>
 #include <BayesFiltersLib/StateModel.h>
-#include <iCub/iKin/iKinFwd.h>
-#include <yarp/dev/IEncoders.h>
-#include <yarp/dev/PolyDriver.h>
-#include <yarp/os/ConstString.h>
-#include <yarp/sig/Vector.h>
 
 
 class GatePose : public bfl::VisualCorrectionDecorator
@@ -50,9 +47,6 @@ protected:
     bool isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state);
 
 private:
-    yarp::os::ConstString  ID_     = "GatePose";
-    yarp::os::ConstString  log_ID_ = "[" + ID_ + "]";
-
     double gate_x_;
     double gate_y_;
     double gate_z_;

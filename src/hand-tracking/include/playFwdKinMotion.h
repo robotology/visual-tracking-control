@@ -3,8 +3,8 @@
 
 #include <BayesFiltersLib/StateModelDecorator.h>
 #include <iCub/iKin/iKinFwd.h>
-#include <yarp/dev/PolyDriver.h>
-#include <yarp/dev/IEncoders.h>
+#include <yarp/os/Bottle.h>
+#include <yarp/os/BufferedPort.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/sig/Vector.h>
 

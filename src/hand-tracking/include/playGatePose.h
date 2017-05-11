@@ -1,36 +1,33 @@
-#ifndef ICUBGATEPOSE_H
-#define ICUBGATEPOSE_H
+#ifndef PLAYGATEPOSE_H
+#define PLAYGATEPOSE_H
 
 #include "GatePose.h"
 
 #include <iCub/iKin/iKinFwd.h>
-#include <yarp/dev/IEncoders.h>
-#include <yarp/dev/PolyDriver.h>
-#include <yarp/os/ConstString.h>
+#include <yarp/os/Bottle.h>
+#include <yarp/os/BufferedPort.h>
 #include <yarp/sig/Vector.h>
 
 
-class iCubGatePose : public GatePose
+class playGatePose : public GatePose
 {
 public:
     /* Constructor */
-    iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+    playGatePose(std::unique_ptr<VisualCorrection> visual_correction,
                  double gate_x, double gate_y, double gate_z,
                  double gate_aperture, double gate_rotation,
                  const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
-    iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+    playGatePose(std::unique_ptr<VisualCorrection> visual_correction,
                  const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
     /* Destructor */
-    ~iCubGatePose() noexcept override;
+    ~playGatePose() noexcept override;
 
 protected:
-    yarp::dev::PolyDriver  drv_arm_enc_;
-    yarp::dev::IEncoders * itf_arm_enc_;
-    yarp::dev::PolyDriver  drv_torso_enc_;
-    yarp::dev::IEncoders * itf_torso_enc_;
-    iCub::iKin::iCubArm    icub_kin_arm_;
+    yarp::os::BufferedPort<yarp::os::Bottle> port_torso_enc_;
+    yarp::os::BufferedPort<yarp::os::Bottle> port_arm_enc_;
+    iCub::iKin::iCubArm                      icub_kin_arm_;
 
     Eigen::VectorXd   readPose() override;
 
@@ -39,7 +36,7 @@ protected:
     yarp::sig::Vector readTorso();
 
 private:
-    yarp::os::ConstString  ID_     = "iCubGatePose";
+    yarp::os::ConstString  ID_     = "playGatePose";
     yarp::os::ConstString  log_ID_ = "[" + ID_ + "]";
 
     yarp::os::ConstString  robot_;
@@ -47,4 +44,4 @@ private:
     yarp::os::ConstString  port_prefix_;
 };
 
-#endif /* ICUBGATEPOSE_H */
+#endif /* PLAYGATEPOSE_H */

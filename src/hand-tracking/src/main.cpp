@@ -18,6 +18,7 @@
 #include "iCubGatePose.h"
 #include "iCubFwdKinMotion.h"
 #include "playFwdKinMotion.h"
+#include "playGatePose.h"
 #include "VisualProprioception.h"
 #include "VisualParticleFilterCorrection.h"
 #include "VisualSIRParticleFilter.h"
@@ -121,9 +122,21 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), 1));
 //    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
 
-    std::unique_ptr<GatePose> vpf_correction_gated(new iCubGatePose(std::move(vpf_correction),
-                                                                    0.1, 0.1, 0.1, 30, 5,
-                                                                    robot_name, robot_laterality, robot_cam_sel));
+    std::unique_ptr<GatePose> vpf_correction_gated;
+    if (!play)
+    {
+        std::unique_ptr<GatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_correction),
+                                                                  0.1, 0.1, 0.1, 30, 5,
+                                                                  robot_name, robot_laterality, robot_cam_sel));
+        vpf_correction_gated = std::move(icub_gate_pose);
+    }
+    else
+    {
+        std::unique_ptr<GatePose> icub_gate_pose(new playGatePose(std::move(vpf_correction),
+                                                                  0.1, 0.1, 0.1, 30, 5,
+                                                                  robot_name, robot_laterality, robot_cam_sel));
+        vpf_correction_gated = std::move(icub_gate_pose);
+    }
 
 
     /* RESAMPLING */
