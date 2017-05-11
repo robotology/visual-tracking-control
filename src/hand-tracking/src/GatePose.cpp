@@ -1,5 +1,7 @@
 #include "GatePose.h"
 
+#include <cmath>
+
 using namespace bfl;
 using namespace cv;
 using namespace Eigen;
@@ -9,7 +11,7 @@ GatePose::GatePose(std::unique_ptr<VisualCorrection> visual_correction,
                    double gate_x, double gate_y, double gate_z,
                    double gate_aperture, double gate_rotation) noexcept :
     VisualCorrectionDecorator(std::move(visual_correction)),
-    gate_x_(gate_x), gate_y_(gate_y), gate_z_(gate_z), gate_aperture_(gate_aperture), gate_rotation_(gate_rotation)
+    gate_x_(gate_x), gate_y_(gate_y), gate_z_(gate_z), gate_aperture_((M_PI / 180.0) * gate_aperture), gate_rotation_((M_PI / 180.0) * gate_rotation)
 {
     ee_pose_ = VectorXd::Zero(6);
 }
@@ -76,7 +78,7 @@ bool GatePose::isWithinRotation(float rot_angle)
 
 bool GatePose::isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state)
 {
-    double   half_aperture    = (M_PI / 180.0) * (gate_aperture_ / 2.0);
+    double   half_aperture    =  gate_aperture_ / 2.0;
 
     VectorXd test_direction   = -state.cast<double>();
 
