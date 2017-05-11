@@ -36,9 +36,6 @@ public:
     bool setProperty(const std::string& property) override;
 
 protected:
-    yarp::os::ConstString                    robot_;
-    yarp::os::ConstString                    laterality_;
-    yarp::os::ConstString                    port_prefix_;
     yarp::os::BufferedPort<yarp::os::Bottle> port_torso_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle> port_arm_enc_;
     iCub::iKin::iCubArm                      icub_kin_arm_;
@@ -52,7 +49,13 @@ protected:
     bool              setDeltaMotion();
 
 private:
-    yarp::os::ConstString log_ID_ = "[playFwdKinMotion]";
+    yarp::os::ConstString ID_     = "playFwdKinMotion";
+    yarp::os::ConstString log_ID_ = "[" + ID_ + "]";
+
+    yarp::os::ConstString robot_;
+    yarp::os::ConstString laterality_;
+    yarp::os::ConstString port_prefix_;
+
     Eigen::VectorXd       prev_ee_pose_;
     Eigen::VectorXd       delta_hand_pose_;
     double                delta_angle_;
