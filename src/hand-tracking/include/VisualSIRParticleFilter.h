@@ -68,7 +68,7 @@ protected:
     yarp::os::ConstString                                            laterality_;
     const int                                                        num_particles_;
 
-    /* INIT ONLY */
+    /* THIS DATA MEMBER SHOULD BE IN INITIALIZATION CLASS */
     iCub::iKin::iCubArm                                              icub_kin_arm_;
     iCub::iKin::iCubFinger                                           icub_kin_finger_[3];
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_torso_enc_;
@@ -76,7 +76,7 @@ protected:
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_left_;
     /* OUTPUT */
     yarp::os::BufferedPort<yarp::sig::Vector>                        port_estimates_out_;
-    /* ********* */
+    /* ************************************************** */
 
     bool                                                             is_filter_init_;
     bool                                                             is_running_;
@@ -102,11 +102,11 @@ private:
 
     Eigen::VectorXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 
-    /* THIS CALL SHOULD BE IN ANOTHER CLASS */
+    /* THIS METHOD SHOULD BE IN INITIALIZATION CLASS */
     yarp::sig::Vector readTorso();
 
     yarp::sig::Vector readRootToEE();
-    /* ************************************ */
+    /* ********************************************* */
 };
 
 #endif /* VISUALSIRPARTICLEFILTER_H */
