@@ -149,7 +149,7 @@ bool iCubFwdKinMotion::setProperty(const std::string& property)
 Vector iCubFwdKinMotion::readTorso()
 {
     int torso_enc_num;
-    itf_arm_enc_->getAxes(&torso_enc_num);
+    itf_torso_enc_->getAxes(&torso_enc_num);
     Vector enc_torso(torso_enc_num);
 
     while (!itf_torso_enc_->getEncoders(enc_torso.data()));
