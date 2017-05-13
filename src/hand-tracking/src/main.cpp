@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     ConstString robot_name       = rf.find("robot").asString();
     ConstString robot_cam_sel    = rf.find("cam").asString();
     ConstString robot_laterality = rf.find("laterality").asString();
-    bool        play             = rf.find("play").asBool();
+    bool        play             = ((rf.findGroup("play").size() == 1 ? true : (rf.findGroup("play").size() == 2 ? rf.find("play").asBool() : false)));
     int         num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
 
     if (robot_name.empty())
