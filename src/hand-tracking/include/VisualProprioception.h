@@ -62,7 +62,6 @@ protected:
     yarp::os::ConstString                     laterality_;
     yarp::dev::PolyDriver                     drv_gaze_;
     yarp::dev::IGazeControl*                  itf_gaze_;
-    yarp::os::Bottle                          cam_info;
     iCub::iKin::iCubArm                       icub_arm_;
     iCub::iKin::iCubFinger                    icub_kin_finger_[3];
     iCub::iKin::iCubEye                       icub_kin_eye_;

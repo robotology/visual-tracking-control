@@ -35,6 +35,7 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
 
     if (openGazeController())
     {
+        Bottle cam_info;
         itf_gaze_->getInfo(cam_info);
         yInfo() << log_ID_ << "[CAM PARAMS]" << cam_info.toString();
         Bottle* cam_sel_intrinsic  = cam_info.findGroup("camera_intrinsics_" + cam_sel_).get(1).asList();
@@ -52,7 +53,7 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
         rf.setVerbose();
         rf.setDefaultContext(context);
         rf.setDefaultConfigFile("parameters.ini");
-        rf.configure(0, nullptr);
+        rf.configure(0, YARP_NULLPTR);
 
         Bottle* fallback_intrinsic = rf.findGroup("FALLBACK").find("intrinsic_" + cam_sel_).asList();
         if (fallback_intrinsic)

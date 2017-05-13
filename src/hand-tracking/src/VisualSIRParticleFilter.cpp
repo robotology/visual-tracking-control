@@ -336,7 +336,7 @@ VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, con
 }
 
 
-/* THIS CALL SHOULD BE IN OTHER CLASSES */
+/* THIS METHOD SHOULD BE IN INITIALIZATION CLASS */
 Vector VisualSIRParticleFilter::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
@@ -369,4 +369,4 @@ Vector VisualSIRParticleFilter::readRootToEE()
 
     return root_ee_enc;
 }
-/* ************************************ */
+/* ********************************************* */
