@@ -63,18 +63,11 @@ int main(int argc, char *argv[])
     rf.setDefaultConfigFile("parameters.ini");
     rf.configure(argc, argv);
 
-    ConstString robot_name       = rf.find("robot").asString();
-    ConstString robot_cam_sel    = rf.find("cam").asString();
-    ConstString robot_laterality = rf.find("laterality").asString();
+    ConstString robot_name       = rf.check("robot",      Value("icub")).asString();
+    ConstString robot_cam_sel    = rf.check("cam",        Value("left")).asString();
+    ConstString robot_laterality = rf.check("laterality", Value("right")).asString();
     bool        play             = ((rf.findGroup("play").size() == 1 ? true : (rf.findGroup("play").size() == 2 ? rf.find("play").asBool() : false)));
     int         num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
-
-    if (robot_name.empty())
-        robot_name       = "icub";
-    if (robot_cam_sel.empty())
-        robot_cam_sel    = "left";
-    if (robot_laterality.empty())
-        robot_laterality = "right";
 
     yInfo() << log_ID << "Running with:";
     yInfo() << log_ID << " - robot name:"          << robot_name;
