@@ -1,5 +1,4 @@
 #include <utility>
-#include <iostream>
 
 #include "DrawPose.h"
 
