@@ -60,9 +60,9 @@ bool GatePose::setObservationModelProperty(const std::string& property)
 
 bool GatePose::isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXf>& state)
 {
-    return ( (abs(state(0) - ee_pose_(0)) < gate_x_) &&
-             (abs(state(1) - ee_pose_(1)) < gate_y_) &&
-             (abs(state(2) - ee_pose_(2)) < gate_z_) );
+    return ( (abs(state(0) - ee_pose_(0)) <= gate_x_) &&
+             (abs(state(1) - ee_pose_(1)) <= gate_y_) &&
+             (abs(state(2) - ee_pose_(2)) <= gate_z_) );
 }
 
 
