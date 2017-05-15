@@ -15,13 +15,13 @@
     <!-- REQUIRED MODULES -->
     <module>
         <name>hand-tracking</name>
-        <parameters>--robot icub --cam left --laterality right</parameters>
+        <parameters>--robot icub --play --cam left --laterality right</parameters>
         <node>localhost</node>
     </module>
 
     <module>
         <name>hand-tracking</name>
-        <parameters>--robot icub --cam right --laterality right</parameters>
+        <parameters>--robot icub --play --cam right --laterality right</parameters>
         <node>localhost</node>
     </module>
 
@@ -160,26 +160,14 @@
     <!-- iCubProprioception connection for displaying results -->
     <connection>
         <from>/hand-tracking/left/result/estimates:o</from>
-        <to>/iCubProprioception/ExtCADSuperimposer/left/hand/right_pose:i</to>
+        <to>/iCubProprioception/BatchCADSuperimposer/cam/left/hand/right_pose:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/hand-tracking/right/result/estimates:o</from>
-        <to>/iCubProprioception/ExtCADSuperimposer/right/hand/right_pose:i</to>
+        <to>/iCubProprioception/BatchCADSuperimposer/cam/right/hand/right_pose:i</to>
         <protocol>tcp</protocol>
     </connection>
-
-    <!--connection>
-        <from>/hand-tracking/left/result/estimates:o</from>
-        <to>/iCubProprioception/ExtCADSuperimposer/estimates/mode:i</to>
-        <protocol>tcp</protocol>
-    </connection-->
-
-    <!--connection>
-        <from>/hand-tracking/right/result/estimates:o</from>
-        <to>/iCubProprioception/ExtCADSuperimposer/estimates/mode:i</to>
-        <protocol>tcp</protocol>
-    </connection-->
 
 </application>
