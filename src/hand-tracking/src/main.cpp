@@ -77,8 +77,8 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - number of particles:" << num_particles;
 
     /* MOTION MODEL */
-    std::unique_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 0.005, 3.0, 1.5, 1));
-    std::unique_ptr<StateModel>     icub_motion;
+    std::unique_ptr<StateModel> brown(new BrownianMotion(0.005, 0.005, 5.0, 5.0, 1));
+    std::unique_ptr<StateModel> icub_motion;
     if (!play)
     {
         std::unique_ptr<iCubFwdKinMotion> icub_fwdkin(new iCubFwdKinMotion(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     }
 
     /* PREDICTION */
-    std::unique_ptr<DrawPose> pf_prediction(new DrawPose(std::move(icub_motion)));
+    std::unique_ptr<ParticleFilterPrediction> pf_prediction(new DrawPose(std::move(icub_motion)));
 
 
     /* SENSOR MODEL */
