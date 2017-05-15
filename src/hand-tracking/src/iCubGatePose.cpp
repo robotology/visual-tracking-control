@@ -18,11 +18,11 @@ using namespace yarp::sig;
 
 iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
                            double gate_x, double gate_y, double gate_z,
-                           double gate_aperture, double gate_rotation,
+                           double gate_rotation, double gate_aperture,
                            const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
     GatePose(std::move(visual_correction),
              gate_x, gate_y, gate_z,
-             gate_aperture, gate_rotation),
+             gate_rotation, gate_aperture),
     robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
 {
     Property opt_arm_enc;
@@ -88,7 +88,7 @@ iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
 
 iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
                            const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
-    iCubGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 30, 5, robot, laterality, port_prefix) { }
+    iCubGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30, robot, laterality, port_prefix) { }
 
 
 iCubGatePose::~iCubGatePose() noexcept { }

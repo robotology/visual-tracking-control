@@ -9,7 +9,7 @@ using namespace Eigen;
 
 GatePose::GatePose(std::unique_ptr<VisualCorrection> visual_correction,
                    double gate_x, double gate_y, double gate_z,
-                   double gate_aperture, double gate_rotation) noexcept :
+                   double gate_rotation, double gate_aperture) noexcept :
     VisualCorrectionDecorator(std::move(visual_correction)),
     gate_x_(gate_x), gate_y_(gate_y), gate_z_(gate_z), gate_aperture_((M_PI / 180.0) * gate_aperture), gate_rotation_((M_PI / 180.0) * gate_rotation)
 {
@@ -18,7 +18,7 @@ GatePose::GatePose(std::unique_ptr<VisualCorrection> visual_correction,
 
 
 GatePose::GatePose(std::unique_ptr<VisualCorrection> visual_correction) noexcept :
-    GatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 30, 5) { }
+    GatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30) { }
 
 
 GatePose::~GatePose() noexcept { }

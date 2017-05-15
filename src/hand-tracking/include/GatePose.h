@@ -13,7 +13,7 @@ public:
     /* Constructor */
     GatePose(std::unique_ptr<VisualCorrection> visual_correction,
              double gate_x, double gate_y, double gate_z,
-             double gate_aperture, double gate_rotation) noexcept;
+             double gate_rotation, double gate_aperture) noexcept;
 
     GatePose(std::unique_ptr<VisualCorrection> visual_correction) noexcept;
 
