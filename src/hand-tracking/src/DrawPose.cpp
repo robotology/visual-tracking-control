@@ -45,16 +45,11 @@ void DrawPose::predict(const Ref<const VectorXf>& prev_state, Ref<VectorXf> pred
     VectorXf sample(VectorXf::Zero(7, 1));
     motionDisturbance(sample);
 
-    pred_state.head<3>() += sample.head<3>();
-
     VectorXf rotated_vec(VectorXf::Zero(3, 1));
-    addAxisangleDisturbance(pred_state.tail<3>().normalized(), sample.middleRows<3>(3), rotated_vec);
+    addAxisangleDisturbance(pred_state.tail<3>(), sample(6), sample.middleRows<3>(3), rotated_vec);
 
-    float ang = pred_state.tail<3>().norm() + sample(6);
-    if (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
-    if (ang <=        0.0) ang += 2.0 * M_PI;
-
-    pred_state.tail<3>() = ang * rotated_vec;
+    pred_state.head<3>() += sample.head<3>();
+    pred_state.tail<3>() =  rotated_vec;
 }
 
 bool DrawPose::setStateModelProperty(const std::string& property)
@@ -63,12 +58,17 @@ bool DrawPose::setStateModelProperty(const std::string& property)
 }
 
 
-void DrawPose::addAxisangleDisturbance(const Ref<const Vector3f>& current_vec, const Ref<const Vector3f>& disturbance_vec, Ref<Vector3f> rotated_vec)
+void DrawPose::addAxisangleDisturbance(const Ref<const Vector3f>& current_vec, float disturbance_angle, const Ref<const Vector3f>& disturbance_vec, Ref<Vector3f> rotated_vec)
 {
+    float ang = current_vec.tail<3>().norm() + disturbance_angle;
+
+    if      (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
+    else if (ang <=        0.0) ang += 2.0 * M_PI;
+
     /* Find the rotation axis 'u' and rotation angle 'rot' [1] */
     Vector3f def_dir(0.0, 0.0, 1.0);
-    Vector3f u = def_dir.cross(current_vec).normalized();
-    float rot  = static_cast<float>(acos(current_vec.dot(def_dir)));
+    Vector3f u = def_dir.cross(current_vec.normalized()).normalized();
+    float rot  = static_cast<float>(acos(current_vec.normalized().dot(def_dir)));
 
     /* Convert rotation axis and angle to 3x3 rotation matrix [2] */
     /* [2] https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle */
@@ -78,5 +78,5 @@ void DrawPose::addAxisangleDisturbance(const Ref<const Vector3f>& current_vec, c
                     -u(1),   u(0),      0;
     Matrix3f R = cos(rot) * Matrix3f::Identity() + sin(rot) * cross_matrix + (1 - cos(rot)) * (u * u.transpose());
 
-    rotated_vec = (R * disturbance_vec).normalized();
+    rotated_vec = ang * (R * disturbance_vec).normalized();
 }

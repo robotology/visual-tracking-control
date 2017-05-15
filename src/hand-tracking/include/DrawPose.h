@@ -41,7 +41,7 @@ public:
 protected:
     std::unique_ptr<StateModel> state_model_;
 
-    void addAxisangleDisturbance(const Eigen::Ref<const Eigen::Vector3f>& current_vec, const Eigen::Ref<const Eigen::Vector3f>& disturbance_vec, Eigen::Ref<Eigen::Vector3f> rotated_vec);
+    void addAxisangleDisturbance(const Eigen::Ref<const Eigen::Vector3f>& current_vec, float disturbance_angle, const Eigen::Ref<const Eigen::Vector3f>& disturbance_vec, Eigen::Ref<Eigen::Vector3f> rotated_vec);
 };
 
 #endif /* DRAWPOSE_H */
