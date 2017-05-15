@@ -76,6 +76,8 @@ bool GatePose::isWithinRotation(float rot_angle)
 
 bool GatePose::isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state)
 {
+    /* See: http://stackoverflow.com/questions/10768142/verify-if-point-is-inside-a-cone-in-3d-space#10772759 */
+
     double   half_aperture    =  gate_aperture_ / 2.0;
 
     VectorXd test_direction   = -state.cast<double>();
