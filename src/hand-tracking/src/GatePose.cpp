@@ -68,9 +68,7 @@ bool GatePose::isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXf>& state)
 
 bool GatePose::isWithinRotation(float rot_angle)
 {
-    float ang_diff = rot_angle - ee_pose_(6);
-    if (ang_diff >  2.0 * M_PI) ang_diff -= 2.0 * M_PI;
-    if (ang_diff <=        0.0) ang_diff += 2.0 * M_PI;
+    float ang_diff = abs(rot_angle - ee_pose_(6));
 
     return (ang_diff <= gate_rotation_);
 }
