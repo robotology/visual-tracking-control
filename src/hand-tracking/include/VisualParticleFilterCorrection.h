@@ -1,21 +1,20 @@
 #ifndef VISUALPARTICLEFILTERCORRECTION_H
 #define VISUALPARTICLEFILTERCORRECTION_H
 
+#include "VisualProprioception.h"
+
 #include <condition_variable>
 #include <mutex>
-#include <string>
 #include <thread>
 
 #include <BayesFiltersLib/VisualCorrection.h>
-#include <BayesFiltersLib/VisualObservationModel.h>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaobjdetect.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 
-#include "VisualProprioception.h"
 
-
-class VisualParticleFilterCorrection : public bfl::VisualCorrection {
+class VisualParticleFilterCorrection : public bfl::VisualCorrection
+{
 public:
     /* Default constructor, disabled */
     VisualParticleFilterCorrection() = delete;
@@ -35,11 +34,7 @@ public:
 
     void likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovation, Eigen::Ref<Eigen::MatrixXf> cor_state) override;
 
-    bool setMeasurementModelProperty(std::string property);
-
-    /* TO BE DEPRECATED */
-    void superimpose(const Eigen::Ref<const Eigen::VectorXf>& state, cv::Mat& img);
-    /* **************** */
+    bool setObservationModelProperty(const std::string& property) override;
 
 protected:
     std::unique_ptr<VisualProprioception> measurement_model_;

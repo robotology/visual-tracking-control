@@ -1233,7 +1233,7 @@ private:
         }
         yInfo() << "Succesfully set ICartesianControl trajectory time!";
 
-        if(!itf_rightarm_cart_->setInTargetTol(0.01))
+        if (!itf_rightarm_cart_->setInTargetTol(0.01))
         {
             yError() << "Error setting ICartesianControl target tolerance.";
             return false;

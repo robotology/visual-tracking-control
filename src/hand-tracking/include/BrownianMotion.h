@@ -7,7 +7,8 @@
 #include <BayesFiltersLib/StateModel.h>
 
 
-class BrownianMotion : public bfl::StateModel {
+class BrownianMotion : public bfl::StateModel
+{
 public:
     /* BM complete constructor */
     BrownianMotion(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept;

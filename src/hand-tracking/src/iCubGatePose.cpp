@@ -1,28 +1,30 @@
-#include "iCubFwdKinMotion.h"
+#include "iCubGatePose.h"
 
-#include <exception>
-#include <functional>
 #include <iCub/ctrl/math.h>
-#include <yarp/math/Math.h>
-#include <yarp/os/Bottle.h>
-#include <yarp/os/Property.h>
+#include <yarp/eigen/Eigen.h>
 #include <yarp/os/LogStream.h>
+#include <yarp/os/Property.h>
 
+using namespace bfl;
+using namespace cv;
 using namespace Eigen;
 using namespace iCub::ctrl;
 using namespace iCub::iKin;
+using namespace yarp::eigen;
 using namespace yarp::math;
 using namespace yarp::os;
 using namespace yarp::sig;
 
 
-iCubFwdKinMotion::iCubFwdKinMotion(std::unique_ptr<StateModel> state_model, const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
-    bfl::StateModelDecorator(std::move(state_model)),
-    icub_kin_arm_(iCubArm(laterality+"_v2")),
-    robot_(robot), laterality_(laterality), port_prefix_(port_prefix),
-    delta_hand_pose_(VectorXd::Zero(6)), delta_angle_(0.0)
+iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+                           double gate_x, double gate_y, double gate_z,
+                           double gate_rotation, double gate_aperture,
+                           const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
+    GatePose(std::move(visual_correction),
+             gate_x, gate_y, gate_z,
+             gate_rotation, gate_aperture),
+    robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
 {
-    // !!!: Questa parte potremmo trasformarla in uno Strategy per essere poi utilizzata anche da altre classi, tipo GatePoseParticle.
     Property opt_arm_enc;
     opt_arm_enc.put("device", "remote_controlboard");
     opt_arm_enc.put("local",  "/hand-tracking/" + ID_ + "/" + port_prefix + "/control_" + laterality_ + "_arm");
@@ -80,78 +82,22 @@ iCubFwdKinMotion::iCubFwdKinMotion(std::unique_ptr<StateModel> state_model, cons
         throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open torso remote_controlboard!");
     }
 
-    Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
-    Map<VectorXd> cur_ee_pose(ee_pose.data(), 6, 1);
-    cur_ee_pose.tail<3>() *= ee_pose(6);
-    prev_ee_pose_ = cur_ee_pose;
-
     yInfo() << log_ID_ << "Succesfully initialized.";
 }
 
 
-iCubFwdKinMotion::~iCubFwdKinMotion() noexcept
-{
-    drv_arm_enc_.close();
-    drv_torso_enc_.close();
-}
+iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+                           const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
+    iCubGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30, robot, laterality, port_prefix) { }
 
 
-iCubFwdKinMotion::iCubFwdKinMotion(iCubFwdKinMotion&& state_model) noexcept :
-    bfl::StateModelDecorator(std::move(state_model)) { }
+iCubGatePose::~iCubGatePose() noexcept { }
 
 
-iCubFwdKinMotion& iCubFwdKinMotion::operator=(iCubFwdKinMotion&& state_model) noexcept
-{
-    bfl::StateModelDecorator::operator=(std::move(state_model));
-
-    return *this;
-}
-
-
-void iCubFwdKinMotion::propagate(const Ref<const VectorXf>& cur_state, Ref<VectorXf> prop_state)
-{
-    prop_state = cur_state;
-
-    prop_state.head<3>() += delta_hand_pose_.head<3>().cast<float>();
-
-    float ang;
-    ang = cur_state.tail<3>().norm();
-    prop_state.tail<3>() /= ang;
-
-    prop_state.tail<3>() += delta_hand_pose_.tail<3>().cast<float>();
-    prop_state.tail<3>() /= prop_state.tail<3>().norm();
-
-    ang += static_cast<float>(delta_angle_);
-
-    if      (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
-    else if (ang <=        0.0) ang += 2.0 * M_PI;
-
-    prop_state.tail<3>() *= ang;
-
-    bfl::StateModelDecorator::propagate(prop_state, prop_state);
-}
-
-
-void iCubFwdKinMotion::noiseSample(Ref<VectorXf> sample)
-{
-    bfl::StateModelDecorator::noiseSample(sample);
-}
-
-
-bool iCubFwdKinMotion::setProperty(const std::string& property)
-{
-    if (!bfl::StateModelDecorator::setProperty(property))
-        if (property == "ICFW_DELTA")
-            return setDeltaMotion();
-
-    return false;
-}
-
-
-Vector iCubFwdKinMotion::readTorso()
+Vector iCubGatePose::readTorso()
 {
     int torso_enc_num;
-    itf_torso_enc_->getAxes(&torso_enc_num);
+    itf_arm_enc_->getAxes(&torso_enc_num);
     Vector enc_torso(torso_enc_num);
 
     while (!itf_torso_enc_->getEncoders(enc_torso.data()));
@@ -162,7 +108,7 @@ Vector iCubFwdKinMotion::readTorso()
 }
 
 
-Vector iCubFwdKinMotion::readRootToEE()
+Vector iCubGatePose::readRootToEE()
 {
     int arm_enc_num;
     itf_arm_enc_->getAxes(&arm_enc_num);
@@ -180,18 +126,9 @@ Vector iCubFwdKinMotion::readRootToEE()
 }
 
 
-bool iCubFwdKinMotion::setDeltaMotion()
+VectorXd iCubGatePose::readPose()
 {
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
-    Map<VectorXd> cur_ee_pose(ee_pose.data(), 6, 1);
-    cur_ee_pose.tail<3>() *= ee_pose(6);
 
-    delta_hand_pose_.head<3>() = cur_ee_pose.head<3>() - prev_ee_pose_.head<3>();
-    delta_angle_               = cur_ee_pose.tail<3>().norm() - prev_ee_pose_.tail<3>().norm();
-
-    delta_hand_pose_.tail<3>() = (cur_ee_pose.tail<3>() / cur_ee_pose.tail<3>().norm()) - (prev_ee_pose_.tail<3>() / prev_ee_pose_.tail<3>().norm());
-
-    prev_ee_pose_ = cur_ee_pose;
-
-    return true;
+    return toEigen(ee_pose);
 }

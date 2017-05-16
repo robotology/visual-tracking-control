@@ -27,9 +27,12 @@ include(YarpInstallationHelpers)
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotion.h
-        include/DrawPoseParticle.h
+        include/DrawPose.h
+        include/GatePose.h
         include/iCubFwdKinMotion.h
-        include/playFwdKinMotion.h
+        include/iCubGatePose.h
+        include/PlayFwdKinMotion.h
+        include/PlayGatePose.h
         include/VisualProprioception.h
         include/VisualParticleFilterCorrection.h
         include/VisualSIRParticleFilter.h)
@@ -37,9 +40,12 @@ set(${EXE_TARGET_NAME}_HDR
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
         src/BrownianMotion.cpp
-        src/DrawPoseParticle.cpp
+        src/DrawPose.cpp
+        src/GatePose.cpp
         src/iCubFwdKinMotion.cpp
-        src/playFwdKinMotion.cpp
+        src/iCubGatePose.cpp
+        src/PlayFwdKinMotion.cpp
+        src/PlayGatePose.cpp
         src/VisualProprioception.cpp
         src/VisualParticleFilterCorrection.cpp
         src/VisualSIRParticleFilter.cpp)
@@ -69,7 +75,7 @@ target_link_libraries(${EXE_TARGET_NAME} BayesFiltersLib::BayesFiltersLib
                                          ${YARP_LIBRARIES})
 
 if(NOT APPLE)
-target_link_libraries(${EXE_TARGET_NAME} Threads::Threads)
+    target_link_libraries(${EXE_TARGET_NAME} Threads::Threads)
 endif()
 
 target_compile_features(${EXE_TARGET_NAME} PUBLIC cxx_nullptr cxx_constexpr cxx_override)
