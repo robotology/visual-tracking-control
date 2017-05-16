@@ -66,6 +66,7 @@ protected:
 
     yarp::os::BufferedPort<yarp::sig::Vector>      port_estimates_out_;
 
+    unsigned long int                              filtering_step_ = 0;
     bool                                           is_filter_init_ = false;
     bool                                           is_running_     = false;
     bool                                           use_mean_       = false;

@@ -69,8 +69,6 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
 void VisualSIRParticleFilter::runFilter()
 {
     /* INITIALIZATION */
-    unsigned int  k = 0;
-
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     Map<VectorXd> init_hand_pose(ee_pose.data(), 6, 1);
     init_hand_pose.tail(3) *= ee_pose(6);
@@ -143,6 +141,7 @@ void VisualSIRParticleFilter::runFilter()
             correction_->correct(init_particle, descriptors_cam_left, init_weight);
             init_weight /= init_weight.sum();
 
+
             /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
             VectorXf out_particle(6);
             /* Extracting state estimate: weighted sum */
@@ -151,7 +150,7 @@ void VisualSIRParticleFilter::runFilter()
 //            out_particle = mode(init_particle, init_weight);
 
             /* RESAMPLING */
-            std::cout << "Step: " << k << "\nNeff: " << resampling_->neff(init_weight) << std::endl;
+            std::cout << "Step: " << filtering_step_ << "\nNeff: " << resampling_->neff(init_weight) << std::endl;
             if (resampling_->neff(init_weight) < std::round(num_particles_ / 5.f))
             {
                 std::cout << "Resampling!" << std::endl;
@@ -164,7 +163,9 @@ void VisualSIRParticleFilter::runFilter()
                 init_weight   = temp_weight;
             }
 
-            k++;
+
+            /* ADVANCE FILTERING STEP COUNTER */
+            filtering_step_++;
 
             /* STATE ESTIMATE OUTPUT */
             /* INDEX FINGERTIP */
