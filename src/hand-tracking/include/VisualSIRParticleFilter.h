@@ -12,7 +12,7 @@
 #include <BayesFiltersLib/Resampling.h>
 #include <Eigen/Dense>
 #include <iCub/iKin/iKinFwd.h>
-#include <thrift/visualSIRParticleFilterIDL.h>
+#include <thrift/VisualSIRParticleFilterIDL.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IAnalogSensor.h>
 #include <yarp/os/Bottle.h>
@@ -25,7 +25,7 @@
 
 
 class VisualSIRParticleFilter: public bfl::FilteringAlgorithm,
-                               public visualSIRParticleFilterIDL
+                               public VisualSIRParticleFilterIDL
 {
 public:
     /* Default constructor, disabled */
@@ -56,52 +56,50 @@ public:
     void getResult() override;
 
 protected:
-    std::unique_ptr<bfl::ParticleFilterPrediction>                   prediction_;
-    std::unique_ptr<bfl::VisualCorrection>                           correction_;
-    std::unique_ptr<bfl::Resampling>                                 resampling_;
-    yarp::os::ConstString                                            cam_sel_;
-    yarp::os::ConstString                                            laterality_;
-    const int                                                        num_particles_;
+    std::unique_ptr<bfl::ParticleFilterPrediction> prediction_;
+    std::unique_ptr<bfl::VisualCorrection>         correction_;
+    std::unique_ptr<bfl::Resampling>               resampling_;
 
-    /* THIS DATA MEMBER SHOULD BE IN INITIALIZATION CLASS */
+    yarp::os::ConstString                          cam_sel_;
+    yarp::os::ConstString                          laterality_;
+    const int                                      num_particles_;
+
+    yarp::os::BufferedPort<yarp::sig::Vector>      port_estimates_out_;
+
+    bool                                           is_filter_init_ = false;
+    bool                                           is_running_     = false;
+    bool                                           use_mean_       = false;
+    bool                                           use_mode_       = true;
+
+    yarp::os::Port                                 port_rpc_command_;
+    bool                                           setCommandPort();
+
+
+    bool        use_analogs(const bool status) override;
+
+    std::string get_info() override;
+
+    bool        set_estimates_extraction_method(const std::string& method) override;
+
+    void        quit() override;
+
+
+    Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
+
+    Eigen::VectorXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
+
+private:
+    /*         THIS DATA MEMBER AND METHODS SHOULD BE IN INITIALIZATION CLASS          */
     iCub::iKin::iCubArm                                              icub_kin_arm_;
     iCub::iKin::iCubFinger                                           icub_kin_finger_[3];
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_torso_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle>                         port_arm_enc_;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>>  port_image_in_left_;
-    /* OUTPUT */
-    yarp::os::BufferedPort<yarp::sig::Vector>                        port_estimates_out_;
-    /* ************************************************** */
 
-    bool                                                             is_filter_init_;
-    bool                                                             is_running_;
+    yarp::sig::Vector                                                readTorso();
 
-    yarp::os::Port port_rpc_command_;
-    bool setCommandPort();
-
-    bool stream_result(const bool status) override;
-    bool stream_ = true;
-
-    bool use_analogs(const bool status) override;
-
-    void quit() override;
-
-    enum laterality
-    {
-       LEFT  = 0,
-       RIGHT = 1
-    };
-
-private:
-    Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
-
-    Eigen::VectorXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
-
-    /* THIS METHOD SHOULD BE IN INITIALIZATION CLASS */
-    yarp::sig::Vector readTorso();
-
-    yarp::sig::Vector readRootToEE();
-    /* ********************************************* */
+    yarp::sig::Vector                                                readRootToEE();
+    /* ******************************************************************************* */
 };
 
 #endif /* VISUALSIRPARTICLEFILTER_H */

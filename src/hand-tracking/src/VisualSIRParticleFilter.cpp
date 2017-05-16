@@ -53,9 +53,6 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<ParticleFilterP
     port_torso_enc_.open     ("/hand-tracking/" + cam_sel_ + "/torso:i");
     port_estimates_out_.open ("/hand-tracking/" + cam_sel_ + "/result/estimates:o");
 
-    is_filter_init_ = false;
-    is_running_     = false;
-
     setCommandPort();
 }
 
@@ -71,8 +68,6 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
 
 void VisualSIRParticleFilter::runFilter()
 {
-    is_running_ = true;
-
     /* INITIALIZATION */
     unsigned int  k = 0;
 
@@ -104,6 +99,7 @@ void VisualSIRParticleFilter::runFilter()
 
 
     /* FILTERING */
+    is_running_ = true;
     ImageOf<PixelRgb>* imgin_left  = YARP_NULLPTR;
     while(is_running_)
     {
@@ -147,7 +143,7 @@ void VisualSIRParticleFilter::runFilter()
             correction_->correct(init_particle, descriptors_cam_left, init_weight);
             init_weight /= init_weight.sum();
 
-            /* ESTIMATE EXTRACTION */
+            /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
             VectorXf out_particle(6);
             /* Extracting state estimate: weighted sum */
             out_particle = mean(init_particle, init_weight);
@@ -170,63 +166,59 @@ void VisualSIRParticleFilter::runFilter()
 
             k++;
 
-            /* DEBUG ONLY */
-            if (stream_)
-            {
-                /* STATE ESTIMATE OUTPUT */
-                /* INDEX FINGERTIP */
-//                Vector q = readRootToEE();
-//                icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
-//                Vector chainjoints;
-//                if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
-//                else          icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), chainjoints);
-//                icub_kin_finger_[1].setAng(chainjoints * (M_PI/180.0));
+            /* STATE ESTIMATE OUTPUT */
+            /* INDEX FINGERTIP */
+//            Vector q = readRootToEE();
+//            icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
+//            Vector chainjoints;
+//            if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
+//            else          icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), chainjoints);
+//            icub_kin_finger_[1].setAng(chainjoints * (M_PI/180.0));
 //
-//                Vector l_ee_t(3);
-//                toEigen(l_ee_t) = out_particle.col(0).head(3).cast<double>();
-//                l_ee_t.push_back(1.0);
+//            Vector l_ee_t(3);
+//            toEigen(l_ee_t) = out_particle.col(0).head(3).cast<double>();
+//            l_ee_t.push_back(1.0);
 //
-//                Vector l_ee_o(3);
-//                toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
-//                l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
+//            Vector l_ee_o(3);
+//            toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
+//            l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
 //
-//                yarp::sig::Matrix l_Ha = axis2dcm(l_ee_o);
-//                l_Ha.setCol(3, l_ee_t);
-//                Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
-//                Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
-//                l_i_o.setSubvector(0, l_i_o.subVector(0, 2) * l_i_o[3]);
+//            yarp::sig::Matrix l_Ha = axis2dcm(l_ee_o);
+//            l_Ha.setCol(3, l_ee_t);
+//            Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
+//            Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
+//            l_i_o.setSubvector(0, l_i_o.subVector(0, 2) * l_i_o[3]);
 //
 //
-//                Vector r_ee_t(3);
-//                toEigen(r_ee_t) = out_particle.col(1).head(3).cast<double>();
-//                r_ee_t.push_back(1.0);
+//            Vector r_ee_t(3);
+//            toEigen(r_ee_t) = out_particle.col(1).head(3).cast<double>();
+//            r_ee_t.push_back(1.0);
 //
-//                Vector r_ee_o(3);
-//                toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
-//                r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
+//            Vector r_ee_o(3);
+//            toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
+//            r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
 //
-//                yarp::sig::Matrix r_Ha = axis2dcm(r_ee_o);
-//                r_Ha.setCol(3, r_ee_t);
-//                Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
-//                Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
-//                r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
+//            yarp::sig::Matrix r_Ha = axis2dcm(r_ee_o);
+//            r_Ha.setCol(3, r_ee_t);
+//            Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
+//            Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
+//            r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
 //
 //
-//                Vector& estimates_out = port_estimates_out_.prepare();
-//                estimates_out.resize(12);
-//                estimates_out.setSubvector(0, l_i_x);
-//                estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
-//                estimates_out.setSubvector(6, r_i_x);
-//                estimates_out.setSubvector(9, r_i_o.subVector(0, 2));
-//                port_estimates_out_.write();
+//            Vector& estimates_out = port_estimates_out_.prepare();
+//            estimates_out.resize(12);
+//            estimates_out.setSubvector(0, l_i_x);
+//            estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
+//            estimates_out.setSubvector(6, r_i_x);
+//            estimates_out.setSubvector(9, r_i_o.subVector(0, 2));
+//            port_estimates_out_.write();
 
-                /* PALM */
-                Vector& estimates_out = port_estimates_out_.prepare();
-                estimates_out.resize(6);
-                toEigen(estimates_out) = out_particle.cast<double>();
-                port_estimates_out_.write();
+            /* PALM */
+            Vector& estimates_out = port_estimates_out_.prepare();
+            estimates_out.resize(6);
+            toEigen(estimates_out) = out_particle.cast<double>();
+            port_estimates_out_.write();
 
-            }
             /* ********** */
         }
     }
@@ -255,20 +247,53 @@ bool VisualSIRParticleFilter::setCommandPort()
 }
 
 
-bool VisualSIRParticleFilter::stream_result(const bool status)
-{
-    stream_ = status;
-
-    return true;
-}
-
-
 bool VisualSIRParticleFilter::use_analogs(const bool status)
 {
     if (status)
         return correction_->setObservationModelProperty("VP_ANALOGS_ON");
     else
         return correction_->setObservationModelProperty("VP_ANALOGS_OFF");
+}
+
+
+std::string VisualSIRParticleFilter::get_info()
+{
+    std::string info;
+
+    info.append("<| Information about Visual SIR Particle Filter |>\n");
+    info.append("   The Particle Filter is " + std::string(is_filter_init_ ? "not " : "") + "correctly intialized\n");
+    info.append("   The Particle Filter is " + std::string(is_running_     ? "not " : "") + "running\n");
+    info.append("   Using " + cam_sel_ + " camera images\n");
+    info.append("   Using encoders from " + laterality_ + " iCub arm\n");
+    info.append("   Using " + std::to_string(num_particles_) + " particles\n");
+    info.append("   Available estimate extraction methods:\n");
+    info.append("    - Mean" + std::string(use_mean_ ? "<-- In use " : "") + "\n");
+    info.append("    - Mode" + std::string(use_mode_ ? "<-- In use " : "") + "\n");
+    info.append("<|~-                                          -~|>\n");
+
+    return info;
+}
+
+
+bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string& method)
+{
+    if (method == "mean")
+    {
+        use_mean_ = true;
+        use_mode_ = false;
+
+        return true;
+    }
+
+    if (method == "mode")
+    {
+        use_mode_ = true;
+        use_mean_ = false;
+
+        return true;
+    }
+
+    return false;
 }
 
 
