@@ -3,7 +3,7 @@
 #include <iostream>
 #include <memory>
 
-#include <BayesFiltersLib/FilteringFunction.h>
+#include <BayesFiltersLib/Resampling.h>
 #include <BayesFiltersLib/SIRParticleFilter.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
