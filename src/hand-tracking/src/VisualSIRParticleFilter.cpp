@@ -144,10 +144,11 @@ void VisualSIRParticleFilter::runFilter()
 
             /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
             VectorXf out_particle(6);
-            /* Extracting state estimate: weighted sum */
-            out_particle = mean(init_particle, init_weight);
-            /* Extracting state estimate: mode */
-//            out_particle = mode(init_particle, init_weight);
+            if (use_mean_)
+                out_particle = mean(init_particle, init_weight);
+            else if (use_mode_)
+                out_particle = mode(init_particle, init_weight);
+
 
             /* RESAMPLING */
             std::cout << "Step: " << filtering_step_ << "\nNeff: " << resampling_->neff(init_weight) << std::endl;
@@ -257,20 +258,21 @@ bool VisualSIRParticleFilter::use_analogs(const bool status)
 }
 
 
-std::string VisualSIRParticleFilter::get_info()
+std::vector<std::string> VisualSIRParticleFilter::get_info()
 {
-    std::string info;
+    std::vector<std::string> info;
 
-    info.append("<| Information about Visual SIR Particle Filter |>\n");
-    info.append("   The Particle Filter is " + std::string(is_filter_init_ ? "not " : "") + "correctly intialized\n");
-    info.append("   The Particle Filter is " + std::string(is_running_     ? "not " : "") + "running\n");
-    info.append("   Using " + cam_sel_ + " camera images\n");
-    info.append("   Using encoders from " + laterality_ + " iCub arm\n");
-    info.append("   Using " + std::to_string(num_particles_) + " particles\n");
-    info.append("   Available estimate extraction methods:\n");
-    info.append("    - Mean" + std::string(use_mean_ ? "<-- In use " : "") + "\n");
-    info.append("    - Mode" + std::string(use_mode_ ? "<-- In use " : "") + "\n");
-    info.append("<|~-                                          -~|>\n");
+    info.push_back("<| Information about Visual SIR Particle Filter |>");
+    info.push_back("   The Particle Filter is " + std::string(is_filter_init_ ? "not " : "") + "correctly intialized");
+    info.push_back("   The Particle Filter is " + std::string(is_running_     ? "not " : "") + "running");
+    info.push_back("    - filtering step: " + std::to_string(filtering_step_));
+    info.push_back("   Using " + cam_sel_ + " camera images");
+    info.push_back("   Using encoders from " + laterality_ + " iCub arm");
+    info.push_back("   Using " + std::to_string(num_particles_) + " particles");
+    info.push_back("   Available estimate extraction methods:");
+    info.push_back("    - Mean" + std::string(use_mean_ ? "<-- In use " : "") + "");
+    info.push_back("    - Mode" + std::string(use_mode_ ? "<-- In use " : "") + "");
+    info.push_back("<|~-                                          -~|>");
 
     return info;
 }

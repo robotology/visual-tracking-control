@@ -28,7 +28,7 @@ service VisualSIRParticleFilterIDL
      *
      * @return a string with all the available information, 'none' otherwise
      */
-    string get_info();
+    list<string> get_info();
 
     /**
      * Cheange the current method to extract the state estimate from the

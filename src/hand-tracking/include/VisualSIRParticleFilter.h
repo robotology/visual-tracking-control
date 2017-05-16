@@ -76,13 +76,13 @@ protected:
     bool                                           setCommandPort();
 
 
-    bool        use_analogs(const bool status) override;
+    bool                     use_analogs(const bool status) override;
 
-    std::string get_info() override;
+    std::vector<std::string> get_info() override;
 
-    bool        set_estimates_extraction_method(const std::string& method) override;
+    bool                     set_estimates_extraction_method(const std::string& method) override;
 
-    void        quit() override;
+    void                     quit() override;
 
 
     Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
