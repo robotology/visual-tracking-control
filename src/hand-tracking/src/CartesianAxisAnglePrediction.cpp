@@ -1,23 +1,23 @@
 #include <utility>
 
-#include "DrawPose.h"
+#include "CartesianAxisAnglePrediction.h"
 
 using namespace bfl;
 using namespace Eigen;
 
 
-DrawPose::DrawPose(std::unique_ptr<StateModel> transition_model) noexcept :
+CartesianAxisAnglePrediction::CartesianAxisAnglePrediction(std::unique_ptr<StateModel> transition_model) noexcept :
     state_model_(std::move(transition_model)) { }
 
 
-DrawPose::~DrawPose() noexcept { }
+CartesianAxisAnglePrediction::~CartesianAxisAnglePrediction() noexcept { }
 
 
-DrawPose::DrawPose(DrawPose&& pf_prediction) noexcept :
+CartesianAxisAnglePrediction::CartesianAxisAnglePrediction(CartesianAxisAnglePrediction&& pf_prediction) noexcept :
     state_model_(std::move(pf_prediction.state_model_)) { };
 
 
-DrawPose& DrawPose::operator=(DrawPose&& pf_prediction) noexcept
+CartesianAxisAnglePrediction& CartesianAxisAnglePrediction::operator=(CartesianAxisAnglePrediction&& pf_prediction) noexcept
 {
     state_model_ = std::move(pf_prediction.state_model_);
 
@@ -25,19 +25,19 @@ DrawPose& DrawPose::operator=(DrawPose&& pf_prediction) noexcept
 }
 
 
-void DrawPose::motion(const Ref<const VectorXf>& cur_state, Ref<VectorXf> prop_state)
+void CartesianAxisAnglePrediction::motion(const Ref<const VectorXf>& cur_state, Ref<VectorXf> prop_state)
 {
     state_model_->propagate(cur_state, prop_state);
 }
 
 
-void DrawPose::motionDisturbance(Ref<VectorXf> sample)
+void CartesianAxisAnglePrediction::motionDisturbance(Ref<VectorXf> sample)
 {
     state_model_->noiseSample(sample);
 }
 
 
-void DrawPose::predict(const Ref<const VectorXf>& prev_state, Ref<VectorXf> pred_state)
+void CartesianAxisAnglePrediction::predict(const Ref<const VectorXf>& prev_state, Ref<VectorXf> pred_state)
 {
     motion(prev_state, pred_state);
 
@@ -51,13 +51,13 @@ void DrawPose::predict(const Ref<const VectorXf>& prev_state, Ref<VectorXf> pred
     pred_state.tail<3>() =  rotated_vec;
 }
 
-bool DrawPose::setStateModelProperty(const std::string& property)
+bool CartesianAxisAnglePrediction::setStateModelProperty(const std::string& property)
 {
     return state_model_->setProperty(property);
 }
 
 
-void DrawPose::addAxisangleDisturbance(const Ref<const Vector3f>& current_vec, float disturbance_angle, const Ref<const Vector3f>& disturbance_vec, Ref<Vector3f> rotated_vec)
+void CartesianAxisAnglePrediction::addAxisangleDisturbance(const Ref<const Vector3f>& current_vec, float disturbance_angle, const Ref<const Vector3f>& disturbance_vec, Ref<Vector3f> rotated_vec)
 {
     float ang = current_vec.tail<3>().norm() + disturbance_angle;
 

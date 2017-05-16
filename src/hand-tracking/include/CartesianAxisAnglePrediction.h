@@ -8,27 +8,27 @@
 #include <BayesFiltersLib/StateModel.h>
 
 namespace bfl {
-    class DrawPose;
+    class CartesianAxisAnglePrediction;
 }
 
 
-class bfl::DrawPose : public bfl::ParticleFilterPrediction
+class bfl::CartesianAxisAnglePrediction : public bfl::ParticleFilterPrediction
 {
 public:
     /* Default constructor, disabled */
-    DrawPose() = delete;
+    CartesianAxisAnglePrediction() = delete;
 
     /* PF prediction constructor */
-    DrawPose(std::unique_ptr<StateModel> transition_model) noexcept;
+    CartesianAxisAnglePrediction(std::unique_ptr<StateModel> transition_model) noexcept;
 
     /* Destructor */
-    ~DrawPose() noexcept override;
+    ~CartesianAxisAnglePrediction() noexcept override;
 
     /* Move constructor */
-    DrawPose(DrawPose&& pf_prediction) noexcept;
+    CartesianAxisAnglePrediction(CartesianAxisAnglePrediction&& pf_prediction) noexcept;
 
     /* Move assignment operator */
-    DrawPose& operator=(DrawPose&& pf_prediction) noexcept;
+    CartesianAxisAnglePrediction& operator=(CartesianAxisAnglePrediction&& pf_prediction) noexcept;
 
     void predict(const Eigen::Ref<const Eigen::VectorXf>& prev_state, Eigen::Ref<Eigen::VectorXf> pred_state) override;
 

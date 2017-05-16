@@ -14,7 +14,7 @@
 #include <opencv2/core/cuda.hpp>
 
 #include "BrownianMotion.h"
-#include "DrawPose.h"
+#include "CartesianAxisAnglePrediction.h"
 #include "iCubGatePose.h"
 #include "iCubFwdKinMotion.h"
 #include "PlayFwdKinMotion.h"
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     }
 
     /* PREDICTION */
-    std::unique_ptr<ParticleFilterPrediction> pf_prediction(new DrawPose(std::move(icub_motion)));
+    std::unique_ptr<ParticleFilterPrediction> pf_prediction(new CartesianAxisAnglePrediction(std::move(icub_motion)));
 
 
     /* SENSOR MODEL */
