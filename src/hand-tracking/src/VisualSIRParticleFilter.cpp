@@ -69,6 +69,7 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
 void VisualSIRParticleFilter::runFilter()
 {
     /* INITIALIZATION */
+    // ???: Initialization shall be a class
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     Map<VectorXd> init_hand_pose(ee_pose.data(), 6, 1);
     init_hand_pose.tail(3) *= ee_pose(6);
@@ -90,7 +91,6 @@ void VisualSIRParticleFilter::runFilter()
     cuda_hog->setGammaCorrection(true);
     cuda_hog->setWinStride(Size(img_width, img_height));
 
-    // !!!: In generale si potrebbe prevedere, per ogni step dell'algoritmo, un passo INIT (senza prefissi), così da essere generico.
     prediction_->setStateModelProperty("ICFW_INIT");
 
     is_filter_init_ = true;
@@ -114,6 +114,7 @@ void VisualSIRParticleFilter::runFilter()
             VectorXf temp_parent(num_particles_, 1);
 
             /* PROCESS CURRENT MEASUREMENT */
+            // ???: Measurement process may be a class
             Mat measurement;
 
             measurement = cvarrToMat(imgin_left->getIplImage());
@@ -123,6 +124,7 @@ void VisualSIRParticleFilter::runFilter()
             descriptors_cam_cuda.download(descriptors_cam_left);
 
             /* PREDICTION */
+            // !!!: The prediction class shall run over all particles internally, not here
             VectorXf sorted_pred = init_weight;
             std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
             float threshold = sorted_pred.tail(6)(0);
