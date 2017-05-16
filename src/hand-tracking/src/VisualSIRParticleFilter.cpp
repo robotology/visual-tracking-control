@@ -263,16 +263,15 @@ std::vector<std::string> VisualSIRParticleFilter::get_info()
     std::vector<std::string> info;
 
     info.push_back("<| Information about Visual SIR Particle Filter |>");
-    info.push_back("   The Particle Filter is " + std::string(is_filter_init_ ? "not " : "") + "correctly intialized");
-    info.push_back("   The Particle Filter is " + std::string(is_running_     ? "not " : "") + "running");
-    info.push_back("    - filtering step: " + std::to_string(filtering_step_));
-    info.push_back("   Using " + cam_sel_ + " camera images");
-    info.push_back("   Using encoders from " + laterality_ + " iCub arm");
-    info.push_back("   Using " + std::to_string(num_particles_) + " particles");
-    info.push_back("   Available estimate extraction methods:");
-    info.push_back("    - Mean" + std::string(use_mean_ ? "<-- In use " : "") + "");
-    info.push_back("    - Mode" + std::string(use_mode_ ? "<-- In use " : "") + "");
-    info.push_back("<|~-                                          -~|>");
+    info.push_back("<| The Particle Filter is " + std::string(is_filter_init_ ? "not " : "") + "correctly intialized |>");
+    info.push_back("<| The Particle Filter is " + std::string(is_running_     ? "not " : "") + "running |>");
+    info.push_back("<| Filtering step: " + std::to_string(filtering_step_) + " |>");
+    info.push_back("<| Using " + cam_sel_ + " camera images |>");
+    info.push_back("<| Using encoders from " + laterality_ + " iCub arm |>");
+    info.push_back("<| Using " + std::to_string(num_particles_) + " particles |>");
+    info.push_back("<| Available estimate extraction methods:" +
+                   std::string(use_mean_ ? "1) Mean <-- In use; " : "1) Mean; ") +
+                   std::string(use_mode_ ? "2) Mode <-- In use; " : "2) Mode") + " |>");
 
     return info;
 }
