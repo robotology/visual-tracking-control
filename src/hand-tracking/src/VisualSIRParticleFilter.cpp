@@ -300,7 +300,7 @@ bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string&
 }
 
 
-void VisualSIRParticleFilter::quit()
+bool VisualSIRParticleFilter::quit()
 {
     if (!is_filter_init_)
     {
@@ -311,6 +311,8 @@ void VisualSIRParticleFilter::quit()
     port_image_in_left_.interrupt();
 
     is_running_ = false;
+
+    return true;
 }
 
 

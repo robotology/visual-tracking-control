@@ -82,7 +82,7 @@ protected:
 
     bool                     set_estimates_extraction_method(const std::string& method) override;
 
-    void                     quit() override;
+    bool                     quit() override;
 
 
     Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;

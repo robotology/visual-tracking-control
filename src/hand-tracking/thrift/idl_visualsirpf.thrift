@@ -45,5 +45,5 @@ service VisualSIRParticleFilterIDL
     /**
      * Gently close the application deallocating resources.
      */
-    void quit();
+    bool quit();
 }
