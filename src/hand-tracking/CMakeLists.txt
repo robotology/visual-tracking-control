@@ -31,8 +31,8 @@ set(${EXE_TARGET_NAME}_HDR
         include/GatePose.h
         include/iCubFwdKinMotion.h
         include/iCubGatePose.h
-        include/playFwdKinMotion.h
-        include/playGatePose.h
+        include/PlayFwdKinMotion.h
+        include/PlayGatePose.h
         include/VisualProprioception.h
         include/VisualParticleFilterCorrection.h
         include/VisualSIRParticleFilter.h)
@@ -44,8 +44,8 @@ set(${EXE_TARGET_NAME}_SRC
         src/GatePose.cpp
         src/iCubFwdKinMotion.cpp
         src/iCubGatePose.cpp
-        src/playFwdKinMotion.cpp
-        src/playGatePose.cpp
+        src/PlayFwdKinMotion.cpp
+        src/PlayGatePose.cpp
         src/VisualProprioception.cpp
         src/VisualParticleFilterCorrection.cpp
         src/VisualSIRParticleFilter.cpp)

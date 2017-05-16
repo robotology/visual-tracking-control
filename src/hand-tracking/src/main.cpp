@@ -17,8 +17,8 @@
 #include "DrawPose.h"
 #include "iCubGatePose.h"
 #include "iCubFwdKinMotion.h"
-#include "playFwdKinMotion.h"
-#include "playGatePose.h"
+#include "PlayFwdKinMotion.h"
+#include "PlayGatePose.h"
 #include "VisualProprioception.h"
 #include "VisualParticleFilterCorrection.h"
 #include "VisualSIRParticleFilter.h"
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        std::unique_ptr<playFwdKinMotion> play_fwdkin(new playFwdKinMotion(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
+        std::unique_ptr<PlayFwdKinMotion> play_fwdkin(new PlayFwdKinMotion(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
         icub_motion = std::move(play_fwdkin);
     }
 
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        std::unique_ptr<playGatePose> icub_gate_pose(new playGatePose(std::move(vpf_correction),
+        std::unique_ptr<PlayGatePose> icub_gate_pose(new PlayGatePose(std::move(vpf_correction),
                                                                       0.1, 0.1, 0.1, 15, 30,
                                                                       robot_name, robot_laterality, robot_cam_sel));
         vpf_correction_gated = std::move(icub_gate_pose);

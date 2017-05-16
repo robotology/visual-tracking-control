@@ -9,25 +9,25 @@
 #include <yarp/sig/Vector.h>
 
 
-class playFwdKinMotion : public bfl::StateModelDecorator
+class PlayFwdKinMotion : public bfl::StateModelDecorator
 {
 public:
     /* Constructor */
-    playFwdKinMotion(std::unique_ptr<StateModel> state_model, const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+    PlayFwdKinMotion(std::unique_ptr<StateModel> state_model, const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
-    playFwdKinMotion(std::unique_ptr<StateModel> state_model, const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix, bool init_pose) noexcept;
+    PlayFwdKinMotion(std::unique_ptr<StateModel> state_model, const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix, bool init_pose) noexcept;
 
     /* Default constructor, disabled */
-    playFwdKinMotion() = delete;
+    PlayFwdKinMotion() = delete;
 
     /* Destructor */
-    ~playFwdKinMotion() noexcept override;
+    ~PlayFwdKinMotion() noexcept override;
 
     /* Move constructor */
-    playFwdKinMotion(playFwdKinMotion&& state_model) noexcept;
+    PlayFwdKinMotion(PlayFwdKinMotion&& state_model) noexcept;
 
     /* Move assignment operator */
-    playFwdKinMotion& operator=(playFwdKinMotion&& state_model) noexcept;
+    PlayFwdKinMotion& operator=(PlayFwdKinMotion&& state_model) noexcept;
 
     void propagate(const Eigen::Ref<const Eigen::VectorXf>& cur_state, Eigen::Ref<Eigen::VectorXf> prop_state) override;
 
@@ -49,7 +49,7 @@ protected:
     bool              setDeltaMotion();
 
 private:
-    yarp::os::ConstString ID_     = "playFwdKinMotion";
+    yarp::os::ConstString ID_     = "PlayFwdKinMotion";
     yarp::os::ConstString log_ID_ = "[" + ID_ + "]";
 
     yarp::os::ConstString robot_;

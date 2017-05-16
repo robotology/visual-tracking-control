@@ -1,4 +1,4 @@
-#include "playGatePose.h"
+#include "PlayGatePose.h"
 
 #include <iCub/ctrl/math.h>
 #include <yarp/eigen/Eigen.h>
@@ -16,7 +16,7 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-playGatePose::playGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+PlayGatePose::PlayGatePose(std::unique_ptr<VisualCorrection> visual_correction,
                            double gate_x, double gate_y, double gate_z,
                            double gate_rotation, double gate_aperture,
                            const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
@@ -39,15 +39,15 @@ playGatePose::playGatePose(std::unique_ptr<VisualCorrection> visual_correction,
 }
 
 
-playGatePose::playGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+PlayGatePose::PlayGatePose(std::unique_ptr<VisualCorrection> visual_correction,
                            const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
-playGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30, robot, laterality, port_prefix) { }
+PlayGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30, robot, laterality, port_prefix) { }
 
 
-playGatePose::~playGatePose() noexcept { }
+PlayGatePose::~PlayGatePose() noexcept { }
 
 
-Vector playGatePose::readTorso()
+Vector PlayGatePose::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
     if (!b) return Vector(3, 0.0);
@@ -63,7 +63,7 @@ Vector playGatePose::readTorso()
 }
 
 
-Vector playGatePose::readRootToEE()
+Vector PlayGatePose::readRootToEE()
 {
     Bottle* b = port_arm_enc_.read();
     if (!b) return Vector(10, 0.0);
@@ -81,7 +81,7 @@ Vector playGatePose::readRootToEE()
 }
 
 
-VectorXd playGatePose::readPose()
+VectorXd PlayGatePose::readPose()
 {
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     

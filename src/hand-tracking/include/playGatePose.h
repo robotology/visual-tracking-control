@@ -9,20 +9,20 @@
 #include <yarp/sig/Vector.h>
 
 
-class playGatePose : public GatePose
+class PlayGatePose : public GatePose
 {
 public:
     /* Constructor */
-    playGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+    PlayGatePose(std::unique_ptr<VisualCorrection> visual_correction,
                  double gate_x, double gate_y, double gate_z,
                  double gate_aperture, double gate_rotation,
                  const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
-    playGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+    PlayGatePose(std::unique_ptr<VisualCorrection> visual_correction,
                  const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
     /* Destructor */
-    ~playGatePose() noexcept override;
+    ~PlayGatePose() noexcept override;
 
 protected:
     yarp::os::BufferedPort<yarp::os::Bottle> port_torso_enc_;
@@ -36,7 +36,7 @@ protected:
     yarp::sig::Vector readTorso();
 
 private:
-    yarp::os::ConstString  ID_     = "playGatePose";
+    yarp::os::ConstString  ID_     = "PlayGatePose";
     yarp::os::ConstString  log_ID_ = "[" + ID_ + "]";
 
     yarp::os::ConstString  robot_;
