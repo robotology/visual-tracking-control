@@ -1,9 +1,7 @@
 #ifndef VISUALSIRPARTICLEFILTER_H
 #define VISUALSIRPARTICLEFILTER_H
 
-#include <future>
 #include <memory>
-#include <random>
 #include <vector>
 
 #include <BayesFiltersLib/FilteringAlgorithm.h>
@@ -56,9 +54,6 @@ public:
     void runFilter() override;
 
     void getResult() override;
-
-    std::future<void> spawn();
-    bool              isRunning();
 
 protected:
     std::unique_ptr<bfl::ParticleFilterPrediction>                   prediction_;

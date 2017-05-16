@@ -1,7 +1,6 @@
 #include "VisualSIRParticleFilter.h"
 
 #include <exception>
-#include <fstream>
 #include <iostream>
 #include <utility>
 
@@ -235,18 +234,6 @@ void VisualSIRParticleFilter::runFilter()
 
 
 void VisualSIRParticleFilter::getResult() { }
-
-
-std::future<void> VisualSIRParticleFilter::spawn()
-{
-    return std::async(std::launch::async, &VisualSIRParticleFilter::runFilter, this);
-}
-
-
-bool VisualSIRParticleFilter::isRunning()
-{
-    return is_running_;
-}
 
 
 bool VisualSIRParticleFilter::setCommandPort()
