@@ -764,7 +764,7 @@ public:
 
                     yInfo() << "Init: " << init_pos.toString() << " " << od.toString();
 
-                    setTorsoDOF();
+                    unsetTorsoDOF();
 
 //                    itf_rightarm_cart_->setLimits(0,  15.0,  15.0);
 //                    itf_rightarm_cart_->setLimits(2, -23.0, -23.0);
@@ -777,7 +777,6 @@ public:
                     itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
                     itf_rightarm_cart_->stopControl();
 
-                    unsetTorsoDOF();
                     itf_rightarm_cart_->removeTipFrame();
 
                     itf_rightarm_cart_->storeContext(&ctx_cart_);
