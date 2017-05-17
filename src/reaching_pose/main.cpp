@@ -364,8 +364,8 @@ public:
 
 
         double Ts    = 0.1;   // controller's sample time [s]
-        double K_x   = 0.5;  // visual servoing proportional gain
-        double K_o   = 0.25;  // visual servoing proportional gain
+        double K_x   = 1.0;  // visual servoing proportional gain
+        double K_o   = 0.5;  // visual servoing proportional gain
 //        double v_max = 0.0005; // max cartesian velocity [m/s]
 
         bool done = false;
@@ -414,7 +414,7 @@ public:
             yInfo() << "axis-angle vel_o = [" << vel_o.toString() << "]";
 
             double K_ctrl_x = 0;
-            if (vel_o(3) > (3.0 * CTRL_DEG2RAD)) K_ctrl_x = exp(-(vel_o(3) - (3.0 * CTRL_DEG2RAD)) / 0.1);
+            if (vel_o(3) > (3.0 * CTRL_DEG2RAD)) K_ctrl_x = exp(-(vel_o(3) - (3.0 * CTRL_DEG2RAD)) / 0.5);
             else                                 K_ctrl_x = 1.0;
             yInfo() << "K_ctrl_x: " << K_ctrl_x;
 
