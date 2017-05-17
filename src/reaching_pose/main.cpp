@@ -782,18 +782,18 @@ public:
 
                     itf_rightarm_cart_->restoreContext(ctxt);
                     itf_rightarm_cart_->deleteContext(ctxt);
-                    
 
-                    itf_rightarm_cart_->storeContext(&ctxt);
+
+                    itf_gaze_->storeContext(&ctxt);
 
                     itf_gaze_->lookAtFixationPointSync(gaze_loc);
                     itf_gaze_->waitMotionDone(0.1, 10.0);
                     itf_gaze_->stopControl();
 
-                    itf_rightarm_cart_->restoreContext(ctxt);
-                    itf_rightarm_cart_->deleteContext(ctxt);
+                    itf_gaze_->restoreContext(ctxt);
+                    itf_gaze_->deleteContext(ctxt);
 
-                    
+
                     unsetTorsoDOF();
                     itf_rightarm_cart_->removeTipFrame();
 
