@@ -5,7 +5,6 @@
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <SuperImpose/SISkeleton.h>
 #include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/PolyDriver.h>
@@ -177,9 +176,6 @@ public:
         yInfo() << "l_H_r_to_cam_ =\n" << l_H_r_to_cam_.toString();
         yInfo() << "r_H_r_to_cam_ =\n" << r_H_r_to_cam_.toString();
 
-
-        l_si_skel_ = new SISkeleton(left_fx,  left_fy,  left_cx,  left_cy);
-        r_si_skel_ = new SISkeleton(right_fx, right_fy, right_cx, right_cy);
 
         icub_index_ = iCubFinger("right_index");
         std::deque<IControlLimits*> temp_lim;
@@ -1170,9 +1166,6 @@ private:
 
     Port                             handler_port_;
     bool                             should_stop_ = false;
-
-    SISkeleton                     * l_si_skel_;
-    SISkeleton                     * r_si_skel_;
 
     BufferedPort<Vector>             port_estimates_left_in_;
     BufferedPort<Vector>             port_estimates_right_in_;
