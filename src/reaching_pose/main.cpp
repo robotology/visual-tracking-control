@@ -735,7 +735,7 @@ public:
                     yInfo() << "Init: " << init_pos.toString() << " " << od.toString();
 
 
-//                    setTorsoDOF();
+                    setTorsoDOF();
 
                     /* Normal trials */
 //                    Vector gaze_loc(3);
@@ -780,7 +780,7 @@ public:
                     itf_rightarm_cart_->deleteContext(ctxt);
 
                     
-//                    unsetTorsoDOF();
+                    unsetTorsoDOF();
                     itf_rightarm_cart_->removeTipFrame();
 
                     reply.addString("ack");
