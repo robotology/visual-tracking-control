@@ -189,10 +189,10 @@ public:
             yError() << "Cannot set joint bound for index finger.";
             return false;
         }
-        
+
         handler_port_.open("/reaching_pose/cmd:i");
         attach(handler_port_);
-        
+
         return true;
     }
 
@@ -427,10 +427,10 @@ public:
 
             Time::delay(Ts);
 
-            done = ((std::abs(px_des(0) - px_ee_now(0)) < 1.0) && (std::abs(px_des(1)  - px_ee_now(1))  < 1.0) && (std::abs(px_des(2)  - px_ee_now(2))  < 1.0) &&
-                    (std::abs(px_des(3) - px_ee_now(3)) < 1.0) && (std::abs(px_des(4)  - px_ee_now(4))  < 1.0) && (std::abs(px_des(5)  - px_ee_now(5))  < 1.0) &&
-                    (std::abs(px_des(6) - px_ee_now(6)) < 1.0) && (std::abs(px_des(7)  - px_ee_now(7))  < 1.0) && (std::abs(px_des(8)  - px_ee_now(8))  < 1.0) &&
-                    (std::abs(px_des(9) - px_ee_now(9)) < 1.0) && (std::abs(px_des(10) - px_ee_now(10)) < 1.0) && (std::abs(px_des(11) - px_ee_now(11)) < 1.0));
+            done = ((std::abs(px_des(0) - px_ee_now(0)) < 5.0) && (std::abs(px_des(1)  - px_ee_now(1))  < 5.0) && (std::abs(px_des(2)  - px_ee_now(2))  < 5.0) &&
+                    (std::abs(px_des(3) - px_ee_now(3)) < 5.0) && (std::abs(px_des(4)  - px_ee_now(4))  < 5.0) && (std::abs(px_des(5)  - px_ee_now(5))  < 5.0) &&
+                    (std::abs(px_des(6) - px_ee_now(6)) < 5.0) && (std::abs(px_des(7)  - px_ee_now(7))  < 5.0) && (std::abs(px_des(8)  - px_ee_now(8))  < 5.0) &&
+                    (std::abs(px_des(9) - px_ee_now(9)) < 5.0) && (std::abs(px_des(10) - px_ee_now(10)) < 5.0) && (std::abs(px_des(11) - px_ee_now(11)) < 5.0));
             if (done)
             {
                 yInfo() << "\npx_des ="  << px_des.toString();
@@ -789,7 +789,7 @@ public:
                 {
                     reply.addString("nack");
                 }
-                
+
                 break;
             }
             /* Get 3D point from Structure From Motion clicking on the left camera image */
@@ -1059,9 +1059,9 @@ public:
                 r_px_goal_[6] = r_px3[0];
                 r_px_goal_[7] = r_px3[1];
 
-                
+
                 reply = command;
-                
+
                 break;
             }
             /* Start reaching phase */
@@ -1239,7 +1239,7 @@ private:
             return false;
         }
         yInfo() << "Succesfully set ICartesianControl target tolerance!";
-        
+
         return true;
     }
 
@@ -1265,7 +1265,7 @@ private:
             yError() << "Gaze control device not available.";
             return false;
         }
-        
+
         return true;
     }
 
@@ -1300,7 +1300,7 @@ private:
             yError() << "Error opening right arm remote_controlboard device.";
             return false;
         }
-        
+
         return true;
     }
 
@@ -1393,7 +1393,7 @@ private:
         root_fingers_enc.setSubvector(0, readTorso());
 
         root_fingers_enc.setSubvector(3, rightarm_encoder);
-        
+
         return root_fingers_enc;
     }
 
