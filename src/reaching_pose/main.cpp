@@ -121,6 +121,12 @@ public:
         float left_fy  = static_cast<float>(cam_left_info->get(5).asDouble());
         float left_cy  = static_cast<float>(cam_left_info->get(6).asDouble());
 
+        yInfo() << "[CAM]" << "Left camera:";
+        yInfo() << "[CAM]" << " - fx:"     << left_fx;
+        yInfo() << "[CAM]" << " - fy:"     << left_fy;
+        yInfo() << "[CAM]" << " - cx:"     << left_cx;
+        yInfo() << "[CAM]" << " - cy:"     << left_cy;
+
         l_proj_ = zeros(3, 4);
         l_proj_(0, 0)  = left_fx;
         l_proj_(0, 2)  = left_cx;
@@ -134,6 +140,12 @@ public:
         float right_cx = static_cast<float>(cam_right_info->get(2).asDouble());
         float right_fy = static_cast<float>(cam_right_info->get(5).asDouble());
         float right_cy = static_cast<float>(cam_right_info->get(6).asDouble());
+
+        yInfo() << "[CAM]" << "Right camera:";
+        yInfo() << "[CAM]" << " - fx:"     << right_fx;
+        yInfo() << "[CAM]" << " - fy:"     << right_fy;
+        yInfo() << "[CAM]" << " - cx:"     << right_cx;
+        yInfo() << "[CAM]" << " - cy:"     << right_cy;
 
         r_proj_ = zeros(3, 4);
         r_proj_(0, 0)  = right_fx;
@@ -154,7 +166,9 @@ public:
         itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
         yInfo() << "left_eye_o =" << left_eye_o.toString();
+        yInfo() << "left_eye_x =" << left_eye_x.toString();
         yInfo() << "right_eye_o =" << right_eye_o.toString();
+        yInfo() << "right_eye_x =" << right_eye_x.toString();
 
 
         l_H_eye_to_r_ = axis2dcm(left_eye_o);
