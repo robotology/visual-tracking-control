@@ -408,6 +408,12 @@ public:
             else                                 K_ctrl_x = 1.0;
             yInfo() << "K_ctrl_x: " << K_ctrl_x;
 
+
+            /* Restoring cartesian and gaze context */
+            itf_rightarm_cart_->restoreContext(ctx_cart_);
+            itf_gaze_->restoreContext(ctx_gaze_);
+
+
             /* Visual control law */
             /* SIM */
 //            vel_x    *= K_x;
@@ -748,8 +754,24 @@ public:
 
                     yInfo() << "Init: " << init_pos.toString() << " " << od.toString();
 
-
                     setTorsoDOF();
+
+//                    itf_rightarm_cart_->setLimits(0,  15.0,  15.0);
+//                    itf_rightarm_cart_->setLimits(2, -23.0, -23.0);
+//                    itf_rightarm_cart_->setLimits(3, -16.0, -16.0);
+//                    itf_rightarm_cart_->setLimits(4,  53.0,  53.0);
+//                    itf_rightarm_cart_->setLimits(5,   0.0,   0.0);
+//                    itf_rightarm_cart_->setLimits(7, -58.0, -58.0);
+
+                    itf_rightarm_cart_->goToPoseSync(init_pos, od);
+                    itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
+                    itf_rightarm_cart_->stopControl();
+
+                    unsetTorsoDOF();
+                    itf_rightarm_cart_->removeTipFrame();
+
+                    itf_rightarm_cart_->storeContext(&ctx_cart_);
+
 
                     /* Normal trials */
 //                    Vector gaze_loc(3);
@@ -766,36 +788,12 @@ public:
 
                     yInfo() << "Fixation point: " << gaze_loc.toString();
 
-                    int ctxt;
-                    itf_rightarm_cart_->storeContext(&ctxt);
-
-//                    itf_rightarm_cart_->setLimits(0,  15.0,  15.0);
-//                    itf_rightarm_cart_->setLimits(2, -23.0, -23.0);
-//                    itf_rightarm_cart_->setLimits(3, -16.0, -16.0);
-//                    itf_rightarm_cart_->setLimits(4,  53.0,  53.0);
-//                    itf_rightarm_cart_->setLimits(5,   0.0,   0.0);
-//                    itf_rightarm_cart_->setLimits(7, -58.0, -58.0);
-
-                    itf_rightarm_cart_->goToPoseSync(init_pos, od);
-                    itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
-                    itf_rightarm_cart_->stopControl();
-
-                    itf_rightarm_cart_->restoreContext(ctxt);
-                    itf_rightarm_cart_->deleteContext(ctxt);
-
-
-                    itf_gaze_->storeContext(&ctxt);
-
                     itf_gaze_->lookAtFixationPointSync(gaze_loc);
                     itf_gaze_->waitMotionDone(0.1, 10.0);
                     itf_gaze_->stopControl();
 
-                    itf_gaze_->restoreContext(ctxt);
-                    itf_gaze_->deleteContext(ctxt);
+                    itf_gaze_->storeContext(&ctx_gaze_);
 
-
-                    unsetTorsoDOF();
-                    itf_rightarm_cart_->removeTipFrame();
 
                     reply.addString("ack");
                 }
@@ -1219,6 +1217,9 @@ private:
     Vector                           l_px_goal_;
     Vector                           r_px_goal_;
     bool                             take_estimates_ = false;
+
+    int                              ctx_cart_;
+    int                              ctx_gaze_;
 
     enum camsel
     {
