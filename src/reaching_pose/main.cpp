@@ -1378,7 +1378,7 @@ private:
         yInfo() << "Setting iCub to use the DOF from the torso.";
         Vector newDOF(curDOF);
         newDOF[0] = 1;
-        newDOF[1] = 2;
+        newDOF[1] = 1;
         newDOF[2] = 1;
         if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
         {
@@ -1399,7 +1399,7 @@ private:
         yInfo() << "Setting iCub to not use the DOF from the torso.";
         Vector newDOF(curDOF);
         newDOF[0] = 0;
-        newDOF[1] = 2;
+        newDOF[1] = 0;
         newDOF[2] = 0;
         if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
         {
