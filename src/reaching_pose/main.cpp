@@ -1368,7 +1368,7 @@ private:
         newDOF[2] = 1;
         if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
         {
-            yError() << "Cannot use torso DOF.";
+            yError() << "Cannot set torso DOF.";
             return false;
         }
         yInfo() << "Setting the DOF done.";
@@ -1382,14 +1382,14 @@ private:
         Vector curDOF;
         itf_rightarm_cart_->getDOF(curDOF);
         yInfo() << "Old DOF: [" + curDOF.toString(0) + "].";
-        yInfo() << "Setting iCub to use the DOF from the torso.";
+        yInfo() << "Setting iCub to not use the DOF from the torso.";
         Vector newDOF(curDOF);
         newDOF[0] = 0;
         newDOF[1] = 2;
         newDOF[2] = 0;
         if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
         {
-            yError() << "Cannot use torso DOF.";
+            yError() << "Cannot set torso DOF.";
             return false;
         }
         yInfo() << "Setting the DOF done.";
