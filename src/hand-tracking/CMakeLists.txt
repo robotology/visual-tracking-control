@@ -9,7 +9,7 @@ endif()
 
 # Dependencies
 find_package(BayesFiltersLib REQUIRED)
-#find_package(EIGEN3          REQUIRED)
+find_package(EIGEN3          REQUIRED)
 find_package(glew            REQUIRED)
 find_package(glfw3           REQUIRED)
 find_package(ICUB            REQUIRED)
@@ -60,7 +60,7 @@ add_executable(${EXE_TARGET_NAME}   ${${EXE_TARGET_NAME}_HDR} ${${EXE_TARGET_NAM
                                     ${${EXE_TARGET_NAME}_THRIFT_SRC})
 
 target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                                                      /home/icub/Dev/eigen-eigen-67e894c6cd8f/
+                                                      ${EIGEN3_INCLUDE_DIRS}
                                                       ${ICUB_INCLUDE_DIRS}
                                                       ${YARP_INCLUDE_DIRS})
 
