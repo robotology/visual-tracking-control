@@ -256,20 +256,6 @@ public:
         yInfo() << "px_des = ["  << px_des.toString() << "]";
 
 
-        // FIXME: solo per controllo con l/r_px?
-        Vector px_ee_left;  /* u_ee_l, v_ee_l */
-        itf_gaze_->get2DPixel(LEFT,  est_copy.subVector(0, 2), px_ee_left);
-        yInfo() << "estimates(0, 2) = ["  << est_copy.subVector(0, 2).toString() << "]";
-        yInfo() << "px_ee_left = ["  << px_ee_left.toString() << "]";
-
-
-        Vector px_ee_right; /* u_ee_r, v_ee_r */
-        itf_gaze_->get2DPixel(RIGHT, est_copy.subVector(6, 8), px_ee_right);
-        yInfo() << "estimates(6, 8) = ["  << est_copy.subVector(6, 8).toString() << "]";
-        yInfo() << "px_ee_right = [" << px_ee_right.toString() << "]";
-        /* ********************************** */
-
-
         Vector l_ee_x0 = zeros(4);
         Vector l_ee_x1 = zeros(4);
         Vector l_ee_x2 = zeros(4);
