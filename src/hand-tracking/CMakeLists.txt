@@ -9,7 +9,7 @@ endif()
 
 # Dependencies
 find_package(BayesFiltersLib REQUIRED)
-find_package(EIGEN3          REQUIRED)
+#find_package(EIGEN3          REQUIRED)
 find_package(glew            REQUIRED)
 find_package(glfw3           REQUIRED)
 find_package(ICUB            REQUIRED)
@@ -27,9 +27,12 @@ include(YarpInstallationHelpers)
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotion.h
-        include/DrawPoseParticle.h
+        include/CartesianAxisAnglePrediction.h
+        include/GatePose.h
         include/iCubFwdKinMotion.h
-        include/playFwdKinMotion.h
+        include/iCubGatePose.h
+        include/PlayFwdKinMotion.h
+        include/PlayGatePose.h
         include/VisualProprioception.h
         include/VisualParticleFilterCorrection.h
         include/VisualSIRParticleFilter.h)
@@ -37,9 +40,12 @@ set(${EXE_TARGET_NAME}_HDR
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
         src/BrownianMotion.cpp
-        src/DrawPoseParticle.cpp
+        src/CartesianAxisAnglePrediction.cpp
+        src/GatePose.cpp
         src/iCubFwdKinMotion.cpp
-        src/playFwdKinMotion.cpp
+        src/iCubGatePose.cpp
+        src/PlayFwdKinMotion.cpp
+        src/PlayGatePose.cpp
         src/VisualProprioception.cpp
         src/VisualParticleFilterCorrection.cpp
         src/VisualSIRParticleFilter.cpp)
@@ -54,7 +60,7 @@ add_executable(${EXE_TARGET_NAME}   ${${EXE_TARGET_NAME}_HDR} ${${EXE_TARGET_NAM
                                     ${${EXE_TARGET_NAME}_THRIFT_SRC})
 
 target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                                                      ${EIGEN3_INCLUDE_DIRS}
+                                                      /home/icub/Dev/eigen-eigen-67e894c6cd8f/
                                                       ${ICUB_INCLUDE_DIRS}
                                                       ${YARP_INCLUDE_DIRS})
 
@@ -69,7 +75,7 @@ target_link_libraries(${EXE_TARGET_NAME} BayesFiltersLib::BayesFiltersLib
                                          ${YARP_LIBRARIES})
 
 if(NOT APPLE)
-target_link_libraries(${EXE_TARGET_NAME} Threads::Threads)
+    target_link_libraries(${EXE_TARGET_NAME} Threads::Threads)
 endif()
 
 target_compile_features(${EXE_TARGET_NAME} PUBLIC cxx_nullptr cxx_constexpr cxx_override)

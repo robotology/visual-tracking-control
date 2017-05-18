@@ -1,7 +1,6 @@
 #include "VisualSIRParticleFilter.h"
 
 #include <exception>
-#include <fstream>
 #include <iostream>
 #include <utility>
 
@@ -29,7 +28,7 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<ParticleFilterPrediction> prediction, std::unique_ptr<VisualParticleFilterCorrection> correction,
+VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<ParticleFilterPrediction> prediction, std::unique_ptr<VisualCorrection> correction,
                                                  std::unique_ptr<Resampling> resampling,
                                                  ConstString cam_sel, ConstString laterality, const int num_particles) :
     prediction_(std::move(prediction)), correction_(std::move(correction)), resampling_(std::move(resampling)),
@@ -54,13 +53,6 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<ParticleFilterP
     port_torso_enc_.open     ("/hand-tracking/" + cam_sel_ + "/torso:i");
     port_estimates_out_.open ("/hand-tracking/" + cam_sel_ + "/result/estimates:o");
 
-    /* DEBUG ONLY */
-    port_image_out_left_.open("/hand-tracking/" + cam_sel_ + "/result/img:o");
-    /* ********** */
-
-    is_filter_init_ = false;
-    is_running_     = false;
-
     setCommandPort();
 }
 
@@ -70,18 +62,14 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
     port_image_in_left_.close();
     port_arm_enc_.close();
     port_torso_enc_.close();
-    port_image_out_left_.close();
     port_estimates_out_.close();
 }
 
 
 void VisualSIRParticleFilter::runFilter()
 {
-    is_running_ = true;
-
     /* INITIALIZATION */
-    unsigned int  k = 0;
-
+    // ???: Initialization shall be a class
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     Map<VectorXd> init_hand_pose(ee_pose.data(), 6, 1);
     init_hand_pose.tail(3) *= ee_pose(6);
@@ -103,12 +91,13 @@ void VisualSIRParticleFilter::runFilter()
     cuda_hog->setGammaCorrection(true);
     cuda_hog->setWinStride(Size(img_width, img_height));
 
-    prediction_->setMotionModelProperty("ICFW_INIT");
+    prediction_->setStateModelProperty("ICFW_INIT");
 
     is_filter_init_ = true;
 
 
     /* FILTERING */
+    is_running_ = true;
     ImageOf<PixelRgb>* imgin_left  = YARP_NULLPTR;
     while(is_running_)
     {
@@ -118,55 +107,56 @@ void VisualSIRParticleFilter::runFilter()
         cuda::GpuMat       descriptors_cam_cuda (Size(descriptor_length, 1),  CV_32F );
 
         imgin_left = port_image_in_left_.read(true);
-
         if (imgin_left != YARP_NULLPTR)
         {
-            Vector& estimates_out = port_estimates_out_.prepare();
-
-            ImageOf<PixelRgb>& imgout_left = port_image_out_left_.prepare();
-            imgout_left = *imgin_left;
-
             MatrixXf temp_particle(6, num_particles_);
             VectorXf temp_weight(num_particles_, 1);
             VectorXf temp_parent(num_particles_, 1);
 
             /* PROCESS CURRENT MEASUREMENT */
+            // ???: Measurement process may be a class
             Mat measurement;
 
-            measurement = cvarrToMat(imgout_left.getIplImage());
+            measurement = cvarrToMat(imgin_left->getIplImage());
             cuda_img.upload(measurement);
             cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);
             cuda_hog->compute(cuda_img_alpha, descriptors_cam_cuda);
             descriptors_cam_cuda.download(descriptors_cam_left);
 
             /* PREDICTION */
+            // !!!: The prediction class shall run over all particles internally, not here
             VectorXf sorted_pred = init_weight;
             std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
             float threshold = sorted_pred.tail(6)(0);
 
-            prediction_->setMotionModelProperty("ICFW_DELTA");
+            prediction_->setStateModelProperty("ICFW_DELTA");
             for (int j = 0; j < num_particles_; ++j)
             {
-                if(init_weight(j) <= threshold)
+                if (init_weight(j) <= threshold)
                     prediction_->predict(init_particle.col(j), init_particle.col(j));
                 else
                     prediction_->motion(init_particle.col(j), init_particle.col(j));
             }
 
             /* CORRECTION */
-            correction_->setMeasurementModelProperty("VP_PARAMS");
-            correction_->correct(init_particle, descriptors_cam_left, init_weight);
-            init_weight /= init_weight.sum();
+            if (do_visual_correction_)
+            {
+                correction_->setObservationModelProperty("VP_PARAMS");
+                correction_->correct(init_particle, descriptors_cam_left, init_weight);
+                init_weight /= init_weight.sum();
+            }
 
-            /* ESTIMATE EXTRACTION */
+
+            /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
             VectorXf out_particle(6);
-            /* Extracting state estimate: weighted sum */
-            out_particle = mean(init_particle, init_weight);
-            /* Extracting state estimate: mode */
-//            out_particle = mode(init_particle, init_weight);
+            if (use_mean_)
+                out_particle = mean(init_particle, init_weight);
+            else if (use_mode_)
+                out_particle = mode(init_particle, init_weight);
+
 
             /* RESAMPLING */
-            std::cout << "Step: " << k << "\nNeff: " << resampling_->neff(init_weight) << std::endl;
+            std::cout << "Step: " << filtering_step_ << "\nNeff: " << resampling_->neff(init_weight) << std::endl;
             if (resampling_->neff(init_weight) < std::round(num_particles_ / 5.f))
             {
                 std::cout << "Resampling!" << std::endl;
@@ -179,7 +169,9 @@ void VisualSIRParticleFilter::runFilter()
                 init_weight   = temp_weight;
             }
 
-            k++;
+
+            /* ADVANCE FILTERING STEP COUNTER */
+            filtering_step_++;
 
             /* STATE ESTIMATE OUTPUT */
             /* INDEX FINGERTIP */
@@ -220,6 +212,7 @@ void VisualSIRParticleFilter::runFilter()
 //            r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
 //
 //
+//            Vector& estimates_out = port_estimates_out_.prepare();
 //            estimates_out.resize(12);
 //            estimates_out.setSubvector(0, l_i_x);
 //            estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
@@ -228,16 +221,11 @@ void VisualSIRParticleFilter::runFilter()
 //            port_estimates_out_.write();
 
             /* PALM */
+            Vector& estimates_out = port_estimates_out_.prepare();
             estimates_out.resize(6);
             toEigen(estimates_out) = out_particle.cast<double>();
             port_estimates_out_.write();
 
-            /* DEBUG ONLY */
-            if (stream_)
-            {
-                correction_->superimpose(out_particle, measurement);
-                port_image_out_left_.write();
-            }
             /* ********** */
         }
     }
@@ -247,22 +235,10 @@ void VisualSIRParticleFilter::runFilter()
 void VisualSIRParticleFilter::getResult() { }
 
 
-std::future<void> VisualSIRParticleFilter::spawn()
-{
-    return std::async(std::launch::async, &VisualSIRParticleFilter::runFilter, this);
-}
-
-
-bool VisualSIRParticleFilter::isRunning()
-{
-    return is_running_;
-}
-
-
 bool VisualSIRParticleFilter::setCommandPort()
 {
     std::cout << "Opening RPC command port." << std::endl;
-    if (!port_rpc_command_.open("/hand-tracking/cmd:i"))
+    if (!port_rpc_command_.open("/hand-tracking/" + cam_sel_ + "/cmd:i"))
     {
         std::cerr << "Cannot open the RPC command port." << std::endl;
         return false;
@@ -278,24 +254,57 @@ bool VisualSIRParticleFilter::setCommandPort()
 }
 
 
-bool VisualSIRParticleFilter::stream_result(const bool status)
-{
-    stream_ = status;
-
-    return true;
-}
-
-
 bool VisualSIRParticleFilter::use_analogs(const bool status)
 {
     if (status)
-        return correction_->setMeasurementModelProperty("VP_ANALOGS_ON");
+        return correction_->setObservationModelProperty("VP_ANALOGS_ON");
     else
-        return correction_->setMeasurementModelProperty("VP_ANALOGS_OFF");
+        return correction_->setObservationModelProperty("VP_ANALOGS_OFF");
 }
 
 
-void VisualSIRParticleFilter::quit()
+std::vector<std::string> VisualSIRParticleFilter::get_info()
+{
+    std::vector<std::string> info;
+
+    info.push_back("<| Information about Visual SIR Particle Filter |>");
+    info.push_back("<| The Particle Filter is " + std::string(is_filter_init_ ? "not " : "") + "correctly intialized |>");
+    info.push_back("<| The Particle Filter is " + std::string(is_running_     ? "not " : "") + "running |>");
+    info.push_back("<| Filtering step: " + std::to_string(filtering_step_) + " |>");
+    info.push_back("<| Using " + cam_sel_ + " camera images |>");
+    info.push_back("<| Using encoders from " + laterality_ + " iCub arm |>");
+    info.push_back("<| Using " + std::to_string(num_particles_) + " particles |>");
+    info.push_back("<| Available estimate extraction methods:" +
+                   std::string(use_mean_ ? "1) Mean <-- In use; " : "1) Mean; ") +
+                   std::string(use_mode_ ? "2) Mode <-- In use; " : "2) Mode") + " |>");
+
+    return info;
+}
+
+
+bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string& method)
+{
+    if (method == "mean")
+    {
+        use_mean_ = true;
+        use_mode_ = false;
+
+        return true;
+    }
+
+    if (method == "mode")
+    {
+        use_mode_ = true;
+        use_mean_ = false;
+
+        return true;
+    }
+
+    return false;
+}
+
+
+bool VisualSIRParticleFilter::quit()
 {
     if (!is_filter_init_)
     {
@@ -306,6 +315,16 @@ void VisualSIRParticleFilter::quit()
     port_image_in_left_.interrupt();
 
     is_running_ = false;
+
+    return true;
+}
+
+
+bool VisualSIRParticleFilter::visual_correction(const bool status)
+{
+    do_visual_correction_ = status;
+
+    return true;
 }
 
 
@@ -321,15 +340,18 @@ VectorXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, con
         out_particle.tail<3>() += weights(i) * particles.col(i).tail<3>().normalized();
 
         float ang = particles.col(i).tail<3>().norm();
-        if (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
-        if (ang <=        0.0) ang += 2.0 * M_PI;
+
+        if      (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
+        else if (ang <=        0.0) ang += 2.0 * M_PI;
+
         s_ang                  += weights(i) * std::sin(ang);
         c_ang                  += weights(i) * std::cos(ang);
     }
 
     float ang = std::atan2(s_ang, c_ang) + M_PI;
-    if (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
-    if (ang <=        0.0) ang += 2.0 * M_PI;
+
+    if      (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
+    else if (ang <=        0.0) ang += 2.0 * M_PI;
 
     out_particle.tail<3>() = out_particle.tail<3>().normalized() * std::atan2(s_ang, c_ang);
 
@@ -346,7 +368,7 @@ VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, con
 }
 
 
-/* THIS CALL SHOULD BE IN OTHER CLASSES */
+/* THIS METHOD SHOULD BE IN INITIALIZATION CLASS */
 Vector VisualSIRParticleFilter::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
@@ -379,4 +401,4 @@ Vector VisualSIRParticleFilter::readRootToEE()
 
     return root_ee_enc;
 }
-/* ************************************ */
+/* ********************************************* */

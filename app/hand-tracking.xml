@@ -5,7 +5,7 @@
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking</name>
     <description>Visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
-    <version>0.3.0</version>
+    <version>0.5.1</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -16,24 +16,12 @@
     <module>
         <name>hand-tracking</name>
         <parameters>--robot icub --cam left --laterality right</parameters>
-        <node>yarprun</node>
+        <node>localhost</node>
     </module>
 
     <module>
         <name>hand-tracking</name>
         <parameters>--robot icub --cam right --laterality right</parameters>
-        <node>yarprun</node>
-    </module>
-
-    <module>
-        <name>yarpview</name>
-        <parameters>--name /view/result/left --x 20 --y 0 --RefreshTime 30</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpview</name>
-        <parameters>--name /view/result/right --x 340 --y 0 --RefreshTime 30</parameters>
         <node>localhost</node>
     </module>
 
@@ -76,18 +64,6 @@
         <protocol>tcp</protocol>
     </connection>
 
-    <connection>
-        <from>/hand-tracking/left/result/img:o</from>
-        <to>/view/result/left</to>
-        <protocol>tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/hand-tracking/right/result/img:o</from>
-        <to>/view/result/right</to>
-        <protocol>tcp</protocol>
-    </connection>
-
 
     <!-- VisualProprioception connections -->
     <connection>
@@ -123,6 +99,20 @@
     <connection>
         <from>/icub/torso/state:o</from>
         <to>/hand-tracking/VisualProprioception/right/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+
+    <!-- iCubProprioception connection for displaying results -->
+    <connection>
+        <from>/hand-tracking/left/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/cam/left/hand/right_pose:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/hand-tracking/right/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/cam/right/hand/right_pose:i</to>
         <protocol>tcp</protocol>
     </connection>
 

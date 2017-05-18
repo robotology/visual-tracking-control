@@ -35,6 +35,7 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
 
     if (openGazeController())
     {
+        Bottle cam_info;
         itf_gaze_->getInfo(cam_info);
         yInfo() << log_ID_ << "[CAM PARAMS]" << cam_info.toString();
         Bottle* cam_sel_intrinsic  = cam_info.findGroup("camera_intrinsics_" + cam_sel_).get(1).asList();
@@ -52,7 +53,7 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
         rf.setVerbose();
         rf.setDefaultContext(context);
         rf.setDefaultConfigFile("parameters.ini");
-        rf.configure(0, nullptr);
+        rf.configure(0, YARP_NULLPTR);
 
         Bottle* fallback_intrinsic = rf.findGroup("FALLBACK").find("intrinsic_" + cam_sel_).asList();
         if (fallback_intrinsic)
@@ -101,21 +102,21 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     if (!file_found(cad_obj_["palm"]))
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_palm.obj not found!");
 
-    cad_obj_["thumb1"] = rf.findFileByName("r_tl0.obj");
-    if (!file_found(cad_obj_["thumb1"]))
-        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
-    cad_obj_["thumb2"] = rf.findFileByName("r_tl1.obj");
-    if (!file_found(cad_obj_["thumb2"]))
-        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
-    cad_obj_["thumb3"] = rf.findFileByName("r_tl2.obj");
-    if (!file_found(cad_obj_["thumb3"]))
-        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
-    cad_obj_["thumb4"] = rf.findFileByName("r_tl3.obj");
-    if (!file_found(cad_obj_["thumb4"]))
-        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
-    cad_obj_["thumb5"] = rf.findFileByName("r_tl4.obj");
-    if (!file_found(cad_obj_["thumb5"]))
-        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
+//    cad_obj_["thumb1"] = rf.findFileByName("r_tl0.obj");
+//    if (!file_found(cad_obj_["thumb1"]))
+//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
+//    cad_obj_["thumb2"] = rf.findFileByName("r_tl1.obj");
+//    if (!file_found(cad_obj_["thumb2"]))
+//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
+//    cad_obj_["thumb3"] = rf.findFileByName("r_tl2.obj");
+//    if (!file_found(cad_obj_["thumb3"]))
+//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
+//    cad_obj_["thumb4"] = rf.findFileByName("r_tl3.obj");
+//    if (!file_found(cad_obj_["thumb4"]))
+//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
+//    cad_obj_["thumb5"] = rf.findFileByName("r_tl4.obj");
+//    if (!file_found(cad_obj_["thumb5"]))
+//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
 
     cad_obj_["index0"] = rf.findFileByName("r_indexbase.obj");
     if (!file_found(cad_obj_["index0"]))
@@ -346,7 +347,7 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
         /* Change index to add/remove limbs */
         yarp::sig::Matrix Ha = axis2dcm(ee_o);
         Ha.setCol(3, ee_t);
-        for (size_t fng = 0; fng < 3; ++fng)
+        for (size_t fng = 1; fng < 3; ++fng)
         {
             std::string finger_s;
             pose.clear();
@@ -445,7 +446,8 @@ bool VisualProprioception::setiCubParams()
         itf_right_hand_analog_->read(analogs);
         setArmJoints(q, analogs, right_hand_analogs_bounds_);
     }
-    else setArmJoints(q);
+    else
+        setArmJoints(q);
 
     return true;
 }
@@ -474,23 +476,6 @@ void VisualProprioception::setArmJoints(const Vector& q, const Vector& analogs, 
         icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), analogs, chainjoints, analog_bounds);
         icub_kin_finger_[i].setAng(chainjoints * (M_PI/180.0));
     }
-}
-
-
-void VisualProprioception::superimpose(const Ref<const VectorXf>&  state, Mat& img)
-{
-    si_cad_->setBackgroundOpt(true);
-    si_cad_->setWireframeOpt(true);
-
-
-    std::vector<SuperImpose::ObjPoseMap> hand_poses;
-    getPoses(state, hand_poses);
-
-    si_cad_->superimpose(hand_poses[0], cam_x_, cam_o_, img);
-
-
-    si_cad_->setBackgroundOpt(false);
-    si_cad_->setWireframeOpt(false);
 }
 
 

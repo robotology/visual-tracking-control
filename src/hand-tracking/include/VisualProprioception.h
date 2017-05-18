@@ -17,7 +17,9 @@
 #include <yarp/sig/Vector.h>
 
 
-class VisualProprioception : public bfl::VisualObservationModel {
+// FIXME: riscrivere rispettando l'interfaccia, altrimenti salta decorator.
+class VisualProprioception : public bfl::VisualObservationModel
+{
 public:
     /* VisualProprioception constructor */
     VisualProprioception(const int num_images, const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const yarp::os::ConstString& context);
@@ -41,9 +43,6 @@ public:
 
     bool setProperty(const std::string property) override;
 
-    /* TO BE DEPRECATED */
-    void superimpose(const Eigen::Ref<const Eigen::VectorXf>& state, cv::Mat& img);
-    /* **************** */
 
     int          getOGLTilesNumber();
     int          getOGLTilesRows();
@@ -63,7 +62,6 @@ protected:
     yarp::os::ConstString                     laterality_;
     yarp::dev::PolyDriver                     drv_gaze_;
     yarp::dev::IGazeControl*                  itf_gaze_;
-    yarp::os::Bottle                          cam_info;
     iCub::iKin::iCubArm                       icub_arm_;
     iCub::iKin::iCubFinger                    icub_kin_finger_[3];
     iCub::iKin::iCubEye                       icub_kin_eye_;

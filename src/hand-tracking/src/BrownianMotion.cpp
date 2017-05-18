@@ -96,13 +96,11 @@ void BrownianMotion::noiseSample(Ref<VectorXf> sample)
     /* Generate points on the spherical cap around the north pole [1]. */
     /* [1] http://math.stackexchange.com/a/205589/81266 */
     float z   = gaussian_random_cone_() * (1 - cos(cone_angle_)) + cos(cone_angle_);
-    float phi = gaussian_random_cone_() * (2 * M_PI);
+    float phi = gaussian_random_cone_() * (2.0 * M_PI);
     float x   = sqrt(1 - (z * z)) * cos(phi);
     float y   = sqrt(1 - (z * z)) * sin(phi);
 
     /* Generate random rotation angle */
     sample.middleRows<3>(3) = Vector3f(x, y, z);
-    float ang = gaussian_random_theta_();
-    if (ang <=        0.0) ang += 2.0 * M_PI;
-    sample(6) = ang;
+    sample(6) = gaussian_random_theta_();
 }

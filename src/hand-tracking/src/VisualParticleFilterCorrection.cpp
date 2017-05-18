@@ -115,13 +115,7 @@ void VisualParticleFilterCorrection::likelihood(const Ref<const MatrixXf>& innov
 }
 
 
-bool VisualParticleFilterCorrection::setMeasurementModelProperty(std::string property)
+bool VisualParticleFilterCorrection::setObservationModelProperty(const std::string& property)
 {
     return measurement_model_->setProperty(property);
-}
-
-
-void VisualParticleFilterCorrection::superimpose(const Ref<const VectorXf>& state, Mat& img)
-{
-    measurement_model_->superimpose(state, img);
 }

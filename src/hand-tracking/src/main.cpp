@@ -3,10 +3,8 @@
 #include <iostream>
 #include <memory>
 
-#include <BayesFiltersLib/FilteringFunction.h>
+#include <BayesFiltersLib/Resampling.h>
 #include <BayesFiltersLib/SIRParticleFilter.h>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
@@ -16,9 +14,11 @@
 #include <opencv2/core/cuda.hpp>
 
 #include "BrownianMotion.h"
-#include "DrawPoseParticle.h"
+#include "CartesianAxisAnglePrediction.h"
+#include "iCubGatePose.h"
 #include "iCubFwdKinMotion.h"
-#include "playFwdKinMotion.h"
+#include "PlayFwdKinMotion.h"
+#include "PlayGatePose.h"
 #include "VisualProprioception.h"
 #include "VisualParticleFilterCorrection.h"
 #include "VisualSIRParticleFilter.h"
@@ -63,18 +63,11 @@ int main(int argc, char *argv[])
     rf.setDefaultConfigFile("parameters.ini");
     rf.configure(argc, argv);
 
-    ConstString robot_name       = rf.find("robot").asString();
-    ConstString robot_cam_sel    = rf.find("cam").asString();
-    ConstString robot_laterality = rf.find("laterality").asString();
-    bool        play             = rf.find("play").asBool();
+    ConstString robot_name       = rf.check("robot",      Value("icub")).asString();
+    ConstString robot_cam_sel    = rf.check("cam",        Value("left")).asString();
+    ConstString robot_laterality = rf.check("laterality", Value("right")).asString();
+    bool        play             = ((rf.findGroup("play").size() == 1 ? true : (rf.findGroup("play").size() == 2 ? rf.find("play").asBool() : false)));
     int         num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
-
-    if (robot_name.empty())
-        robot_name       = "icub";
-    if (robot_cam_sel.empty())
-        robot_cam_sel    = "left";
-    if (robot_laterality.empty())
-        robot_laterality = "right";
 
     yInfo() << log_ID << "Running with:";
     yInfo() << log_ID << " - robot name:"          << robot_name;
@@ -83,10 +76,9 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - use data from ports:" << (play ? "true" : "false");
     yInfo() << log_ID << " - number of particles:" << num_particles;
 
-    /* Initialize filtering functions */
-    // FIXME: passare robot name ai metodi
-    std::unique_ptr<BrownianMotion> brown(new BrownianMotion(0.005, 0.005, 3.0, 1.5, 1));
-    std::unique_ptr<StateModel>     icub_motion;
+    /* MOTION MODEL */
+    std::unique_ptr<StateModel> brown(new BrownianMotion(0.005, 0.005, 5.0, 5.0, 1));
+    std::unique_ptr<StateModel> icub_motion;
     if (!play)
     {
         std::unique_ptr<iCubFwdKinMotion> icub_fwdkin(new iCubFwdKinMotion(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
@@ -94,13 +86,15 @@ int main(int argc, char *argv[])
     }
     else
     {
-        std::unique_ptr<playFwdKinMotion> play_fwdkin(new playFwdKinMotion(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
+        std::unique_ptr<PlayFwdKinMotion> play_fwdkin(new PlayFwdKinMotion(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
         icub_motion = std::move(play_fwdkin);
     }
 
+    /* PREDICTION */
+    std::unique_ptr<ParticleFilterPrediction> pf_prediction(new CartesianAxisAnglePrediction(std::move(icub_motion)));
 
-    std::unique_ptr<DrawPoseParticle> pf_prediction(new DrawPoseParticle(std::move(icub_motion)));
 
+    /* SENSOR MODEL */
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
@@ -117,20 +111,37 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    /* CORRECTION */
     std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), 1));
 //    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
 
+    std::unique_ptr<VisualCorrection> vpf_correction_gated;
+    if (!play)
+    {
+        std::unique_ptr<iCubGatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_correction),
+                                                                      0.1, 0.1, 0.1, 15, 30,
+                                                                      robot_name, robot_laterality, robot_cam_sel));
+        vpf_correction_gated = std::move(icub_gate_pose);
+    }
+    else
+    {
+        std::unique_ptr<PlayGatePose> icub_gate_pose(new PlayGatePose(std::move(vpf_correction),
+                                                                      0.1, 0.1, 0.1, 15, 30,
+                                                                      robot_name, robot_laterality, robot_cam_sel));
+        vpf_correction_gated = std::move(icub_gate_pose);
+    }
+
+
+    /* RESAMPLING */
     std::unique_ptr<Resampling> resampling(new Resampling());
 
-    VisualSIRParticleFilter vsir_pf(std::move(pf_prediction), std::move(vpf_correction),
+
+    /* PARTICLE FILTER */
+    VisualSIRParticleFilter vsir_pf(std::move(pf_prediction), std::move(vpf_correction_gated),
                                     std::move(resampling),
                                     robot_cam_sel, robot_laterality, num_particles);
 
     vsir_pf.runFilter();
-
-    yInfo() << log_ID << "Terminating OpenGL...";
-    glfwMakeContextCurrent(NULL);
-    glfwTerminate();
 
     yInfo() << log_ID << "Application closed succesfully.";
     return EXIT_SUCCESS;
