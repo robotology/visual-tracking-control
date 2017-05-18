@@ -275,6 +275,8 @@ public:
         l_px2[0] /= l_px2[2];
         l_px2[1] /= l_px2[2];
         Vector l_px3 = l_H_r_to_cam_ * l_ee_x3;
+        l_px3[0] /= l_px3[2];
+        l_px3[1] /= l_px3[2];
         yInfo() << "Proj left ee    = [" << l_px0.subVector(0, 1).toString() << "]";
         yInfo() << "Proj left ee x1 = [" << l_px1.subVector(0, 1).toString() << "]";
         yInfo() << "Proj left ee x2 = [" << l_px2.subVector(0, 1).toString() << "]";
