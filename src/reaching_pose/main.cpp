@@ -570,12 +570,32 @@ public:
                 /* Get the new end-effector pose from left eye particle filter */
                 estimates = port_estimates_left_in_.read(true);
                 yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
-                est_copy_left = *estimates;
+                if (estimates->length() == 7)
+                {
+                    est_copy_left = estimates->subVector(0, 5);
+                    float ang     = (*estimates)[6];
+
+                    est_copy_left[3] *= ang;
+                    est_copy_left[4] *= ang;
+                    est_copy_left[5] *= ang;
+                }
+                else
+                    est_copy_left = *estimates;
 
                 /* Get the new end-effector pose from right eye particle filter */
                 yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
                 estimates = port_estimates_right_in_.read(true);
-                est_copy_right = *estimates;
+                if (estimates->length() == 7)
+                {
+                    est_copy_right = estimates->subVector(0, 5);
+                    float ang      = (*estimates)[6];
+
+                    est_copy_right[3] *= ang;
+                    est_copy_right[4] *= ang;
+                    est_copy_right[5] *= ang;
+                }
+                else
+                    est_copy_left = *estimates;
 
                 yInfo() << "EE estimates left = [" << est_copy_left.toString() << "]";
                 yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]\n";
