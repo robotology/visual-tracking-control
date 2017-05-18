@@ -584,6 +584,7 @@ public:
                 /* *************** */
 
 
+                /* DEBUG OUTPUT */
                 /* Dump pixel coordinates of the goal */
                 Bottle& l_px_endeffector = port_px_left_endeffector.prepare();
                 l_px_endeffector.clear();
@@ -643,6 +644,7 @@ public:
                 cv::circle(r_img, cv::Point(r_px_goal_[6], r_px_goal_[7]), 4, cv::Scalar(255, 255,   0), 4);
 
                 port_image_right_out_.write();
+                /* ************ */
             }
         }
 
