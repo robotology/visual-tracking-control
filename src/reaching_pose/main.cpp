@@ -877,6 +877,10 @@ public:
                     Vector p = zeros(7);
                     p.setSubvector(0, sfm_pos.subVector(0, 2));
                     p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+                    goal_pose_ = p;
+                    yInfo() << "Goal: " << goal_pose_.toString();
+
                     Vector p0 = zeros(4);
                     Vector p1 = zeros(4);
                     Vector p2 = zeros(4);
@@ -1027,7 +1031,8 @@ public:
 //                p[2] =  0.10;
 //                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
 
-                yInfo() << "Goal: " << p.toString();
+                goal_pose_ = p;
+                yInfo() << "Goal: " << goal_pose_.toString();
 
                 Vector p0 = zeros(4);
                 Vector p1 = zeros(4);
@@ -1204,6 +1209,7 @@ private:
 
     iCubFinger                       icub_index_;
 
+    Vector                           goal_pose_;
     Matrix                           l_proj_;
     Matrix                           r_proj_;
     Matrix                           l_H_r_to_eye_;
