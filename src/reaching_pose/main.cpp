@@ -217,22 +217,24 @@ public:
         if (should_stop_) return false;
 
 
-        Vector est_copy(12);
+        Vector est_copy_left(6);
+        Vector est_copy_right(6);
 
         /* Get the initial end-effector pose from left eye particle filter */
         Vector* estimates = port_estimates_left_in_.read(true);
         yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
-        est_copy.setSubvector(0, *estimates);
+        est_copy_left = *estimates;
 
         /* Get the initial end-effector pose from right eye particle filter */
         estimates = port_estimates_right_in_.read(true);
         yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
-        est_copy.setSubvector(6, *estimates);
+        est_copy_right = *estimates;
 
 
         yInfo() << "RUNNING!\n";
 
-        yInfo() << "estimates = ["  << est_copy.toString() << "]";
+        yInfo() << "EE estimates left = ["  << est_copy_left.toString() << "]";
+        yInfo() << "EE estimates right = ["  << est_copy_right.toString() << "]";
         yInfo() << "l_px_goal_ = [" << l_px_goal_.toString() << "]";
         yInfo() << "r_px_goal_ = [" << r_px_goal_.toString() << "]";
 
@@ -260,7 +262,7 @@ public:
         Vector l_ee_x1 = zeros(4);
         Vector l_ee_x2 = zeros(4);
         Vector l_ee_x3 = zeros(4);
-        getPalmPoints(est_copy.subVector(0, 5), l_ee_x0, l_ee_x1, l_ee_x2, l_ee_x3);
+        getPalmPoints(est_copy_left, l_ee_x0, l_ee_x1, l_ee_x2, l_ee_x3);
 
 
         Vector l_px0 = l_H_r_to_cam_ * l_ee_x0;
@@ -283,7 +285,7 @@ public:
         Vector r_ee_x1 = zeros(4);
         Vector r_ee_x2 = zeros(4);
         Vector r_ee_x3 = zeros(4);
-        getPalmPoints(est_copy.subVector(6, 11), r_ee_x0, r_ee_x1, r_ee_x2, r_ee_x3);
+        getPalmPoints(est_copy_right, r_ee_x0, r_ee_x1, r_ee_x2, r_ee_x3);
 
 
         Vector r_px0 = r_H_r_to_cam_ * r_ee_x0;
@@ -444,24 +446,25 @@ public:
                 /* Get the new end-effector pose from left eye particle filter */
                 estimates = port_estimates_left_in_.read(true);
                 yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
-                est_copy.setSubvector(0, *estimates);
+                est_copy_left = *estimates;
 
                 /* Get the new end-effector pose from right eye particle filter */
                 yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
                 estimates = port_estimates_right_in_.read(true);
-                est_copy.setSubvector(6, *estimates);
+                est_copy_right = *estimates;
+
+                yInfo() << "EE estimates left = [" << est_copy_left.toString() << "]";
+                yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]\n";
 
                 /* SIM */
 //                /* Simulate reaching starting from the initial position */
 //                /* Comment any previous write on variable 'estimates' */
-//                yInfo() << "EE L now: " << est_copy.subVector(0, 2).toString();
-//                yInfo() << "EE R now: " << est_copy.subVector(6, 8).toString() << "\n";
 //
 //                /* Evaluate the new orientation vector from axis-angle representation */
 //                /* The following code is a copy of the setTaskVelocities() code */
-//                Vector l_o = getAxisAngle(est_copy.subVector(3, 5));
+//                Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
 //                Matrix l_R = axis2dcm(l_o);
-//                Vector r_o = getAxisAngle(est_copy.subVector(9, 11));
+//                Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
 //                Matrix r_R = axis2dcm(r_o);
 //
 //                vel_o[3] *= Ts;
@@ -478,21 +481,18 @@ public:
 //                r_new_o.pop_back();
 //                r_new_o *= r_ang;
 //
-//                est_copy.setSubvector(0, est_copy.subVector(0, 2)  + vel_x * Ts);
-//                est_copy.setSubvector(3, l_new_o);
-//                est_copy.setSubvector(6, est_copy.subVector(6, 8)  + vel_x * Ts);
-//                est_copy.setSubvector(9, r_new_o);
+//                est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts);
+//                est_copy_left.setSubvector(3, l_new_o);
+//                est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts);
+//                est_copy_right.setSubvector(3, r_new_o);
                 /* **************************************************** */
-
-                yInfo() << "EE L coord: " << est_copy.subVector(0, 2).toString();
-                yInfo() << "EE R coord: " << est_copy.subVector(6, 8).toString() << "\n";
 
 
                 l_ee_x0 = zeros(4);
                 l_ee_x1 = zeros(4);
                 l_ee_x2 = zeros(4);
                 l_ee_x3 = zeros(4);
-                getPalmPoints(est_copy.subVector(0, 5), l_ee_x0, l_ee_x1, l_ee_x2, l_ee_x3);
+                getPalmPoints(est_copy_left, l_ee_x0, l_ee_x1, l_ee_x2, l_ee_x3);
 
                 l_px0 = l_H_r_to_cam_ * l_ee_x0;
                 l_px0[0] /= l_px0[2];
@@ -512,7 +512,7 @@ public:
                 r_ee_x1 = zeros(4);
                 r_ee_x2 = zeros(4);
                 r_ee_x3 = zeros(4);
-                getPalmPoints(est_copy.subVector(6, 11), r_ee_x0, r_ee_x1, r_ee_x2, r_ee_x3);
+                getPalmPoints(est_copy_right, r_ee_x0, r_ee_x1, r_ee_x2, r_ee_x3);
 
                 r_px0 = r_H_r_to_cam_ * r_ee_x0;
                 r_px0[0] /= r_px0[2];
