@@ -473,7 +473,7 @@ public:
 
 
         double Ts    = 0.1;   // controller's sample time [s]
-        double K_x   = 1.0;  // visual servoing proportional gain
+        double K_x   = 0.5;  // visual servoing proportional gain
         double K_o   = 0.5;  // visual servoing proportional gain
 //        double v_max = 0.0005; // max cartesian velocity [m/s]
 
@@ -527,11 +527,6 @@ public:
             vel_o.push_back(ang);
             yInfo() << "axis-angle vel_o = [" << vel_o.toString() << "]";
 
-            double K_ctrl_x = 0;
-            if (vel_o(3) > (3.0 * CTRL_DEG2RAD)) K_ctrl_x = exp(-(vel_o(3) - (3.0 * CTRL_DEG2RAD)) / 0.5);
-            else                                 K_ctrl_x = 1.0;
-            yInfo() << "K_ctrl_x: " << K_ctrl_x;
-
 
             /* Restoring cartesian and gaze context */
             itf_rightarm_cart_->restoreContext(ctx_cart_);
@@ -540,11 +535,10 @@ public:
 
             /* Visual control law */
             /* SIM */
-//            vel_x    *= K_x;
-//            vel_x    *= (K_x * K_ctrl_x);
-//            vel_o(3) *= K_o;
+            vel_x    *= K_x;
+            vel_o(3) *= K_o;
             /* Real robot - Pose */
-//            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
             /* Real robot - Orientation */
 //            itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
             /* Real robot - Translation */
@@ -574,48 +568,48 @@ public:
             }
             else
             {
-//                /* Get the new end-effector pose from left eye particle filter */
-//                estimates = port_estimates_left_in_.read(true);
-//                yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
-//                est_copy_left = *estimates;
-//
-//                /* Get the new end-effector pose from right eye particle filter */
-//                yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
-//                estimates = port_estimates_right_in_.read(true);
-//                est_copy_right = *estimates;
+                /* Get the new end-effector pose from left eye particle filter */
+                estimates = port_estimates_left_in_.read(true);
+                yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
+                est_copy_left = *estimates;
+
+                /* Get the new end-effector pose from right eye particle filter */
+                yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
+                estimates = port_estimates_right_in_.read(true);
+                est_copy_right = *estimates;
 
                 yInfo() << "EE estimates left = [" << est_copy_left.toString() << "]";
                 yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]\n";
 
                 /* SIM */
-                /* Simulate reaching starting from the initial position */
-                /* Comment any previous write on variable 'estimates' */
-
-                /* Evaluate the new orientation vector from axis-angle representation */
-                /* The following code is a copy of the setTaskVelocities() code */
-                Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
-                Matrix l_R = axis2dcm(l_o);
-                Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
-                Matrix r_R = axis2dcm(r_o);
-
-                vel_o[3] *= Ts;
-                l_R = axis2dcm(vel_o) * l_R;
-                r_R = axis2dcm(vel_o) * r_R;
-
-                Vector l_new_o = dcm2axis(l_R);
-                double l_ang = l_new_o(3);
-                l_new_o.pop_back();
-                l_new_o *= l_ang;
-
-                Vector r_new_o = dcm2axis(r_R);
-                double r_ang = r_new_o(3);
-                r_new_o.pop_back();
-                r_new_o *= r_ang;
-
-                est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts);
-                est_copy_left.setSubvector(3, l_new_o);
-                est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts);
-                est_copy_right.setSubvector(3, r_new_o);
+//                /* Simulate reaching starting from the initial position */
+//                /* Comment any previous write on variable 'estimates' */
+//
+//                /* Evaluate the new orientation vector from axis-angle representation */
+//                /* The following code is a copy of the setTaskVelocities() code */
+//                Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
+//                Matrix l_R = axis2dcm(l_o);
+//                Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
+//                Matrix r_R = axis2dcm(r_o);
+//
+//                vel_o[3] *= Ts;
+//                l_R = axis2dcm(vel_o) * l_R;
+//                r_R = axis2dcm(vel_o) * r_R;
+//
+//                Vector l_new_o = dcm2axis(l_R);
+//                double l_ang = l_new_o(3);
+//                l_new_o.pop_back();
+//                l_new_o *= l_ang;
+//
+//                Vector r_new_o = dcm2axis(r_R);
+//                double r_ang = r_new_o(3);
+//                r_new_o.pop_back();
+//                r_new_o *= r_ang;
+//
+//                est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts);
+//                est_copy_left.setSubvector(3, l_new_o);
+//                est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts);
+//                est_copy_right.setSubvector(3, r_new_o);
                 /* **************************************************** */
 
 
