@@ -84,6 +84,9 @@ protected:
 
     bool                     quit() override;
 
+    bool                     visual_correction(const bool status) override;
+    bool                     do_visual_correction_ = true;
+
 
     Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 

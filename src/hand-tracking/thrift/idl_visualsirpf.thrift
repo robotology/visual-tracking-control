@@ -43,6 +43,18 @@ service VisualSIRParticleFilterIDL
     bool set_estimates_extraction_method(1:string method);
 
     /**
+     * Enable/Disable the visual correction step of the SIR Particle Filter.
+     *
+     * @param status true/false to enable/disable visual correction
+     *
+     * @return true activation/deactivation success, false otherwise.
+     *
+     * @note By disabling the visual correction step the particles will be only
+     *       propageted over time with the prediction step.
+     */
+    bool visual_correction(1:bool status)
+
+    /**
      * Gently close the application deallocating resources.
      */
     bool quit();
