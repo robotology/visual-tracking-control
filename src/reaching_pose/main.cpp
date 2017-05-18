@@ -472,6 +472,11 @@ public:
         /* ******** */
 
 
+        /* Restoring cartesian and gaze context */
+        itf_rightarm_cart_->restoreContext(ctx_cart_);
+        itf_gaze_->restoreContext(ctx_gaze_);
+
+
         double Ts    = 0.1;   // controller's sample time [s]
         double K_x   = 0.5;  // visual servoing proportional gain
         double K_o   = 0.5;  // visual servoing proportional gain
@@ -526,12 +531,6 @@ public:
             vel_o /= ang;
             vel_o.push_back(ang);
             yInfo() << "axis-angle vel_o = [" << vel_o.toString() << "]";
-
-
-            /* Restoring cartesian and gaze context */
-            itf_rightarm_cart_->restoreContext(ctx_cart_);
-            itf_gaze_->restoreContext(ctx_gaze_);
-
 
             /* Visual control law */
             /* SIM */
