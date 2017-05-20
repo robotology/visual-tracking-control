@@ -27,7 +27,7 @@ hand-tracking depends on
      - Debian: apt
      - macOS: brew
      - WIN: TBD
- - [SuperImpose](https://github.com/claudiofantacci/superimpose-hand)
+ - [SuperimposeMeshLib](https://github.com/robotology/superimpose-mesh-lib)
      - Documentation is WIP
  - [Yet Another Robot Platform, YARP](http://www.yarp.it)
      - Debian, macOS, WIN: [yarp on GitHub](https://github.com/robotology/yarp)
