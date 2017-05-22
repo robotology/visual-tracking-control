@@ -2,7 +2,6 @@
 #define SERVERVISUALSERVOING_H
 
 #include <yarp/dev/CartesianControl.h>
-#include <yarp/dev/IControlLimits2.h>
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/IEncoders.h>
 #include <yarp/dev/PolyDriver.h>
@@ -50,10 +49,6 @@ private:
     yarp::dev::PolyDriver         gaze_driver_;
     yarp::dev::IGazeControl     * itf_gaze_;
 
-    yarp::dev::PolyDriver         rightarm_remote_driver_;
-    yarp::dev::IEncoders        * itf_rightarm_enc_;
-    yarp::dev::IControlLimits2  * itf_fingers_lim_;
-
     yarp::dev::PolyDriver         torso_remote_driver_;
     yarp::dev::IEncoders        * itf_torso_enc_;
 
@@ -98,9 +93,6 @@ private:
 
 
     bool setGazeController();
-
-
-    bool setRightArmRemoteControlboard();
 
 
     bool setTorsoRemoteControlboard();

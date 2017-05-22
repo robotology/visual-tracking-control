@@ -80,8 +80,6 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
 
     if (!setTorsoRemoteControlboard()) return false;
 
-    if (!setRightArmRemoteControlboard()) return false;
-
     if (!setRightArmCartesianController()) return false;
 
 
@@ -1450,42 +1448,6 @@ bool ServerVisualServoing::setGazeController()
     else
     {
         yError() << "Gaze control device not available.";
-        return false;
-    }
-
-    return true;
-}
-
-
-bool ServerVisualServoing::setRightArmRemoteControlboard()
-{
-    Property rightarm_remote_options;
-    rightarm_remote_options.put("device", "remote_controlboard");
-    rightarm_remote_options.put("local",  "/visual_servoing/control_right_arm");
-    rightarm_remote_options.put("remote", "/"+robot_name_+"/right_arm");
-
-    rightarm_remote_driver_.open(rightarm_remote_options);
-    if (rightarm_remote_driver_.isValid())
-    {
-        yInfo() << "Right arm remote_controlboard succefully opened.";
-
-        rightarm_remote_driver_.view(itf_rightarm_enc_);
-        if (!itf_rightarm_enc_)
-        {
-            yError() << "Error getting right arm IEncoders interface.";
-            return false;
-        }
-
-        rightarm_remote_driver_.view(itf_fingers_lim_);
-        if (!itf_fingers_lim_)
-        {
-            yError() << "Error getting IControlLimits interface.";
-            return false;
-        }
-    }
-    else
-    {
-        yError() << "Error opening right arm remote_controlboard device.";
         return false;
     }
 
