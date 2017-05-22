@@ -1458,17 +1458,17 @@ bool ServerVisualServoing::setTorsoDOF()
     Vector curDOF;
     itf_rightarm_cart_->getDOF(curDOF);
     yInfo() << "Old DOF: [" + curDOF.toString(0) + "].";
-    yInfo() << "Setting iCub to use the DOF from the torso.";
+
+    yInfo() << "Setting iCub to use torso DOF.";
     Vector newDOF(curDOF);
     newDOF[0] = 1;
     newDOF[1] = 1;
     newDOF[2] = 1;
     if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
     {
-        yError() << "Cannot set torso DOF.";
+        yError() << "Unable to set torso DOF.";
         return false;
     }
-    yInfo() << "Setting the DOF done.";
     yInfo() << "New DOF: [" + curDOF.toString(0) + "]";
     
     return true;
@@ -1480,17 +1480,17 @@ bool ServerVisualServoing::unsetTorsoDOF()
     Vector curDOF;
     itf_rightarm_cart_->getDOF(curDOF);
     yInfo() << "Old DOF: [" + curDOF.toString(0) + "].";
-    yInfo() << "Setting iCub to not use the DOF from the torso.";
+
+    yInfo() << "Setting iCub to block torso DOF.";
     Vector newDOF(curDOF);
     newDOF[0] = 0;
     newDOF[1] = 0;
     newDOF[2] = 0;
     if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
     {
-        yError() << "Cannot set torso DOF.";
+        yError() << "Unable to set torso DOF.";
         return false;
     }
-    yInfo() << "Setting the DOF done.";
     yInfo() << "New DOF: [" + curDOF.toString(0) + "]";
     
     return true;
