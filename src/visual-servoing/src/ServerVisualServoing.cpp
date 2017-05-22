@@ -18,7 +18,6 @@ using namespace yarp::math;
 using namespace yarp::os;
 using namespace yarp::sig;
 using namespace iCub::ctrl;
-using namespace iCub::iKin;
 
 
 bool ServerVisualServoing::configure(ResourceFinder &rf)
