@@ -78,8 +78,6 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
 
     if (!setGazeController()) return false;
 
-    if (!setTorsoRemoteControlboard()) return false;
-
     if (!setRightArmCartesianController()) return false;
 
 
@@ -1455,35 +1453,6 @@ bool ServerVisualServoing::setGazeController()
 }
 
 
-bool ServerVisualServoing::setTorsoRemoteControlboard()
-{
-    Property torso_remote_options;
-    torso_remote_options.put("device", "remote_controlboard");
-    torso_remote_options.put("local",  "/visual_servoing/control_torso");
-    torso_remote_options.put("remote", "/"+robot_name_+"/torso");
-
-    torso_remote_driver_.open(torso_remote_options);
-    if (torso_remote_driver_.isValid())
-    {
-        yInfo() << "Torso remote_controlboard succefully opened.";
-
-        torso_remote_driver_.view(itf_torso_enc_);
-        if (!itf_torso_enc_)
-        {
-            yError() << "Error getting torso IEncoders interface.";
-            return false;
-        }
-        
-        return true;
-    }
-    else
-    {
-        yError() << "Error opening Torso remote_controlboard device.";
-        return false;
-    }
-}
-
-
 bool ServerVisualServoing::setTorsoDOF()
 {
     Vector curDOF;
@@ -1525,17 +1494,6 @@ bool ServerVisualServoing::unsetTorsoDOF()
     yInfo() << "New DOF: [" + curDOF.toString(0) + "]";
     
     return true;
-}
-
-
-Vector ServerVisualServoing::readTorso()
-{
-    Vector torso_enc(3);
-    itf_torso_enc_->getEncoders(torso_enc.data());
-    
-    std::swap(torso_enc(0), torso_enc(2));
-    
-    return torso_enc;
 }
 
 

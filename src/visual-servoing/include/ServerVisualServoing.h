@@ -49,9 +49,6 @@ private:
     yarp::dev::PolyDriver         gaze_driver_;
     yarp::dev::IGazeControl     * itf_gaze_;
 
-    yarp::dev::PolyDriver         torso_remote_driver_;
-    yarp::dev::IEncoders        * itf_torso_enc_;
-
     yarp::sig::Vector             goal_pose_;
     yarp::sig::Matrix             l_proj_;
     yarp::sig::Matrix             r_proj_;
@@ -95,16 +92,10 @@ private:
     bool setGazeController();
 
 
-    bool setTorsoRemoteControlboard();
-
-
     bool setTorsoDOF();
 
 
     bool unsetTorsoDOF();
-
-
-    yarp::sig::Vector readTorso();
 
 
     void getPalmPoints(const yarp::sig::Vector& endeffector, yarp::sig::Vector& p0, yarp::sig::Vector& p1, yarp::sig::Vector& p2, yarp::sig::Vector& p3);
