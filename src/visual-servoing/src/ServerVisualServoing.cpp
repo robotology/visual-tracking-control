@@ -1577,20 +1577,6 @@ Vector ServerVisualServoing::readTorso()
 }
 
 
-Vector ServerVisualServoing::readRootToFingers()
-{
-    Vector rightarm_encoder(16);
-    itf_rightarm_enc_->getEncoders(rightarm_encoder.data());
-    
-    Vector root_fingers_enc(19);
-    root_fingers_enc.setSubvector(0, readTorso());
-    
-    root_fingers_enc.setSubvector(3, rightarm_encoder);
-    
-    return root_fingers_enc;
-}
-
-
 void ServerVisualServoing::getPalmPoints(const Vector& endeffector, Vector& p0, Vector& p1, Vector& p2, Vector& p3)
 {
     Vector ee_x = endeffector.subVector(0, 2);

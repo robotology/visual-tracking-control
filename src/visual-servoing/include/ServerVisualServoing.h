@@ -115,9 +115,6 @@ private:
     yarp::sig::Vector readTorso();
 
 
-    yarp::sig::Vector readRootToFingers();
-
-
     void getPalmPoints(const yarp::sig::Vector& endeffector, yarp::sig::Vector& p0, yarp::sig::Vector& p1, yarp::sig::Vector& p2, yarp::sig::Vector& p3);
 
     
