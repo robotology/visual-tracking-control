@@ -30,53 +30,52 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
         return false;
     }
 
+
     if (!port_estimates_left_in_.open("/visual_servoing/estimates/left:i"))
     {
         yError() << "Could not open /visual_servoing/estimates/left:i port! Closing.";
         return false;
     }
-
     if (!port_estimates_right_in_.open("/visual_servoing/estimates/right:i"))
     {
         yError() << "Could not open /visual_servoing/estimates/right:i port! Closing.";
         return false;
     }
 
+
     if (!port_image_left_in_.open("/visual_servoing/cam_left/img:i"))
     {
         yError() << "Could not open /visual_servoing/cam_left/img:i port! Closing.";
         return false;
     }
-
     if (!port_image_left_out_.open("/visual_servoing/cam_left/img:o"))
     {
         yError() << "Could not open /visual_servoing/cam_left/img:o port! Closing.";
         return false;
     }
-
     if (!port_click_left_.open("/visual_servoing/cam_left/click:i"))
     {
         yError() << "Could not open /visual_servoing/cam_left/click:in port! Closing.";
         return false;
     }
 
+
     if (!port_image_right_in_.open("/visual_servoing/cam_right/img:i"))
     {
         yError() << "Could not open /visual_servoing/cam_right/img:i port! Closing.";
         return false;
     }
-
     if (!port_image_right_out_.open("/visual_servoing/cam_right/img:o"))
     {
         yError() << "Could not open /visual_servoing/cam_right/img:o port! Closing.";
         return false;
     }
-
     if (!port_click_right_.open("/visual_servoing/cam_right/click:i"))
     {
         yError() << "Could not open /visual_servoing/cam_right/click:i port! Closing.";
         return false;
     }
+
 
     if (!setGazeController()) return false;
 
@@ -86,16 +85,17 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
 
     if (!setRightArmCartesianController()) return false;
 
+
     Bottle btl_cam_info;
     itf_gaze_->getInfo(btl_cam_info);
     yInfo() << "[CAM INFO]" << btl_cam_info.toString();
     Bottle* cam_left_info = btl_cam_info.findGroup("camera_intrinsics_left").get(1).asList();
     Bottle* cam_right_info = btl_cam_info.findGroup("camera_intrinsics_right").get(1).asList();
 
-    float left_fx  = static_cast<float>(cam_left_info->get(0).asDouble());
-    float left_cx  = static_cast<float>(cam_left_info->get(2).asDouble());
-    float left_fy  = static_cast<float>(cam_left_info->get(5).asDouble());
-    float left_cy  = static_cast<float>(cam_left_info->get(6).asDouble());
+    float left_fx = static_cast<float>(cam_left_info->get(0).asDouble());
+    float left_cx = static_cast<float>(cam_left_info->get(2).asDouble());
+    float left_fy = static_cast<float>(cam_left_info->get(5).asDouble());
+    float left_cy = static_cast<float>(cam_left_info->get(6).asDouble());
 
     yInfo() << "[CAM]" << "Left camera:";
     yInfo() << "[CAM]" << " - fx:"     << left_fx;
@@ -103,12 +103,12 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     yInfo() << "[CAM]" << " - cx:"     << left_cx;
     yInfo() << "[CAM]" << " - cy:"     << left_cy;
 
-    l_proj_ = zeros(3, 4);
-    l_proj_(0, 0)  = left_fx;
-    l_proj_(0, 2)  = left_cx;
-    l_proj_(1, 1)  = left_fy;
-    l_proj_(1, 2)  = left_cy;
-    l_proj_(2, 2)  = 1.0;
+    l_proj_       = zeros(3, 4);
+    l_proj_(0, 0) = left_fx;
+    l_proj_(0, 2) = left_cx;
+    l_proj_(1, 1) = left_fy;
+    l_proj_(1, 2) = left_cy;
+    l_proj_(2, 2) = 1.0;
 
     yInfo() << "l_proj_ =\n" << l_proj_.toString();
 
@@ -123,12 +123,12 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     yInfo() << "[CAM]" << " - cx:"     << right_cx;
     yInfo() << "[CAM]" << " - cy:"     << right_cy;
 
-    r_proj_ = zeros(3, 4);
-    r_proj_(0, 0)  = right_fx;
-    r_proj_(0, 2)  = right_cx;
-    r_proj_(1, 1)  = right_fy;
-    r_proj_(1, 2)  = right_cy;
-    r_proj_(2, 2)  = 1.0;
+    r_proj_       = zeros(3, 4);
+    r_proj_(0, 0) = right_fx;
+    r_proj_(0, 2) = right_cx;
+    r_proj_(1, 1) = right_fy;
+    r_proj_(1, 2) = right_cy;
+    r_proj_(2, 2) = 1.0;
 
     yInfo() << "r_proj_ =\n" << r_proj_.toString();
 
