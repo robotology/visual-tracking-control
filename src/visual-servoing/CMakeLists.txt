@@ -20,7 +20,14 @@ set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
         src/ServerVisualServoing.cpp)
 
-add_executable(${EXE_TARGET_NAME} ${${EXE_TARGET_NAME}_HDR} ${${EXE_TARGET_NAME}_SRC})
+set(${EXE_TARGET_NAME}_THRIFT_HDR
+        thrift/idl_servervisualservoing.thrift)
+
+# Application target calls
+yarp_add_idl(${EXE_TARGET_NAME}_THRIFT_SRC ${${EXE_TARGET_NAME}_THRIFT_HDR})
+
+add_executable(${EXE_TARGET_NAME}   ${${EXE_TARGET_NAME}_HDR} ${${EXE_TARGET_NAME}_SRC}
+                                    ${${EXE_TARGET_NAME}_THRIFT_SRC})
 
 target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                                       ${ICUB_INCLUDE_DIRS}
