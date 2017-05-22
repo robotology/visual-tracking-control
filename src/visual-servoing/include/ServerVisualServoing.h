@@ -1,3 +1,6 @@
+#ifndef SERVERVISUALSERVOING_H
+#define SERVERVISUALSERVOING_H
+
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/ControlBoardInterfaces.h>
@@ -135,3 +138,5 @@ private:
     
     yarp::sig::Vector getAxisAngle(const yarp::sig::Vector& v);
 };
+
+#endif
