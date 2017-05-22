@@ -4,7 +4,7 @@ else()
     cmake_minimum_required(VERSION 3.0)
 endif()
 
-project(hand-tracking-suite
+project(visual-tracking-control
         LANGUAGES CXX
         VERSION 0.4.0.0)
 
