@@ -72,9 +72,10 @@ protected:
     bool                                           use_mean_       = false;
     bool                                           use_mode_       = true;
 
-    yarp::os::Port                                 port_rpc_command_;
-    bool                                           setCommandPort();
 
+    yarp::os::Port           port_rpc_command_;
+    bool                     attach(yarp::os::Port &source);
+    bool                     setCommandPort();
 
     bool                     use_analogs(const bool status) override;
 

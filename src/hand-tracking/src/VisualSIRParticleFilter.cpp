@@ -235,6 +235,12 @@ void VisualSIRParticleFilter::runFilter()
 void VisualSIRParticleFilter::getResult() { }
 
 
+bool VisualSIRParticleFilter::attach(yarp::os::Port &source)
+{
+    return this->yarp().attachAsServer(source);
+}
+
+
 bool VisualSIRParticleFilter::setCommandPort()
 {
     std::cout << "Opening RPC command port." << std::endl;
@@ -243,7 +249,7 @@ bool VisualSIRParticleFilter::setCommandPort()
         std::cerr << "Cannot open the RPC command port." << std::endl;
         return false;
     }
-    if (!this->yarp().attachAsServer(port_rpc_command_))
+    if (!attach(port_rpc_command_))
     {
         std::cerr << "Cannot attach the RPC command port." << std::endl;
         return false;
