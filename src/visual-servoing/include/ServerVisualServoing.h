@@ -32,9 +32,6 @@ public:
     bool updateModule();
 
 
-    bool respond(const yarp::os::Bottle& command, yarp::os::Bottle& reply);
-
-
     bool interruptModule();
 
 

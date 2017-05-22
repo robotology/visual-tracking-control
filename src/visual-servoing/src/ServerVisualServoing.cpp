@@ -868,474 +868,6 @@ bool ServerVisualServoing::updateModule()
 }
 
 
-bool ServerVisualServoing::respond(const Bottle& command, Bottle& reply)
-{
-    int cmd = command.get(0).asVocab();
-    switch (cmd)
-    {
-        /* Go to initial position (open-loop) */
-        case VOCAB4('i', 'n', 'i', 't'):
-        {
-            /* Trial 27/04/17 */
-            // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
-//            Vector od(4);
-//            od[0] =  0.140;
-//            od[1] = -0.989;
-//            od[2] =  0.026;
-//            od[3] =  2.693;
-
-            /* Trial 17/05/17 */
-            // -0.300 0.088 0.080 -0.245 0.845 -0.473 2.896
-            Vector od(4);
-            od[0] = -0.245;
-            od[1] =  0.845;
-            od[2] = -0.473;
-            od[3] =  2.896;
-
-            /* KARATE */
-//            // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
-//            Matrix Od = zeros(3, 3);
-//            Od(0, 0) = -1.0;
-//            Od(2, 1) = -1.0;
-//            Od(1, 2) = -1.0;
-//            Vector od = dcm2axis(Od);
-
-            /* GRASPING */
-//            Vector od = zeros(4);
-//            od(0) = -0.141;
-//            od(1) =  0.612;
-//            od(2) = -0.777;
-//            od(4) =  3.012;
-
-            /* SIM */
-//            Matrix Od(3, 3);
-//            Od(0, 0) = -1.0;
-//            Od(1, 1) = -1.0;
-//            Od(2, 2) =  1.0;
-//            Vector od = dcm2axis(Od);
-
-
-            double traj_time = 0.0;
-            itf_rightarm_cart_->getTrajTime(&traj_time);
-
-            if (traj_time == traj_time_)
-            {
-                Vector init_pos = zeros(3);
-
-                //FIXME: to implement
-//                init_pos[0] = -0.345;
-//                init_pos[1] =  0.139;
-//                init_pos[2] =  0.089;
-
-                /* Trial 27/04/17 */
-                // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
-//                init_pos[0] = -0.346;
-//                init_pos[1] =  0.133;
-//                init_pos[2] =  0.162;
-
-                /* Trial 17/05/17 */
-                // -0.300 0.088 0.080 -0.245 0.845 -0.473 2.896
-                init_pos[0] = -0.300;
-                init_pos[1] =  0.088;
-                init_pos[2] =  0.080;
-
-                /* KARATE init */
-                // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
-//                init_pos[0] = -0.319;
-//                init_pos[1] =  0.128;
-//                init_pos[2] =  0.075;
-
-                /* GRASPING init */
-//                init_pos[0] = -0.370;
-//                init_pos[1] =  0.103;
-//                init_pos[2] =  0.064;
-
-                /* SIM init 1 */
-//                init_pos[0] = -0.416;
-//                init_pos[1] =  0.024 + 0.1;
-//                init_pos[2] =  0.055;
-
-                /* SIM init 2 */
-//                init_pos[0] = -0.35;
-//                init_pos[1] =  0.025 + 0.05;
-//                init_pos[2] =  0.10;
-
-                yInfo() << "Init: " << init_pos.toString() << " " << od.toString();
-
-                unsetTorsoDOF();
-
-//                itf_rightarm_cart_->setLimits(0,  15.0,  15.0);
-//                itf_rightarm_cart_->setLimits(2, -23.0, -23.0);
-//                itf_rightarm_cart_->setLimits(3, -16.0, -16.0);
-//                itf_rightarm_cart_->setLimits(4,  53.0,  53.0);
-//                itf_rightarm_cart_->setLimits(5,   0.0,   0.0);
-//                itf_rightarm_cart_->setLimits(7, -58.0, -58.0);
-
-                itf_rightarm_cart_->goToPoseSync(init_pos, od);
-                itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
-                itf_rightarm_cart_->stopControl();
-
-                itf_rightarm_cart_->removeTipFrame();
-
-                itf_rightarm_cart_->storeContext(&ctx_cart_);
-
-
-                /* Normal trials */
-//                Vector gaze_loc(3);
-//                gaze_loc[0] = init_pos[0];
-//                gaze_loc[1] = init_pos[1];
-//                gaze_loc[2] = init_pos[2];
-
-                /* Trial 27/04/17 */
-                // -6.706 1.394 -3.618
-//                Vector gaze_loc(3);
-//                gaze_loc[0] = -6.706;
-//                gaze_loc[1] =  1.394;
-//                gaze_loc[2] = -3.618;
-
-                /* Trial 17/05/17 */
-                // -0.681 0.112 -0.240
-                Vector gaze_loc(3);
-                gaze_loc[0] = -0.681;
-                gaze_loc[1] =  0.112;
-                gaze_loc[2] = -0.240;
-
-                yInfo() << "Fixation point: " << gaze_loc.toString();
-
-                itf_gaze_->lookAtFixationPointSync(gaze_loc);
-                itf_gaze_->waitMotionDone(0.1, 10.0);
-                itf_gaze_->stopControl();
-
-                itf_gaze_->storeContext(&ctx_gaze_);
-
-
-                reply.addString("ack");
-            }
-            else
-            {
-                reply.addString("nack");
-            }
-
-            break;
-        }
-            /* Get 3D point from Structure From Motion clicking on the left camera image */
-            /* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
-        case VOCAB3('s', 'f', 'm'):
-        {
-            Vector left_eye_x;
-            Vector left_eye_o;
-            itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
-
-            Vector right_eye_x;
-            Vector right_eye_o;
-            itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
-
-            yInfo() << "left_eye_o =" << left_eye_o.toString();
-            yInfo() << "right_eye_o =" << right_eye_o.toString();
-
-
-            l_H_eye_to_r_ = axis2dcm(left_eye_o);
-            left_eye_x.push_back(1.0);
-            l_H_eye_to_r_.setCol(3, left_eye_x);
-            l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
-
-            r_H_eye_to_r_ = axis2dcm(right_eye_o);
-            right_eye_x.push_back(1.0);
-            r_H_eye_to_r_.setCol(3, right_eye_x);
-            r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
-
-            yInfo() << "l_H_r_to_eye_ =\n" << l_H_r_to_eye_.toString();
-            yInfo() << "r_H_r_to_eye_ =\n" << r_H_r_to_eye_.toString();
-
-            l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
-            r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
-
-
-            Network yarp;
-            Bottle  cmd;
-            Bottle  rep;
-
-            Bottle* click_left = port_click_left_.read(true);
-            Vector l_click = zeros(2);
-            l_click[0] = click_left->get(0).asDouble();
-            l_click[1] = click_left->get(1).asDouble();
-
-            RpcClient port_sfm;
-            port_sfm.open("/visual-servoing/tosfm");
-            yarp.connect("/visual-servoing/tosfm", "/SFM/rpc");
-
-            cmd.clear();
-
-            cmd.addInt(l_click[0]);
-            cmd.addInt(l_click[1]);
-
-            Bottle reply_pos;
-            port_sfm.write(cmd, reply_pos);
-            if (reply_pos.size() == 5)
-            {
-                Matrix R_ee = zeros(3, 3);
-                R_ee(0, 0) = -1.0;
-                R_ee(1, 1) =  1.0;
-                R_ee(2, 2) = -1.0;
-                Vector ee_o = dcm2axis(R_ee);
-
-                Vector sfm_pos = zeros(3);
-                sfm_pos[0] = reply_pos.get(0).asDouble();
-                sfm_pos[1] = reply_pos.get(1).asDouble();
-                sfm_pos[2] = reply_pos.get(2).asDouble();
-
-                Vector p = zeros(7);
-                p.setSubvector(0, sfm_pos.subVector(0, 2));
-                p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-
-                goal_pose_ = p;
-                yInfo() << "Goal: " << goal_pose_.toString();
-
-                Vector p0 = zeros(4);
-                Vector p1 = zeros(4);
-                Vector p2 = zeros(4);
-                Vector p3 = zeros(4);
-                getPalmPoints(p, p0, p1, p2, p3);
-
-                yInfo() << "goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
-
-
-                Vector l_px0_goal = l_H_r_to_cam_ * p0;
-                l_px0_goal[0] /= l_px0_goal[2];
-                l_px0_goal[1] /= l_px0_goal[2];
-                Vector l_px1_goal = l_H_r_to_cam_ * p1;
-                l_px1_goal[0] /= l_px1_goal[2];
-                l_px1_goal[1] /= l_px1_goal[2];
-                Vector l_px2_goal = l_H_r_to_cam_ * p2;
-                l_px2_goal[0] /= l_px2_goal[2];
-                l_px2_goal[1] /= l_px2_goal[2];
-                Vector l_px3_goal = l_H_r_to_cam_ * p3;
-                l_px3_goal[0] /= l_px3_goal[2];
-                l_px3_goal[1] /= l_px3_goal[2];
-
-                l_px_goal_.resize(8);
-                l_px_goal_[0] = l_px0_goal[0];
-                l_px_goal_[1] = l_px0_goal[1];
-                l_px_goal_[2] = l_px1_goal[0];
-                l_px_goal_[3] = l_px1_goal[1];
-                l_px_goal_[4] = l_px2_goal[0];
-                l_px_goal_[5] = l_px2_goal[1];
-                l_px_goal_[6] = l_px3_goal[0];
-                l_px_goal_[7] = l_px3_goal[1];
-
-
-                Vector r_px0_goal = r_H_r_to_cam_ * p0;
-                r_px0_goal[0] /= r_px0_goal[2];
-                r_px0_goal[1] /= r_px0_goal[2];
-                Vector r_px1_goal = r_H_r_to_cam_ * p1;
-                r_px1_goal[0] /= r_px1_goal[2];
-                r_px1_goal[1] /= r_px1_goal[2];
-                Vector r_px2_goal = r_H_r_to_cam_ * p2;
-                r_px2_goal[0] /= r_px2_goal[2];
-                r_px2_goal[1] /= r_px2_goal[2];
-                Vector r_px3_goal = r_H_r_to_cam_ * p3;
-                r_px3_goal[0] /= r_px3_goal[2];
-                r_px3_goal[1] /= r_px3_goal[2];
-
-                r_px_goal_.resize(8);
-                r_px_goal_[0] = r_px0_goal[0];
-                r_px_goal_[1] = r_px0_goal[1];
-                r_px_goal_[2] = r_px1_goal[0];
-                r_px_goal_[3] = r_px1_goal[1];
-                r_px_goal_[4] = r_px2_goal[0];
-                r_px_goal_[5] = r_px2_goal[1];
-                r_px_goal_[6] = r_px3_goal[0];
-                r_px_goal_[7] = r_px3_goal[1];
-            }
-            else
-            {
-                reply.addString("nack");
-            }
-
-            yarp.disconnect("/visual-servoing/tosfm", "/SFM/rpc");
-            port_sfm.close();
-
-            reply = command;
-
-            break;
-        }
-            /* Set a fixed goal in pixel coordinates */
-            /* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
-        case VOCAB4('g', 'o', 'a', 'l'):
-        {
-            Vector left_eye_x;
-            Vector left_eye_o;
-            itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
-
-            Vector right_eye_x;
-            Vector right_eye_o;
-            itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
-
-            yInfo() << "left_eye_o = ["  << left_eye_o.toString()  << "]";
-            yInfo() << "right_eye_o = [" << right_eye_o.toString() << "]";
-
-
-            l_H_eye_to_r_ = axis2dcm(left_eye_o);
-            left_eye_x.push_back(1.0);
-            l_H_eye_to_r_.setCol(3, left_eye_x);
-            l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
-
-            r_H_eye_to_r_ = axis2dcm(right_eye_o);
-            right_eye_x.push_back(1.0);
-            r_H_eye_to_r_.setCol(3, right_eye_x);
-            r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
-
-            yInfo() << "l_H_r_to_eye_ = [\n" << l_H_r_to_eye_.toString() << "]";
-            yInfo() << "r_H_r_to_eye_ = [\n" << r_H_r_to_eye_.toString() << "]";
-
-            l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
-            r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
-
-
-            /* Hand pointing forward, palm looking down */
-//            Matrix R_ee = zeros(3, 3);
-//            R_ee(0, 0) = -1.0;
-//            R_ee(1, 1) =  1.0;
-//            R_ee(2, 2) = -1.0;
-//            Vector ee_o = dcm2axis(R_ee);
-
-            /* Trial 27/04/17 */
-            // -0.323 0.018 0.121 0.310 -0.873 0.374 3.008
-//            Vector p = zeros(6);
-//            p[0] = -0.323;
-//            p[1] =  0.018;
-//            p[2] =  0.121;
-//            p[3] =  0.310 * 3.008;
-//            p[4] = -0.873 * 3.008;
-//            p[5] =  0.374 * 3.008;
-
-            /* Trial 17/05/17 */
-            // -0.284 0.013 0.104 -0.370 0.799 -0.471 2.781
-            Vector p = zeros(6);
-            p[0] = -0.284;
-            p[1] =  0.013;
-            p[2] =  0.104;
-            p[3] = -0.370 * 2.781;
-            p[4] =  0.799 * 2.781;
-            p[5] = -0.471 * 2.781;
-
-            /* KARATE */
-//            Vector p = zeros(6);
-//            p[0] = -0.319;
-//            p[1] =  0.128;
-//            p[2] =  0.075;
-//            p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-
-            /* SIM init 1 */
-            // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
-//            Vector p = zeros(6);
-//            p[0] = -0.416;
-//            p[1] = -0.024;
-//            p[2] =  0.055;
-//            p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-
-            /* SIM init 2 */
-//            Vector p = zeros(6);
-//            p[0] = -0.35;
-//            p[1] =  0.025;
-//            p[2] =  0.10;
-//            p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-
-            goal_pose_ = p;
-            yInfo() << "Goal: " << goal_pose_.toString();
-
-            Vector p0 = zeros(4);
-            Vector p1 = zeros(4);
-            Vector p2 = zeros(4);
-            Vector p3 = zeros(4);
-            getPalmPoints(p, p0, p1, p2, p3);
-
-            yInfo() << "Goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
-
-
-            Vector l_px0_goal = l_H_r_to_cam_ * p0;
-            l_px0_goal[0] /= l_px0_goal[2];
-            l_px0_goal[1] /= l_px0_goal[2];
-            Vector l_px1_goal = l_H_r_to_cam_ * p1;
-            l_px1_goal[0] /= l_px1_goal[2];
-            l_px1_goal[1] /= l_px1_goal[2];
-            Vector l_px2_goal = l_H_r_to_cam_ * p2;
-            l_px2_goal[0] /= l_px2_goal[2];
-            l_px2_goal[1] /= l_px2_goal[2];
-            Vector l_px3_goal = l_H_r_to_cam_ * p3;
-            l_px3_goal[0] /= l_px3_goal[2];
-            l_px3_goal[1] /= l_px3_goal[2];
-
-            l_px_goal_.resize(8);
-            l_px_goal_[0] = l_px0_goal[0];
-            l_px_goal_[1] = l_px0_goal[1];
-            l_px_goal_[2] = l_px1_goal[0];
-            l_px_goal_[3] = l_px1_goal[1];
-            l_px_goal_[4] = l_px2_goal[0];
-            l_px_goal_[5] = l_px2_goal[1];
-            l_px_goal_[6] = l_px3_goal[0];
-            l_px_goal_[7] = l_px3_goal[1];
-
-
-            Vector r_px0_goal = r_H_r_to_cam_ * p0;
-            r_px0_goal[0] /= r_px0_goal[2];
-            r_px0_goal[1] /= r_px0_goal[2];
-            Vector r_px1_goal = r_H_r_to_cam_ * p1;
-            r_px1_goal[0] /= r_px1_goal[2];
-            r_px1_goal[1] /= r_px1_goal[2];
-            Vector r_px2_goal = r_H_r_to_cam_ * p2;
-            r_px2_goal[0] /= r_px2_goal[2];
-            r_px2_goal[1] /= r_px2_goal[2];
-            Vector r_px3_goal = r_H_r_to_cam_ * p3;
-            r_px3_goal[0] /= r_px3_goal[2];
-            r_px3_goal[1] /= r_px3_goal[2];
-
-            r_px_goal_.resize(8);
-            r_px_goal_[0] = r_px0_goal[0];
-            r_px_goal_[1] = r_px0_goal[1];
-            r_px_goal_[2] = r_px1_goal[0];
-            r_px_goal_[3] = r_px1_goal[1];
-            r_px_goal_[4] = r_px2_goal[0];
-            r_px_goal_[5] = r_px2_goal[1];
-            r_px_goal_[6] = r_px3_goal[0];
-            r_px_goal_[7] = r_px3_goal[1];
-
-
-            reply = command;
-
-            break;
-        }
-            /* Start reaching phase */
-        case VOCAB2('g','o'):
-        {
-            reply = command;
-            take_estimates_ = true;
-
-            break;
-        }
-            /* Safely close the application */
-        case VOCAB4('q','u','i','t'):
-        {
-            itf_rightarm_cart_->stopControl();
-            itf_gaze_->stopControl();
-
-            should_stop_    = true;
-            take_estimates_ = true;
-
-            reply = command;
-
-            break;
-        }
-        default:
-        {
-            reply.addString("nack");
-        }
-    }
-
-    return true;
-}
-
-
 bool ServerVisualServoing::interruptModule()
 {
     yInfo() << "Interrupting module...";
@@ -1379,9 +911,466 @@ bool ServerVisualServoing::close()
     if (rightarm_cartesian_driver_.isValid()) rightarm_cartesian_driver_.close();
     if (gaze_driver_.isValid())               gaze_driver_.close();
 
-    handler_port_.close();
-
     yInfo() << "...done!";
+    return true;
+}
+
+
+std::vector<std::string> ServerVisualServoing::get_info()
+{
+    std::vector<std::string> info;
+
+    info.push_back("Unimplemented...!");
+
+    return info;
+}
+
+
+/* Go to initial position (open-loop) */
+bool ServerVisualServoing::init(const std::string& label)
+{
+    /* Trial 27/04/17 */
+    // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
+//    Vector od(4);
+//    od[0] =  0.140;
+//    od[1] = -0.989;
+//    od[2] =  0.026;
+//    od[3] =  2.693;
+
+    /* Trial 17/05/17 */
+    // -0.300 0.088 0.080 -0.245 0.845 -0.473 2.896
+    Vector od(4);
+    od[0] = -0.245;
+    od[1] =  0.845;
+    od[2] = -0.473;
+    od[3] =  2.896;
+
+    /* KARATE */
+    // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
+//    Matrix Od = zeros(3, 3);
+//    Od(0, 0) = -1.0;
+//    Od(2, 1) = -1.0;
+//    Od(1, 2) = -1.0;
+//    Vector od = dcm2axis(Od);
+
+    /* GRASPING */
+//    Vector od = zeros(4);
+//    od(0) = -0.141;
+//    od(1) =  0.612;
+//    od(2) = -0.777;
+//    od(4) =  3.012;
+
+    /* SIM */
+//    Matrix Od(3, 3);
+//    Od(0, 0) = -1.0;
+//    Od(1, 1) = -1.0;
+//    Od(2, 2) =  1.0;
+//    Vector od = dcm2axis(Od);
+
+
+    double traj_time = 0.0;
+    itf_rightarm_cart_->getTrajTime(&traj_time);
+
+    if (traj_time == traj_time_)
+    {
+        Vector init_pos = zeros(3);
+
+        //FIXME: to implement
+//        init_pos[0] = -0.345;
+//        init_pos[1] =  0.139;
+//        init_pos[2] =  0.089;
+
+        /* Trial 27/04/17 */
+        // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
+//        init_pos[0] = -0.346;
+//        init_pos[1] =  0.133;
+//        init_pos[2] =  0.162;
+
+        /* Trial 17/05/17 */
+        // -0.300 0.088 0.080 -0.245 0.845 -0.473 2.896
+        init_pos[0] = -0.300;
+        init_pos[1] =  0.088;
+        init_pos[2] =  0.080;
+
+        /* KARATE init */
+        // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
+//        init_pos[0] = -0.319;
+//        init_pos[1] =  0.128;
+//        init_pos[2] =  0.075;
+
+        /* GRASPING init */
+//        init_pos[0] = -0.370;
+//        init_pos[1] =  0.103;
+//        init_pos[2] =  0.064;
+
+        /* SIM init 1 */
+//        init_pos[0] = -0.416;
+//        init_pos[1] =  0.024 + 0.1;
+//        init_pos[2] =  0.055;
+
+        /* SIM init 2 */
+//        init_pos[0] = -0.35;
+//        init_pos[1] =  0.025 + 0.05;
+//        init_pos[2] =  0.10;
+
+        yInfo() << "Init: " << init_pos.toString() << " " << od.toString();
+
+        unsetTorsoDOF();
+
+//        itf_rightarm_cart_->setLimits(0,  15.0,  15.0);
+//        itf_rightarm_cart_->setLimits(2, -23.0, -23.0);
+//        itf_rightarm_cart_->setLimits(3, -16.0, -16.0);
+//        itf_rightarm_cart_->setLimits(4,  53.0,  53.0);
+//        itf_rightarm_cart_->setLimits(5,   0.0,   0.0);
+//        itf_rightarm_cart_->setLimits(7, -58.0, -58.0);
+
+        itf_rightarm_cart_->goToPoseSync(init_pos, od);
+        itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
+        itf_rightarm_cart_->stopControl();
+
+        itf_rightarm_cart_->removeTipFrame();
+
+        itf_rightarm_cart_->storeContext(&ctx_cart_);
+
+
+        /* Normal trials */
+//        Vector gaze_loc(3);
+//        gaze_loc[0] = init_pos[0];
+//        gaze_loc[1] = init_pos[1];
+//        gaze_loc[2] = init_pos[2];
+
+        /* Trial 27/04/17 */
+        // -6.706 1.394 -3.618
+//        Vector gaze_loc(3);
+//        gaze_loc[0] = -6.706;
+//        gaze_loc[1] =  1.394;
+//        gaze_loc[2] = -3.618;
+
+        /* Trial 17/05/17 */
+        // -0.681 0.112 -0.240
+        Vector gaze_loc(3);
+        gaze_loc[0] = -0.681;
+        gaze_loc[1] =  0.112;
+        gaze_loc[2] = -0.240;
+
+        yInfo() << "Fixation point: " << gaze_loc.toString();
+
+        itf_gaze_->lookAtFixationPointSync(gaze_loc);
+        itf_gaze_->waitMotionDone(0.1, 10.0);
+        itf_gaze_->stopControl();
+
+        itf_gaze_->storeContext(&ctx_gaze_);
+    }
+    else
+        return false;
+
+    return true;
+}
+
+
+/* Set a fixed goal in pixel coordinates */
+/* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
+bool ServerVisualServoing::set_goal(const std::string& label)
+{
+    Vector left_eye_x;
+    Vector left_eye_o;
+    itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+
+    Vector right_eye_x;
+    Vector right_eye_o;
+    itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+
+    yInfo() << "left_eye_o = ["  << left_eye_o.toString()  << "]";
+    yInfo() << "right_eye_o = [" << right_eye_o.toString() << "]";
+
+
+    l_H_eye_to_r_ = axis2dcm(left_eye_o);
+    left_eye_x.push_back(1.0);
+    l_H_eye_to_r_.setCol(3, left_eye_x);
+    l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
+
+    r_H_eye_to_r_ = axis2dcm(right_eye_o);
+    right_eye_x.push_back(1.0);
+    r_H_eye_to_r_.setCol(3, right_eye_x);
+    r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
+
+    yInfo() << "l_H_r_to_eye_ = [\n" << l_H_r_to_eye_.toString() << "]";
+    yInfo() << "r_H_r_to_eye_ = [\n" << r_H_r_to_eye_.toString() << "]";
+
+    l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
+    r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
+
+
+    /* Hand pointing forward, palm looking down */
+//    Matrix R_ee = zeros(3, 3);
+//    R_ee(0, 0) = -1.0;
+//    R_ee(1, 1) =  1.0;
+//    R_ee(2, 2) = -1.0;
+//    Vector ee_o = dcm2axis(R_ee);
+
+    /* Trial 27/04/17 */
+    // -0.323 0.018 0.121 0.310 -0.873 0.374 3.008
+//    Vector p = zeros(6);
+//    p[0] = -0.323;
+//    p[1] =  0.018;
+//    p[2] =  0.121;
+//    p[3] =  0.310 * 3.008;
+//    p[4] = -0.873 * 3.008;
+//    p[5] =  0.374 * 3.008;
+
+    /* Trial 17/05/17 */
+    // -0.284 0.013 0.104 -0.370 0.799 -0.471 2.781
+    Vector p = zeros(6);
+    p[0] = -0.284;
+    p[1] =  0.013;
+    p[2] =  0.104;
+    p[3] = -0.370 * 2.781;
+    p[4] =  0.799 * 2.781;
+    p[5] = -0.471 * 2.781;
+
+    /* KARATE */
+//    Vector p = zeros(6);
+//    p[0] = -0.319;
+//    p[1] =  0.128;
+//    p[2] =  0.075;
+//    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+    /* SIM init 1 */
+    // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
+//    Vector p = zeros(6);
+//    p[0] = -0.416;
+//    p[1] = -0.024;
+//    p[2] =  0.055;
+//    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+    /* SIM init 2 */
+//    Vector p = zeros(6);
+//    p[0] = -0.35;
+//    p[1] =  0.025;
+//    p[2] =  0.10;
+//    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+    goal_pose_ = p;
+    yInfo() << "Goal: " << goal_pose_.toString();
+
+    Vector p0 = zeros(4);
+    Vector p1 = zeros(4);
+    Vector p2 = zeros(4);
+    Vector p3 = zeros(4);
+    getPalmPoints(p, p0, p1, p2, p3);
+
+    yInfo() << "Goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
+
+
+    Vector l_px0_goal = l_H_r_to_cam_ * p0;
+    l_px0_goal[0] /= l_px0_goal[2];
+    l_px0_goal[1] /= l_px0_goal[2];
+    Vector l_px1_goal = l_H_r_to_cam_ * p1;
+    l_px1_goal[0] /= l_px1_goal[2];
+    l_px1_goal[1] /= l_px1_goal[2];
+    Vector l_px2_goal = l_H_r_to_cam_ * p2;
+    l_px2_goal[0] /= l_px2_goal[2];
+    l_px2_goal[1] /= l_px2_goal[2];
+    Vector l_px3_goal = l_H_r_to_cam_ * p3;
+    l_px3_goal[0] /= l_px3_goal[2];
+    l_px3_goal[1] /= l_px3_goal[2];
+
+    l_px_goal_.resize(8);
+    l_px_goal_[0] = l_px0_goal[0];
+    l_px_goal_[1] = l_px0_goal[1];
+    l_px_goal_[2] = l_px1_goal[0];
+    l_px_goal_[3] = l_px1_goal[1];
+    l_px_goal_[4] = l_px2_goal[0];
+    l_px_goal_[5] = l_px2_goal[1];
+    l_px_goal_[6] = l_px3_goal[0];
+    l_px_goal_[7] = l_px3_goal[1];
+
+
+    Vector r_px0_goal = r_H_r_to_cam_ * p0;
+    r_px0_goal[0] /= r_px0_goal[2];
+    r_px0_goal[1] /= r_px0_goal[2];
+    Vector r_px1_goal = r_H_r_to_cam_ * p1;
+    r_px1_goal[0] /= r_px1_goal[2];
+    r_px1_goal[1] /= r_px1_goal[2];
+    Vector r_px2_goal = r_H_r_to_cam_ * p2;
+    r_px2_goal[0] /= r_px2_goal[2];
+    r_px2_goal[1] /= r_px2_goal[2];
+    Vector r_px3_goal = r_H_r_to_cam_ * p3;
+    r_px3_goal[0] /= r_px3_goal[2];
+    r_px3_goal[1] /= r_px3_goal[2];
+
+    r_px_goal_.resize(8);
+    r_px_goal_[0] = r_px0_goal[0];
+    r_px_goal_[1] = r_px0_goal[1];
+    r_px_goal_[2] = r_px1_goal[0];
+    r_px_goal_[3] = r_px1_goal[1];
+    r_px_goal_[4] = r_px2_goal[0];
+    r_px_goal_[5] = r_px2_goal[1];
+    r_px_goal_[6] = r_px3_goal[0];
+    r_px_goal_[7] = r_px3_goal[1];
+
+
+    return true;
+}
+
+
+/* Get 3D point from Structure From Motion clicking on the left camera image */
+/* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
+bool ServerVisualServoing::get_sfm_points()
+{
+    Vector left_eye_x;
+    Vector left_eye_o;
+    itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+
+    Vector right_eye_x;
+    Vector right_eye_o;
+    itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+
+    yInfo() << "left_eye_o =" << left_eye_o.toString();
+    yInfo() << "right_eye_o =" << right_eye_o.toString();
+
+
+    l_H_eye_to_r_ = axis2dcm(left_eye_o);
+    left_eye_x.push_back(1.0);
+    l_H_eye_to_r_.setCol(3, left_eye_x);
+    l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
+
+    r_H_eye_to_r_ = axis2dcm(right_eye_o);
+    right_eye_x.push_back(1.0);
+    r_H_eye_to_r_.setCol(3, right_eye_x);
+    r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
+
+    yInfo() << "l_H_r_to_eye_ =\n" << l_H_r_to_eye_.toString();
+    yInfo() << "r_H_r_to_eye_ =\n" << r_H_r_to_eye_.toString();
+
+    l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
+    r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
+
+
+    Network yarp;
+    Bottle  cmd;
+    Bottle  rep;
+
+    Bottle* click_left = port_click_left_.read(true);
+    Vector l_click = zeros(2);
+    l_click[0] = click_left->get(0).asDouble();
+    l_click[1] = click_left->get(1).asDouble();
+
+    RpcClient port_sfm;
+    port_sfm.open("/visual-servoing/tosfm");
+    yarp.connect("/visual-servoing/tosfm", "/SFM/rpc");
+
+    cmd.clear();
+
+    cmd.addInt(l_click[0]);
+    cmd.addInt(l_click[1]);
+
+    Bottle reply_pos;
+    port_sfm.write(cmd, reply_pos);
+    if (reply_pos.size() == 5)
+    {
+        Matrix R_ee = zeros(3, 3);
+        R_ee(0, 0) = -1.0;
+        R_ee(1, 1) =  1.0;
+        R_ee(2, 2) = -1.0;
+        Vector ee_o = dcm2axis(R_ee);
+
+        Vector sfm_pos = zeros(3);
+        sfm_pos[0] = reply_pos.get(0).asDouble();
+        sfm_pos[1] = reply_pos.get(1).asDouble();
+        sfm_pos[2] = reply_pos.get(2).asDouble();
+
+        Vector p = zeros(7);
+        p.setSubvector(0, sfm_pos.subVector(0, 2));
+        p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+        goal_pose_ = p;
+        yInfo() << "Goal: " << goal_pose_.toString();
+
+        Vector p0 = zeros(4);
+        Vector p1 = zeros(4);
+        Vector p2 = zeros(4);
+        Vector p3 = zeros(4);
+        getPalmPoints(p, p0, p1, p2, p3);
+
+        yInfo() << "goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
+
+
+        Vector l_px0_goal = l_H_r_to_cam_ * p0;
+        l_px0_goal[0] /= l_px0_goal[2];
+        l_px0_goal[1] /= l_px0_goal[2];
+        Vector l_px1_goal = l_H_r_to_cam_ * p1;
+        l_px1_goal[0] /= l_px1_goal[2];
+        l_px1_goal[1] /= l_px1_goal[2];
+        Vector l_px2_goal = l_H_r_to_cam_ * p2;
+        l_px2_goal[0] /= l_px2_goal[2];
+        l_px2_goal[1] /= l_px2_goal[2];
+        Vector l_px3_goal = l_H_r_to_cam_ * p3;
+        l_px3_goal[0] /= l_px3_goal[2];
+        l_px3_goal[1] /= l_px3_goal[2];
+
+        l_px_goal_.resize(8);
+        l_px_goal_[0] = l_px0_goal[0];
+        l_px_goal_[1] = l_px0_goal[1];
+        l_px_goal_[2] = l_px1_goal[0];
+        l_px_goal_[3] = l_px1_goal[1];
+        l_px_goal_[4] = l_px2_goal[0];
+        l_px_goal_[5] = l_px2_goal[1];
+        l_px_goal_[6] = l_px3_goal[0];
+        l_px_goal_[7] = l_px3_goal[1];
+
+
+        Vector r_px0_goal = r_H_r_to_cam_ * p0;
+        r_px0_goal[0] /= r_px0_goal[2];
+        r_px0_goal[1] /= r_px0_goal[2];
+        Vector r_px1_goal = r_H_r_to_cam_ * p1;
+        r_px1_goal[0] /= r_px1_goal[2];
+        r_px1_goal[1] /= r_px1_goal[2];
+        Vector r_px2_goal = r_H_r_to_cam_ * p2;
+        r_px2_goal[0] /= r_px2_goal[2];
+        r_px2_goal[1] /= r_px2_goal[2];
+        Vector r_px3_goal = r_H_r_to_cam_ * p3;
+        r_px3_goal[0] /= r_px3_goal[2];
+        r_px3_goal[1] /= r_px3_goal[2];
+
+        r_px_goal_.resize(8);
+        r_px_goal_[0] = r_px0_goal[0];
+        r_px_goal_[1] = r_px0_goal[1];
+        r_px_goal_[2] = r_px1_goal[0];
+        r_px_goal_[3] = r_px1_goal[1];
+        r_px_goal_[4] = r_px2_goal[0];
+        r_px_goal_[5] = r_px2_goal[1];
+        r_px_goal_[6] = r_px3_goal[0];
+        r_px_goal_[7] = r_px3_goal[1];
+    }
+    else
+        return false;
+
+    yarp.disconnect("/visual-servoing/tosfm", "/SFM/rpc");
+    port_sfm.close();
+
+    return true;
+}
+
+
+/* Start visual servoing */
+bool ServerVisualServoing::go()
+{
+    take_estimates_ = true;
+
+    return true;
+}
+
+
+/* Safely close the application */
+bool ServerVisualServoing::quit()
+{
+    itf_rightarm_cart_->stopControl();
+    itf_gaze_->stopControl();
+
+    should_stop_    = true;
+    take_estimates_ = true;
+
     return true;
 }
 
