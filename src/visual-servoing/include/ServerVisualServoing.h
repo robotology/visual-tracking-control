@@ -61,7 +61,6 @@ protected:
 private:
     yarp::os::ConstString         robot_name_;
 
-    yarp::os::Port                handler_port_;
     bool                          should_stop_ = false;
 
     yarp::dev::PolyDriver         rightarm_cartesian_driver_;

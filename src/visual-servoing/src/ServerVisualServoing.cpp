@@ -162,8 +162,11 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     yInfo() << "r_H_r_to_cam_ =\n" << r_H_r_to_cam_.toString();
 
 
-    handler_port_.open("/visual-servoing/cmd:i");
-    attach(handler_port_);
+    if (!setCommandPort())
+    {
+        yError() << "Could not open /visual-servoing/cmd:i port! Closing.";
+        return false;
+    }
 
     return true;
 }
@@ -1352,7 +1355,6 @@ bool ServerVisualServoing::interruptModule()
     port_image_right_in_.interrupt();
     port_image_right_out_.interrupt();
     port_click_right_.interrupt();
-    handler_port_.interrupt();
 
     yInfo() << "...done!";
     return true;
