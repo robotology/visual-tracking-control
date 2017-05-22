@@ -30,48 +30,48 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     }
 
 
-    if (!port_estimates_left_in_.open("/visual_servoing/estimates/left:i"))
+    if (!port_estimates_left_in_.open("/visual-servoing/estimates/left:i"))
     {
-        yError() << "Could not open /visual_servoing/estimates/left:i port! Closing.";
+        yError() << "Could not open /visual-servoing/estimates/left:i port! Closing.";
         return false;
     }
-    if (!port_estimates_right_in_.open("/visual_servoing/estimates/right:i"))
+    if (!port_estimates_right_in_.open("/visual-servoing/estimates/right:i"))
     {
-        yError() << "Could not open /visual_servoing/estimates/right:i port! Closing.";
-        return false;
-    }
-
-
-    if (!port_image_left_in_.open("/visual_servoing/cam_left/img:i"))
-    {
-        yError() << "Could not open /visual_servoing/cam_left/img:i port! Closing.";
-        return false;
-    }
-    if (!port_image_left_out_.open("/visual_servoing/cam_left/img:o"))
-    {
-        yError() << "Could not open /visual_servoing/cam_left/img:o port! Closing.";
-        return false;
-    }
-    if (!port_click_left_.open("/visual_servoing/cam_left/click:i"))
-    {
-        yError() << "Could not open /visual_servoing/cam_left/click:in port! Closing.";
+        yError() << "Could not open /visual-servoing/estimates/right:i port! Closing.";
         return false;
     }
 
 
-    if (!port_image_right_in_.open("/visual_servoing/cam_right/img:i"))
+    if (!port_image_left_in_.open("/visual-servoing/cam_left/img:i"))
     {
-        yError() << "Could not open /visual_servoing/cam_right/img:i port! Closing.";
+        yError() << "Could not open /visual-servoing/cam_left/img:i port! Closing.";
         return false;
     }
-    if (!port_image_right_out_.open("/visual_servoing/cam_right/img:o"))
+    if (!port_image_left_out_.open("/visual-servoing/cam_left/img:o"))
     {
-        yError() << "Could not open /visual_servoing/cam_right/img:o port! Closing.";
+        yError() << "Could not open /visual-servoing/cam_left/img:o port! Closing.";
         return false;
     }
-    if (!port_click_right_.open("/visual_servoing/cam_right/click:i"))
+    if (!port_click_left_.open("/visual-servoing/cam_left/click:i"))
     {
-        yError() << "Could not open /visual_servoing/cam_right/click:i port! Closing.";
+        yError() << "Could not open /visual-servoing/cam_left/click:in port! Closing.";
+        return false;
+    }
+
+
+    if (!port_image_right_in_.open("/visual-servoing/cam_right/img:i"))
+    {
+        yError() << "Could not open /visual-servoing/cam_right/img:i port! Closing.";
+        return false;
+    }
+    if (!port_image_right_out_.open("/visual-servoing/cam_right/img:o"))
+    {
+        yError() << "Could not open /visual-servoing/cam_right/img:o port! Closing.";
+        return false;
+    }
+    if (!port_click_right_.open("/visual-servoing/cam_right/click:i"))
+    {
+        yError() << "Could not open /visual-servoing/cam_right/click:i port! Closing.";
         return false;
     }
 
@@ -162,7 +162,7 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     yInfo() << "r_H_r_to_cam_ =\n" << r_H_r_to_cam_.toString();
 
 
-    handler_port_.open("/visual_servoing/cmd:i");
+    handler_port_.open("/visual-servoing/cmd:i");
     attach(handler_port_);
 
     return true;
@@ -1058,8 +1058,8 @@ bool ServerVisualServoing::respond(const Bottle& command, Bottle& reply)
             l_click[1] = click_left->get(1).asDouble();
 
             RpcClient port_sfm;
-            port_sfm.open("/visual_servoing/tosfm");
-            yarp.connect("/visual_servoing/tosfm", "/SFM/rpc");
+            port_sfm.open("/visual-servoing/tosfm");
+            yarp.connect("/visual-servoing/tosfm", "/SFM/rpc");
 
             cmd.clear();
 
@@ -1149,7 +1149,7 @@ bool ServerVisualServoing::respond(const Bottle& command, Bottle& reply)
                 reply.addString("nack");
             }
 
-            yarp.disconnect("/visual_servoing/tosfm", "/SFM/rpc");
+            yarp.disconnect("/visual-servoing/tosfm", "/SFM/rpc");
             port_sfm.close();
 
             reply = command;
@@ -1388,7 +1388,7 @@ bool ServerVisualServoing::setRightArmCartesianController()
 {
     Property rightarm_cartesian_options;
     rightarm_cartesian_options.put("device", "cartesiancontrollerclient");
-    rightarm_cartesian_options.put("local",  "/visual_servoing/cart_right_arm");
+    rightarm_cartesian_options.put("local",  "/visual-servoing/cart_right_arm");
     rightarm_cartesian_options.put("remote", "/"+robot_name_+"/cartesianController/right_arm");
 
     rightarm_cartesian_driver_.open(rightarm_cartesian_options);
@@ -1430,7 +1430,7 @@ bool ServerVisualServoing::setGazeController()
 {
     Property gaze_option;
     gaze_option.put("device", "gazecontrollerclient");
-    gaze_option.put("local",  "/visual_servoing/gaze");
+    gaze_option.put("local",  "/visual-servoing/gaze");
     gaze_option.put("remote", "/iKinGazeCtrl");
 
     gaze_driver_.open(gaze_option);
