@@ -1453,6 +1453,31 @@ bool ServerVisualServoing::setGazeController()
 }
 
 
+bool ServerVisualServoing::attach(yarp::os::Port &source)
+{
+    return this->yarp().attachAsServer(source);
+}
+
+
+bool ServerVisualServoing::setCommandPort()
+{
+    std::cout << "Opening RPC command port." << std::endl;
+    if (!port_rpc_command_.open("/visual-servoing/cmd:i"))
+    {
+        std::cerr << "Cannot open the RPC command port." << std::endl;
+        return false;
+    }
+    if (!attach(port_rpc_command_))
+    {
+        std::cerr << "Cannot attach the RPC command port." << std::endl;
+        return false;
+    }
+    std::cout << "RPC command port opened and attached. Ready to recieve commands!" << std::endl;
+
+    return true;
+}
+
+
 bool ServerVisualServoing::setTorsoDOF()
 {
     Vector curDOF;

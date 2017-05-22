@@ -1,6 +1,9 @@
 #ifndef SERVERVISUALSERVOING_H
 #define SERVERVISUALSERVOING_H
 
+#include <vector>
+
+#include <thrift/ServerVisualServoingIDL.h>
 #include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/IEncoders.h>
@@ -16,7 +19,8 @@
 #include <yarp/sig/Vector.h>
 
 
-class ServerVisualServoing : public yarp::os::RFModule
+class ServerVisualServoing : public yarp::os::RFModule,
+                             public ServerVisualServoingIDL
 {
 public:
     bool configure(yarp::os::ResourceFinder &rf);
@@ -36,6 +40,23 @@ public:
 
     bool close();
 
+protected:
+    std::vector<std::string> get_info();
+
+
+    bool init(const std::string& label);
+
+
+    bool set_goal(const std::string& label);
+
+
+    bool get_sfm_points();
+
+
+    bool go();
+
+
+    bool quit();
 
 private:
     yarp::os::ConstString         robot_name_;
@@ -90,6 +111,11 @@ private:
 
 
     bool setGazeController();
+
+
+    yarp::os::Port port_rpc_command_;
+    bool           attach(yarp::os::Port &source);
+    bool           setCommandPort();
 
 
     bool setTorsoDOF();
