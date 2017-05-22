@@ -1706,18 +1706,6 @@ Matrix ServerVisualServoing::getSkew(const Vector& v)
 }
 
 
-Matrix ServerVisualServoing::getGamma(const Vector& p)
-{
-    Matrix G = zeros(6, 6);
-    
-    G.setSubmatrix(-1.0 * eye(3, 3), 0, 0);
-    G.setSubmatrix(getSkew(p)      , 0, 3);
-    G.setSubmatrix(-1.0 * eye(3, 3), 3, 3);
-    
-    return G;
-}
-
-
 Vector ServerVisualServoing::getAxisAngle(const Vector& v)
 {
     double ang  = norm(v);

@@ -130,9 +130,6 @@ private:
     yarp::sig::Matrix getSkew(const yarp::sig::Vector& v);
 
     
-    yarp::sig::Matrix getGamma(const yarp::sig::Vector& p);
-
-    
     yarp::sig::Vector getAxisAngle(const yarp::sig::Vector& v);
 };
 
