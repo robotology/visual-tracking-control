@@ -127,9 +127,6 @@ private:
     yarp::sig::Vector setJacobianV(const int cam, const yarp::sig::Vector& px);
 
     
-    yarp::sig::Matrix getSkew(const yarp::sig::Vector& v);
-
-    
     yarp::sig::Vector getAxisAngle(const yarp::sig::Vector& v);
 };
 

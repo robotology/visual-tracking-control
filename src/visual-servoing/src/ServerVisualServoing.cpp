@@ -1689,23 +1689,6 @@ Vector ServerVisualServoing::setJacobianV(const int cam, const Vector& px)
 }
 
 
-Matrix ServerVisualServoing::getSkew(const Vector& v)
-{
-    Matrix skew = zeros(3, 3);
-    
-    skew(0, 1) = -v(2);
-    skew(0, 2) =  v(1);
-    
-    skew(1, 0) =  v(2);
-    skew(1, 2) = -v(0);
-    
-    skew(2, 0) = -v(1);
-    skew(2, 1) =  v(0);
-    
-    return skew;
-}
-
-
 Vector ServerVisualServoing::getAxisAngle(const Vector& v)
 {
     double ang  = norm(v);
