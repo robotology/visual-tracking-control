@@ -167,15 +167,6 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     yInfo() << "r_H_r_to_cam_ =\n" << r_H_r_to_cam_.toString();
 
 
-    icub_index_ = iCubFinger("right_index");
-    std::deque<IControlLimits*> temp_lim;
-    temp_lim.push_front(itf_fingers_lim_);
-    if (!icub_index_.alignJointsBounds(temp_lim))
-    {
-        yError() << "Cannot set joint bound for index finger.";
-        return false;
-    }
-
     handler_port_.open("/visual_servoing/cmd:i");
     attach(handler_port_);
 
@@ -887,13 +878,6 @@ bool ServerVisualServoing::respond(const Bottle& command, Bottle& reply)
         /* Go to initial position (open-loop) */
         case VOCAB4('i', 'n', 'i', 't'):
         {
-            /* FINGERTIP */
-//            Matrix Od(3, 3);
-//            Od(0, 0) = -1.0;
-//            Od(1, 1) =  1.0;
-//            Od(2, 2) = -1.0;
-//            Vector od = dcm2axis(Od);
-
             /* Trial 27/04/17 */
             // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
 //            Vector od(4);
@@ -939,15 +923,6 @@ bool ServerVisualServoing::respond(const Bottle& command, Bottle& reply)
             if (traj_time == traj_time_)
             {
                 Vector init_pos = zeros(3);
-
-                /* FINGERTIP init */
-//                Vector chain_joints;
-//                icub_index_.getChainJoints(readRootToFingers().subVector(3, 18), chain_joints);
-//
-//                Matrix tip_pose_index = icub_index_.getH((M_PI/180.0) * chain_joints);
-//                Vector tip_x = tip_pose_index.getCol(3);
-//                Vector tip_o = dcm2axis(tip_pose_index);
-//                itf_rightarm_cart_->attachTipFrame(tip_x, tip_o);
 
                 //FIXME: to implement
 //                init_pos[0] = -0.345;

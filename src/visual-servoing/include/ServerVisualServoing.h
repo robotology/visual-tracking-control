@@ -58,8 +58,6 @@ private:
     yarp::dev::PolyDriver         torso_remote_driver_;
     yarp::dev::IEncoders        * itf_torso_enc_;
 
-    iCub::iKin::iCubFinger         icub_index_;
-
     yarp::sig::Vector             goal_pose_;
     yarp::sig::Matrix             l_proj_;
     yarp::sig::Matrix             r_proj_;
