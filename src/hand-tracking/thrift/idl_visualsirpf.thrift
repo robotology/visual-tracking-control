@@ -4,9 +4,9 @@
 # idl_visualsirpf.thrift
 
 /**
- * visualSIRParticleFilterIDL
+ * VisualSIRParticleFilterIDL
  *
- * IDL Interface to \ref visualSIRParticleFilterIDL SIR particle filter options.
+ * IDL Interface to \ref VisualSIRParticleFilter options.
  */
 
 service VisualSIRParticleFilterIDL
