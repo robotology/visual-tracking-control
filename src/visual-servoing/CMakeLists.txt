@@ -13,10 +13,14 @@ LIST(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
 include(YarpInstallationHelpers)
 
 # Application source and header files
-set(${EXE_TARGET_NAME}_SRC
-        main.cpp)
+set(${EXE_TARGET_NAME}_HDR
+        include/ServerVisualServoing.h)
 
-add_executable(${EXE_TARGET_NAME} ${${EXE_TARGET_NAME}_SRC})
+set(${EXE_TARGET_NAME}_SRC
+        src/main.cpp
+        src/ServerVisualServoing.cpp)
+
+add_executable(${EXE_TARGET_NAME} ${${EXE_TARGET_NAME}_HDR} ${${EXE_TARGET_NAME}_SRC})
 
 target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                                       ${ICUB_INCLUDE_DIRS}
