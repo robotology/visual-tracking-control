@@ -42,51 +42,51 @@ public:
             return false;
         }
 
-        if (!port_estimates_left_in_.open("/reaching_pose/estimates/left:i"))
+        if (!port_estimates_left_in_.open("/visual_servoing/estimates/left:i"))
         {
-            yError() << "Could not open /reaching_pose/estimates/left:i port! Closing.";
+            yError() << "Could not open /visual_servoing/estimates/left:i port! Closing.";
             return false;
         }
 
-        if (!port_estimates_right_in_.open("/reaching_pose/estimates/right:i"))
+        if (!port_estimates_right_in_.open("/visual_servoing/estimates/right:i"))
         {
-            yError() << "Could not open /reaching_pose/estimates/right:i port! Closing.";
+            yError() << "Could not open /visual_servoing/estimates/right:i port! Closing.";
             return false;
         }
 
-        if (!port_image_left_in_.open("/reaching_pose/cam_left/img:i"))
+        if (!port_image_left_in_.open("/visual_servoing/cam_left/img:i"))
         {
-            yError() << "Could not open /reaching_pose/cam_left/img:i port! Closing.";
+            yError() << "Could not open /visual_servoing/cam_left/img:i port! Closing.";
             return false;
         }
 
-        if (!port_image_left_out_.open("/reaching_pose/cam_left/img:o"))
+        if (!port_image_left_out_.open("/visual_servoing/cam_left/img:o"))
         {
-            yError() << "Could not open /reaching_pose/cam_left/img:o port! Closing.";
+            yError() << "Could not open /visual_servoing/cam_left/img:o port! Closing.";
             return false;
         }
 
-        if (!port_click_left_.open("/reaching_pose/cam_left/click:i"))
+        if (!port_click_left_.open("/visual_servoing/cam_left/click:i"))
         {
-            yError() << "Could not open /reaching_pose/cam_left/click:in port! Closing.";
+            yError() << "Could not open /visual_servoing/cam_left/click:in port! Closing.";
             return false;
         }
 
-        if (!port_image_right_in_.open("/reaching_pose/cam_right/img:i"))
+        if (!port_image_right_in_.open("/visual_servoing/cam_right/img:i"))
         {
-            yError() << "Could not open /reaching_pose/cam_right/img:i port! Closing.";
+            yError() << "Could not open /visual_servoing/cam_right/img:i port! Closing.";
             return false;
         }
 
-        if (!port_image_right_out_.open("/reaching_pose/cam_right/img:o"))
+        if (!port_image_right_out_.open("/visual_servoing/cam_right/img:o"))
         {
-            yError() << "Could not open /reaching_pose/cam_right/img:o port! Closing.";
+            yError() << "Could not open /visual_servoing/cam_right/img:o port! Closing.";
             return false;
         }
 
-        if (!port_click_right_.open("/reaching_pose/cam_right/click:i"))
+        if (!port_click_right_.open("/visual_servoing/cam_right/click:i"))
         {
-            yError() << "Could not open /reaching_pose/cam_right/click:i port! Closing.";
+            yError() << "Could not open /visual_servoing/cam_right/click:i port! Closing.";
             return false;
         }
 
@@ -188,7 +188,7 @@ public:
             return false;
         }
 
-        handler_port_.open("/reaching_pose/cmd:i");
+        handler_port_.open("/visual_servoing/cmd:i");
         attach(handler_port_);
 
         return true;
@@ -807,26 +807,26 @@ public:
                 px_ee_cur_orientation[9]  = l_px3_orientation[0];   /* u_x3_l */
                 px_ee_cur_orientation[10] = r_px3_orientation[0];   /* u_x3_r */
                 px_ee_cur_orientation[11] = l_px3_orientation[1];   /* v_x3_l */
-                
+
                 yInfo() << "px_ee_cur_orientation = [" << px_ee_cur_orientation.toString() << "]";
-                
+
                 jacobian_orientation = zeros(12, 6);
-                
+
                 /* Point 0 */
                 jacobian_orientation.setRow(0,  setJacobianU(LEFT,  l_px0_orientation));
                 jacobian_orientation.setRow(1,  setJacobianU(RIGHT, r_px0_orientation));
                 jacobian_orientation.setRow(2,  setJacobianV(LEFT,  l_px0_orientation));
-                
+
                 /* Point 1 */
                 jacobian_orientation.setRow(3,  setJacobianU(LEFT,  l_px1_orientation));
                 jacobian_orientation.setRow(4,  setJacobianU(RIGHT, r_px1_orientation));
                 jacobian_orientation.setRow(5,  setJacobianV(LEFT,  l_px1_orientation));
-                
+
                 /* Point 2 */
                 jacobian_orientation.setRow(6,  setJacobianU(LEFT,  l_px2_orientation));
                 jacobian_orientation.setRow(7,  setJacobianU(RIGHT, r_px2_orientation));
                 jacobian_orientation.setRow(8,  setJacobianV(LEFT,  l_px2_orientation));
-                
+
                 /* Point 3 */
                 jacobian_orientation.setRow(9,  setJacobianU(LEFT,  l_px3_orientation));
                 jacobian_orientation.setRow(10, setJacobianU(RIGHT, r_px3_orientation));
@@ -839,7 +839,7 @@ public:
                 cv::Scalar green (  0, 255,   0);
                 cv::Scalar blue  (  0,   0, 255);
                 cv::Scalar yellow(255, 255,   0);
-                
+
 
                 /* Left eye end-effector superimposition */
                 ImageOf<PixelRgb>* l_imgin  = port_image_left_in_.read(true);
@@ -1103,8 +1103,8 @@ public:
                 l_click[1] = click_left->get(1).asDouble();
 
                 RpcClient port_sfm;
-                port_sfm.open("/reaching_pose/tosfm");
-                yarp.connect("/reaching_pose/tosfm", "/SFM/rpc");
+                port_sfm.open("/visual_servoing/tosfm");
+                yarp.connect("/visual_servoing/tosfm", "/SFM/rpc");
 
                 cmd.clear();
 
@@ -1194,7 +1194,7 @@ public:
                     reply.addString("nack");
                 }
 
-                yarp.disconnect("/reaching_pose/tosfm", "/SFM/rpc");
+                yarp.disconnect("/visual_servoing/tosfm", "/SFM/rpc");
                 port_sfm.close();
 
                 reply = command;
@@ -1487,7 +1487,7 @@ private:
     {
         Property rightarm_cartesian_options;
         rightarm_cartesian_options.put("device", "cartesiancontrollerclient");
-        rightarm_cartesian_options.put("local",  "/reaching_pose/cart_right_arm");
+        rightarm_cartesian_options.put("local",  "/visual_servoing/cart_right_arm");
         rightarm_cartesian_options.put("remote", "/"+robot_name_+"/cartesianController/right_arm");
 
         rightarm_cartesian_driver_.open(rightarm_cartesian_options);
@@ -1528,7 +1528,7 @@ private:
     {
         Property gaze_option;
         gaze_option.put("device", "gazecontrollerclient");
-        gaze_option.put("local",  "/reaching_pose/gaze");
+        gaze_option.put("local",  "/visual_servoing/gaze");
         gaze_option.put("remote", "/iKinGazeCtrl");
 
         gaze_driver_.open(gaze_option);
@@ -1554,7 +1554,7 @@ private:
     {
         Property rightarm_remote_options;
         rightarm_remote_options.put("device", "remote_controlboard");
-        rightarm_remote_options.put("local",  "/reaching_pose/control_right_arm");
+        rightarm_remote_options.put("local",  "/visual_servoing/control_right_arm");
         rightarm_remote_options.put("remote", "/"+robot_name_+"/right_arm");
 
         rightarm_remote_driver_.open(rightarm_remote_options);
@@ -1589,7 +1589,7 @@ private:
     {
         Property torso_remote_options;
         torso_remote_options.put("device", "remote_controlboard");
-        torso_remote_options.put("local",  "/reaching_pose/control_torso");
+        torso_remote_options.put("local",  "/visual_servoing/control_torso");
         torso_remote_options.put("remote", "/"+robot_name_+"/torso");
 
         torso_remote_driver_.open(torso_remote_options);
