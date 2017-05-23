@@ -270,21 +270,21 @@ bool ServerVisualServoing::updateModule()
     /* JACOBIAN: ORIENTATION = GOAL */
     Vector px_ee_cur_position;
 
-    px_ee_cur_position.push_back(l_px0_position[0]);  /* u_ee_l */
-    px_ee_cur_position.push_back(r_px0_position[0]);  /* u_ee_r */
-    px_ee_cur_position.push_back(l_px0_position[1]);  /* v_ee_l */
+    px_ee_cur_position.push_back(l_px0_position[0]);    /* u_ee_l */
+    px_ee_cur_position.push_back(r_px0_position[0]);    /* u_ee_r */
+    px_ee_cur_position.push_back(l_px0_position[1]);    /* v_ee_l */
 
-    px_ee_cur_position.push_back(l_px1_position[0]);  /* u_x1_l */
-    px_ee_cur_position.push_back(r_px1_position[0]);  /* u_x1_r */
-    px_ee_cur_position.push_back(l_px1_position[1]);  /* v_x1_l */
+    px_ee_cur_position.push_back(l_px1_position[0]);    /* u_x1_l */
+    px_ee_cur_position.push_back(r_px1_position[0]);    /* u_x1_r */
+    px_ee_cur_position.push_back(l_px1_position[1]);    /* v_x1_l */
 
-    px_ee_cur_position.push_back(l_px2_position[0]);  /* u_x2_l */
-    px_ee_cur_position.push_back(r_px2_position[0]);  /* u_x2_r */
-    px_ee_cur_position.push_back(l_px2_position[1]);  /* v_x2_l */
+    px_ee_cur_position.push_back(l_px2_position[0]);    /* u_x2_l */
+    px_ee_cur_position.push_back(r_px2_position[0]);    /* u_x2_r */
+    px_ee_cur_position.push_back(l_px2_position[1]);    /* v_x2_l */
 
-    px_ee_cur_position.push_back(l_px3_position[0]);  /* u_x3_l */
-    px_ee_cur_position.push_back(r_px3_position[0]);  /* u_x3_r */
-    px_ee_cur_position.push_back(l_px3_position[1]);  /* v_x3_l */
+    px_ee_cur_position.push_back(l_px3_position[0]);    /* u_x3_l */
+    px_ee_cur_position.push_back(r_px3_position[0]);    /* u_x3_r */
+    px_ee_cur_position.push_back(l_px3_position[1]);    /* v_x3_l */
 
     yInfo() << "px_ee_cur_position = [" << px_ee_cur_position.toString() << "]";
 
@@ -482,7 +482,7 @@ bool ServerVisualServoing::updateModule()
             else
                 est_copy_right = *estimates;
 
-            yInfo() << "EE estimates left = [" << est_copy_left.toString() << "]";
+            yInfo() << "EE estimates left  = [" << est_copy_left.toString() << "]";
             yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]\n";
 
             /* SIM */
