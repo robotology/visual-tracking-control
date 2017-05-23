@@ -455,7 +455,7 @@ bool ServerVisualServoing::updateModule()
     double Ts    = 0.1;   // controller's sample time [s]
     double K_x   = 0.5;  // visual servoing proportional gain
     double K_o   = 0.5;  // visual servoing proportional gain
-                         //        double v_max = 0.0005; // max cartesian velocity [m/s]
+//    double v_max = 0.0005; // max cartesian velocity [m/s]
 
     bool done = false;
     while (!should_stop_ && !done)
