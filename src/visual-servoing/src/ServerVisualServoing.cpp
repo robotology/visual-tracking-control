@@ -241,120 +241,30 @@ bool ServerVisualServoing::updateModule()
     yInfo() << "px_des = ["  << px_des.toString() << "]";
 
 
-    /* LEFT: ORIENTATION = GOAL */
-    Vector l_est_position = est_copy_left;
-    l_est_position.setSubvector(3, goal_pose_.subVector(3, 5));
+    Vector l_px0_position = zeros(2);
+    Vector l_px1_position = zeros(2);
+    Vector l_px2_position = zeros(2);
+    Vector l_px3_position = zeros(2);
+    getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_x, l_px0_position, l_px1_position, l_px2_position, l_px3_position);
 
-    Vector l_ee_position_x0 = zeros(4);
-    Vector l_ee_position_x1 = zeros(4);
-    Vector l_ee_position_x2 = zeros(4);
-    Vector l_ee_position_x3 = zeros(4);
-    getPalmPoints(l_est_position, l_ee_position_x0, l_ee_position_x1, l_ee_position_x2, l_ee_position_x3);
-
-    /* LEFT: POSITION = GOAL */
-    Vector l_est_orientation = est_copy_left;
-    l_est_orientation.setSubvector(0, goal_pose_.subVector(0, 2));
-
-    Vector l_ee_orientation_x0 = zeros(4);
-    Vector l_ee_orientation_x1 = zeros(4);
-    Vector l_ee_orientation_x2 = zeros(4);
-    Vector l_ee_orientation_x3 = zeros(4);
-    getPalmPoints(l_est_orientation, l_ee_orientation_x0, l_ee_orientation_x1, l_ee_orientation_x2, l_ee_orientation_x3);
+    Vector l_px0_orientation = zeros(2);
+    Vector l_px1_orientation = zeros(2);
+    Vector l_px2_orientation = zeros(2);
+    Vector l_px3_orientation = zeros(2);
+    getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_o, l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation);
 
 
-    /* LEFT: EVALUATE CORRESPONDING ORIENTATION = GOAL PIXELS */
-    Vector l_px0_position = l_H_r_to_cam_ * l_ee_position_x0;
-    l_px0_position[0] /= l_px0_position[2];
-    l_px0_position[1] /= l_px0_position[2];
-    Vector l_px1_position = l_H_r_to_cam_ * l_ee_position_x1;
-    l_px1_position[0] /= l_px1_position[2];
-    l_px1_position[1] /= l_px1_position[2];
-    Vector l_px2_position = l_H_r_to_cam_ * l_ee_position_x2;
-    l_px2_position[0] /= l_px2_position[2];
-    l_px2_position[1] /= l_px2_position[2];
-    Vector l_px3_position = l_H_r_to_cam_ * l_ee_position_x3;
-    l_px3_position[0] /= l_px3_position[2];
-    l_px3_position[1] /= l_px3_position[2];
-    yInfo() << "Left POSITION ee    = [" << l_px0_position.subVector(0, 1).toString() << "]";
-    yInfo() << "Left POSITION ee x1 = [" << l_px1_position.subVector(0, 1).toString() << "]";
-    yInfo() << "Left POSITION ee x2 = [" << l_px2_position.subVector(0, 1).toString() << "]";
-    yInfo() << "Left POSITION ee x3 = [" << l_px3_position.subVector(0, 1).toString() << "]";
+    Vector r_px0_position = zeros(2);
+    Vector r_px1_position = zeros(2);
+    Vector r_px2_position = zeros(2);
+    Vector r_px3_position = zeros(2);
+    getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_x, r_px0_position, r_px1_position, r_px2_position, r_px3_position);
 
-    /* LEFT: EVALUATE CORRESPONDING POSITION = GOAL PIXELS */
-    Vector l_px0_orientation = l_H_r_to_cam_ * l_ee_orientation_x0;
-    l_px0_orientation[0] /= l_px0_orientation[2];
-    l_px0_orientation[1] /= l_px0_orientation[2];
-    Vector l_px1_orientation = l_H_r_to_cam_ * l_ee_orientation_x1;
-    l_px1_orientation[0] /= l_px1_orientation[2];
-    l_px1_orientation[1] /= l_px1_orientation[2];
-    Vector l_px2_orientation = l_H_r_to_cam_ * l_ee_orientation_x2;
-    l_px2_orientation[0] /= l_px2_orientation[2];
-    l_px2_orientation[1] /= l_px2_orientation[2];
-    Vector l_px3_orientation = l_H_r_to_cam_ * l_ee_orientation_x3;
-    l_px3_orientation[0] /= l_px3_orientation[2];
-    l_px3_orientation[1] /= l_px3_orientation[2];
-    yInfo() << "Left ORIENTATION ee    = [" << l_px0_orientation.subVector(0, 1).toString() << "]";
-    yInfo() << "Left ORIENTATION ee x1 = [" << l_px1_orientation.subVector(0, 1).toString() << "]";
-    yInfo() << "Left ORIENTATION ee x2 = [" << l_px2_orientation.subVector(0, 1).toString() << "]";
-    yInfo() << "Left ORIENTATION ee x3 = [" << l_px3_orientation.subVector(0, 1).toString() << "]";
-
-
-    /* RIGHT: ORIENTATION = GOAL */
-    Vector r_est_position = est_copy_right;
-    r_est_position.setSubvector(3, goal_pose_.subVector(3, 5));
-
-    Vector r_ee_position_x0 = zeros(4);
-    Vector r_ee_position_x1 = zeros(4);
-    Vector r_ee_position_x2 = zeros(4);
-    Vector r_ee_position_x3 = zeros(4);
-    getPalmPoints(r_est_position, r_ee_position_x0, r_ee_position_x1, r_ee_position_x2, r_ee_position_x3);
-
-    /* RIGHT: POSITION = GOAL */
-    Vector r_est_orientation = est_copy_right;
-    r_est_orientation.setSubvector(0, goal_pose_.subVector(0, 2));
-
-    Vector r_ee_orientation_x0 = zeros(4);
-    Vector r_ee_orientation_x1 = zeros(4);
-    Vector r_ee_orientation_x2 = zeros(4);
-    Vector r_ee_orientation_x3 = zeros(4);
-    getPalmPoints(r_est_orientation, r_ee_orientation_x0, r_ee_orientation_x1, r_ee_orientation_x2, r_ee_orientation_x3);
-
-
-    /* RIGHT: EVALUATE CORRESPONDING ORIENTATION = GOAL PIXELS */
-    Vector r_px0_position = r_H_r_to_cam_ * r_ee_position_x0;
-    r_px0_position[0] /= r_px0_position[2];
-    r_px0_position[1] /= r_px0_position[2];
-    Vector r_px1_position = r_H_r_to_cam_ * r_ee_position_x1;
-    r_px1_position[0] /= r_px1_position[2];
-    r_px1_position[1] /= r_px1_position[2];
-    Vector r_px2_position = r_H_r_to_cam_ * r_ee_position_x2;
-    r_px2_position[0] /= r_px2_position[2];
-    r_px2_position[1] /= r_px2_position[2];
-    Vector r_px3_position = r_H_r_to_cam_ * r_ee_position_x3;
-    r_px3_position[0] /= r_px3_position[2];
-    r_px3_position[1] /= r_px3_position[2];
-    yInfo() << "Right POSITION ee    = [" << r_px0_position.subVector(0, 1).toString() << "]";
-    yInfo() << "Right POSITION ee x1 = [" << r_px1_position.subVector(0, 1).toString() << "]";
-    yInfo() << "Right POSITION ee x2 = [" << r_px2_position.subVector(0, 1).toString() << "]";
-    yInfo() << "Right POSITION ee x3 = [" << r_px3_position.subVector(0, 1).toString() << "]";
-
-    /* RIGHT: EVALUATE CORRESPONDING POSITION = GOAL PIXELS */
-    Vector r_px0_orientation = r_H_r_to_cam_ * r_ee_orientation_x0;
-    r_px0_orientation[0] /= r_px0_orientation[2];
-    r_px0_orientation[1] /= r_px0_orientation[2];
-    Vector r_px1_orientation = r_H_r_to_cam_ * r_ee_orientation_x1;
-    r_px1_orientation[0] /= r_px1_orientation[2];
-    r_px1_orientation[1] /= r_px1_orientation[2];
-    Vector r_px2_orientation = r_H_r_to_cam_ * r_ee_orientation_x2;
-    r_px2_orientation[0] /= r_px2_orientation[2];
-    r_px2_orientation[1] /= r_px2_orientation[2];
-    Vector r_px3_orientation = r_H_r_to_cam_ * r_ee_orientation_x3;
-    r_px3_orientation[0] /= r_px3_orientation[2];
-    r_px3_orientation[1] /= r_px3_orientation[2];
-    yInfo() << "Right ORIENTATION ee    = [" << r_px0_orientation.subVector(0, 1).toString() << "]";
-    yInfo() << "Right ORIENTATION ee x1 = [" << r_px1_orientation.subVector(0, 1).toString() << "]";
-    yInfo() << "Right ORIENTATION ee x2 = [" << r_px2_orientation.subVector(0, 1).toString() << "]";
-    yInfo() << "Right ORIENTATION ee x3 = [" << r_px3_orientation.subVector(0, 1).toString() << "]";
+    Vector r_px0_orientation = zeros(2);
+    Vector r_px1_orientation = zeros(2);
+    Vector r_px2_orientation = zeros(2);
+    Vector r_px3_orientation = zeros(2);
+    getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
 
 
     /* JACOBIAN: ORIENTATION = GOAL */
@@ -381,24 +291,24 @@ bool ServerVisualServoing::updateModule()
     Matrix jacobian_position = zeros(12, 6);
 
     /* Point 0 */
-    jacobian_position.setRow(0,  setJacobianU(LEFT,  l_px0_position));
-    jacobian_position.setRow(1,  setJacobianU(RIGHT, r_px0_position));
-    jacobian_position.setRow(2,  setJacobianV(LEFT,  l_px0_position));
+    jacobian_position.setRow(0,  setJacobianU(CamSel::left,  l_px0_position));
+    jacobian_position.setRow(1,  setJacobianU(CamSel::right, r_px0_position));
+    jacobian_position.setRow(2,  setJacobianV(CamSel::left,  l_px0_position));
 
     /* Point 1 */
-    jacobian_position.setRow(3,  setJacobianU(LEFT,  l_px1_position));
-    jacobian_position.setRow(4,  setJacobianU(RIGHT, r_px1_position));
-    jacobian_position.setRow(5,  setJacobianV(LEFT,  l_px1_position));
+    jacobian_position.setRow(3,  setJacobianU(CamSel::left,  l_px1_position));
+    jacobian_position.setRow(4,  setJacobianU(CamSel::right, r_px1_position));
+    jacobian_position.setRow(5,  setJacobianV(CamSel::left,  l_px1_position));
 
     /* Point 2 */
-    jacobian_position.setRow(6,  setJacobianU(LEFT,  l_px2_position));
-    jacobian_position.setRow(7,  setJacobianU(RIGHT, r_px2_position));
-    jacobian_position.setRow(8,  setJacobianV(LEFT,  l_px2_position));
+    jacobian_position.setRow(6,  setJacobianU(CamSel::left,  l_px2_position));
+    jacobian_position.setRow(7,  setJacobianU(CamSel::right, r_px2_position));
+    jacobian_position.setRow(8,  setJacobianV(CamSel::left,  l_px2_position));
 
     /* Point 3 */
-    jacobian_position.setRow(9,  setJacobianU(LEFT,  l_px3_position));
-    jacobian_position.setRow(10, setJacobianU(RIGHT, r_px3_position));
-    jacobian_position.setRow(11, setJacobianV(LEFT,  l_px3_position));
+    jacobian_position.setRow(9,  setJacobianU(CamSel::left,  l_px3_position));
+    jacobian_position.setRow(10, setJacobianU(CamSel::right, r_px3_position));
+    jacobian_position.setRow(11, setJacobianV(CamSel::left,  l_px3_position));
     /* ******** */
 
 
@@ -426,24 +336,24 @@ bool ServerVisualServoing::updateModule()
     Matrix jacobian_orientation = zeros(12, 6);
 
     /* Point 0 */
-    jacobian_orientation.setRow(0,  setJacobianU(LEFT,  l_px0_orientation));
-    jacobian_orientation.setRow(1,  setJacobianU(RIGHT, r_px0_orientation));
-    jacobian_orientation.setRow(2,  setJacobianV(LEFT,  l_px0_orientation));
+    jacobian_orientation.setRow(0,  setJacobianU(CamSel::left,  l_px0_orientation));
+    jacobian_orientation.setRow(1,  setJacobianU(CamSel::right, r_px0_orientation));
+    jacobian_orientation.setRow(2,  setJacobianV(CamSel::left,  l_px0_orientation));
 
     /* Point 1 */
-    jacobian_orientation.setRow(3,  setJacobianU(LEFT,  l_px1_orientation));
-    jacobian_orientation.setRow(4,  setJacobianU(RIGHT, r_px1_orientation));
-    jacobian_orientation.setRow(5,  setJacobianV(LEFT,  l_px1_orientation));
+    jacobian_orientation.setRow(3,  setJacobianU(CamSel::left,  l_px1_orientation));
+    jacobian_orientation.setRow(4,  setJacobianU(CamSel::right, r_px1_orientation));
+    jacobian_orientation.setRow(5,  setJacobianV(CamSel::left,  l_px1_orientation));
 
     /* Point 2 */
-    jacobian_orientation.setRow(6,  setJacobianU(LEFT,  l_px2_orientation));
-    jacobian_orientation.setRow(7,  setJacobianU(RIGHT, r_px2_orientation));
-    jacobian_orientation.setRow(8,  setJacobianV(LEFT,  l_px2_orientation));
+    jacobian_orientation.setRow(6,  setJacobianU(CamSel::left,  l_px2_orientation));
+    jacobian_orientation.setRow(7,  setJacobianU(CamSel::right, r_px2_orientation));
+    jacobian_orientation.setRow(8,  setJacobianV(CamSel::left,  l_px2_orientation));
 
     /* Point 3 */
-    jacobian_orientation.setRow(9,  setJacobianU(LEFT,  l_px3_orientation));
-    jacobian_orientation.setRow(10, setJacobianU(RIGHT, r_px3_orientation));
-    jacobian_orientation.setRow(11, setJacobianV(LEFT,  l_px3_orientation));
+    jacobian_orientation.setRow(9,  setJacobianU(CamSel::left,  l_px3_orientation));
+    jacobian_orientation.setRow(10, setJacobianU(CamSel::right, r_px3_orientation));
+    jacobian_orientation.setRow(11, setJacobianV(CamSel::left,  l_px3_orientation));
     /* ******** */
 
 
@@ -606,121 +516,11 @@ bool ServerVisualServoing::updateModule()
 //            est_copy_right.setSubvector(3, r_new_o);
             /* **************************************************** */
 
+            getControlPixelsFromPose(est_copy_left,  CamSel::left,  ControlPixelMode::origin_x, l_px0_position,    l_px1_position,    l_px2_position,    l_px3_position);
+            getControlPixelsFromPose(est_copy_left,  CamSel::left,  ControlPixelMode::origin_o, l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation);
 
-            /* LEFT: ORIENTATION = GOAL */
-            l_est_position = est_copy_left;
-            l_est_position.setSubvector(3, goal_pose_.subVector(3, 5));
-
-            l_ee_position_x0 = zeros(4);
-            l_ee_position_x1 = zeros(4);
-            l_ee_position_x2 = zeros(4);
-            l_ee_position_x3 = zeros(4);
-            getPalmPoints(l_est_position, l_ee_position_x0, l_ee_position_x1, l_ee_position_x2, l_ee_position_x3);
-
-            /* LEFT: POSITION = GOAL */
-            l_est_orientation = est_copy_left;
-            l_est_orientation.setSubvector(0, goal_pose_.subVector(0, 2));
-
-            l_ee_orientation_x0 = zeros(4);
-            l_ee_orientation_x1 = zeros(4);
-            l_ee_orientation_x2 = zeros(4);
-            l_ee_orientation_x3 = zeros(4);
-            getPalmPoints(l_est_orientation, l_ee_orientation_x0, l_ee_orientation_x1, l_ee_orientation_x2, l_ee_orientation_x3);
-
-
-            /* LEFT: EVALUATE CORRESPONDING ORIENTATION = GOAL PIXELS */
-            l_px0_position = l_H_r_to_cam_ * l_ee_position_x0;
-            l_px0_position[0] /= l_px0_position[2];
-            l_px0_position[1] /= l_px0_position[2];
-            l_px1_position = l_H_r_to_cam_ * l_ee_position_x1;
-            l_px1_position[0] /= l_px1_position[2];
-            l_px1_position[1] /= l_px1_position[2];
-            l_px2_position = l_H_r_to_cam_ * l_ee_position_x2;
-            l_px2_position[0] /= l_px2_position[2];
-            l_px2_position[1] /= l_px2_position[2];
-            l_px3_position = l_H_r_to_cam_ * l_ee_position_x3;
-            l_px3_position[0] /= l_px3_position[2];
-            l_px3_position[1] /= l_px3_position[2];
-            yInfo() << "Left POSITION ee    = [" << l_px0_position.subVector(0, 1).toString() << "]";
-            yInfo() << "Left POSITION ee x1 = [" << l_px1_position.subVector(0, 1).toString() << "]";
-            yInfo() << "Left POSITION ee x2 = [" << l_px2_position.subVector(0, 1).toString() << "]";
-            yInfo() << "Left POSITION ee x3 = [" << l_px3_position.subVector(0, 1).toString() << "]";
-
-            /* LEFT: EVALUATE CORRESPONDING POSITION = GOAL PIXELS */
-            l_px0_orientation = l_H_r_to_cam_ * l_ee_orientation_x0;
-            l_px0_orientation[0] /= l_px0_orientation[2];
-            l_px0_orientation[1] /= l_px0_orientation[2];
-            l_px1_orientation = l_H_r_to_cam_ * l_ee_orientation_x1;
-            l_px1_orientation[0] /= l_px1_orientation[2];
-            l_px1_orientation[1] /= l_px1_orientation[2];
-            l_px2_orientation = l_H_r_to_cam_ * l_ee_orientation_x2;
-            l_px2_orientation[0] /= l_px2_orientation[2];
-            l_px2_orientation[1] /= l_px2_orientation[2];
-            l_px3_orientation = l_H_r_to_cam_ * l_ee_orientation_x3;
-            l_px3_orientation[0] /= l_px3_orientation[2];
-            l_px3_orientation[1] /= l_px3_orientation[2];
-            yInfo() << "Left ORIENTATION ee    = [" << l_px0_orientation.subVector(0, 1).toString() << "]";
-            yInfo() << "Left ORIENTATION ee x1 = [" << l_px1_orientation.subVector(0, 1).toString() << "]";
-            yInfo() << "Left ORIENTATION ee x2 = [" << l_px2_orientation.subVector(0, 1).toString() << "]";
-            yInfo() << "Left ORIENTATION ee x3 = [" << l_px3_orientation.subVector(0, 1).toString() << "]";
-
-
-            /* RIGHT: ORIENTATION = GOAL */
-            r_est_position = est_copy_right;
-            r_est_position.setSubvector(3, goal_pose_.subVector(3, 5));
-
-            r_ee_position_x0 = zeros(4);
-            r_ee_position_x1 = zeros(4);
-            r_ee_position_x2 = zeros(4);
-            r_ee_position_x3 = zeros(4);
-            getPalmPoints(r_est_position, r_ee_position_x0, r_ee_position_x1, r_ee_position_x2, r_ee_position_x3);
-
-            /* RIGHT: POSITION = GOAL */
-            r_est_orientation = est_copy_right;
-            r_est_orientation.setSubvector(0, goal_pose_.subVector(0, 2));
-
-            r_ee_orientation_x0 = zeros(4);
-            r_ee_orientation_x1 = zeros(4);
-            r_ee_orientation_x2 = zeros(4);
-            r_ee_orientation_x3 = zeros(4);
-            getPalmPoints(r_est_orientation, r_ee_orientation_x0, r_ee_orientation_x1, r_ee_orientation_x2, r_ee_orientation_x3);
-
-
-            /* RIGHT: EVALUATE CORRESPONDING ORIENTATION = GOAL PIXELS */
-            r_px0_position = r_H_r_to_cam_ * r_ee_position_x0;
-            r_px0_position[0] /= r_px0_position[2];
-            r_px0_position[1] /= r_px0_position[2];
-            r_px1_position = r_H_r_to_cam_ * r_ee_position_x1;
-            r_px1_position[0] /= r_px1_position[2];
-            r_px1_position[1] /= r_px1_position[2];
-            r_px2_position = r_H_r_to_cam_ * r_ee_position_x2;
-            r_px2_position[0] /= r_px2_position[2];
-            r_px2_position[1] /= r_px2_position[2];
-            r_px3_position = r_H_r_to_cam_ * r_ee_position_x3;
-            r_px3_position[0] /= r_px3_position[2];
-            r_px3_position[1] /= r_px3_position[2];
-            yInfo() << "Right POSITION ee    = [" << r_px0_position.subVector(0, 1).toString() << "]";
-            yInfo() << "Right POSITION ee x1 = [" << r_px1_position.subVector(0, 1).toString() << "]";
-            yInfo() << "Right POSITION ee x2 = [" << r_px2_position.subVector(0, 1).toString() << "]";
-            yInfo() << "Right POSITION ee x3 = [" << r_px3_position.subVector(0, 1).toString() << "]";
-
-            /* RIGHT: EVALUATE CORRESPONDING POSITION = GOAL PIXELS */
-            r_px0_orientation = r_H_r_to_cam_ * r_ee_orientation_x0;
-            r_px0_orientation[0] /= r_px0_orientation[2];
-            r_px0_orientation[1] /= r_px0_orientation[2];
-            r_px1_orientation = r_H_r_to_cam_ * r_ee_orientation_x1;
-            r_px1_orientation[0] /= r_px1_orientation[2];
-            r_px1_orientation[1] /= r_px1_orientation[2];
-            r_px2_orientation = r_H_r_to_cam_ * r_ee_orientation_x2;
-            r_px2_orientation[0] /= r_px2_orientation[2];
-            r_px2_orientation[1] /= r_px2_orientation[2];
-            r_px3_orientation = r_H_r_to_cam_ * r_ee_orientation_x3;
-            r_px3_orientation[0] /= r_px3_orientation[2];
-            r_px3_orientation[1] /= r_px3_orientation[2];
-            yInfo() << "Right ORIENTATION ee    = [" << r_px0_orientation.subVector(0, 1).toString() << "]";
-            yInfo() << "Right ORIENTATION ee x1 = [" << r_px1_orientation.subVector(0, 1).toString() << "]";
-            yInfo() << "Right ORIENTATION ee x2 = [" << r_px2_orientation.subVector(0, 1).toString() << "]";
-            yInfo() << "Right ORIENTATION ee x3 = [" << r_px3_orientation.subVector(0, 1).toString() << "]";
+            getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_x, r_px0_position,    r_px1_position,    r_px2_position,    r_px3_position);
+            getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
 
 
             /* JACOBIAN: ORIENTATION = GOAL */
@@ -745,24 +545,24 @@ bool ServerVisualServoing::updateModule()
             jacobian_position = zeros(12, 6);
 
             /* Point 0 */
-            jacobian_position.setRow(0,  setJacobianU(LEFT,  l_px0_position));
-            jacobian_position.setRow(1,  setJacobianU(RIGHT, r_px0_position));
-            jacobian_position.setRow(2,  setJacobianV(LEFT,  l_px0_position));
+            jacobian_position.setRow(0,  setJacobianU(CamSel::left,  l_px0_position));
+            jacobian_position.setRow(1,  setJacobianU(CamSel::right, r_px0_position));
+            jacobian_position.setRow(2,  setJacobianV(CamSel::left,  l_px0_position));
 
             /* Point 1 */
-            jacobian_position.setRow(3,  setJacobianU(LEFT,  l_px1_position));
-            jacobian_position.setRow(4,  setJacobianU(RIGHT, r_px1_position));
-            jacobian_position.setRow(5,  setJacobianV(LEFT,  l_px1_position));
+            jacobian_position.setRow(3,  setJacobianU(CamSel::left,  l_px1_position));
+            jacobian_position.setRow(4,  setJacobianU(CamSel::right, r_px1_position));
+            jacobian_position.setRow(5,  setJacobianV(CamSel::left,  l_px1_position));
 
             /* Point 2 */
-            jacobian_position.setRow(6,  setJacobianU(LEFT,  l_px2_position));
-            jacobian_position.setRow(7,  setJacobianU(RIGHT, r_px2_position));
-            jacobian_position.setRow(8,  setJacobianV(LEFT,  l_px2_position));
+            jacobian_position.setRow(6,  setJacobianU(CamSel::left,  l_px2_position));
+            jacobian_position.setRow(7,  setJacobianU(CamSel::right, r_px2_position));
+            jacobian_position.setRow(8,  setJacobianV(CamSel::left,  l_px2_position));
 
             /* Point 3 */
-            jacobian_position.setRow(9,  setJacobianU(LEFT,  l_px3_position));
-            jacobian_position.setRow(10, setJacobianU(RIGHT, r_px3_position));
-            jacobian_position.setRow(11, setJacobianV(LEFT,  l_px3_position));
+            jacobian_position.setRow(9,  setJacobianU(CamSel::left,  l_px3_position));
+            jacobian_position.setRow(10, setJacobianU(CamSel::right, r_px3_position));
+            jacobian_position.setRow(11, setJacobianV(CamSel::left,  l_px3_position));
             /* ******** */
 
 
@@ -788,24 +588,24 @@ bool ServerVisualServoing::updateModule()
             jacobian_orientation = zeros(12, 6);
 
             /* Point 0 */
-            jacobian_orientation.setRow(0,  setJacobianU(LEFT,  l_px0_orientation));
-            jacobian_orientation.setRow(1,  setJacobianU(RIGHT, r_px0_orientation));
-            jacobian_orientation.setRow(2,  setJacobianV(LEFT,  l_px0_orientation));
+            jacobian_orientation.setRow(0,  setJacobianU(CamSel::left,  l_px0_orientation));
+            jacobian_orientation.setRow(1,  setJacobianU(CamSel::right, r_px0_orientation));
+            jacobian_orientation.setRow(2,  setJacobianV(CamSel::left,  l_px0_orientation));
 
             /* Point 1 */
-            jacobian_orientation.setRow(3,  setJacobianU(LEFT,  l_px1_orientation));
-            jacobian_orientation.setRow(4,  setJacobianU(RIGHT, r_px1_orientation));
-            jacobian_orientation.setRow(5,  setJacobianV(LEFT,  l_px1_orientation));
+            jacobian_orientation.setRow(3,  setJacobianU(CamSel::left,  l_px1_orientation));
+            jacobian_orientation.setRow(4,  setJacobianU(CamSel::right, r_px1_orientation));
+            jacobian_orientation.setRow(5,  setJacobianV(CamSel::left,  l_px1_orientation));
 
             /* Point 2 */
-            jacobian_orientation.setRow(6,  setJacobianU(LEFT,  l_px2_orientation));
-            jacobian_orientation.setRow(7,  setJacobianU(RIGHT, r_px2_orientation));
-            jacobian_orientation.setRow(8,  setJacobianV(LEFT,  l_px2_orientation));
+            jacobian_orientation.setRow(6,  setJacobianU(CamSel::left,  l_px2_orientation));
+            jacobian_orientation.setRow(7,  setJacobianU(CamSel::right, r_px2_orientation));
+            jacobian_orientation.setRow(8,  setJacobianV(CamSel::left,  l_px2_orientation));
 
             /* Point 3 */
-            jacobian_orientation.setRow(9,  setJacobianU(LEFT,  l_px3_orientation));
-            jacobian_orientation.setRow(10, setJacobianU(RIGHT, r_px3_orientation));
-            jacobian_orientation.setRow(11, setJacobianV(LEFT,  l_px3_orientation));
+            jacobian_orientation.setRow(9,  setJacobianU(CamSel::left,  l_px3_orientation));
+            jacobian_orientation.setRow(10, setJacobianU(CamSel::right, r_px3_orientation));
+            jacobian_orientation.setRow(11, setJacobianV(CamSel::left,  l_px3_orientation));
             /* ******** */
 
 
@@ -1158,7 +958,7 @@ bool ServerVisualServoing::set_goal(const std::string& label)
     Vector p1 = zeros(4);
     Vector p2 = zeros(4);
     Vector p3 = zeros(4);
-    getPalmPoints(p, p0, p1, p2, p3);
+    getControlPointsFromPose(p, p0, p1, p2, p3);
 
     yInfo() << "Goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
 
@@ -1292,7 +1092,7 @@ bool ServerVisualServoing::get_sfm_points()
         Vector p1 = zeros(4);
         Vector p2 = zeros(4);
         Vector p3 = zeros(4);
-        getPalmPoints(p, p0, p1, p2, p3);
+        getControlPointsFromPose(p, p0, p1, p2, p3);
 
         yInfo() << "goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
 
@@ -1514,12 +1314,12 @@ bool ServerVisualServoing::unsetTorsoDOF()
 }
 
 
-void ServerVisualServoing::getPalmPoints(const Vector& endeffector, Vector& p0, Vector& p1, Vector& p2, Vector& p3)
+void ServerVisualServoing::getControlPointsFromPose(const Vector& pose, Vector& p0, Vector& p1, Vector& p2, Vector& p3)
 {
-    Vector ee_x = endeffector.subVector(0, 2);
+    Vector ee_x = pose.subVector(0, 2);
     ee_x.push_back(1.0);
-    double ang  = norm(endeffector.subVector(3, 5));
-    Vector ee_o = endeffector.subVector(3, 5) / ang;
+    double ang  = norm(pose.subVector(3, 5));
+    Vector ee_o = pose.subVector(3, 5) / ang;
     ee_o.push_back(ang);
     
     Matrix H_ee_to_root = axis2dcm(ee_o);
@@ -1562,11 +1362,64 @@ void ServerVisualServoing::getPalmPoints(const Vector& endeffector, Vector& p0, 
 }
 
 
-Vector ServerVisualServoing::setJacobianU(const int cam, const Vector& px)
+void ServerVisualServoing::getControlPixelsFromPose(const Vector& pose, const CamSel cam, const ControlPixelMode mode, Vector& px0, Vector& px1, Vector& px2, Vector& px3)
+{
+    yAssert(cam == CamSel::left || cam == CamSel::right);
+    yAssert(mode == ControlPixelMode::origin || mode == ControlPixelMode::origin_o || mode == ControlPixelMode::origin_x);
+
+
+    Vector control_pose = pose;
+    if (mode == ControlPixelMode::origin_x)
+        control_pose.setSubvector(3, goal_pose_.subVector(3, 5));
+    else if (mode == ControlPixelMode::origin_o)
+        control_pose.setSubvector(0, goal_pose_.subVector(0, 2));
+
+
+    Vector control_p0 = zeros(4);
+    Vector control_p1 = zeros(4);
+    Vector control_p2 = zeros(4);
+    Vector control_p3 = zeros(4);
+    getControlPointsFromPose(control_pose, control_p0, control_p1, control_p2, control_p3);
+
+
+    px0 = getPixelFromPoint(cam, control_p0);
+    px1 = getPixelFromPoint(cam, control_p1);
+    px2 = getPixelFromPoint(cam, control_p2);
+    px3 = getPixelFromPoint(cam, control_p3);
+
+
+    ConstString s_cam  = (cam == CamSel::left ? "Left" : "Right");
+    ConstString s_mode = (mode == ControlPixelMode::origin ? "(original)" : (mode == ControlPixelMode::origin_x ? "(original position)" : "(original orientation)"));
+    yInfo() << s_cam << s_mode << "control px0 = [" << px0.toString() << "]";
+    yInfo() << s_cam << s_mode << "control px1 = [" << px1.toString() << "]";
+    yInfo() << s_cam << s_mode << "control px2 = [" << px2.toString() << "]";
+    yInfo() << s_cam << s_mode << "control px3 = [" << px3.toString() << "]";
+}
+
+
+Vector ServerVisualServoing::getPixelFromPoint(const CamSel cam, const Vector& p) const
+{
+    yAssert(cam == CamSel::left || cam == CamSel::right);
+
+    Vector px;
+
+    if (cam == CamSel::left)
+        px = l_H_r_to_cam_ * p;
+    else if (cam == CamSel::right)
+        px = r_H_r_to_cam_ * p;
+
+    px[0] /= px[2];
+    px[1] /= px[2];
+
+    return px;
+}
+
+
+Vector ServerVisualServoing::setJacobianU(const CamSel cam, const Vector& px)
 {
     Vector jacobian = zeros(6);
     
-    if (cam == LEFT)
+    if (cam == CamSel::left)
     {
         jacobian(0) = l_proj_(0, 0) / px(2);
         jacobian(2) = - (px(0) - l_proj_(0, 2)) / px(2);
@@ -1574,7 +1427,7 @@ Vector ServerVisualServoing::setJacobianU(const int cam, const Vector& px)
         jacobian(4) = (pow(l_proj_(0, 0), 2.0) + pow(px(0) - l_proj_(0, 2), 2.0)) / l_proj_(0, 0);
         jacobian(5) = - l_proj_(0, 0) / l_proj_(1, 1) * (px(1) - l_proj_(1, 2));
     }
-    else if (cam == RIGHT)
+    else if (cam == CamSel::right)
     {
         jacobian(0) = r_proj_(0, 0) / px(2);
         jacobian(2) = - (px(0) - r_proj_(0, 2)) / px(2);
@@ -1587,11 +1440,11 @@ Vector ServerVisualServoing::setJacobianU(const int cam, const Vector& px)
 }
 
 
-Vector ServerVisualServoing::setJacobianV(const int cam, const Vector& px)
+Vector ServerVisualServoing::setJacobianV(const CamSel cam, const Vector& px)
 {
     Vector jacobian = zeros(6);
     
-    if (cam == LEFT)
+    if (cam == CamSel::left)
     {
         jacobian(1) = l_proj_(1, 1) / px(2);
         jacobian(2) = - (px(1) - l_proj_(1, 2)) / px(2);
@@ -1599,7 +1452,7 @@ Vector ServerVisualServoing::setJacobianV(const int cam, const Vector& px)
         jacobian(4) = ((px(0) - l_proj_(0, 2)) * (px(1) - l_proj_(1, 2))) / l_proj_(0, 0);
         jacobian(5) = l_proj_(1, 1) / l_proj_(0, 0) * (px(0) - l_proj_(0, 2));
     }
-    else if (cam == RIGHT)
+    else if (cam == CamSel::right)
     {
         jacobian(1) = r_proj_(1, 1) / px(2);
         jacobian(2) = - (px(1) - r_proj_(1, 2)) / px(2);

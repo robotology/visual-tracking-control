@@ -120,13 +120,17 @@ private:
     bool unsetTorsoDOF();
 
 
-    void getPalmPoints(const yarp::sig::Vector& endeffector, yarp::sig::Vector& p0, yarp::sig::Vector& p1, yarp::sig::Vector& p2, yarp::sig::Vector& p3);
+    void getControlPointsFromPose(const yarp::sig::Vector& pose, yarp::sig::Vector& p0, yarp::sig::Vector& p1, yarp::sig::Vector& p2, yarp::sig::Vector& p3);
+
+
+    void getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel cam, const ControlPixelMode mode, yarp::sig::Vector& px0, yarp::sig::Vector& px1, yarp::sig::Vector& px2, yarp::sig::Vector& px3);
+    yarp::sig::Vector getPixelFromPoint(const CamSel cam, const yarp::sig::Vector& p) const;
 
     
-    yarp::sig::Vector setJacobianU(const int cam, const yarp::sig::Vector& px);
+    yarp::sig::Vector setJacobianU(const CamSel cam, const yarp::sig::Vector& px);
 
     
-    yarp::sig::Vector setJacobianV(const int cam, const yarp::sig::Vector& px);
+    yarp::sig::Vector setJacobianV(const CamSel cam, const yarp::sig::Vector& px);
 
     
     yarp::sig::Vector getAxisAngle(const yarp::sig::Vector& v);
