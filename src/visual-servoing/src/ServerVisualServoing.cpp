@@ -1172,6 +1172,8 @@ bool ServerVisualServoing::quit()
     should_stop_    = true;
     take_estimates_ = true;
 
+    stopModule();
+
     return true;
 }
 
