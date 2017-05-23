@@ -178,119 +178,37 @@ bool ServerVisualServoing::updateModule()
 
     if (should_stop_) return false;
 
+    yInfo() << "RUNNING!\n";
 
     Vector  est_copy_left(6);
     Vector  est_copy_right(6);
     Vector* estimates;
 
-    /* Get the initial end-effector pose from left eye view */
-    estimates = port_pose_left_in_.read(true);
-    yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
-    if (estimates->length() == 7)
-    {
-        est_copy_left = estimates->subVector(0, 5);
-        float ang     = (*estimates)[6];
-
-        est_copy_left[3] *= ang;
-        est_copy_left[4] *= ang;
-        est_copy_left[5] *= ang;
-    }
-    else
-        est_copy_left = *estimates;
-
-    /* Get the initial end-effector pose from right eye view */
-    estimates = port_pose_right_in_.read(true);
-    yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
-    if (estimates->length() == 7)
-    {
-        est_copy_right = estimates->subVector(0, 5);
-        float ang      = (*estimates)[6];
-
-        est_copy_right[3] *= ang;
-        est_copy_right[4] *= ang;
-        est_copy_right[5] *= ang;
-    }
-    else
-        est_copy_right = *estimates;
-
-
-    yInfo() << "RUNNING!\n";
-
-    yInfo() << "EE estimates left  = ["  << est_copy_left.toString()  << "]";
-    yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]";
-
-    /* EVALUATING CONTROL POINTS */
-    Vector l_px0_position = zeros(2);
-    Vector l_px1_position = zeros(2);
-    Vector l_px2_position = zeros(2);
-    Vector l_px3_position = zeros(2);
-    getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_x, l_px0_position, l_px1_position, l_px2_position, l_px3_position);
-
-    yInfo() << "Left (original position) control px0 = [" << l_px0_position.toString() << "]";
-    yInfo() << "Left (original position) control px1 = [" << l_px1_position.toString() << "]";
-    yInfo() << "Left (original position) control px2 = [" << l_px2_position.toString() << "]";
-    yInfo() << "Left (original position) control px3 = [" << l_px3_position.toString() << "]";
-
-    Vector l_px0_orientation = zeros(2);
-    Vector l_px1_orientation = zeros(2);
-    Vector l_px2_orientation = zeros(2);
-    Vector l_px3_orientation = zeros(2);
-    getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_o, l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation);
-
-    yInfo() << "Left (original orientation) control px0 = [" << l_px0_orientation.toString() << "]";
-    yInfo() << "Left (original orientation) control px1 = [" << l_px1_orientation.toString() << "]";
-    yInfo() << "Left (original orientation) control px2 = [" << l_px2_orientation.toString() << "]";
-    yInfo() << "Left (original orientation) control px3 = [" << l_px3_orientation.toString() << "]";
-
-
-    Vector r_px0_position = zeros(2);
-    Vector r_px1_position = zeros(2);
-    Vector r_px2_position = zeros(2);
-    Vector r_px3_position = zeros(2);
-    getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_x, r_px0_position, r_px1_position, r_px2_position, r_px3_position);
-
-    yInfo() << "Right (original position) control px0 = [" << r_px0_position.toString() << "]";
-    yInfo() << "Right (original position) control px1 = [" << r_px1_position.toString() << "]";
-    yInfo() << "Right (original position) control px2 = [" << r_px2_position.toString() << "]";
-    yInfo() << "Right (original position) control px3 = [" << r_px3_position.toString() << "]";
-
-    Vector r_px0_orientation = zeros(2);
-    Vector r_px1_orientation = zeros(2);
-    Vector r_px2_orientation = zeros(2);
-    Vector r_px3_orientation = zeros(2);
-    getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
-
-    yInfo() << "Right (original orientation) control px0 = [" << r_px0_orientation.toString() << "]";
-    yInfo() << "Right (original orientation) control px1 = [" << r_px1_orientation.toString() << "]";
-    yInfo() << "Right (original orientation) control px2 = [" << r_px2_orientation.toString() << "]";
-    yInfo() << "Right (original orientation) control px3 = [" << r_px3_orientation.toString() << "]";
-
-
-    /* FEATURES AND JACOBIAN (original position) */
-    Vector px_ee_cur_position = zeros(12);
-    Matrix jacobian_position  = zeros(12, 6);
-    getCurrentStereoFeaturesAndJacobian(l_px0_position, l_px1_position, l_px2_position, l_px3_position,
-                                        r_px0_position, r_px1_position, r_px2_position, r_px3_position,
-                                        px_ee_cur_position, jacobian_position);
-
-    yInfo() << "px_ee_cur_position = [" << px_ee_cur_position.toString() << "]";
-    yInfo() << "jacobian_position  = [" << jacobian_position.toString() << "]";
-
-    /* FEATURES AND JACOBIAN (original orientation) */
-    Vector px_ee_cur_orientation = zeros(12);
-    Matrix jacobian_orientation  = zeros(12, 6);
-    getCurrentStereoFeaturesAndJacobian(l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation,
-                                        r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation,
-                                        px_ee_cur_orientation, jacobian_orientation);
-
-    yInfo() << "px_ee_cur_orientation = [" << px_ee_cur_orientation.toString() << "]";
-    yInfo() << "jacobian_orientation  = [" << jacobian_orientation.toString() << "]";
-
-
     /* Restoring cartesian and gaze context */
     itf_rightarm_cart_->restoreContext(ctx_cart_);
     itf_gaze_->restoreContext(ctx_gaze_);
 
+    Vector l_px0_position    = zeros(2);
+    Vector l_px1_position    = zeros(2);
+    Vector l_px2_position    = zeros(2);
+    Vector l_px3_position    = zeros(2);
+    Vector l_px0_orientation = zeros(2);
+    Vector l_px1_orientation = zeros(2);
+    Vector l_px2_orientation = zeros(2);
+    Vector l_px3_orientation = zeros(2);
+    Vector r_px0_position    = zeros(2);
+    Vector r_px1_position    = zeros(2);
+    Vector r_px2_position    = zeros(2);
+    Vector r_px3_position    = zeros(2);
+    Vector r_px0_orientation = zeros(2);
+    Vector r_px1_orientation = zeros(2);
+    Vector r_px2_orientation = zeros(2);
+    Vector r_px3_orientation = zeros(2);
+
+    Vector px_ee_cur_position    = zeros(12);
+    Matrix jacobian_position     = zeros(12, 6);
+    Vector px_ee_cur_orientation = zeros(12);
+    Matrix jacobian_orientation  = zeros(12, 6);
 
     double Ts     = 0.1;
     double K_x    = 0.5;
@@ -301,6 +219,121 @@ bool ServerVisualServoing::updateModule()
     bool done = false;
     while (!should_stop_ && !done)
     {
+        /* Get the initial end-effector pose from left eye view */
+        estimates = port_pose_left_in_.read(true);
+        yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
+        if (estimates->length() == 7)
+        {
+            est_copy_left = estimates->subVector(0, 5);
+            float ang     = (*estimates)[6];
+
+            est_copy_left[3] *= ang;
+            est_copy_left[4] *= ang;
+            est_copy_left[5] *= ang;
+        }
+        else
+            est_copy_left = *estimates;
+
+        /* Get the initial end-effector pose from right eye view */
+        estimates = port_pose_right_in_.read(true);
+        yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
+        if (estimates->length() == 7)
+        {
+            est_copy_right = estimates->subVector(0, 5);
+            float ang      = (*estimates)[6];
+
+            est_copy_right[3] *= ang;
+            est_copy_right[4] *= ang;
+            est_copy_right[5] *= ang;
+        }
+        else
+            est_copy_right = *estimates;
+
+        yInfo() << "EE estimates left  = ["  << est_copy_left.toString()  << "]";
+        yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]";
+
+        /* SIM */
+//        /* Simulate reaching starting from the initial position */
+//        /* Comment any previous write on variable 'estimates' */
+//
+//        /* Evaluate the new orientation vector from axis-angle representation */
+//        /* The following code is a copy of the setTaskVelocities() code */
+//        Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
+//        Matrix l_R = axis2dcm(l_o);
+//        Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
+//        Matrix r_R = axis2dcm(r_o);
+//
+//        vel_o[3] *= Ts;
+//        l_R = axis2dcm(vel_o) * l_R;
+//        r_R = axis2dcm(vel_o) * r_R;
+//
+//        Vector l_new_o = dcm2axis(l_R);
+//        double l_ang = l_new_o(3);
+//        l_new_o.pop_back();
+//        l_new_o *= l_ang;
+//
+//        Vector r_new_o = dcm2axis(r_R);
+//        double r_ang = r_new_o(3);
+//        r_new_o.pop_back();
+//        r_new_o *= r_ang;
+//
+//        est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts);
+//        est_copy_left.setSubvector(3, l_new_o);
+//        est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts);
+//        est_copy_right.setSubvector(3, r_new_o);
+        /* **************************************************** */
+
+        /* EVALUATING CONTROL POINTS */
+        getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_x, l_px0_position, l_px1_position, l_px2_position, l_px3_position);
+
+        yInfo() << "Left (original position) control px0 = [" << l_px0_position.toString() << "]";
+        yInfo() << "Left (original position) control px1 = [" << l_px1_position.toString() << "]";
+        yInfo() << "Left (original position) control px2 = [" << l_px2_position.toString() << "]";
+        yInfo() << "Left (original position) control px3 = [" << l_px3_position.toString() << "]";
+
+
+        getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_o, l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation);
+
+        yInfo() << "Left (original orientation) control px0 = [" << l_px0_orientation.toString() << "]";
+        yInfo() << "Left (original orientation) control px1 = [" << l_px1_orientation.toString() << "]";
+        yInfo() << "Left (original orientation) control px2 = [" << l_px2_orientation.toString() << "]";
+        yInfo() << "Left (original orientation) control px3 = [" << l_px3_orientation.toString() << "]";
+
+
+        getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_x, r_px0_position, r_px1_position, r_px2_position, r_px3_position);
+
+        yInfo() << "Right (original position) control px0 = [" << r_px0_position.toString() << "]";
+        yInfo() << "Right (original position) control px1 = [" << r_px1_position.toString() << "]";
+        yInfo() << "Right (original position) control px2 = [" << r_px2_position.toString() << "]";
+        yInfo() << "Right (original position) control px3 = [" << r_px3_position.toString() << "]";
+
+
+        getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
+
+        yInfo() << "Right (original orientation) control px0 = [" << r_px0_orientation.toString() << "]";
+        yInfo() << "Right (original orientation) control px1 = [" << r_px1_orientation.toString() << "]";
+        yInfo() << "Right (original orientation) control px2 = [" << r_px2_orientation.toString() << "]";
+        yInfo() << "Right (original orientation) control px3 = [" << r_px3_orientation.toString() << "]";
+
+
+        /* FEATURES AND JACOBIAN (original position) */
+        getCurrentStereoFeaturesAndJacobian(l_px0_position, l_px1_position, l_px2_position, l_px3_position,
+                                            r_px0_position, r_px1_position, r_px2_position, r_px3_position,
+                                            px_ee_cur_position, jacobian_position);
+
+        yInfo() << "px_ee_cur_position = [" << px_ee_cur_position.toString() << "]";
+        yInfo() << "jacobian_position  = [" << jacobian_position.toString() << "]";
+
+
+        /* FEATURES AND JACOBIAN (original orientation) */
+        getCurrentStereoFeaturesAndJacobian(l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation,
+                                            r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation,
+                                            px_ee_cur_orientation, jacobian_orientation);
+        
+        yInfo() << "px_ee_cur_orientation = [" << px_ee_cur_orientation.toString() << "]";
+        yInfo() << "jacobian_orientation  = [" << jacobian_orientation.toString() << "]";
+
+
         Vector e_position               = px_des_ - px_ee_cur_position;
         Matrix inv_jacobian_position    = pinv(jacobian_position);
 
@@ -341,17 +374,19 @@ bool ServerVisualServoing::updateModule()
         vel_o.push_back(ang);
         yInfo() << "axis-angle vel_o      = [" << vel_o.toString()                 << "]";
 
+
         /* Enforce translational velocity bounds */
         for (size_t i = 0; i < vel_x.length(); ++i)
             vel_x[i] = sign(vel_x[i]) * std::min(vx_max, std::fabs(vel_x[i]));
         yInfo() << "bounded vel_x = [" << vel_x.toString() << "]";
 
+
         /* Enforce rotational velocity bounds */
         vel_o[3] = sign(vel_o[3]) * std::min(vo_max, std::fabs(vel_o[3]));
         yInfo() << "bounded vel_o = [" << vel_o.toString() << "]";
 
+
         /* Visual control law */
-        /* SIM */
         vel_x    *= K_x;
         vel_o(3) *= K_o;
         /* Real robot - Pose */
@@ -388,138 +423,55 @@ bool ServerVisualServoing::updateModule()
             yInfo() << "px_ee_cur_orientation =" << px_ee_cur_orientation.toString();
             yInfo() << "\nTERMINATING!\n";
         }
-        else
-        {
-            /* Get the new end-effector pose from left eye particle filter */
-            estimates = port_pose_left_in_.read(true);
-            yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
-            if (estimates->length() == 7)
-            {
-                est_copy_left = estimates->subVector(0, 5);
-                float ang     = (*estimates)[6];
 
-                est_copy_left[3] *= ang;
-                est_copy_left[4] *= ang;
-                est_copy_left[5] *= ang;
-            }
-            else
-                est_copy_left = *estimates;
+        /* *** *** *** DEBUG OUTPUT *** *** *** */
+        cv::Scalar red   (255,   0,   0);
+        cv::Scalar green (  0, 255,   0);
+        cv::Scalar blue  (  0,   0, 255);
+        cv::Scalar yellow(255, 255,   0);
 
-            /* Get the new end-effector pose from right eye particle filter */
-            yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
-            estimates = port_pose_right_in_.read(true);
-            if (estimates->length() == 7)
-            {
-                est_copy_right = estimates->subVector(0, 5);
-                float ang      = (*estimates)[6];
+        /* Left eye end-effector superimposition */
+        ImageOf<PixelRgb>* l_imgin  = port_image_left_in_.read(true);
+        ImageOf<PixelRgb>& l_imgout = port_image_left_out_.prepare();
+        l_imgout = *l_imgin;
+        cv::Mat l_img = cv::cvarrToMat(l_imgout.getIplImage());
 
-                est_copy_right[3] *= ang;
-                est_copy_right[4] *= ang;
-                est_copy_right[5] *= ang;
-            }
-            else
-                est_copy_right = *estimates;
+        cv::circle(l_img, cv::Point(l_px0_position[0],    l_px0_position[1]),    4, red   , 4);
+        cv::circle(l_img, cv::Point(l_px1_position[0],    l_px1_position[1]),    4, green , 4);
+        cv::circle(l_img, cv::Point(l_px2_position[0],    l_px2_position[1]),    4, blue  , 4);
+        cv::circle(l_img, cv::Point(l_px3_position[0],    l_px3_position[1]),    4, yellow, 4);
+        cv::circle(l_img, cv::Point(l_px0_orientation[0], l_px0_orientation[1]), 4, red   , 4);
+        cv::circle(l_img, cv::Point(l_px1_orientation[0], l_px1_orientation[1]), 4, green , 4);
+        cv::circle(l_img, cv::Point(l_px2_orientation[0], l_px2_orientation[1]), 4, blue  , 4);
+        cv::circle(l_img, cv::Point(l_px3_orientation[0], l_px3_orientation[1]), 4, yellow, 4);
+        cv::circle(l_img, cv::Point(l_px_goal_[0], l_px_goal_[1]),               4, red   , 4);
+        cv::circle(l_img, cv::Point(l_px_goal_[2], l_px_goal_[3]),               4, green , 4);
+        cv::circle(l_img, cv::Point(l_px_goal_[4], l_px_goal_[5]),               4, blue  , 4);
+        cv::circle(l_img, cv::Point(l_px_goal_[6], l_px_goal_[7]),               4, yellow, 4);
 
-            yInfo() << "EE estimates left  = [" << est_copy_left.toString() << "]";
-            yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]\n";
+        port_image_left_out_.write();
 
-            /* SIM */
-//            /* Simulate reaching starting from the initial position */
-//            /* Comment any previous write on variable 'estimates' */
-//
-//            /* Evaluate the new orientation vector from axis-angle representation */
-//            /* The following code is a copy of the setTaskVelocities() code */
-//            Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
-//            Matrix l_R = axis2dcm(l_o);
-//            Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
-//            Matrix r_R = axis2dcm(r_o);
-//
-//            vel_o[3] *= Ts;
-//            l_R = axis2dcm(vel_o) * l_R;
-//            r_R = axis2dcm(vel_o) * r_R;
-//
-//            Vector l_new_o = dcm2axis(l_R);
-//            double l_ang = l_new_o(3);
-//            l_new_o.pop_back();
-//            l_new_o *= l_ang;
-//
-//            Vector r_new_o = dcm2axis(r_R);
-//            double r_ang = r_new_o(3);
-//            r_new_o.pop_back();
-//            r_new_o *= r_ang;
-//
-//            est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts);
-//            est_copy_left.setSubvector(3, l_new_o);
-//            est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts);
-//            est_copy_right.setSubvector(3, r_new_o);
-            /* **************************************************** */
+        /* Right eye end-effector superimposition */
+        ImageOf<PixelRgb>* r_imgin  = port_image_right_in_.read(true);
+        ImageOf<PixelRgb>& r_imgout = port_image_right_out_.prepare();
+        r_imgout = *r_imgin;
+        cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
 
-            getControlPixelsFromPose(est_copy_left,  CamSel::left,  ControlPixelMode::origin_x, l_px0_position,    l_px1_position,    l_px2_position,    l_px3_position);
-            getControlPixelsFromPose(est_copy_left,  CamSel::left,  ControlPixelMode::origin_o, l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation);
+        cv::circle(r_img, cv::Point(r_px0_position[0],    r_px0_position[1]),    4, red   , 4);
+        cv::circle(r_img, cv::Point(r_px1_position[0],    r_px1_position[1]),    4, green , 4);
+        cv::circle(r_img, cv::Point(r_px2_position[0],    r_px2_position[1]),    4, blue  , 4);
+        cv::circle(r_img, cv::Point(r_px3_position[0],    r_px3_position[1]),    4, yellow, 4);
+        cv::circle(r_img, cv::Point(r_px0_orientation[0], r_px0_orientation[1]), 4, red   , 4);
+        cv::circle(r_img, cv::Point(r_px1_orientation[0], r_px1_orientation[1]), 4, green , 4);
+        cv::circle(r_img, cv::Point(r_px2_orientation[0], r_px2_orientation[1]), 4, blue  , 4);
+        cv::circle(r_img, cv::Point(r_px3_orientation[0], r_px3_orientation[1]), 4, yellow, 4);
+        cv::circle(r_img, cv::Point(r_px_goal_[0], r_px_goal_[1]),               4, red   , 4);
+        cv::circle(r_img, cv::Point(r_px_goal_[2], r_px_goal_[3]),               4, green , 4);
+        cv::circle(r_img, cv::Point(r_px_goal_[4], r_px_goal_[5]),               4, blue  , 4);
+        cv::circle(r_img, cv::Point(r_px_goal_[6], r_px_goal_[7]),               4, yellow, 4);
 
-            getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_x, r_px0_position,    r_px1_position,    r_px2_position,    r_px3_position);
-            getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
-
-
-            getCurrentStereoFeaturesAndJacobian(l_px0_position, l_px1_position, l_px2_position, l_px3_position,
-                                                r_px0_position, r_px1_position, r_px2_position, r_px3_position,
-                                                px_ee_cur_position, jacobian_position);
-
-            getCurrentStereoFeaturesAndJacobian(l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation,
-                                                r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation,
-                                                px_ee_cur_orientation, jacobian_orientation);
-
-
-            /* DEBUG OUTPUT */
-            cv::Scalar red   (255,   0,   0);
-            cv::Scalar green (  0, 255,   0);
-            cv::Scalar blue  (  0,   0, 255);
-            cv::Scalar yellow(255, 255,   0);
-
-
-            /* Left eye end-effector superimposition */
-            ImageOf<PixelRgb>* l_imgin  = port_image_left_in_.read(true);
-            ImageOf<PixelRgb>& l_imgout = port_image_left_out_.prepare();
-            l_imgout = *l_imgin;
-            cv::Mat l_img = cv::cvarrToMat(l_imgout.getIplImage());
-
-            cv::circle(l_img, cv::Point(l_px0_position[0],    l_px0_position[1]),    4, red   , 4);
-            cv::circle(l_img, cv::Point(l_px1_position[0],    l_px1_position[1]),    4, green , 4);
-            cv::circle(l_img, cv::Point(l_px2_position[0],    l_px2_position[1]),    4, blue  , 4);
-            cv::circle(l_img, cv::Point(l_px3_position[0],    l_px3_position[1]),    4, yellow, 4);
-            cv::circle(l_img, cv::Point(l_px0_orientation[0], l_px0_orientation[1]), 4, red   , 4);
-            cv::circle(l_img, cv::Point(l_px1_orientation[0], l_px1_orientation[1]), 4, green , 4);
-            cv::circle(l_img, cv::Point(l_px2_orientation[0], l_px2_orientation[1]), 4, blue  , 4);
-            cv::circle(l_img, cv::Point(l_px3_orientation[0], l_px3_orientation[1]), 4, yellow, 4);
-            cv::circle(l_img, cv::Point(l_px_goal_[0], l_px_goal_[1]),               4, red   , 4);
-            cv::circle(l_img, cv::Point(l_px_goal_[2], l_px_goal_[3]),               4, green , 4);
-            cv::circle(l_img, cv::Point(l_px_goal_[4], l_px_goal_[5]),               4, blue  , 4);
-            cv::circle(l_img, cv::Point(l_px_goal_[6], l_px_goal_[7]),               4, yellow, 4);
-
-            port_image_left_out_.write();
-
-            /* Right eye end-effector superimposition */
-            ImageOf<PixelRgb>* r_imgin  = port_image_right_in_.read(true);
-            ImageOf<PixelRgb>& r_imgout = port_image_right_out_.prepare();
-            r_imgout = *r_imgin;
-            cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
-
-            cv::circle(r_img, cv::Point(r_px0_position[0],    r_px0_position[1]),    4, red   , 4);
-            cv::circle(r_img, cv::Point(r_px1_position[0],    r_px1_position[1]),    4, green , 4);
-            cv::circle(r_img, cv::Point(r_px2_position[0],    r_px2_position[1]),    4, blue  , 4);
-            cv::circle(r_img, cv::Point(r_px3_position[0],    r_px3_position[1]),    4, yellow, 4);
-            cv::circle(r_img, cv::Point(r_px0_orientation[0], r_px0_orientation[1]), 4, red   , 4);
-            cv::circle(r_img, cv::Point(r_px1_orientation[0], r_px1_orientation[1]), 4, green , 4);
-            cv::circle(r_img, cv::Point(r_px2_orientation[0], r_px2_orientation[1]), 4, blue  , 4);
-            cv::circle(r_img, cv::Point(r_px3_orientation[0], r_px3_orientation[1]), 4, yellow, 4);
-            cv::circle(r_img, cv::Point(r_px_goal_[0], r_px_goal_[1]),               4, red   , 4);
-            cv::circle(r_img, cv::Point(r_px_goal_[2], r_px_goal_[3]),               4, green , 4);
-            cv::circle(r_img, cv::Point(r_px_goal_[4], r_px_goal_[5]),               4, blue  , 4);
-            cv::circle(r_img, cv::Point(r_px_goal_[6], r_px_goal_[7]),               4, yellow, 4);
-
-            port_image_right_out_.write();
-            /* ************ */
-        }
+        port_image_right_out_.write();
+        /* *** *** *** *** *** *** *** *** *** */
     }
 
     itf_rightarm_cart_->stopControl();
