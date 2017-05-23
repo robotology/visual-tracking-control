@@ -130,10 +130,10 @@ private:
     yarp::sig::Vector getPixelFromPoint(const CamSel cam, const yarp::sig::Vector& p) const;
 
     
-    yarp::sig::Vector setJacobianU(const CamSel cam, const yarp::sig::Vector& px);
+    yarp::sig::Vector getJacobianU(const CamSel cam, const yarp::sig::Vector& px);
 
     
-    yarp::sig::Vector setJacobianV(const CamSel cam, const yarp::sig::Vector& px);
+    yarp::sig::Vector getJacobianV(const CamSel cam, const yarp::sig::Vector& px);
 
     
     yarp::sig::Vector getAxisAngle(const yarp::sig::Vector& v);

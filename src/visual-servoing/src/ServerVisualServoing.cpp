@@ -291,24 +291,24 @@ bool ServerVisualServoing::updateModule()
     Matrix jacobian_position = zeros(12, 6);
 
     /* Point 0 */
-    jacobian_position.setRow(0,  setJacobianU(CamSel::left,  l_px0_position));
-    jacobian_position.setRow(1,  setJacobianU(CamSel::right, r_px0_position));
-    jacobian_position.setRow(2,  setJacobianV(CamSel::left,  l_px0_position));
+    jacobian_position.setRow(0,  getJacobianU(CamSel::left,  l_px0_position));
+    jacobian_position.setRow(1,  getJacobianU(CamSel::right, r_px0_position));
+    jacobian_position.setRow(2,  getJacobianV(CamSel::left,  l_px0_position));
 
     /* Point 1 */
-    jacobian_position.setRow(3,  setJacobianU(CamSel::left,  l_px1_position));
-    jacobian_position.setRow(4,  setJacobianU(CamSel::right, r_px1_position));
-    jacobian_position.setRow(5,  setJacobianV(CamSel::left,  l_px1_position));
+    jacobian_position.setRow(3,  getJacobianU(CamSel::left,  l_px1_position));
+    jacobian_position.setRow(4,  getJacobianU(CamSel::right, r_px1_position));
+    jacobian_position.setRow(5,  getJacobianV(CamSel::left,  l_px1_position));
 
     /* Point 2 */
-    jacobian_position.setRow(6,  setJacobianU(CamSel::left,  l_px2_position));
-    jacobian_position.setRow(7,  setJacobianU(CamSel::right, r_px2_position));
-    jacobian_position.setRow(8,  setJacobianV(CamSel::left,  l_px2_position));
+    jacobian_position.setRow(6,  getJacobianU(CamSel::left,  l_px2_position));
+    jacobian_position.setRow(7,  getJacobianU(CamSel::right, r_px2_position));
+    jacobian_position.setRow(8,  getJacobianV(CamSel::left,  l_px2_position));
 
     /* Point 3 */
-    jacobian_position.setRow(9,  setJacobianU(CamSel::left,  l_px3_position));
-    jacobian_position.setRow(10, setJacobianU(CamSel::right, r_px3_position));
-    jacobian_position.setRow(11, setJacobianV(CamSel::left,  l_px3_position));
+    jacobian_position.setRow(9,  getJacobianU(CamSel::left,  l_px3_position));
+    jacobian_position.setRow(10, getJacobianU(CamSel::right, r_px3_position));
+    jacobian_position.setRow(11, getJacobianV(CamSel::left,  l_px3_position));
     /* ******** */
 
 
@@ -336,24 +336,24 @@ bool ServerVisualServoing::updateModule()
     Matrix jacobian_orientation = zeros(12, 6);
 
     /* Point 0 */
-    jacobian_orientation.setRow(0,  setJacobianU(CamSel::left,  l_px0_orientation));
-    jacobian_orientation.setRow(1,  setJacobianU(CamSel::right, r_px0_orientation));
-    jacobian_orientation.setRow(2,  setJacobianV(CamSel::left,  l_px0_orientation));
+    jacobian_orientation.setRow(0,  getJacobianU(CamSel::left,  l_px0_orientation));
+    jacobian_orientation.setRow(1,  getJacobianU(CamSel::right, r_px0_orientation));
+    jacobian_orientation.setRow(2,  getJacobianV(CamSel::left,  l_px0_orientation));
 
     /* Point 1 */
-    jacobian_orientation.setRow(3,  setJacobianU(CamSel::left,  l_px1_orientation));
-    jacobian_orientation.setRow(4,  setJacobianU(CamSel::right, r_px1_orientation));
-    jacobian_orientation.setRow(5,  setJacobianV(CamSel::left,  l_px1_orientation));
+    jacobian_orientation.setRow(3,  getJacobianU(CamSel::left,  l_px1_orientation));
+    jacobian_orientation.setRow(4,  getJacobianU(CamSel::right, r_px1_orientation));
+    jacobian_orientation.setRow(5,  getJacobianV(CamSel::left,  l_px1_orientation));
 
     /* Point 2 */
-    jacobian_orientation.setRow(6,  setJacobianU(CamSel::left,  l_px2_orientation));
-    jacobian_orientation.setRow(7,  setJacobianU(CamSel::right, r_px2_orientation));
-    jacobian_orientation.setRow(8,  setJacobianV(CamSel::left,  l_px2_orientation));
+    jacobian_orientation.setRow(6,  getJacobianU(CamSel::left,  l_px2_orientation));
+    jacobian_orientation.setRow(7,  getJacobianU(CamSel::right, r_px2_orientation));
+    jacobian_orientation.setRow(8,  getJacobianV(CamSel::left,  l_px2_orientation));
 
     /* Point 3 */
-    jacobian_orientation.setRow(9,  setJacobianU(CamSel::left,  l_px3_orientation));
-    jacobian_orientation.setRow(10, setJacobianU(CamSel::right, r_px3_orientation));
-    jacobian_orientation.setRow(11, setJacobianV(CamSel::left,  l_px3_orientation));
+    jacobian_orientation.setRow(9,  getJacobianU(CamSel::left,  l_px3_orientation));
+    jacobian_orientation.setRow(10, getJacobianU(CamSel::right, r_px3_orientation));
+    jacobian_orientation.setRow(11, getJacobianV(CamSel::left,  l_px3_orientation));
     /* ******** */
 
 
@@ -545,24 +545,24 @@ bool ServerVisualServoing::updateModule()
             jacobian_position = zeros(12, 6);
 
             /* Point 0 */
-            jacobian_position.setRow(0,  setJacobianU(CamSel::left,  l_px0_position));
-            jacobian_position.setRow(1,  setJacobianU(CamSel::right, r_px0_position));
-            jacobian_position.setRow(2,  setJacobianV(CamSel::left,  l_px0_position));
+            jacobian_position.setRow(0,  getJacobianU(CamSel::left,  l_px0_position));
+            jacobian_position.setRow(1,  getJacobianU(CamSel::right, r_px0_position));
+            jacobian_position.setRow(2,  getJacobianV(CamSel::left,  l_px0_position));
 
             /* Point 1 */
-            jacobian_position.setRow(3,  setJacobianU(CamSel::left,  l_px1_position));
-            jacobian_position.setRow(4,  setJacobianU(CamSel::right, r_px1_position));
-            jacobian_position.setRow(5,  setJacobianV(CamSel::left,  l_px1_position));
+            jacobian_position.setRow(3,  getJacobianU(CamSel::left,  l_px1_position));
+            jacobian_position.setRow(4,  getJacobianU(CamSel::right, r_px1_position));
+            jacobian_position.setRow(5,  getJacobianV(CamSel::left,  l_px1_position));
 
             /* Point 2 */
-            jacobian_position.setRow(6,  setJacobianU(CamSel::left,  l_px2_position));
-            jacobian_position.setRow(7,  setJacobianU(CamSel::right, r_px2_position));
-            jacobian_position.setRow(8,  setJacobianV(CamSel::left,  l_px2_position));
+            jacobian_position.setRow(6,  getJacobianU(CamSel::left,  l_px2_position));
+            jacobian_position.setRow(7,  getJacobianU(CamSel::right, r_px2_position));
+            jacobian_position.setRow(8,  getJacobianV(CamSel::left,  l_px2_position));
 
             /* Point 3 */
-            jacobian_position.setRow(9,  setJacobianU(CamSel::left,  l_px3_position));
-            jacobian_position.setRow(10, setJacobianU(CamSel::right, r_px3_position));
-            jacobian_position.setRow(11, setJacobianV(CamSel::left,  l_px3_position));
+            jacobian_position.setRow(9,  getJacobianU(CamSel::left,  l_px3_position));
+            jacobian_position.setRow(10, getJacobianU(CamSel::right, r_px3_position));
+            jacobian_position.setRow(11, getJacobianV(CamSel::left,  l_px3_position));
             /* ******** */
 
 
@@ -588,24 +588,24 @@ bool ServerVisualServoing::updateModule()
             jacobian_orientation = zeros(12, 6);
 
             /* Point 0 */
-            jacobian_orientation.setRow(0,  setJacobianU(CamSel::left,  l_px0_orientation));
-            jacobian_orientation.setRow(1,  setJacobianU(CamSel::right, r_px0_orientation));
-            jacobian_orientation.setRow(2,  setJacobianV(CamSel::left,  l_px0_orientation));
+            jacobian_orientation.setRow(0,  getJacobianU(CamSel::left,  l_px0_orientation));
+            jacobian_orientation.setRow(1,  getJacobianU(CamSel::right, r_px0_orientation));
+            jacobian_orientation.setRow(2,  getJacobianV(CamSel::left,  l_px0_orientation));
 
             /* Point 1 */
-            jacobian_orientation.setRow(3,  setJacobianU(CamSel::left,  l_px1_orientation));
-            jacobian_orientation.setRow(4,  setJacobianU(CamSel::right, r_px1_orientation));
-            jacobian_orientation.setRow(5,  setJacobianV(CamSel::left,  l_px1_orientation));
+            jacobian_orientation.setRow(3,  getJacobianU(CamSel::left,  l_px1_orientation));
+            jacobian_orientation.setRow(4,  getJacobianU(CamSel::right, r_px1_orientation));
+            jacobian_orientation.setRow(5,  getJacobianV(CamSel::left,  l_px1_orientation));
 
             /* Point 2 */
-            jacobian_orientation.setRow(6,  setJacobianU(CamSel::left,  l_px2_orientation));
-            jacobian_orientation.setRow(7,  setJacobianU(CamSel::right, r_px2_orientation));
-            jacobian_orientation.setRow(8,  setJacobianV(CamSel::left,  l_px2_orientation));
+            jacobian_orientation.setRow(6,  getJacobianU(CamSel::left,  l_px2_orientation));
+            jacobian_orientation.setRow(7,  getJacobianU(CamSel::right, r_px2_orientation));
+            jacobian_orientation.setRow(8,  getJacobianV(CamSel::left,  l_px2_orientation));
 
             /* Point 3 */
-            jacobian_orientation.setRow(9,  setJacobianU(CamSel::left,  l_px3_orientation));
-            jacobian_orientation.setRow(10, setJacobianU(CamSel::right, r_px3_orientation));
-            jacobian_orientation.setRow(11, setJacobianV(CamSel::left,  l_px3_orientation));
+            jacobian_orientation.setRow(9,  getJacobianU(CamSel::left,  l_px3_orientation));
+            jacobian_orientation.setRow(10, getJacobianU(CamSel::right, r_px3_orientation));
+            jacobian_orientation.setRow(11, getJacobianV(CamSel::left,  l_px3_orientation));
             /* ******** */
 
 
@@ -1417,7 +1417,7 @@ Vector ServerVisualServoing::getPixelFromPoint(const CamSel cam, const Vector& p
 }
 
 
-Vector ServerVisualServoing::setJacobianU(const CamSel cam, const Vector& px)
+Vector ServerVisualServoing::getJacobianU(const CamSel cam, const Vector& px)
 {
     Vector jacobian = zeros(6);
     
@@ -1442,7 +1442,7 @@ Vector ServerVisualServoing::setJacobianU(const CamSel cam, const Vector& px)
 }
 
 
-Vector ServerVisualServoing::setJacobianV(const CamSel cam, const Vector& px)
+Vector ServerVisualServoing::getJacobianV(const CamSel cam, const Vector& px)
 {
     Vector jacobian = zeros(6);
     
