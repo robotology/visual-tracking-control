@@ -85,8 +85,8 @@ private:
     int                           ctx_cart_;
     int                           ctx_gaze_;
 
-    yarp::os::BufferedPort<yarp::sig::Vector>                       port_estimates_left_in_;
-    yarp::os::BufferedPort<yarp::sig::Vector>                       port_estimates_right_in_;
+    yarp::os::BufferedPort<yarp::sig::Vector>                       port_pose_left_in_;
+    yarp::os::BufferedPort<yarp::sig::Vector>                       port_pose_right_in_;
 
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_left_in_;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_left_out_;

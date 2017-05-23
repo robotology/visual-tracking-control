@@ -30,14 +30,14 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     }
 
 
-    if (!port_estimates_left_in_.open("/visual-servoing/estimates/left:i"))
+    if (!port_pose_left_in_.open("/visual-servoing/pose/left:i"))
     {
-        yError() << "Could not open /visual-servoing/estimates/left:i port! Closing.";
+        yError() << "Could not open /visual-servoing/pose/left:i port! Closing.";
         return false;
     }
-    if (!port_estimates_right_in_.open("/visual-servoing/estimates/right:i"))
+    if (!port_pose_right_in_.open("/visual-servoing/pose/right:i"))
     {
-        yError() << "Could not open /visual-servoing/estimates/right:i port! Closing.";
+        yError() << "Could not open /visual-servoing/pose/right:i port! Closing.";
         return false;
     }
 
@@ -179,11 +179,12 @@ bool ServerVisualServoing::updateModule()
     if (should_stop_) return false;
 
 
-    Vector est_copy_left(6);
-    Vector est_copy_right(6);
+    Vector  est_copy_left(6);
+    Vector  est_copy_right(6);
+    Vector* estimates;
 
-    /* Get the initial end-effector pose from left eye particle filter */
-    Vector* estimates = port_estimates_left_in_.read(true);
+    /* Get the initial end-effector pose from left eye view */
+    estimates = port_pose_left_in_.read(true);
     yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
     if (estimates->length() == 7)
     {
@@ -197,8 +198,8 @@ bool ServerVisualServoing::updateModule()
     else
         est_copy_left = *estimates;
 
-    /* Get the initial end-effector pose from right eye particle filter */
-    estimates = port_estimates_right_in_.read(true);
+    /* Get the initial end-effector pose from right eye view */
+    estimates = port_pose_right_in_.read(true);
     yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
     if (estimates->length() == 7)
     {
@@ -215,8 +216,8 @@ bool ServerVisualServoing::updateModule()
 
     yInfo() << "RUNNING!\n";
 
-    yInfo() << "EE estimates left = ["  << est_copy_left.toString() << "]";
-    yInfo() << "EE estimates right = ["  << est_copy_right.toString() << "]";
+    yInfo() << "EE estimates left = ["  << est_copy_left.toString()  << "]";
+    yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]";
     yInfo() << "l_px_goal_ = [" << l_px_goal_.toString() << "]";
     yInfo() << "r_px_goal_ = [" << r_px_goal_.toString() << "]";
 
@@ -542,7 +543,7 @@ bool ServerVisualServoing::updateModule()
         else
         {
             /* Get the new end-effector pose from left eye particle filter */
-            estimates = port_estimates_left_in_.read(true);
+            estimates = port_pose_left_in_.read(true);
             yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
             if (estimates->length() == 7)
             {
@@ -558,7 +559,7 @@ bool ServerVisualServoing::updateModule()
 
             /* Get the new end-effector pose from right eye particle filter */
             yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
-            estimates = port_estimates_right_in_.read(true);
+            estimates = port_pose_right_in_.read(true);
             if (estimates->length() == 7)
             {
                 est_copy_right = estimates->subVector(0, 5);
@@ -879,8 +880,8 @@ bool ServerVisualServoing::interruptModule()
     Time::delay(3.0);
 
     yInfo() << "...port cleanup...";
-    port_estimates_left_in_.interrupt();
-    port_estimates_right_in_.interrupt();
+    port_pose_left_in_.interrupt();
+    port_pose_right_in_.interrupt();
     port_image_left_in_.interrupt();
     port_image_left_out_.interrupt();
     port_click_left_.interrupt();
@@ -897,8 +898,8 @@ bool ServerVisualServoing::close()
 {
     yInfo() << "Calling close functions...";
 
-    port_estimates_left_in_.close();
-    port_estimates_right_in_.close();
+    port_pose_left_in_.close();
+    port_pose_right_in_.close();
     port_image_left_in_.close();
     port_image_left_out_.close();
     port_click_left_.close();
