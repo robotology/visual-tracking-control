@@ -60,8 +60,8 @@ service ServerVisualServoingIDL
      *
      * @note The default operating mode is 'pose'.
      *
-     * @param label a label referring to one of the three operating mode, i.e.
-     *              'position', 'orientation' or 'pose'.
+     * @param mode a label referring to one of the three operating mode, i.e.
+     *             'position', 'orientation' or 'pose'.
      *
      * @return true upon success, false otherwise.
      */
