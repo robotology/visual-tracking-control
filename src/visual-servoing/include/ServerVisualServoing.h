@@ -130,6 +130,11 @@ private:
     
     yarp::sig::Vector getPixelFromPoint(const CamSel cam, const yarp::sig::Vector& p) const;
 
+
+    void getCurrentStereoFeaturesAndJacobian(const yarp::sig::Vector& left_px0,  const yarp::sig::Vector& left_px1,  const yarp::sig::Vector& left_px2,  const yarp::sig::Vector& left_px3,
+                                             const yarp::sig::Vector& right_px0, const yarp::sig::Vector& right_px1, const yarp::sig::Vector& right_px2, const yarp::sig::Vector& right_px3,
+                                             yarp::sig::Vector& features, yarp::sig::Matrix& jacobian);
+
     
     yarp::sig::Vector getJacobianU(const CamSel cam, const yarp::sig::Vector& px);
 

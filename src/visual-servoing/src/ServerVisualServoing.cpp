@@ -238,101 +238,39 @@ bool ServerVisualServoing::updateModule()
     Vector r_px3_position = zeros(2);
     getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_x, r_px0_position, r_px1_position, r_px2_position, r_px3_position);
 
+    yInfo() << "Right (original position) control px0 = [" << r_px0_position.toString() << "]";
+    yInfo() << "Right (original position) control px1 = [" << r_px1_position.toString() << "]";
+    yInfo() << "Right (original position) control px2 = [" << r_px2_position.toString() << "]";
+    yInfo() << "Right (original position) control px3 = [" << r_px3_position.toString() << "]";
+
     Vector r_px0_orientation = zeros(2);
     Vector r_px1_orientation = zeros(2);
     Vector r_px2_orientation = zeros(2);
     Vector r_px3_orientation = zeros(2);
     getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
 
+    yInfo() << "Right (original orientation) control px0 = [" << r_px0_orientation.toString() << "]";
+    yInfo() << "Right (original orientation) control px1 = [" << r_px1_orientation.toString() << "]";
+    yInfo() << "Right (original orientation) control px2 = [" << r_px2_orientation.toString() << "]";
+    yInfo() << "Right (original orientation) control px3 = [" << r_px3_orientation.toString() << "]";
 
-    /* JACOBIAN: ORIENTATION = GOAL */
-    Vector px_ee_cur_position;
 
-    px_ee_cur_position.push_back(l_px0_position[0]);    /* u_ee_l */
-    px_ee_cur_position.push_back(r_px0_position[0]);    /* u_ee_r */
-    px_ee_cur_position.push_back(l_px0_position[1]);    /* v_ee_l */
-
-    px_ee_cur_position.push_back(l_px1_position[0]);    /* u_x1_l */
-    px_ee_cur_position.push_back(r_px1_position[0]);    /* u_x1_r */
-    px_ee_cur_position.push_back(l_px1_position[1]);    /* v_x1_l */
-
-    px_ee_cur_position.push_back(l_px2_position[0]);    /* u_x2_l */
-    px_ee_cur_position.push_back(r_px2_position[0]);    /* u_x2_r */
-    px_ee_cur_position.push_back(l_px2_position[1]);    /* v_x2_l */
-
-    px_ee_cur_position.push_back(l_px3_position[0]);    /* u_x3_l */
-    px_ee_cur_position.push_back(r_px3_position[0]);    /* u_x3_r */
-    px_ee_cur_position.push_back(l_px3_position[1]);    /* v_x3_l */
+    /* FEATURES AND JACOBIAN (original position) */
+    Vector px_ee_cur_position = zeros(12);
+    Matrix jacobian_position  = zeros(12, 6);
+    getCurrentStereoFeaturesAndJacobian(l_px0_position, l_px1_position, l_px2_position, l_px3_position,
+                                        r_px0_position, r_px1_position, r_px2_position, r_px3_position,
+                                        px_ee_cur_position, jacobian_position);
 
     yInfo() << "px_ee_cur_position = [" << px_ee_cur_position.toString() << "]";
+    yInfo() << "jacobian_position  = [" << jacobian_position.toString() << "]";
 
-    Matrix jacobian_position = zeros(12, 6);
-
-    /* Point 0 */
-    jacobian_position.setRow(0,  getJacobianU(CamSel::left,  l_px0_position));
-    jacobian_position.setRow(1,  getJacobianU(CamSel::right, r_px0_position));
-    jacobian_position.setRow(2,  getJacobianV(CamSel::left,  l_px0_position));
-
-    /* Point 1 */
-    jacobian_position.setRow(3,  getJacobianU(CamSel::left,  l_px1_position));
-    jacobian_position.setRow(4,  getJacobianU(CamSel::right, r_px1_position));
-    jacobian_position.setRow(5,  getJacobianV(CamSel::left,  l_px1_position));
-
-    /* Point 2 */
-    jacobian_position.setRow(6,  getJacobianU(CamSel::left,  l_px2_position));
-    jacobian_position.setRow(7,  getJacobianU(CamSel::right, r_px2_position));
-    jacobian_position.setRow(8,  getJacobianV(CamSel::left,  l_px2_position));
-
-    /* Point 3 */
-    jacobian_position.setRow(9,  getJacobianU(CamSel::left,  l_px3_position));
-    jacobian_position.setRow(10, getJacobianU(CamSel::right, r_px3_position));
-    jacobian_position.setRow(11, getJacobianV(CamSel::left,  l_px3_position));
-    /* ******** */
-
-
-    /* JACOBIAN: POSITION = GOAL */
-    Vector px_ee_cur_orientation;
-
-    px_ee_cur_orientation.push_back(l_px0_orientation[0]);  /* u_ee_l */
-    px_ee_cur_orientation.push_back(r_px0_orientation[0]);  /* u_ee_r */
-    px_ee_cur_orientation.push_back(l_px0_orientation[1]);  /* v_ee_l */
-
-    px_ee_cur_orientation.push_back(l_px1_orientation[0]);  /* u_x1_l */
-    px_ee_cur_orientation.push_back(r_px1_orientation[0]);  /* u_x1_r */
-    px_ee_cur_orientation.push_back(l_px1_orientation[1]);  /* v_x1_l */
-
-    px_ee_cur_orientation.push_back(l_px2_orientation[0]);  /* u_x2_l */
-    px_ee_cur_orientation.push_back(r_px2_orientation[0]);  /* u_x2_r */
-    px_ee_cur_orientation.push_back(l_px2_orientation[1]);  /* v_x2_l */
-
-    px_ee_cur_orientation.push_back(l_px3_orientation[0]);  /* u_x3_l */
-    px_ee_cur_orientation.push_back(r_px3_orientation[0]);  /* u_x3_r */
-    px_ee_cur_orientation.push_back(l_px3_orientation[1]);  /* v_x3_l */
-
-    yInfo() << "px_ee_cur_orientation = [" << px_ee_cur_orientation.toString() << "]";
-
-    Matrix jacobian_orientation = zeros(12, 6);
-
-    /* Point 0 */
-    jacobian_orientation.setRow(0,  getJacobianU(CamSel::left,  l_px0_orientation));
-    jacobian_orientation.setRow(1,  getJacobianU(CamSel::right, r_px0_orientation));
-    jacobian_orientation.setRow(2,  getJacobianV(CamSel::left,  l_px0_orientation));
-
-    /* Point 1 */
-    jacobian_orientation.setRow(3,  getJacobianU(CamSel::left,  l_px1_orientation));
-    jacobian_orientation.setRow(4,  getJacobianU(CamSel::right, r_px1_orientation));
-    jacobian_orientation.setRow(5,  getJacobianV(CamSel::left,  l_px1_orientation));
-
-    /* Point 2 */
-    jacobian_orientation.setRow(6,  getJacobianU(CamSel::left,  l_px2_orientation));
-    jacobian_orientation.setRow(7,  getJacobianU(CamSel::right, r_px2_orientation));
-    jacobian_orientation.setRow(8,  getJacobianV(CamSel::left,  l_px2_orientation));
-
-    /* Point 3 */
-    jacobian_orientation.setRow(9,  getJacobianU(CamSel::left,  l_px3_orientation));
-    jacobian_orientation.setRow(10, getJacobianU(CamSel::right, r_px3_orientation));
-    jacobian_orientation.setRow(11, getJacobianV(CamSel::left,  l_px3_orientation));
-    /* ******** */
+    /* FEATURES AND JACOBIAN (original orientation) */
+    Vector px_ee_cur_orientation = zeros(12);
+    Matrix jacobian_orientation  = zeros(12, 6);
+    getCurrentStereoFeaturesAndJacobian(l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation,
+                                        r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation,
+                                        px_ee_cur_orientation, jacobian_orientation);
 
 
     /* Restoring cartesian and gaze context */
@@ -506,90 +444,13 @@ bool ServerVisualServoing::updateModule()
             getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
 
 
-            /* JACOBIAN: ORIENTATION = GOAL */
-            px_ee_cur_position[0]  = l_px0_position[0];   /* u_ee_l */
-            px_ee_cur_position[1]  = r_px0_position[0];   /* u_ee_r */
-            px_ee_cur_position[2]  = l_px0_position[1];   /* v_ee_l */
+            getCurrentStereoFeaturesAndJacobian(l_px0_position, l_px1_position, l_px2_position, l_px3_position,
+                                                r_px0_position, r_px1_position, r_px2_position, r_px3_position,
+                                                px_ee_cur_position, jacobian_position);
 
-            px_ee_cur_position[3]  = l_px1_position[0];   /* u_x1_l */
-            px_ee_cur_position[4]  = r_px1_position[0];   /* u_x1_r */
-            px_ee_cur_position[5]  = l_px1_position[1];   /* v_x1_l */
-
-            px_ee_cur_position[6]  = l_px2_position[0];   /* u_x2_l */
-            px_ee_cur_position[7]  = r_px2_position[0];   /* u_x2_r */
-            px_ee_cur_position[8]  = l_px2_position[1];   /* v_x2_l */
-
-            px_ee_cur_position[9]  = l_px3_position[0];   /* u_x3_l */
-            px_ee_cur_position[10] = r_px3_position[0];   /* u_x3_r */
-            px_ee_cur_position[11] = l_px3_position[1];   /* v_x3_l */
-
-            yInfo() << "px_ee_cur_position = [" << px_ee_cur_position.toString() << "]";
-
-            jacobian_position = zeros(12, 6);
-
-            /* Point 0 */
-            jacobian_position.setRow(0,  getJacobianU(CamSel::left,  l_px0_position));
-            jacobian_position.setRow(1,  getJacobianU(CamSel::right, r_px0_position));
-            jacobian_position.setRow(2,  getJacobianV(CamSel::left,  l_px0_position));
-
-            /* Point 1 */
-            jacobian_position.setRow(3,  getJacobianU(CamSel::left,  l_px1_position));
-            jacobian_position.setRow(4,  getJacobianU(CamSel::right, r_px1_position));
-            jacobian_position.setRow(5,  getJacobianV(CamSel::left,  l_px1_position));
-
-            /* Point 2 */
-            jacobian_position.setRow(6,  getJacobianU(CamSel::left,  l_px2_position));
-            jacobian_position.setRow(7,  getJacobianU(CamSel::right, r_px2_position));
-            jacobian_position.setRow(8,  getJacobianV(CamSel::left,  l_px2_position));
-
-            /* Point 3 */
-            jacobian_position.setRow(9,  getJacobianU(CamSel::left,  l_px3_position));
-            jacobian_position.setRow(10, getJacobianU(CamSel::right, r_px3_position));
-            jacobian_position.setRow(11, getJacobianV(CamSel::left,  l_px3_position));
-            /* ******** */
-
-
-            /* JACOBIAN: POSITION = GOAL */
-            px_ee_cur_orientation[0]  = l_px0_orientation[0];   /* u_ee_l */
-            px_ee_cur_orientation[1]  = r_px0_orientation[0];   /* u_ee_r */
-            px_ee_cur_orientation[2]  = l_px0_orientation[1];   /* v_ee_l */
-
-            px_ee_cur_orientation[3]  = l_px1_orientation[0];   /* u_x1_l */
-            px_ee_cur_orientation[4]  = r_px1_orientation[0];   /* u_x1_r */
-            px_ee_cur_orientation[5]  = l_px1_orientation[1];   /* v_x1_l */
-
-            px_ee_cur_orientation[6]  = l_px2_orientation[0];   /* u_x2_l */
-            px_ee_cur_orientation[7]  = r_px2_orientation[0];   /* u_x2_r */
-            px_ee_cur_orientation[8]  = l_px2_orientation[1];   /* v_x2_l */
-
-            px_ee_cur_orientation[9]  = l_px3_orientation[0];   /* u_x3_l */
-            px_ee_cur_orientation[10] = r_px3_orientation[0];   /* u_x3_r */
-            px_ee_cur_orientation[11] = l_px3_orientation[1];   /* v_x3_l */
-
-            yInfo() << "px_ee_cur_orientation = [" << px_ee_cur_orientation.toString() << "]";
-
-            jacobian_orientation = zeros(12, 6);
-
-            /* Point 0 */
-            jacobian_orientation.setRow(0,  getJacobianU(CamSel::left,  l_px0_orientation));
-            jacobian_orientation.setRow(1,  getJacobianU(CamSel::right, r_px0_orientation));
-            jacobian_orientation.setRow(2,  getJacobianV(CamSel::left,  l_px0_orientation));
-
-            /* Point 1 */
-            jacobian_orientation.setRow(3,  getJacobianU(CamSel::left,  l_px1_orientation));
-            jacobian_orientation.setRow(4,  getJacobianU(CamSel::right, r_px1_orientation));
-            jacobian_orientation.setRow(5,  getJacobianV(CamSel::left,  l_px1_orientation));
-
-            /* Point 2 */
-            jacobian_orientation.setRow(6,  getJacobianU(CamSel::left,  l_px2_orientation));
-            jacobian_orientation.setRow(7,  getJacobianU(CamSel::right, r_px2_orientation));
-            jacobian_orientation.setRow(8,  getJacobianV(CamSel::left,  l_px2_orientation));
-
-            /* Point 3 */
-            jacobian_orientation.setRow(9,  getJacobianU(CamSel::left,  l_px3_orientation));
-            jacobian_orientation.setRow(10, getJacobianU(CamSel::right, r_px3_orientation));
-            jacobian_orientation.setRow(11, getJacobianV(CamSel::left,  l_px3_orientation));
-            /* ******** */
+            getCurrentStereoFeaturesAndJacobian(l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation,
+                                                r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation,
+                                                px_ee_cur_orientation, jacobian_orientation);
 
 
             /* DEBUG OUTPUT */
@@ -1438,6 +1299,54 @@ Vector ServerVisualServoing::getPixelFromPoint(const CamSel cam, const Vector& p
     px[1] /= px[2];
 
     return px;
+}
+
+
+void ServerVisualServoing::getCurrentStereoFeaturesAndJacobian(const Vector& left_px0,  const Vector& left_px1,  const Vector& left_px2,  const Vector& left_px3,
+                                                               const Vector& right_px0, const Vector& right_px1, const Vector& right_px2, const Vector& right_px3,
+                                                               Vector& features, Matrix& jacobian)
+{
+    if (features.length() != 12)
+        features.resize(12);
+
+    if (jacobian.rows() != 12 || jacobian.cols() != 6)
+        jacobian.resize(12, 6);
+
+
+    /* FEATURES */
+    features[0]  = left_px0 [0];    /* u_ee_l */
+    features[1]  = right_px0[0];    /* u_ee_r */
+    features[2]  = left_px0 [1];    /* v_ee_l */
+
+    features[3]  = left_px1 [0];    /* u_x1_l */
+    features[4]  = right_px1[0];    /* u_x1_r */
+    features[5]  = left_px1 [1];    /* v_x1_l */
+
+    features[6]  = left_px2 [0];    /* u_x2_l */
+    features[7]  = right_px2[0];    /* u_x2_r */
+    features[8]  = left_px2 [1];    /* v_x2_l */
+
+    features[9]  = left_px3 [0];    /* u_x3_l */
+    features[10] = right_px3[0];    /* u_x3_r */
+    features[11] = left_px3 [1];    /* v_x3_l */
+
+
+    /* JACOBIAN */
+    jacobian.setRow(0,  getJacobianU(CamSel::left,  left_px0));
+    jacobian.setRow(1,  getJacobianU(CamSel::right, right_px0));
+    jacobian.setRow(2,  getJacobianV(CamSel::left,  left_px0));
+
+    jacobian.setRow(3,  getJacobianU(CamSel::left,  left_px1));
+    jacobian.setRow(4,  getJacobianU(CamSel::right, right_px1));
+    jacobian.setRow(5,  getJacobianV(CamSel::left,  left_px1));
+
+    jacobian.setRow(6,  getJacobianU(CamSel::left,  left_px2));
+    jacobian.setRow(7,  getJacobianU(CamSel::right, right_px2));
+    jacobian.setRow(8,  getJacobianV(CamSel::left,  left_px2));
+
+    jacobian.setRow(9,  getJacobianU(CamSel::left,  left_px3));
+    jacobian.setRow(10, getJacobianU(CamSel::right, right_px3));
+    jacobian.setRow(11, getJacobianV(CamSel::left,  left_px3));
 }
 
 
