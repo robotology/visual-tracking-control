@@ -219,17 +219,28 @@ bool ServerVisualServoing::updateModule()
     yInfo() << "EE estimates left  = ["  << est_copy_left.toString()  << "]";
     yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]";
 
+    /* EVALUATING CONTROL POINTS */
     Vector l_px0_position = zeros(2);
     Vector l_px1_position = zeros(2);
     Vector l_px2_position = zeros(2);
     Vector l_px3_position = zeros(2);
     getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_x, l_px0_position, l_px1_position, l_px2_position, l_px3_position);
 
+    yInfo() << "Left (original position) control px0 = [" << l_px0_position.toString() << "]";
+    yInfo() << "Left (original position) control px1 = [" << l_px1_position.toString() << "]";
+    yInfo() << "Left (original position) control px2 = [" << l_px2_position.toString() << "]";
+    yInfo() << "Left (original position) control px3 = [" << l_px3_position.toString() << "]";
+
     Vector l_px0_orientation = zeros(2);
     Vector l_px1_orientation = zeros(2);
     Vector l_px2_orientation = zeros(2);
     Vector l_px3_orientation = zeros(2);
     getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_o, l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation);
+
+    yInfo() << "Left (original orientation) control px0 = [" << l_px0_orientation.toString() << "]";
+    yInfo() << "Left (original orientation) control px1 = [" << l_px1_orientation.toString() << "]";
+    yInfo() << "Left (original orientation) control px2 = [" << l_px2_orientation.toString() << "]";
+    yInfo() << "Left (original orientation) control px3 = [" << l_px3_orientation.toString() << "]";
 
 
     Vector r_px0_position = zeros(2);
@@ -1225,14 +1236,6 @@ void ServerVisualServoing::getControlPixelsFromPose(const Vector& pose, const Ca
     px1 = getPixelFromPoint(cam, control_p1);
     px2 = getPixelFromPoint(cam, control_p2);
     px3 = getPixelFromPoint(cam, control_p3);
-
-
-    ConstString s_cam  = (cam == CamSel::left ? "Left" : "Right");
-    ConstString s_mode = (mode == ControlPixelMode::origin ? "(original)" : (mode == ControlPixelMode::origin_x ? "(original position)" : "(original orientation)"));
-    yInfo() << s_cam << s_mode << "control px0 = [" << px0.toString() << "]";
-    yInfo() << s_cam << s_mode << "control px1 = [" << px1.toString() << "]";
-    yInfo() << s_cam << s_mode << "control px2 = [" << px2.toString() << "]";
-    yInfo() << s_cam << s_mode << "control px3 = [" << px3.toString() << "]";
 }
 
 
