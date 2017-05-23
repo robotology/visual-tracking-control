@@ -283,6 +283,9 @@ bool ServerVisualServoing::updateModule()
                                         r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation,
                                         px_ee_cur_orientation, jacobian_orientation);
 
+    yInfo() << "px_ee_cur_orientation = [" << px_ee_cur_orientation.toString() << "]";
+    yInfo() << "jacobian_orientation  = [" << jacobian_orientation.toString() << "]";
+
 
     /* Restoring cartesian and gaze context */
     itf_rightarm_cart_->restoreContext(ctx_cart_);
