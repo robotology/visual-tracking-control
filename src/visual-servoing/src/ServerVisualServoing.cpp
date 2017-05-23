@@ -216,30 +216,8 @@ bool ServerVisualServoing::updateModule()
 
     yInfo() << "RUNNING!\n";
 
-    yInfo() << "EE estimates left = ["  << est_copy_left.toString()  << "]";
+    yInfo() << "EE estimates left  = ["  << est_copy_left.toString()  << "]";
     yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]";
-    yInfo() << "l_px_goal_ = [" << l_px_goal_.toString() << "]";
-    yInfo() << "r_px_goal_ = [" << r_px_goal_.toString() << "]";
-
-    Vector px_des;
-    px_des.push_back(l_px_goal_[0]);    /* u_ee_l */
-    px_des.push_back(r_px_goal_[0]);    /* u_ee_r */
-    px_des.push_back(l_px_goal_[1]);    /* v_ee_l */
-
-    px_des.push_back(l_px_goal_[2]);    /* u_x1_l */
-    px_des.push_back(r_px_goal_[2]);    /* u_x1_r */
-    px_des.push_back(l_px_goal_[3]);    /* v_x1_l */
-
-    px_des.push_back(l_px_goal_[4]);    /* u_x2_l */
-    px_des.push_back(r_px_goal_[4]);    /* u_x2_r */
-    px_des.push_back(l_px_goal_[5]);    /* v_x2_l */
-
-    px_des.push_back(l_px_goal_[6]);    /* u_x3_l */
-    px_des.push_back(r_px_goal_[6]);    /* u_x3_r */
-    px_des.push_back(l_px_goal_[7]);    /* v_x3_l */
-
-    yInfo() << "px_des = ["  << px_des.toString() << "]";
-
 
     Vector l_px0_position = zeros(2);
     Vector l_px1_position = zeros(2);
@@ -370,10 +348,10 @@ bool ServerVisualServoing::updateModule()
     bool done = false;
     while (!should_stop_ && !done)
     {
-        Vector e_position               = px_des - px_ee_cur_position;
+        Vector e_position               = px_des_ - px_ee_cur_position;
         Matrix inv_jacobian_position    = pinv(jacobian_position);
 
-        Vector e_orientation            = px_des - px_ee_cur_orientation;
+        Vector e_orientation            = px_des_ - px_ee_cur_orientation;
         Matrix inv_jacobian_orientation = pinv(jacobian_orientation);
 
 
@@ -397,7 +375,7 @@ bool ServerVisualServoing::updateModule()
         }
 
 
-        yInfo() << "px_des = ["             << px_des.toString()             << "]";
+        yInfo() << "px_des_ = ["            << px_des_.toString()             << "]";
         yInfo() << "px_ee_cur_position = [" << px_ee_cur_position.toString() << "]";
         yInfo() << "e_position = ["         << e_position.toString()         << "]";
         yInfo() << "e_orientation = ["      << e_orientation.toString()      << "]";
@@ -428,24 +406,29 @@ bool ServerVisualServoing::updateModule()
         /* Real robot - Translation */
 //        itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
 
-        yInfo() << "Pixel errors: " << std::abs(px_des(0) - px_ee_cur_position(0)) << std::abs(px_des(1)  - px_ee_cur_position(1))  << std::abs(px_des(2)  - px_ee_cur_position(2))
-        << std::abs(px_des(3) - px_ee_cur_position(3)) << std::abs(px_des(4)  - px_ee_cur_position(4))  << std::abs(px_des(5)  - px_ee_cur_position(5))
-        << std::abs(px_des(6) - px_ee_cur_position(6)) << std::abs(px_des(7)  - px_ee_cur_position(7))  << std::abs(px_des(8)  - px_ee_cur_position(8))
-        << std::abs(px_des(9) - px_ee_cur_position(9)) << std::abs(px_des(10) - px_ee_cur_position(10)) << std::abs(px_des(11) - px_ee_cur_position(11));
+        yInfo() << "Position errors: " << std::abs(px_des_(0) - px_ee_cur_position(0)) << std::abs(px_des_(1)  - px_ee_cur_position(1))  << std::abs(px_des_(2)  - px_ee_cur_position(2))
+                                       << std::abs(px_des_(3) - px_ee_cur_position(3)) << std::abs(px_des_(4)  - px_ee_cur_position(4))  << std::abs(px_des_(5)  - px_ee_cur_position(5))
+                                       << std::abs(px_des_(6) - px_ee_cur_position(6)) << std::abs(px_des_(7)  - px_ee_cur_position(7))  << std::abs(px_des_(8)  - px_ee_cur_position(8))
+                                       << std::abs(px_des_(9) - px_ee_cur_position(9)) << std::abs(px_des_(10) - px_ee_cur_position(10)) << std::abs(px_des_(11) - px_ee_cur_position(11));
+
+        yInfo() << "Oreintation errors: " << std::abs(px_des_(0) - px_ee_cur_orientation(0)) << std::abs(px_des_(1)  - px_ee_cur_orientation(1))  << std::abs(px_des_(2)  - px_ee_cur_orientation(2))
+                                          << std::abs(px_des_(3) - px_ee_cur_orientation(3)) << std::abs(px_des_(4)  - px_ee_cur_orientation(4))  << std::abs(px_des_(5)  - px_ee_cur_orientation(5))
+                                          << std::abs(px_des_(6) - px_ee_cur_orientation(6)) << std::abs(px_des_(7)  - px_ee_cur_orientation(7))  << std::abs(px_des_(8)  - px_ee_cur_orientation(8))
+                                          << std::abs(px_des_(9) - px_ee_cur_orientation(9)) << std::abs(px_des_(10) - px_ee_cur_orientation(10)) << std::abs(px_des_(11) - px_ee_cur_orientation(11));
 
         Time::delay(Ts);
 
-        done = ((std::abs(px_des(0) - px_ee_cur_position(0)) < 5.0)    && (std::abs(px_des(1)  - px_ee_cur_position(1))  < 5.0)    && (std::abs(px_des(2)  - px_ee_cur_position(2))  < 5.0)    &&
-                (std::abs(px_des(3) - px_ee_cur_position(3)) < 5.0)    && (std::abs(px_des(4)  - px_ee_cur_position(4))  < 5.0)    && (std::abs(px_des(5)  - px_ee_cur_position(5))  < 5.0)    &&
-                (std::abs(px_des(6) - px_ee_cur_position(6)) < 5.0)    && (std::abs(px_des(7)  - px_ee_cur_position(7))  < 5.0)    && (std::abs(px_des(8)  - px_ee_cur_position(8))  < 5.0)    &&
-                (std::abs(px_des(9) - px_ee_cur_position(9)) < 5.0)    && (std::abs(px_des(10) - px_ee_cur_position(10)) < 5.0)    && (std::abs(px_des(11) - px_ee_cur_position(11)) < 5.0)    &&
-                (std::abs(px_des(0) - px_ee_cur_orientation(0)) < 5.0) && (std::abs(px_des(1)  - px_ee_cur_orientation(1))  < 5.0) && (std::abs(px_des(2)  - px_ee_cur_orientation(2))  < 5.0) &&
-                (std::abs(px_des(3) - px_ee_cur_orientation(3)) < 5.0) && (std::abs(px_des(4)  - px_ee_cur_orientation(4))  < 5.0) && (std::abs(px_des(5)  - px_ee_cur_orientation(5))  < 5.0) &&
-                (std::abs(px_des(6) - px_ee_cur_orientation(6)) < 5.0) && (std::abs(px_des(7)  - px_ee_cur_orientation(7))  < 5.0) && (std::abs(px_des(8)  - px_ee_cur_orientation(8))  < 5.0) &&
-                (std::abs(px_des(9) - px_ee_cur_orientation(9)) < 5.0) && (std::abs(px_des(10) - px_ee_cur_orientation(10)) < 5.0) && (std::abs(px_des(11) - px_ee_cur_orientation(11)) < 5.0));
+        done = ((std::abs(px_des_(0) - px_ee_cur_position(0))    < 5.0) && (std::abs(px_des_(1)  - px_ee_cur_position(1))     < 5.0) && (std::abs(px_des_(2)  - px_ee_cur_position(2))     < 5.0) &&
+                (std::abs(px_des_(3) - px_ee_cur_position(3))    < 5.0) && (std::abs(px_des_(4)  - px_ee_cur_position(4))     < 5.0) && (std::abs(px_des_(5)  - px_ee_cur_position(5))     < 5.0) &&
+                (std::abs(px_des_(6) - px_ee_cur_position(6))    < 5.0) && (std::abs(px_des_(7)  - px_ee_cur_position(7))     < 5.0) && (std::abs(px_des_(8)  - px_ee_cur_position(8))     < 5.0) &&
+                (std::abs(px_des_(9) - px_ee_cur_position(9))    < 5.0) && (std::abs(px_des_(10) - px_ee_cur_position(10))    < 5.0) && (std::abs(px_des_(11) - px_ee_cur_position(11))    < 5.0) &&
+                (std::abs(px_des_(0) - px_ee_cur_orientation(0)) < 5.0) && (std::abs(px_des_(1)  - px_ee_cur_orientation(1))  < 5.0) && (std::abs(px_des_(2)  - px_ee_cur_orientation(2))  < 5.0) &&
+                (std::abs(px_des_(3) - px_ee_cur_orientation(3)) < 5.0) && (std::abs(px_des_(4)  - px_ee_cur_orientation(4))  < 5.0) && (std::abs(px_des_(5)  - px_ee_cur_orientation(5))  < 5.0) &&
+                (std::abs(px_des_(6) - px_ee_cur_orientation(6)) < 5.0) && (std::abs(px_des_(7)  - px_ee_cur_orientation(7))  < 5.0) && (std::abs(px_des_(8)  - px_ee_cur_orientation(8))  < 5.0) &&
+                (std::abs(px_des_(9) - px_ee_cur_orientation(9)) < 5.0) && (std::abs(px_des_(10) - px_ee_cur_orientation(10)) < 5.0) && (std::abs(px_des_(11) - px_ee_cur_orientation(11)) < 5.0));
         if (done)
         {
-            yInfo() << "\npx_des ="              << px_des.toString();
+            yInfo() << "\npx_des ="              << px_des_.toString();
             yInfo() << "px_ee_cur_position ="    << px_ee_cur_position.toString();
             yInfo() << "px_ee_cur_orientation =" << px_ee_cur_orientation.toString();
             yInfo() << "\nTERMINATING!\n";
@@ -1010,6 +993,26 @@ bool ServerVisualServoing::set_goal(const std::string& label)
     r_px_goal_[6] = r_px3_goal[0];
     r_px_goal_[7] = r_px3_goal[1];
 
+    yInfo() << "l_px_goal_ = [" << l_px_goal_.toString() << "]";
+    yInfo() << "r_px_goal_ = [" << r_px_goal_.toString() << "]";
+
+    px_des_.push_back(l_px_goal_[0]);    /* u_ee_l */
+    px_des_.push_back(r_px_goal_[0]);    /* u_ee_r */
+    px_des_.push_back(l_px_goal_[1]);    /* v_ee_l */
+
+    px_des_.push_back(l_px_goal_[2]);    /* u_x1_l */
+    px_des_.push_back(r_px_goal_[2]);    /* u_x1_r */
+    px_des_.push_back(l_px_goal_[3]);    /* v_x1_l */
+
+    px_des_.push_back(l_px_goal_[4]);    /* u_x2_l */
+    px_des_.push_back(r_px_goal_[4]);    /* u_x2_r */
+    px_des_.push_back(l_px_goal_[5]);    /* v_x2_l */
+
+    px_des_.push_back(l_px_goal_[6]);    /* u_x3_l */
+    px_des_.push_back(r_px_goal_[6]);    /* u_x3_r */
+    px_des_.push_back(l_px_goal_[7]);    /* v_x3_l */
+
+    yInfo() << "px_des_ = ["  << px_des_.toString() << "]";
 
     return true;
 }
@@ -1143,6 +1146,27 @@ bool ServerVisualServoing::get_sfm_points()
         r_px_goal_[5] = r_px2_goal[1];
         r_px_goal_[6] = r_px3_goal[0];
         r_px_goal_[7] = r_px3_goal[1];
+
+        yInfo() << "l_px_goal_ = [" << l_px_goal_.toString() << "]";
+        yInfo() << "r_px_goal_ = [" << r_px_goal_.toString() << "]";
+
+        px_des_.push_back(l_px_goal_[0]);    /* u_ee_l */
+        px_des_.push_back(r_px_goal_[0]);    /* u_ee_r */
+        px_des_.push_back(l_px_goal_[1]);    /* v_ee_l */
+
+        px_des_.push_back(l_px_goal_[2]);    /* u_x1_l */
+        px_des_.push_back(r_px_goal_[2]);    /* u_x1_r */
+        px_des_.push_back(l_px_goal_[3]);    /* v_x1_l */
+
+        px_des_.push_back(l_px_goal_[4]);    /* u_x2_l */
+        px_des_.push_back(r_px_goal_[4]);    /* u_x2_r */
+        px_des_.push_back(l_px_goal_[5]);    /* v_x2_l */
+
+        px_des_.push_back(l_px_goal_[6]);    /* u_x3_l */
+        px_des_.push_back(r_px_goal_[6]);    /* u_x3_r */
+        px_des_.push_back(l_px_goal_[7]);    /* v_x3_l */
+
+        yInfo() << "px_des_ = ["  << px_des_.toString() << "]";
     }
     else
         return false;

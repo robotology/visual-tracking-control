@@ -86,6 +86,7 @@ private:
     double                        traj_time_ = 3.0;
     yarp::sig::Vector             l_px_goal_;
     yarp::sig::Vector             r_px_goal_;
+    yarp::sig::Vector             px_des_;
     bool                          take_estimates_ = false;
 
     int                           ctx_cart_;
