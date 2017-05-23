@@ -211,7 +211,7 @@ bool ServerVisualServoing::updateModule()
         est_copy_right[5] *= ang;
     }
     else
-        est_copy_left = *estimates;
+        est_copy_right = *estimates;
 
 
     yInfo() << "RUNNING!\n";
@@ -570,7 +570,7 @@ bool ServerVisualServoing::updateModule()
                 est_copy_right[5] *= ang;
             }
             else
-                est_copy_left = *estimates;
+                est_copy_right = *estimates;
 
             yInfo() << "EE estimates left = [" << est_copy_left.toString() << "]";
             yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]\n";
