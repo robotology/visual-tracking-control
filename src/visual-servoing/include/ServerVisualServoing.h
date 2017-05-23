@@ -55,6 +55,12 @@ protected:
 
     bool quit();
 
+
+    enum class CamSel { left, right };
+
+
+    enum class ControlPixelMode { origin, origin_x, origin_o };
+
 private:
     yarp::os::ConstString         robot_name_;
 
@@ -96,12 +102,6 @@ private:
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_right_out_;
     yarp::os::BufferedPort<yarp::os::Bottle>                        port_click_right_;
 
-
-    enum camsel
-    {
-        LEFT = 0,
-        RIGHT = 1
-    };
 
     bool setRightArmCartesianController();
 
