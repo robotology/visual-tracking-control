@@ -292,10 +292,11 @@ bool ServerVisualServoing::updateModule()
     itf_gaze_->restoreContext(ctx_gaze_);
 
 
-    double Ts    = 0.1;
-    double K_x   = 0.5;
-    double K_o   = 0.5;
-    double v_max = 0.025;
+    double Ts     = 0.1;
+    double K_x    = 0.5;
+    double K_o    = 0.5;
+    double vx_max = 0.025;
+    double vo_max = 5 * CTRL_DEG2RAD;
 
     bool done = false;
     while (!should_stop_ && !done)
@@ -327,23 +328,27 @@ bool ServerVisualServoing::updateModule()
         }
 
 
-        yInfo() << "px_des_ = ["            << px_des_.toString()             << "]";
-        yInfo() << "px_ee_cur_position = [" << px_ee_cur_position.toString() << "]";
-        yInfo() << "e_position = ["         << e_position.toString()         << "]";
-        yInfo() << "e_orientation = ["      << e_orientation.toString()      << "]";
-        yInfo() << "vel_x = ["              << vel_x.toString()              << "]";
-        yInfo() << "vel_o = ["              << vel_o.toString()              << "]";
-
-        /* Enforce velocity bounds */
-        for (size_t i = 0; i < vel_x.length(); ++i)
-            vel_x[i] = sign(vel_x[i]) * std::min(v_max, std::fabs(vel_x[i]));
-
-        yInfo() << "bounded vel_x = [" << vel_x.toString() << "]";
+        yInfo() << "px_des_               = [" << px_des_.toString()               << "]";
+        yInfo() << "px_ee_cur_position    = [" << px_ee_cur_position.toString()    << "]";
+        yInfo() << "px_ee_cur_orientation = [" << px_ee_cur_orientation.toString() << "]";
+        yInfo() << "e_position            = [" << e_position.toString()            << "]";
+        yInfo() << "e_orientation         = [" << e_orientation.toString()         << "]";
+        yInfo() << "vel_x                 = [" << vel_x.toString()                 << "]";
+        yInfo() << "vel_o                 = [" << vel_o.toString()                 << "]";
 
         double ang = norm(vel_o);
         vel_o /= ang;
         vel_o.push_back(ang);
-        yInfo() << "axis-angle vel_o = [" << vel_o.toString() << "]";
+        yInfo() << "axis-angle vel_o      = [" << vel_o.toString()                 << "]";
+
+        /* Enforce translational velocity bounds */
+        for (size_t i = 0; i < vel_x.length(); ++i)
+            vel_x[i] = sign(vel_x[i]) * std::min(vx_max, std::fabs(vel_x[i]));
+        yInfo() << "bounded vel_x = [" << vel_x.toString() << "]";
+
+        /* Enforce rotational velocity bounds */
+        vel_o[3] = sign(vel_o[3]) * std::min(vo_max, std::fabs(vel_o[3]));
+        yInfo() << "bounded vel_o = [" << vel_o.toString() << "]";
 
         /* Visual control law */
         /* SIM */
