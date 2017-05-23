@@ -335,10 +335,8 @@ bool ServerVisualServoing::updateModule()
         yInfo() << "vel_o = ["              << vel_o.toString()              << "]";
 
         /* Enforce velocity bounds */
-//        for (size_t i = 0; i < vel_x.length(); ++i)
-//        {
-//            vel_x[i] = sign(vel_x[i]) * std::min(v_max, std::fabs(vel_x[i]));
-//        }
+        for (size_t i = 0; i < vel_x.length(); ++i)
+            vel_x[i] = sign(vel_x[i]) * std::min(v_max, std::fabs(vel_x[i]));
 
         yInfo() << "bounded vel_x = [" << vel_x.toString() << "]";
 
