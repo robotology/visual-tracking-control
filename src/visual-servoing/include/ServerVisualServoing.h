@@ -50,6 +50,9 @@ protected:
     bool get_sfm_points();
 
 
+    bool set_modality(const std::string& mode);
+
+
     bool go();
 
 
@@ -61,10 +64,15 @@ protected:
 
     enum class ControlPixelMode { origin, origin_x, origin_o };
 
+
+    enum class OperatingMode { position, orientation, pose };
+
 private:
     yarp::os::ConstString         robot_name_;
 
     bool                          should_stop_ = false;
+    bool                          shall_go_    = false;
+    OperatingMode                 op_mode_     = OperatingMode::pose;
 
     yarp::dev::PolyDriver         rightarm_cartesian_driver_;
     yarp::dev::ICartesianControl* itf_rightarm_cart_;
@@ -87,7 +95,6 @@ private:
     yarp::sig::Vector             l_px_goal_;
     yarp::sig::Vector             r_px_goal_;
     yarp::sig::Vector             px_des_;
-    bool                          take_estimates_ = false;
 
     int                           ctx_cart_;
     int                           ctx_gaze_;
@@ -119,7 +126,6 @@ private:
 
 
     bool unsetTorsoDOF();
-
 
 
     void getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel cam, const ControlPixelMode mode, yarp::sig::Vector& px0, yarp::sig::Vector& px1, yarp::sig::Vector& px2, yarp::sig::Vector& px3);

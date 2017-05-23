@@ -53,6 +53,21 @@ service ServerVisualServoingIDL
     bool get_sfm_points();
 
     /**
+     * Set visual servoing operating mode between:
+     *  1. 'position': position-only visual servo control;
+     *  2. 'orientation': orientation-only visual servo control;
+     *  3. 'pose': position + orientation visual servo control.
+     *
+     * @note The default operating mode is 'pose'.
+     *
+     * @param label a label referring to one of the three operating mode, i.e.
+     *              'position', 'orientation' or 'pose'.
+     *
+     * @return true upon success, false otherwise.
+     */
+    bool set_modality(1:string mode);
+
+    /**
      * Start the visual servoing controller.
      *
      * @note This is a non-blocking function.

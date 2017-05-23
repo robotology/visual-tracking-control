@@ -174,7 +174,7 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
 
 bool ServerVisualServoing::updateModule()
 {
-    while (!take_estimates_);
+    while (!shall_go_);
 
     if (should_stop_) return false;
 
@@ -389,12 +389,18 @@ bool ServerVisualServoing::updateModule()
         /* Visual control law */
         vel_x    *= K_x;
         vel_o(3) *= K_o;
-        /* Real robot - Pose */
-        itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
-        /* Real robot - Orientation */
-//        itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
-        /* Real robot - Translation */
-//        itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
+
+        if (op_mode_ == OperatingMode::position)
+            itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
+        else if (op_mode_ == OperatingMode::orientation)
+            itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
+        else if (op_mode_ == OperatingMode::pose)
+            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+
+
+        /* Wait for some motion */
+        Time::delay(Ts);
+
 
         yInfo() << "Position errors: " << std::abs(px_des_(0) - px_ee_cur_position(0)) << std::abs(px_des_(1)  - px_ee_cur_position(1))  << std::abs(px_des_(2)  - px_ee_cur_position(2))
                                        << std::abs(px_des_(3) - px_ee_cur_position(3)) << std::abs(px_des_(4)  - px_ee_cur_position(4))  << std::abs(px_des_(5)  - px_ee_cur_position(5))
@@ -406,8 +412,8 @@ bool ServerVisualServoing::updateModule()
                                           << std::abs(px_des_(6) - px_ee_cur_orientation(6)) << std::abs(px_des_(7)  - px_ee_cur_orientation(7))  << std::abs(px_des_(8)  - px_ee_cur_orientation(8))
                                           << std::abs(px_des_(9) - px_ee_cur_orientation(9)) << std::abs(px_des_(10) - px_ee_cur_orientation(10)) << std::abs(px_des_(11) - px_ee_cur_orientation(11));
 
-        Time::delay(Ts);
 
+        /* Check for goal */
         done = ((std::abs(px_des_(0) - px_ee_cur_position(0))    < 5.0) && (std::abs(px_des_(1)  - px_ee_cur_position(1))     < 5.0) && (std::abs(px_des_(2)  - px_ee_cur_position(2))     < 5.0) &&
                 (std::abs(px_des_(3) - px_ee_cur_position(3))    < 5.0) && (std::abs(px_des_(4)  - px_ee_cur_position(4))     < 5.0) && (std::abs(px_des_(5)  - px_ee_cur_position(5))     < 5.0) &&
                 (std::abs(px_des_(6) - px_ee_cur_position(6))    < 5.0) && (std::abs(px_des_(7)  - px_ee_cur_position(7))     < 5.0) && (std::abs(px_des_(8)  - px_ee_cur_position(8))     < 5.0) &&
@@ -416,6 +422,7 @@ bool ServerVisualServoing::updateModule()
                 (std::abs(px_des_(3) - px_ee_cur_orientation(3)) < 5.0) && (std::abs(px_des_(4)  - px_ee_cur_orientation(4))  < 5.0) && (std::abs(px_des_(5)  - px_ee_cur_orientation(5))  < 5.0) &&
                 (std::abs(px_des_(6) - px_ee_cur_orientation(6)) < 5.0) && (std::abs(px_des_(7)  - px_ee_cur_orientation(7))  < 5.0) && (std::abs(px_des_(8)  - px_ee_cur_orientation(8))  < 5.0) &&
                 (std::abs(px_des_(9) - px_ee_cur_orientation(9)) < 5.0) && (std::abs(px_des_(10) - px_ee_cur_orientation(10)) < 5.0) && (std::abs(px_des_(11) - px_ee_cur_orientation(11)) < 5.0));
+
         if (done)
         {
             yInfo() << "\npx_des ="              << px_des_.toString();
@@ -423,6 +430,7 @@ bool ServerVisualServoing::updateModule()
             yInfo() << "px_ee_cur_orientation =" << px_ee_cur_orientation.toString();
             yInfo() << "\nTERMINATING!\n";
         }
+
 
         /* *** *** *** DEBUG OUTPUT *** *** *** */
         cv::Scalar red   (255,   0,   0);
@@ -475,6 +483,7 @@ bool ServerVisualServoing::updateModule()
     }
 
     itf_rightarm_cart_->stopControl();
+    itf_gaze_->stopControl();
 
     Time::delay(0.5);
 
@@ -1008,10 +1017,26 @@ bool ServerVisualServoing::get_sfm_points()
 }
 
 
+/* Set visual servoing operating mode */
+bool ServerVisualServoing::set_modality(const std::string& mode)
+{
+    if (mode == "position")
+        op_mode_ = OperatingMode::position;
+    else if (mode == "orientation")
+        op_mode_ = OperatingMode::orientation;
+    else if (mode == "pose")
+        op_mode_ = OperatingMode::pose;
+    else
+        return false;
+
+    return true;
+}
+
+
 /* Start visual servoing */
 bool ServerVisualServoing::go()
 {
-    take_estimates_ = true;
+    shall_go_ = true;
 
     return true;
 }
@@ -1023,8 +1048,8 @@ bool ServerVisualServoing::quit()
     itf_rightarm_cart_->stopControl();
     itf_gaze_->stopControl();
 
-    should_stop_    = true;
-    take_estimates_ = true;
+    should_stop_ = true;
+    shall_go_    = true;
 
     stopModule();
 
