@@ -1316,54 +1316,6 @@ bool ServerVisualServoing::unsetTorsoDOF()
 }
 
 
-void ServerVisualServoing::getControlPointsFromPose(const Vector& pose, Vector& p0, Vector& p1, Vector& p2, Vector& p3)
-{
-    Vector ee_x = pose.subVector(0, 2);
-    ee_x.push_back(1.0);
-    double ang  = norm(pose.subVector(3, 5));
-    Vector ee_o = pose.subVector(3, 5) / ang;
-    ee_o.push_back(ang);
-    
-    Matrix H_ee_to_root = axis2dcm(ee_o);
-    H_ee_to_root.setCol(3, ee_x);
-    
-    
-    Vector p = zeros(4);
-    
-    p(0) =  0;
-    p(1) = -0.015;
-    p(2) =  0;
-    p(3) =  1.0;
-    
-    p0 = zeros(4);
-    p0 = H_ee_to_root * p;
-    
-    p(0) = 0;
-    p(1) = 0.015;
-    p(2) = 0;
-    p(3) = 1.0;
-    
-    p1 = zeros(4);
-    p1 = H_ee_to_root * p;
-    
-    p(0) = -0.035;
-    p(1) =  0.015;
-    p(2) =  0;
-    p(3) =  1.0;
-    
-    p2 = zeros(4);
-    p2 = H_ee_to_root * p;
-    
-    p(0) = -0.035;
-    p(1) = -0.015;
-    p(2) =  0;
-    p(3) =  1.0;
-    
-    p3 = zeros(4);
-    p3 = H_ee_to_root * p;
-}
-
-
 void ServerVisualServoing::getControlPixelsFromPose(const Vector& pose, const CamSel cam, const ControlPixelMode mode, Vector& px0, Vector& px1, Vector& px2, Vector& px3)
 {
     yAssert(cam == CamSel::left || cam == CamSel::right);
@@ -1396,6 +1348,54 @@ void ServerVisualServoing::getControlPixelsFromPose(const Vector& pose, const Ca
     yInfo() << s_cam << s_mode << "control px1 = [" << px1.toString() << "]";
     yInfo() << s_cam << s_mode << "control px2 = [" << px2.toString() << "]";
     yInfo() << s_cam << s_mode << "control px3 = [" << px3.toString() << "]";
+}
+
+
+void ServerVisualServoing::getControlPointsFromPose(const Vector& pose, Vector& p0, Vector& p1, Vector& p2, Vector& p3)
+{
+    Vector ee_x = pose.subVector(0, 2);
+    ee_x.push_back(1.0);
+    double ang  = norm(pose.subVector(3, 5));
+    Vector ee_o = pose.subVector(3, 5) / ang;
+    ee_o.push_back(ang);
+
+    Matrix H_ee_to_root = axis2dcm(ee_o);
+    H_ee_to_root.setCol(3, ee_x);
+
+
+    Vector p = zeros(4);
+
+    p(0) =  0;
+    p(1) = -0.015;
+    p(2) =  0;
+    p(3) =  1.0;
+
+    p0 = zeros(4);
+    p0 = H_ee_to_root * p;
+
+    p(0) = 0;
+    p(1) = 0.015;
+    p(2) = 0;
+    p(3) = 1.0;
+
+    p1 = zeros(4);
+    p1 = H_ee_to_root * p;
+
+    p(0) = -0.035;
+    p(1) =  0.015;
+    p(2) =  0;
+    p(3) =  1.0;
+
+    p2 = zeros(4);
+    p2 = H_ee_to_root * p;
+
+    p(0) = -0.035;
+    p(1) = -0.015;
+    p(2) =  0;
+    p(3) =  1.0;
+
+    p3 = zeros(4);
+    p3 = H_ee_to_root * p;
 }
 
 

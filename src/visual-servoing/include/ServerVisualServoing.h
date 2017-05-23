@@ -120,10 +120,13 @@ private:
     bool unsetTorsoDOF();
 
 
-    void getControlPointsFromPose(const yarp::sig::Vector& pose, yarp::sig::Vector& p0, yarp::sig::Vector& p1, yarp::sig::Vector& p2, yarp::sig::Vector& p3);
-
 
     void getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel cam, const ControlPixelMode mode, yarp::sig::Vector& px0, yarp::sig::Vector& px1, yarp::sig::Vector& px2, yarp::sig::Vector& px3);
+
+
+    void getControlPointsFromPose(const yarp::sig::Vector& pose, yarp::sig::Vector& p0, yarp::sig::Vector& p1, yarp::sig::Vector& p2, yarp::sig::Vector& p3);
+
+    
     yarp::sig::Vector getPixelFromPoint(const CamSel cam, const yarp::sig::Vector& p) const;
 
     
