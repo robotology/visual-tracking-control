@@ -292,10 +292,10 @@ bool ServerVisualServoing::updateModule()
     itf_gaze_->restoreContext(ctx_gaze_);
 
 
-    double Ts    = 0.1;   // controller's sample time [s]
-    double K_x   = 0.5;  // visual servoing proportional gain
-    double K_o   = 0.5;  // visual servoing proportional gain
-//    double v_max = 0.0005; // max cartesian velocity [m/s]
+    double Ts    = 0.1;
+    double K_x   = 0.5;
+    double K_o   = 0.5;
+    double v_max = 0.025;
 
     bool done = false;
     while (!should_stop_ && !done)
