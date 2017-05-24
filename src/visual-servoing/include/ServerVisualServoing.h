@@ -26,60 +26,42 @@ class ServerVisualServoing : public yarp::os::RFModule,
 public:
     bool configure(yarp::os::ResourceFinder &rf);
 
-
     double getPeriod() { return 0; }
-
 
     bool updateModule();
 
-
     bool interruptModule();
-
 
     bool close();
 
 protected:
     std::vector<std::string> get_info();
 
-
     bool init(const std::string& label);
-
 
     bool set_goal(const std::string& label);
 
-
     bool get_sfm_points();
-
 
     bool set_modality(const std::string& mode);
 
-
     bool set_position_gain(const double k);
-
 
     bool set_orientation_gain(const double k);
 
-
     bool set_position_bound(const double b);
-
 
     bool set_orientation_bound(const double b);
 
-
     bool set_goal_tol(const double px);
-
 
     bool go();
 
-
     bool quit();
-
 
     enum class CamSel { left, right };
 
-
     enum class ControlPixelMode { origin, origin_x, origin_o };
-
 
     enum class OperatingMode { position, orientation, pose };
 
@@ -136,7 +118,6 @@ private:
 
     bool setRightArmCartesianController();
 
-
     bool setGazeController();
 
 
@@ -147,29 +128,21 @@ private:
 
     bool setTorsoDOF();
 
-
     bool unsetTorsoDOF();
-
 
     void getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel cam, const ControlPixelMode mode, yarp::sig::Vector& px0, yarp::sig::Vector& px1, yarp::sig::Vector& px2, yarp::sig::Vector& px3);
 
-
     void getControlPointsFromPose(const yarp::sig::Vector& pose, yarp::sig::Vector& p0, yarp::sig::Vector& p1, yarp::sig::Vector& p2, yarp::sig::Vector& p3);
 
-    
     yarp::sig::Vector getPixelFromPoint(const CamSel cam, const yarp::sig::Vector& p) const;
-
 
     void getCurrentStereoFeaturesAndJacobian(const yarp::sig::Vector& left_px0,  const yarp::sig::Vector& left_px1,  const yarp::sig::Vector& left_px2,  const yarp::sig::Vector& left_px3,
                                              const yarp::sig::Vector& right_px0, const yarp::sig::Vector& right_px1, const yarp::sig::Vector& right_px2, const yarp::sig::Vector& right_px3,
                                              yarp::sig::Vector& features, yarp::sig::Matrix& jacobian);
 
-    
     yarp::sig::Vector getJacobianU(const CamSel cam, const yarp::sig::Vector& px);
 
-    
     yarp::sig::Vector getJacobianV(const CamSel cam, const yarp::sig::Vector& px);
-
     
     yarp::sig::Vector getAxisAngle(const yarp::sig::Vector& v);
 };
