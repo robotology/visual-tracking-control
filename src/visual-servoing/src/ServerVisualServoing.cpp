@@ -397,15 +397,15 @@ bool ServerVisualServoing::updateModule()
 
 
         /* Check for goal */
-        bool is_pos_done = ((std::abs(px_des_(0) - px_ee_cur_position(0)) < 5.0) && (std::abs(px_des_(1)  - px_ee_cur_position(1))  < 5.0) && (std::abs(px_des_(2)  - px_ee_cur_position(2))  < 5.0) &&
-                            (std::abs(px_des_(3) - px_ee_cur_position(3)) < 5.0) && (std::abs(px_des_(4)  - px_ee_cur_position(4))  < 5.0) && (std::abs(px_des_(5)  - px_ee_cur_position(5))  < 5.0) &&
-                            (std::abs(px_des_(6) - px_ee_cur_position(6)) < 5.0) && (std::abs(px_des_(7)  - px_ee_cur_position(7))  < 5.0) && (std::abs(px_des_(8)  - px_ee_cur_position(8))  < 5.0) &&
-                            (std::abs(px_des_(9) - px_ee_cur_position(9)) < 5.0) && (std::abs(px_des_(10) - px_ee_cur_position(10)) < 5.0) && (std::abs(px_des_(11) - px_ee_cur_position(11)) < 5.0));
+        bool is_pos_done = ((std::abs(px_des_(0) - px_ee_cur_position(0)) < px_tol_) && (std::abs(px_des_(1)  - px_ee_cur_position(1))  < px_tol_) && (std::abs(px_des_(2)  - px_ee_cur_position(2))  < px_tol_) &&
+                            (std::abs(px_des_(3) - px_ee_cur_position(3)) < px_tol_) && (std::abs(px_des_(4)  - px_ee_cur_position(4))  < px_tol_) && (std::abs(px_des_(5)  - px_ee_cur_position(5))  < px_tol_) &&
+                            (std::abs(px_des_(6) - px_ee_cur_position(6)) < px_tol_) && (std::abs(px_des_(7)  - px_ee_cur_position(7))  < px_tol_) && (std::abs(px_des_(8)  - px_ee_cur_position(8))  < px_tol_) &&
+                            (std::abs(px_des_(9) - px_ee_cur_position(9)) < px_tol_) && (std::abs(px_des_(10) - px_ee_cur_position(10)) < px_tol_) && (std::abs(px_des_(11) - px_ee_cur_position(11)) < px_tol_));
 
-        bool is_orient_done = ((std::abs(px_des_(0) - px_ee_cur_orientation(0)) < 5.0) && (std::abs(px_des_(1)  - px_ee_cur_orientation(1))  < 5.0) && (std::abs(px_des_(2)  - px_ee_cur_orientation(2))  < 5.0) &&
-                               (std::abs(px_des_(3) - px_ee_cur_orientation(3)) < 5.0) && (std::abs(px_des_(4)  - px_ee_cur_orientation(4))  < 5.0) && (std::abs(px_des_(5)  - px_ee_cur_orientation(5))  < 5.0) &&
-                               (std::abs(px_des_(6) - px_ee_cur_orientation(6)) < 5.0) && (std::abs(px_des_(7)  - px_ee_cur_orientation(7))  < 5.0) && (std::abs(px_des_(8)  - px_ee_cur_orientation(8))  < 5.0) &&
-                               (std::abs(px_des_(9) - px_ee_cur_orientation(9)) < 5.0) && (std::abs(px_des_(10) - px_ee_cur_orientation(10)) < 5.0) && (std::abs(px_des_(11) - px_ee_cur_orientation(11)) < 5.0));
+        bool is_orient_done = ((std::abs(px_des_(0) - px_ee_cur_orientation(0)) < px_tol_) && (std::abs(px_des_(1)  - px_ee_cur_orientation(1))  < px_tol_) && (std::abs(px_des_(2)  - px_ee_cur_orientation(2))  < px_tol_) &&
+                               (std::abs(px_des_(3) - px_ee_cur_orientation(3)) < px_tol_) && (std::abs(px_des_(4)  - px_ee_cur_orientation(4))  < px_tol_) && (std::abs(px_des_(5)  - px_ee_cur_orientation(5))  < px_tol_) &&
+                               (std::abs(px_des_(6) - px_ee_cur_orientation(6)) < px_tol_) && (std::abs(px_des_(7)  - px_ee_cur_orientation(7))  < px_tol_) && (std::abs(px_des_(8)  - px_ee_cur_orientation(8))  < px_tol_) &&
+                               (std::abs(px_des_(9) - px_ee_cur_orientation(9)) < px_tol_) && (std::abs(px_des_(10) - px_ee_cur_orientation(10)) < px_tol_) && (std::abs(px_des_(11) - px_ee_cur_orientation(11)) < px_tol_));
 
         if (op_mode_ == OperatingMode::position)
             is_vs_done = is_pos_done;
@@ -1052,6 +1052,14 @@ bool ServerVisualServoing::set_position_bound(const double b)
 bool ServerVisualServoing::set_orientation_bound(const double b)
 {
     vo_max_ = b;
+
+    return true;
+}
+
+
+bool ServerVisualServoing::set_goal_tol(const double px)
+{
+    px_tol_ = px;
 
     return true;
 }

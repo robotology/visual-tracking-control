@@ -112,6 +112,17 @@ service ServerVisualServoingIDL
     bool set_orientation_bound(1:double b);
 
     /**
+     * Set goal tolerance [pixel].
+     *
+     * @note The default value is 5 [pixel].
+     *
+     * @param px a positive value.
+     *
+     * @return true upon success, false otherwise.
+     */
+    bool set_goal_tol(1:double px);
+
+    /**
      * Start the visual servoing controller.
      *
      * @note This is a non-blocking function.

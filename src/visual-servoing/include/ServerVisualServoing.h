@@ -66,6 +66,9 @@ protected:
     bool set_orientation_bound(const double b);
 
 
+    bool set_goal_tol(const double px);
+
+
     bool go();
 
 
@@ -98,6 +101,7 @@ private:
     double                        K_o_    = 0.5;
     double                        vx_max_ = 0.025; /* [m/s] */
     double                        vo_max_ = 5 * M_PI / 180.0; /* [rad/s] */
+    double                        px_tol_ = 5.0;
 
     yarp::sig::Vector             goal_pose_;
     yarp::sig::Matrix             l_proj_;
