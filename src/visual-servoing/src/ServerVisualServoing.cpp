@@ -210,12 +210,6 @@ bool ServerVisualServoing::updateModule()
     Vector px_ee_cur_orientation = zeros(12);
     Matrix jacobian_orientation  = zeros(12, 6);
 
-    double Ts     = 0.1;
-    double K_x    = 0.5;
-    double K_o    = 0.5;
-    double vx_max = 0.025;
-    double vo_max = 5 * CTRL_DEG2RAD;
-
     bool done = false;
     while (!should_stop_ && !done)
     {
@@ -263,7 +257,7 @@ bool ServerVisualServoing::updateModule()
 //        Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
 //        Matrix r_R = axis2dcm(r_o);
 //
-//        vel_o[3] *= Ts;
+//        vel_o[3] *= Ts_;
 //        l_R = axis2dcm(vel_o) * l_R;
 //        r_R = axis2dcm(vel_o) * r_R;
 //
@@ -277,9 +271,9 @@ bool ServerVisualServoing::updateModule()
 //        r_new_o.pop_back();
 //        r_new_o *= r_ang;
 //
-//        est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts);
+//        est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
 //        est_copy_left.setSubvector(3, l_new_o);
-//        est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts);
+//        est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
 //        est_copy_right.setSubvector(3, r_new_o);
         /* **************************************************** */
 
@@ -377,18 +371,18 @@ bool ServerVisualServoing::updateModule()
 
         /* Enforce translational velocity bounds */
         for (size_t i = 0; i < vel_x.length(); ++i)
-            vel_x[i] = sign(vel_x[i]) * std::min(vx_max, std::fabs(vel_x[i]));
+            vel_x[i] = sign(vel_x[i]) * std::min(vx_max_, std::fabs(vel_x[i]));
         yInfo() << "bounded vel_x = [" << vel_x.toString() << "]";
 
 
         /* Enforce rotational velocity bounds */
-        vel_o[3] = sign(vel_o[3]) * std::min(vo_max, std::fabs(vel_o[3]));
+        vel_o[3] = sign(vel_o[3]) * std::min(vo_max_, std::fabs(vel_o[3]));
         yInfo() << "bounded vel_o = [" << vel_o.toString() << "]";
 
 
         /* Visual control law */
-        vel_x    *= K_x;
-        vel_o(3) *= K_o;
+        vel_x    *= K_x_;
+        vel_o(3) *= K_o_;
 
         if (op_mode_ == OperatingMode::position)
             itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
@@ -399,7 +393,7 @@ bool ServerVisualServoing::updateModule()
 
 
         /* Wait for some motion */
-        Time::delay(Ts);
+        Time::delay(Ts_);
 
 
         yInfo() << "Position errors: " << std::abs(px_des_(0) - px_ee_cur_position(0)) << std::abs(px_des_(1)  - px_ee_cur_position(1))  << std::abs(px_des_(2)  - px_ee_cur_position(2))
@@ -1028,6 +1022,38 @@ bool ServerVisualServoing::set_modality(const std::string& mode)
         op_mode_ = OperatingMode::pose;
     else
         return false;
+
+    return true;
+}
+
+
+bool ServerVisualServoing::set_position_gain(const double k)
+{
+    K_x_ = k;
+
+    return true;
+}
+
+
+bool ServerVisualServoing::set_orientation_gain(const double k)
+{
+    K_o_ = k;
+
+    return true;
+}
+
+
+bool ServerVisualServoing::set_position_bound(const double b)
+{
+    vx_max_ = b;
+
+    return true;
+}
+
+
+bool ServerVisualServoing::set_orientation_bound(const double b)
+{
+    vo_max_ = b;
 
     return true;
 }

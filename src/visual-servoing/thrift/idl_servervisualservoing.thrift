@@ -68,6 +68,50 @@ service ServerVisualServoingIDL
     bool set_modality(1:string mode);
 
     /**
+     * Set visual servoing position gain.
+     *
+     * @note The default value is 0.5.
+     *
+     * @param k a positive value.
+     *
+     * @return true upon success, false otherwise.
+     */
+    bool set_position_gain(1:double k);
+
+    /**
+     * Set visual servoing orientation gain.
+     *
+     * @note The default value is 0.5.
+     *
+     * @param k a positive value.
+     *
+     * @return true upon success, false otherwise.
+     */
+    bool set_orientation_gain(1:double k);
+
+    /**
+     * Set a translational velocity bound in [m/s].
+     *
+     * @note The default value is 0.025 [m/s].
+     *
+     * @param b a positive value.
+     *
+     * @return true upon success, false otherwise.
+     */
+    bool set_position_bound(1:double b);
+
+    /**
+     * Set an orientation velocity bound in [deg/s].
+     *
+     * @note The default value is 5 [deg/s].
+     *
+     * @param b a positive value.
+     *
+     * @return true upon success, false otherwise.
+     */
+    bool set_orientation_bound(1:double b);
+
+    /**
      * Start the visual servoing controller.
      *
      * @note This is a non-blocking function.

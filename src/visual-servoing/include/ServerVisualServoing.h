@@ -1,6 +1,7 @@
 #ifndef SERVERVISUALSERVOING_H
 #define SERVERVISUALSERVOING_H
 
+#include <cmath>
 #include <vector>
 
 #include <thrift/ServerVisualServoingIDL.h>
@@ -53,6 +54,18 @@ protected:
     bool set_modality(const std::string& mode);
 
 
+    bool set_position_gain(const double k);
+
+
+    bool set_orientation_gain(const double k);
+
+
+    bool set_position_bound(const double b);
+
+
+    bool set_orientation_bound(const double b);
+
+
     bool go();
 
 
@@ -79,6 +92,12 @@ private:
 
     yarp::dev::PolyDriver         gaze_driver_;
     yarp::dev::IGazeControl     * itf_gaze_;
+
+    const double                  Ts_     = 0.1;
+    double                        K_x_    = 0.5;
+    double                        K_o_    = 0.5;
+    double                        vx_max_ = 0.025; /* [m/s] */
+    double                        vo_max_ = 5 * M_PI / 180.0; /* [rad/s] */
 
     yarp::sig::Vector             goal_pose_;
     yarp::sig::Matrix             l_proj_;
