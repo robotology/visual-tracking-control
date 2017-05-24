@@ -210,8 +210,8 @@ bool ServerVisualServoing::updateModule()
     Vector px_ee_cur_orientation = zeros(12);
     Matrix jacobian_orientation  = zeros(12, 6);
 
-    bool done = false;
-    while (!should_stop_ && !done)
+    bool is_vs_done = false;
+    while (!should_stop_ && !is_vs_done)
     {
         /* Get the initial end-effector pose from left eye view */
         estimates = port_pose_left_in_.read(true);
@@ -396,28 +396,26 @@ bool ServerVisualServoing::updateModule()
         Time::delay(Ts_);
 
 
-        yInfo() << "Position errors: " << std::abs(px_des_(0) - px_ee_cur_position(0)) << std::abs(px_des_(1)  - px_ee_cur_position(1))  << std::abs(px_des_(2)  - px_ee_cur_position(2))
-                                       << std::abs(px_des_(3) - px_ee_cur_position(3)) << std::abs(px_des_(4)  - px_ee_cur_position(4))  << std::abs(px_des_(5)  - px_ee_cur_position(5))
-                                       << std::abs(px_des_(6) - px_ee_cur_position(6)) << std::abs(px_des_(7)  - px_ee_cur_position(7))  << std::abs(px_des_(8)  - px_ee_cur_position(8))
-                                       << std::abs(px_des_(9) - px_ee_cur_position(9)) << std::abs(px_des_(10) - px_ee_cur_position(10)) << std::abs(px_des_(11) - px_ee_cur_position(11));
-
-        yInfo() << "Oreintation errors: " << std::abs(px_des_(0) - px_ee_cur_orientation(0)) << std::abs(px_des_(1)  - px_ee_cur_orientation(1))  << std::abs(px_des_(2)  - px_ee_cur_orientation(2))
-                                          << std::abs(px_des_(3) - px_ee_cur_orientation(3)) << std::abs(px_des_(4)  - px_ee_cur_orientation(4))  << std::abs(px_des_(5)  - px_ee_cur_orientation(5))
-                                          << std::abs(px_des_(6) - px_ee_cur_orientation(6)) << std::abs(px_des_(7)  - px_ee_cur_orientation(7))  << std::abs(px_des_(8)  - px_ee_cur_orientation(8))
-                                          << std::abs(px_des_(9) - px_ee_cur_orientation(9)) << std::abs(px_des_(10) - px_ee_cur_orientation(10)) << std::abs(px_des_(11) - px_ee_cur_orientation(11));
-
-
         /* Check for goal */
-        done = ((std::abs(px_des_(0) - px_ee_cur_position(0))    < 5.0) && (std::abs(px_des_(1)  - px_ee_cur_position(1))     < 5.0) && (std::abs(px_des_(2)  - px_ee_cur_position(2))     < 5.0) &&
-                (std::abs(px_des_(3) - px_ee_cur_position(3))    < 5.0) && (std::abs(px_des_(4)  - px_ee_cur_position(4))     < 5.0) && (std::abs(px_des_(5)  - px_ee_cur_position(5))     < 5.0) &&
-                (std::abs(px_des_(6) - px_ee_cur_position(6))    < 5.0) && (std::abs(px_des_(7)  - px_ee_cur_position(7))     < 5.0) && (std::abs(px_des_(8)  - px_ee_cur_position(8))     < 5.0) &&
-                (std::abs(px_des_(9) - px_ee_cur_position(9))    < 5.0) && (std::abs(px_des_(10) - px_ee_cur_position(10))    < 5.0) && (std::abs(px_des_(11) - px_ee_cur_position(11))    < 5.0) &&
-                (std::abs(px_des_(0) - px_ee_cur_orientation(0)) < 5.0) && (std::abs(px_des_(1)  - px_ee_cur_orientation(1))  < 5.0) && (std::abs(px_des_(2)  - px_ee_cur_orientation(2))  < 5.0) &&
-                (std::abs(px_des_(3) - px_ee_cur_orientation(3)) < 5.0) && (std::abs(px_des_(4)  - px_ee_cur_orientation(4))  < 5.0) && (std::abs(px_des_(5)  - px_ee_cur_orientation(5))  < 5.0) &&
-                (std::abs(px_des_(6) - px_ee_cur_orientation(6)) < 5.0) && (std::abs(px_des_(7)  - px_ee_cur_orientation(7))  < 5.0) && (std::abs(px_des_(8)  - px_ee_cur_orientation(8))  < 5.0) &&
-                (std::abs(px_des_(9) - px_ee_cur_orientation(9)) < 5.0) && (std::abs(px_des_(10) - px_ee_cur_orientation(10)) < 5.0) && (std::abs(px_des_(11) - px_ee_cur_orientation(11)) < 5.0));
+        bool is_pos_done = ((std::abs(px_des_(0) - px_ee_cur_position(0)) < 5.0) && (std::abs(px_des_(1)  - px_ee_cur_position(1))  < 5.0) && (std::abs(px_des_(2)  - px_ee_cur_position(2))  < 5.0) &&
+                            (std::abs(px_des_(3) - px_ee_cur_position(3)) < 5.0) && (std::abs(px_des_(4)  - px_ee_cur_position(4))  < 5.0) && (std::abs(px_des_(5)  - px_ee_cur_position(5))  < 5.0) &&
+                            (std::abs(px_des_(6) - px_ee_cur_position(6)) < 5.0) && (std::abs(px_des_(7)  - px_ee_cur_position(7))  < 5.0) && (std::abs(px_des_(8)  - px_ee_cur_position(8))  < 5.0) &&
+                            (std::abs(px_des_(9) - px_ee_cur_position(9)) < 5.0) && (std::abs(px_des_(10) - px_ee_cur_position(10)) < 5.0) && (std::abs(px_des_(11) - px_ee_cur_position(11)) < 5.0));
 
-        if (done)
+        bool is_orient_done = ((std::abs(px_des_(0) - px_ee_cur_orientation(0)) < 5.0) && (std::abs(px_des_(1)  - px_ee_cur_orientation(1))  < 5.0) && (std::abs(px_des_(2)  - px_ee_cur_orientation(2))  < 5.0) &&
+                               (std::abs(px_des_(3) - px_ee_cur_orientation(3)) < 5.0) && (std::abs(px_des_(4)  - px_ee_cur_orientation(4))  < 5.0) && (std::abs(px_des_(5)  - px_ee_cur_orientation(5))  < 5.0) &&
+                               (std::abs(px_des_(6) - px_ee_cur_orientation(6)) < 5.0) && (std::abs(px_des_(7)  - px_ee_cur_orientation(7))  < 5.0) && (std::abs(px_des_(8)  - px_ee_cur_orientation(8))  < 5.0) &&
+                               (std::abs(px_des_(9) - px_ee_cur_orientation(9)) < 5.0) && (std::abs(px_des_(10) - px_ee_cur_orientation(10)) < 5.0) && (std::abs(px_des_(11) - px_ee_cur_orientation(11)) < 5.0));
+
+        if (op_mode_ == OperatingMode::position)
+            is_vs_done = is_pos_done;
+        else if (op_mode_ == OperatingMode::orientation)
+            is_vs_done = is_orient_done;
+        else if (op_mode_ == OperatingMode::pose)
+            is_vs_done = is_pos_done && is_orient_done;
+
+
+        if (is_vs_done)
         {
             yInfo() << "\npx_des ="              << px_des_.toString();
             yInfo() << "px_ee_cur_position ="    << px_ee_cur_position.toString();
@@ -446,10 +444,10 @@ bool ServerVisualServoing::updateModule()
         cv::circle(l_img, cv::Point(l_px1_orientation[0], l_px1_orientation[1]), 4, green , 4);
         cv::circle(l_img, cv::Point(l_px2_orientation[0], l_px2_orientation[1]), 4, blue  , 4);
         cv::circle(l_img, cv::Point(l_px3_orientation[0], l_px3_orientation[1]), 4, yellow, 4);
-        cv::circle(l_img, cv::Point(l_px_goal_[0], l_px_goal_[1]),               4, red   , 4);
-        cv::circle(l_img, cv::Point(l_px_goal_[2], l_px_goal_[3]),               4, green , 4);
-        cv::circle(l_img, cv::Point(l_px_goal_[4], l_px_goal_[5]),               4, blue  , 4);
-        cv::circle(l_img, cv::Point(l_px_goal_[6], l_px_goal_[7]),               4, yellow, 4);
+        cv::circle(l_img, cv::Point(l_px_goal_[0],        l_px_goal_[1]),        4, red   , 4);
+        cv::circle(l_img, cv::Point(l_px_goal_[2],        l_px_goal_[3]),        4, green , 4);
+        cv::circle(l_img, cv::Point(l_px_goal_[4],        l_px_goal_[5]),        4, blue  , 4);
+        cv::circle(l_img, cv::Point(l_px_goal_[6],        l_px_goal_[7]),        4, yellow, 4);
 
         port_image_left_out_.write();
 
@@ -467,10 +465,10 @@ bool ServerVisualServoing::updateModule()
         cv::circle(r_img, cv::Point(r_px1_orientation[0], r_px1_orientation[1]), 4, green , 4);
         cv::circle(r_img, cv::Point(r_px2_orientation[0], r_px2_orientation[1]), 4, blue  , 4);
         cv::circle(r_img, cv::Point(r_px3_orientation[0], r_px3_orientation[1]), 4, yellow, 4);
-        cv::circle(r_img, cv::Point(r_px_goal_[0], r_px_goal_[1]),               4, red   , 4);
-        cv::circle(r_img, cv::Point(r_px_goal_[2], r_px_goal_[3]),               4, green , 4);
-        cv::circle(r_img, cv::Point(r_px_goal_[4], r_px_goal_[5]),               4, blue  , 4);
-        cv::circle(r_img, cv::Point(r_px_goal_[6], r_px_goal_[7]),               4, yellow, 4);
+        cv::circle(r_img, cv::Point(r_px_goal_[0],        r_px_goal_[1]),        4, red   , 4);
+        cv::circle(r_img, cv::Point(r_px_goal_[2],        r_px_goal_[3]),        4, green , 4);
+        cv::circle(r_img, cv::Point(r_px_goal_[4],        r_px_goal_[5]),        4, blue  , 4);
+        cv::circle(r_img, cv::Point(r_px_goal_[6],        r_px_goal_[7]),        4, yellow, 4);
 
         port_image_right_out_.write();
         /* *** *** *** *** *** *** *** *** *** */
