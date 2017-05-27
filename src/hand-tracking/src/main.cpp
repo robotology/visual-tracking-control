@@ -17,6 +17,7 @@
 #include "CartesianAxisAnglePrediction.h"
 #include "iCubGatePose.h"
 #include "iCubFwdKinMotion.h"
+#include "InitiCubArm.h"
 #include "PlayFwdKinMotion.h"
 #include "PlayGatePose.h"
 #include "VisualProprioception.h"
@@ -75,6 +76,10 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - robot laterality:"    << robot_laterality;
     yInfo() << log_ID << " - use data from ports:" << (play ? "true" : "false");
     yInfo() << log_ID << " - number of particles:" << num_particles;
+
+    /* INITIALIZATION */
+    std::unique_ptr<Initialization> init_arm(new InitiCubArm(robot_cam_sel, robot_laterality));
+
 
     /* MOTION MODEL */
     std::unique_ptr<StateModel> brown(new BrownianMotion(0.005, 0.005, 3.0, 2.5, 1));
@@ -137,7 +142,8 @@ int main(int argc, char *argv[])
 
 
     /* PARTICLE FILTER */
-    VisualSIRParticleFilter vsir_pf(std::move(pf_prediction), std::move(vpf_correction),
+    VisualSIRParticleFilter vsir_pf(std::move(init_arm),
+                                    std::move(pf_prediction), std::move(vpf_correction),
                                     std::move(resampling),
                                     robot_cam_sel, robot_laterality, num_particles);
 

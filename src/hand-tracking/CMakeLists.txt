@@ -31,6 +31,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/GatePose.h
         include/iCubFwdKinMotion.h
         include/iCubGatePose.h
+        include/InitiCubArm.h
         include/PlayFwdKinMotion.h
         include/PlayGatePose.h
         include/VisualProprioception.h
@@ -44,6 +45,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/GatePose.cpp
         src/iCubFwdKinMotion.cpp
         src/iCubGatePose.cpp
+        src/InitiCubArm.cpp
         src/PlayFwdKinMotion.cpp
         src/PlayGatePose.cpp
         src/VisualProprioception.cpp
