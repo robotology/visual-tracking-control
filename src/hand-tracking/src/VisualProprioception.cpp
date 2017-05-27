@@ -429,7 +429,6 @@ bool VisualProprioception::setiCubParams()
 
 
     Vector q = readRootToFingers();
-
 //    q(10) = 32.0;
 //    q(11) = 30.0;
 //    q(12) = 0.0;
