@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - number of particles:" << num_particles;
 
     /* MOTION MODEL */
-    std::unique_ptr<StateModel> brown(new BrownianMotion(0.005, 0.005, 5.0, 5.0, 1));
+    std::unique_ptr<StateModel> brown(new BrownianMotion(0.005, 0.005, 3.0, 2.5, 1));
     std::unique_ptr<StateModel> icub_motion;
     if (!play)
     {
@@ -115,21 +115,21 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), 1));
 //    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
 
-    std::unique_ptr<VisualCorrection> vpf_correction_gated;
-    if (!play)
-    {
-        std::unique_ptr<iCubGatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_correction),
-                                                                      0.1, 0.1, 0.1, 15, 30,
-                                                                      robot_name, robot_laterality, robot_cam_sel));
-        vpf_correction_gated = std::move(icub_gate_pose);
-    }
-    else
-    {
-        std::unique_ptr<PlayGatePose> icub_gate_pose(new PlayGatePose(std::move(vpf_correction),
-                                                                      0.1, 0.1, 0.1, 15, 30,
-                                                                      robot_name, robot_laterality, robot_cam_sel));
-        vpf_correction_gated = std::move(icub_gate_pose);
-    }
+//    std::unique_ptr<VisualCorrection> vpf_correction_gated;
+//    if (!play)
+//    {
+//        std::unique_ptr<iCubGatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_correction),
+//                                                                      0.1, 0.1, 0.1, 15, 30,
+//                                                                      robot_name, robot_laterality, robot_cam_sel));
+//        vpf_correction_gated = std::move(icub_gate_pose);
+//    }
+//    else
+//    {
+//        std::unique_ptr<PlayGatePose> icub_gate_pose(new PlayGatePose(std::move(vpf_correction),
+//                                                                      0.1, 0.1, 0.1, 15, 30,
+//                                                                      robot_name, robot_laterality, robot_cam_sel));
+//        vpf_correction_gated = std::move(icub_gate_pose);
+//    }
 
 
     /* RESAMPLING */
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 
 
     /* PARTICLE FILTER */
-    VisualSIRParticleFilter vsir_pf(std::move(pf_prediction), std::move(vpf_correction_gated),
+    VisualSIRParticleFilter vsir_pf(std::move(pf_prediction), std::move(vpf_correction),
                                     std::move(resampling),
                                     robot_cam_sel, robot_laterality, num_particles);
 

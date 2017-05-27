@@ -69,8 +69,8 @@ protected:
     unsigned long int                              filtering_step_ = 0;
     bool                                           is_filter_init_ = false;
     bool                                           is_running_     = false;
-    bool                                           use_mean_       = false;
-    bool                                           use_mode_       = true;
+    bool                                           use_mean_       = true;
+    bool                                           use_mode_       = false;
 
 
     yarp::os::Port           port_rpc_command_;

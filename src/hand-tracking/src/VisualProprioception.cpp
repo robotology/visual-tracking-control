@@ -102,21 +102,21 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     if (!file_found(cad_obj_["palm"]))
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_palm.obj not found!");
 
-//    cad_obj_["thumb1"] = rf.findFileByName("r_tl0.obj");
-//    if (!file_found(cad_obj_["thumb1"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
-//    cad_obj_["thumb2"] = rf.findFileByName("r_tl1.obj");
-//    if (!file_found(cad_obj_["thumb2"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
-//    cad_obj_["thumb3"] = rf.findFileByName("r_tl2.obj");
-//    if (!file_found(cad_obj_["thumb3"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
-//    cad_obj_["thumb4"] = rf.findFileByName("r_tl3.obj");
-//    if (!file_found(cad_obj_["thumb4"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
-//    cad_obj_["thumb5"] = rf.findFileByName("r_tl4.obj");
-//    if (!file_found(cad_obj_["thumb5"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
+    cad_obj_["thumb1"] = rf.findFileByName("r_tl0.obj");
+    if (!file_found(cad_obj_["thumb1"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
+    cad_obj_["thumb2"] = rf.findFileByName("r_tl1.obj");
+    if (!file_found(cad_obj_["thumb2"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
+    cad_obj_["thumb3"] = rf.findFileByName("r_tl2.obj");
+    if (!file_found(cad_obj_["thumb3"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
+    cad_obj_["thumb4"] = rf.findFileByName("r_tl3.obj");
+    if (!file_found(cad_obj_["thumb4"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
+    cad_obj_["thumb5"] = rf.findFileByName("r_tl4.obj");
+    if (!file_found(cad_obj_["thumb5"]))
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
 
     cad_obj_["index0"] = rf.findFileByName("r_indexbase.obj");
     if (!file_found(cad_obj_["index0"]))
@@ -347,7 +347,7 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
         /* Change index to add/remove limbs */
         yarp::sig::Matrix Ha = axis2dcm(ee_o);
         Ha.setCol(3, ee_t);
-        for (size_t fng = 1; fng < 3; ++fng)
+        for (size_t fng = 0; fng < 3; ++fng)
         {
             std::string finger_s;
             pose.clear();
@@ -430,8 +430,8 @@ bool VisualProprioception::setiCubParams()
 
     Vector q = readRootToFingers();
 
-    q(10) = 32.0;
-    q(11) = 30.0;
+//    q(10) = 32.0;
+//    q(11) = 30.0;
 //    q(12) = 0.0;
 //    q(13) = 0.0;
 //    q(14) = 0.0;
