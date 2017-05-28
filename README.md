@@ -12,8 +12,8 @@ The output of the hand-tracking application can be visualized by means of the [i
 **visual-tracking-control** suite works on Linux, macOS and is under testing on Windows.
 
 ## Dependencies
-hand-tracking depends on
- - [BayesFiltersLib](https://github.com/claudiofantacci/BayesFIltersLib)
+visual-tracking-control suite depends on
+ - [BayesFilters](https://github.com/robotology/bayes-filters-lib)
      - Documentation is WIP
  - [GLFW](http://www.glfw.org)
      - Debian: apt
@@ -31,7 +31,7 @@ hand-tracking depends on
      - Debian: apt
      - macOS: brew
      - WIN: TBD
- - [SuperimposeMeshLib](https://github.com/robotology/superimpose-mesh-lib)
+ - [SuperimposeMesh](https://github.com/robotology/superimpose-mesh-lib)
      - Documentation is WIP
  - [Yet Another Robot Platform, YARP](http://www.yarp.it)
      - Debian, macOS, WIN: [yarp on GitHub](https://github.com/robotology/yarp)

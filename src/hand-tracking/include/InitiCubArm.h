@@ -1,7 +1,7 @@
 #ifndef INITICUBARM_H
 #define INITICUBARM_H
 
-#include <BayesFiltersLib/Initialization.h>
+#include <BayesFilters/Initialization.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>

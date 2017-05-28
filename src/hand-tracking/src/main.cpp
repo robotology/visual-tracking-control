@@ -3,8 +3,8 @@
 #include <iostream>
 #include <memory>
 
-#include <BayesFiltersLib/Resampling.h>
-#include <BayesFiltersLib/SIRParticleFilter.h>
+#include <BayesFilters/Resampling.h>
+#include <BayesFilters/SIRParticleFilter.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>

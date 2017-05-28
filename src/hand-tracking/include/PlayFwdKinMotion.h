@@ -1,7 +1,7 @@
 #ifndef PLAYFWDKINMOTION_H
 #define PLAYFWDKINMOTION_H
 
-#include <BayesFiltersLib/StateModelDecorator.h>
+#include <BayesFilters/StateModelDecorator.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>

@@ -1,7 +1,7 @@
 #ifndef ICUBFWDKINMOTION_H
 #define ICUBFWDKINMOTION_H
 
-#include <BayesFiltersLib/StateModelDecorator.h>
+#include <BayesFilters/StateModelDecorator.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IEncoders.h>

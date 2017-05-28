@@ -4,7 +4,7 @@
 #include <functional>
 #include <random>
 
-#include <BayesFiltersLib/StateModel.h>
+#include <BayesFilters/StateModel.h>
 
 
 class BrownianMotion : public bfl::StateModel

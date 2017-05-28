@@ -4,13 +4,13 @@
 #include <memory>
 #include <vector>
 
-#include <BayesFiltersLib/FilteringAlgorithm.h>
-#include <BayesFiltersLib/Initialization.h>
-#include <BayesFiltersLib/StateModel.h>
-#include <BayesFiltersLib/ParticleFilterPrediction.h>
-#include <BayesFiltersLib/VisualObservationModel.h>
-#include <BayesFiltersLib/VisualCorrection.h>
-#include <BayesFiltersLib/Resampling.h>
+#include <BayesFilters/FilteringAlgorithm.h>
+#include <BayesFilters/Initialization.h>
+#include <BayesFilters/StateModel.h>
+#include <BayesFilters/ParticleFilterPrediction.h>
+#include <BayesFilters/VisualObservationModel.h>
+#include <BayesFilters/VisualCorrection.h>
+#include <BayesFilters/Resampling.h>
 #include <Eigen/Dense>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/cudaobjdetect.hpp>

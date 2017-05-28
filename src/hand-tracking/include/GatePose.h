@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include <BayesFiltersLib/VisualCorrectionDecorator.h>
-#include <BayesFiltersLib/StateModel.h>
+#include <BayesFilters/VisualCorrectionDecorator.h>
+#include <BayesFilters/StateModel.h>
 
 
 class GatePose : public bfl::VisualCorrectionDecorator

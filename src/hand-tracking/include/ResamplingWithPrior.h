@@ -5,7 +5,7 @@
 
 #include <random>
 
-#include <BayesFiltersLib/Resampling.h>
+#include <BayesFilters/Resampling.h>
 #include <Eigen/Dense>
 
 

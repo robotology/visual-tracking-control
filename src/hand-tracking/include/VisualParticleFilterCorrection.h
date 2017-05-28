@@ -7,7 +7,7 @@
 #include <mutex>
 #include <thread>
 
-#include <BayesFiltersLib/VisualCorrection.h>
+#include <BayesFilters/VisualCorrection.h>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaobjdetect.hpp>
 #include <opencv2/objdetect/objdetect.hpp>

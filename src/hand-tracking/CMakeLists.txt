@@ -8,13 +8,13 @@ if(NOT APPLE)
 endif()
 
 # Dependencies
-find_package(BayesFiltersLib REQUIRED)
+find_package(BayesFilters    REQUIRED)
 find_package(EIGEN3          REQUIRED)
 find_package(glew            REQUIRED)
 find_package(glfw3           REQUIRED)
 find_package(ICUB            REQUIRED)
 find_package(OpenCV          REQUIRED)
-find_package(SuperImpose     REQUIRED)
+find_package(SuperimposeMesh REQUIRED)
 find_package(YARP            REQUIRED)
 
 
@@ -68,14 +68,14 @@ target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE
                                                       ${ICUB_INCLUDE_DIRS}
                                                       ${YARP_INCLUDE_DIRS})
 
-target_link_libraries(${EXE_TARGET_NAME} BayesFiltersLib::BayesFiltersLib
+target_link_libraries(${EXE_TARGET_NAME} BayesFilters::BayesFilters
                                          ctrlLib
                                          GLEW::GLEW
                                          glfw
                                          ${ICUB_LIBRARIES}
                                          iKin
                                          ${OpenCV_LIBS}
-                                         SuperImpose::SuperImpose
+                                         SuperimposeMesh::SuperimposeMesh
                                          ${YARP_LIBRARIES})
 
 if(NOT APPLE)
