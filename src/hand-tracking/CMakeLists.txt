@@ -34,6 +34,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/InitiCubArm.h
         include/PlayFwdKinMotion.h
         include/PlayGatePose.h
+        include/ResamplingWithPrior.h
         include/VisualProprioception.h
         include/VisualParticleFilterCorrection.h
         include/VisualSIRParticleFilter.h)
@@ -48,6 +49,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/InitiCubArm.cpp
         src/PlayFwdKinMotion.cpp
         src/PlayGatePose.cpp
+        src/ResamplingWithPrior.cpp
         src/VisualProprioception.cpp
         src/VisualParticleFilterCorrection.cpp
         src/VisualSIRParticleFilter.cpp)

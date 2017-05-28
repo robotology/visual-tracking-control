@@ -20,6 +20,7 @@
 #include "InitiCubArm.h"
 #include "PlayFwdKinMotion.h"
 #include "PlayGatePose.h"
+#include "ResamplingWithPrior.h"
 #include "VisualProprioception.h"
 #include "VisualParticleFilterCorrection.h"
 #include "VisualSIRParticleFilter.h"
@@ -138,7 +139,8 @@ int main(int argc, char *argv[])
 
 
     /* RESAMPLING */
-    std::unique_ptr<Resampling> resampling(new Resampling());
+//    std::unique_ptr<Resampling> resampling(new Resampling());
+    std::unique_ptr<Resampling> resampling(new ResamplingWithPrior("hand-tracking/ResamplingWithPrior", robot_cam_sel, robot_laterality));
 
 
     /* PARTICLE FILTER */
