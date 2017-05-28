@@ -37,7 +37,7 @@ public:
     VisualSIRParticleFilter(std::unique_ptr<bfl::Initialization> initialization,
                             std::unique_ptr<bfl::ParticleFilterPrediction> prediction, std::unique_ptr<bfl::VisualCorrection> correction,
                             std::unique_ptr<bfl::Resampling> resampling,
-                            yarp::os::ConstString cam_sel, yarp::os::ConstString laterality, const int num_particles);
+                            const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const int num_particles);
 
     /* Destructor */
     ~VisualSIRParticleFilter() noexcept override;

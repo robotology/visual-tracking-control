@@ -17,8 +17,8 @@ using namespace yarp::sig;
 
 
 PlayGatePose::PlayGatePose(std::unique_ptr<VisualCorrection> visual_correction,
-                           double gate_x, double gate_y, double gate_z,
-                           double gate_rotation, double gate_aperture,
+                           const double gate_x, const double gate_y, const double gate_z,
+                           const double gate_rotation, const double gate_aperture,
                            const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
     GatePose(std::move(visual_correction),
              gate_x, gate_y, gate_z,

@@ -10,7 +10,7 @@ using namespace yarp::sig;
 using namespace yarp::os;
 
 
-InitiCubArm::InitiCubArm(ConstString port_prefix, ConstString cam_sel, ConstString laterality) noexcept :
+InitiCubArm::InitiCubArm(const ConstString& port_prefix, const ConstString& cam_sel, const ConstString& laterality) noexcept :
     icub_kin_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")}
 {
     icub_kin_arm_.setAllConstraints(false);
@@ -27,7 +27,7 @@ InitiCubArm::InitiCubArm(ConstString port_prefix, ConstString cam_sel, ConstStri
 }
 
 
-InitiCubArm::InitiCubArm(ConstString cam_sel, ConstString laterality) noexcept :
+InitiCubArm::InitiCubArm(const ConstString& cam_sel, const ConstString& laterality) noexcept :
     InitiCubArm("InitiCubArm", cam_sel, laterality) { }
 
 

@@ -14,11 +14,11 @@ class ResamplingWithPrior : public bfl::Resampling,
 {
 public:
     /* Resampling complete constructor */
-    ResamplingWithPrior(unsigned int seed, yarp::os::ConstString port_prefix, yarp::os::ConstString cam_sel, yarp::os::ConstString laterality) noexcept;
+    ResamplingWithPrior(const unsigned int seed, const yarp::os::ConstString& port_prefix, const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality) noexcept;
 
-    ResamplingWithPrior(yarp::os::ConstString port_prefix, yarp::os::ConstString cam_sel, yarp::os::ConstString laterality) noexcept;
+    ResamplingWithPrior(const yarp::os::ConstString& port_prefix, const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality) noexcept;
 
-    ResamplingWithPrior(yarp::os::ConstString cam_sel, yarp::os::ConstString laterality) noexcept;
+    ResamplingWithPrior(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality) noexcept;
 
     /* Destructor */
     ~ResamplingWithPrior() noexcept;

@@ -1,6 +1,5 @@
 #include "ResamplingWithPrior.h"
 
-#include <iostream>
 #include <vector>
 
 using namespace bfl;
@@ -8,15 +7,15 @@ using namespace Eigen;
 using namespace yarp::os;
 
 
-ResamplingWithPrior::ResamplingWithPrior(unsigned int seed, ConstString port_prefix, ConstString cam_sel, ConstString laterality) noexcept :
+ResamplingWithPrior::ResamplingWithPrior(const unsigned int seed, const ConstString& port_prefix, const ConstString& cam_sel, const ConstString& laterality) noexcept :
     Resampling(seed), InitiCubArm(port_prefix, cam_sel, laterality) { }
 
 
-ResamplingWithPrior::ResamplingWithPrior(ConstString port_prefix, ConstString cam_sel, ConstString laterality) noexcept :
+ResamplingWithPrior::ResamplingWithPrior(const ConstString& port_prefix, const ConstString& cam_sel, const ConstString& laterality) noexcept :
     ResamplingWithPrior(1, port_prefix, cam_sel, laterality) { }
 
 
-ResamplingWithPrior::ResamplingWithPrior(ConstString cam_sel, ConstString laterality) noexcept :
+ResamplingWithPrior::ResamplingWithPrior(const ConstString& cam_sel, const ConstString& laterality) noexcept :
     ResamplingWithPrior(1, "ResamplingWithPrior", cam_sel, laterality) { }
 
 
