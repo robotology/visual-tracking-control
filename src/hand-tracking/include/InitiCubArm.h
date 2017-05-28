@@ -12,6 +12,8 @@
 class InitiCubArm : public bfl::Initialization
 {
 public:
+    InitiCubArm(yarp::os::ConstString port_prefix, yarp::os::ConstString cam_sel, yarp::os::ConstString laterality) noexcept;
+
     InitiCubArm(yarp::os::ConstString cam_sel, yarp::os::ConstString laterality) noexcept;
 
     ~InitiCubArm() noexcept;

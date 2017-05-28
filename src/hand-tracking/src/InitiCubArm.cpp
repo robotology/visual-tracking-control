@@ -10,7 +10,7 @@ using namespace yarp::sig;
 using namespace yarp::os;
 
 
-InitiCubArm::InitiCubArm(ConstString cam_sel, ConstString laterality) noexcept :
+InitiCubArm::InitiCubArm(ConstString port_prefix, ConstString cam_sel, ConstString laterality) noexcept :
     icub_kin_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")}
 {
     icub_kin_arm_.setAllConstraints(false);
@@ -22,9 +22,13 @@ InitiCubArm::InitiCubArm(ConstString cam_sel, ConstString laterality) noexcept :
     icub_kin_finger_[1].setAllConstraints(false);
     icub_kin_finger_[2].setAllConstraints(false);
 
-    port_arm_enc_.open  ("/hand-tracking/" + cam_sel + "/" + laterality + "_arm:i");
-    port_torso_enc_.open("/hand-tracking/" + cam_sel + "/torso:i");
+    port_arm_enc_.open  ("/" + port_prefix + "/cam/" + cam_sel + "/" + laterality + "_arm:i");
+    port_torso_enc_.open("/" + port_prefix + "/cam/" + cam_sel + "/torso:i");
 }
+
+
+InitiCubArm::InitiCubArm(ConstString cam_sel, ConstString laterality) noexcept :
+    InitiCubArm("InitiCubArm", cam_sel, laterality) { }
 
 
 InitiCubArm::~InitiCubArm() noexcept
@@ -44,7 +48,7 @@ void InitiCubArm::initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref<Eigen
     for (int i = 0; i < state.cols(); ++i)
         state.col(i) = init_hand_pose.cast<float>();
 
-    weight.fill(1.0/state.cols());
+    weight.fill(1.0 / state.cols());
 }
 
 

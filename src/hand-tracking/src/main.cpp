@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - number of particles:" << num_particles;
 
     /* INITIALIZATION */
-    std::unique_ptr<Initialization> init_arm(new InitiCubArm(robot_cam_sel, robot_laterality));
+    std::unique_ptr<Initialization> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", robot_cam_sel, robot_laterality));
 
 
     /* MOTION MODEL */
