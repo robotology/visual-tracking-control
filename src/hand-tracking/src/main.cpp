@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
     ConstString robot_laterality = rf.check("laterality", Value("right")).asString();
     bool        play             = ((rf.findGroup("play").size() == 1 ? true : (rf.findGroup("play").size() == 2 ? rf.find("play").asBool() : false)));
     int         num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
+    int         gpu_count        = 1;
 
     yInfo() << log_ID << "Running with:";
     yInfo() << log_ID << " - robot name:"          << robot_name;
@@ -104,12 +105,10 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles, robot_cam_sel, robot_laterality, rf.getContext()));
-//        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality, rf.getContext()));
+        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_count, robot_cam_sel, robot_laterality, rf.getContext()));
 
         proprio = std::move(vp);
-        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols();
-//        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * gpu_dev.multiProcessorCount();
+        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * gpu_count;
     }
     catch (const std::runtime_error& e)
     {
