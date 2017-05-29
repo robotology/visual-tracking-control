@@ -14,6 +14,7 @@ include(YarpInstallationHelpers)
 
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
+        common/VisualServoingCommon.h
         include/ServerVisualServoing.h)
 
 set(${EXE_TARGET_NAME}_SRC
