@@ -11,7 +11,7 @@ using namespace yarp::os;
 
 
 InitiCubArm::InitiCubArm(const ConstString& port_prefix, const ConstString& cam_sel, const ConstString& laterality) noexcept :
-    icub_kin_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")}
+    icub_kin_arm_(iCubArm(laterality + "_v2")), icub_kin_finger_{iCubFinger(laterality + "_thumb"), iCubFinger(laterality + "_index"), iCubFinger(laterality + "_middle")}
 {
     icub_kin_arm_.setAllConstraints(false);
     icub_kin_arm_.releaseLink(0);
@@ -76,11 +76,11 @@ Vector InitiCubArm::readRootToEE()
     yAssert(b->size() == 16);
 
     Vector root_ee_enc(10);
+
     root_ee_enc.setSubvector(0, readTorso());
+
     for (size_t i = 0; i < 7; ++i)
-    {
         root_ee_enc(i+3) = b->get(i).asDouble();
-    }
 
     return root_ee_enc;
 }
