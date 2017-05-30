@@ -178,7 +178,7 @@ bool ServerVisualServoing::open(Searchable &config)
 }
 
 
-bool ServerVisualServoing::updateModule()
+void ServerVisualServoing::run()
 {
     while (!shall_go_);
 
@@ -489,9 +489,9 @@ bool ServerVisualServoing::updateModule()
 }
 
 
-bool ServerVisualServoing::interruptModule()
+bool ServerVisualServoing::interrupt()
 {
-    yInfoVerbose("Interrupting module...");
+    yInfoVerbose("Interrupting...");
 
     yInfoVerbose("...blocking controllers...");
     itf_rightarm_cart_->stopControl();
@@ -1098,7 +1098,7 @@ bool ServerVisualServoing::quit()
     should_stop_ = true;
     shall_go_    = true;
 
-    stopModule();
+    interrupt();
 
     return true;
 }

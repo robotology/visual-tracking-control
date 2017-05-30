@@ -20,7 +20,7 @@ int main(int argc, char **argv)
     rf.configure(argc, argv);
 
     ServerVisualServoing reaching;
-    reaching.runModule(rf);
+    reaching.open(rf);
 
     return EXIT_SUCCESS;
 }

@@ -99,6 +99,10 @@ protected:
     bool quit() override;
 
 
+    /* Class methods */
+    bool interrupt();
+
+
     /* Enum helpers */
     enum class CamSel { left, right };
 
