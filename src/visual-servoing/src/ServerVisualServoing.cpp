@@ -694,6 +694,67 @@ bool ServerVisualServoing::init(const std::string& label)
 /* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
 bool ServerVisualServoing::set_goal(const std::string& label)
 {
+    /* Hand pointing forward, palm looking down */
+    //    Matrix R_ee = zeros(3, 3);
+    //    R_ee(0, 0) = -1.0;
+    //    R_ee(1, 1) =  1.0;
+    //    R_ee(2, 2) = -1.0;
+    //    Vector ee_o = dcm2axis(R_ee);
+
+    /* Trial 27/04/17 */
+    // -0.323 0.018 0.121 0.310 -0.873 0.374 3.008
+    //    Vector p = zeros(6);
+    //    p[0] = -0.323;
+    //    p[1] =  0.018;
+    //    p[2] =  0.121;
+    //    p[3] =  0.310 * 3.008;
+    //    p[4] = -0.873 * 3.008;
+    //    p[5] =  0.374 * 3.008;
+
+    /* Trial 17/05/17 */
+    // -0.284 0.013 0.104 -0.370 0.799 -0.471 2.781
+    Vector p = zeros(6);
+    p[0] = -0.284;
+    p[1] =  0.013;
+    p[2] =  0.104;
+    p[3] = -0.370 * 2.781;
+    p[4] =  0.799 * 2.781;
+    p[5] = -0.471 * 2.781;
+
+    /* KARATE */
+    //    Vector p = zeros(6);
+    //    p[0] = -0.319;
+    //    p[1] =  0.128;
+    //    p[2] =  0.075;
+    //    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+    /* SIM init 1 */
+    // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
+    //    Vector p = zeros(6);
+    //    p[0] = -0.416;
+    //    p[1] = -0.024;
+    //    p[2] =  0.055;
+    //    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+    /* SIM init 2 */
+    //    Vector p = zeros(6);
+    //    p[0] = -0.35;
+    //    p[1] =  0.025;
+    //    p[2] =  0.10;
+    //    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+    goal_pose_ = p;
+    yInfo() << "Goal: " << goal_pose_.toString();
+
+    Vector p0 = zeros(4);
+    Vector p1 = zeros(4);
+    Vector p2 = zeros(4);
+    Vector p3 = zeros(4);
+    getControlPointsFromPose(p, p0, p1, p2, p3);
+
+    yInfo() << "Goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
+
+
     Vector left_eye_x;
     Vector left_eye_o;
     itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
@@ -721,67 +782,6 @@ bool ServerVisualServoing::set_goal(const std::string& label)
 
     l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
     r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
-
-
-    /* Hand pointing forward, palm looking down */
-//    Matrix R_ee = zeros(3, 3);
-//    R_ee(0, 0) = -1.0;
-//    R_ee(1, 1) =  1.0;
-//    R_ee(2, 2) = -1.0;
-//    Vector ee_o = dcm2axis(R_ee);
-
-    /* Trial 27/04/17 */
-    // -0.323 0.018 0.121 0.310 -0.873 0.374 3.008
-//    Vector p = zeros(6);
-//    p[0] = -0.323;
-//    p[1] =  0.018;
-//    p[2] =  0.121;
-//    p[3] =  0.310 * 3.008;
-//    p[4] = -0.873 * 3.008;
-//    p[5] =  0.374 * 3.008;
-
-    /* Trial 17/05/17 */
-    // -0.284 0.013 0.104 -0.370 0.799 -0.471 2.781
-    Vector p = zeros(6);
-    p[0] = -0.284;
-    p[1] =  0.013;
-    p[2] =  0.104;
-    p[3] = -0.370 * 2.781;
-    p[4] =  0.799 * 2.781;
-    p[5] = -0.471 * 2.781;
-
-    /* KARATE */
-//    Vector p = zeros(6);
-//    p[0] = -0.319;
-//    p[1] =  0.128;
-//    p[2] =  0.075;
-//    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-
-    /* SIM init 1 */
-    // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
-//    Vector p = zeros(6);
-//    p[0] = -0.416;
-//    p[1] = -0.024;
-//    p[2] =  0.055;
-//    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-
-    /* SIM init 2 */
-//    Vector p = zeros(6);
-//    p[0] = -0.35;
-//    p[1] =  0.025;
-//    p[2] =  0.10;
-//    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-
-    goal_pose_ = p;
-    yInfo() << "Goal: " << goal_pose_.toString();
-
-    Vector p0 = zeros(4);
-    Vector p1 = zeros(4);
-    Vector p2 = zeros(4);
-    Vector p3 = zeros(4);
-    getControlPointsFromPose(p, p0, p1, p2, p3);
-
-    yInfo() << "Goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
 
 
     Vector l_px0_goal = l_H_r_to_cam_ * p0;
