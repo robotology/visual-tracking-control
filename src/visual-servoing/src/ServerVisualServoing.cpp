@@ -544,129 +544,136 @@ std::vector<std::string> ServerVisualServoing::get_info()
 /* Go to initial position (open-loop) */
 bool ServerVisualServoing::init(const std::string& label)
 {
+    Vector xd       = zeros(3);
+    Vector od       = zeros(4);
+    Vector gaze_loc = zeros(3);
+
     /* Trial 27/04/17 */
     // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
-//    Vector od(4);
+//    xd[0] = -0.346;
+//    xd[1] =  0.133;
+//    xd[2] =  0.162;
 //    od[0] =  0.140;
 //    od[1] = -0.989;
 //    od[2] =  0.026;
 //    od[3] =  2.693;
+//    gaze_loc[0] = -6.706;
+//    gaze_loc[1] =  1.394;
+//    gaze_loc[2] = -3.618;
 
-    /* Trial 17/05/17 */
-    // -0.300 0.088 0.080 -0.245 0.845 -0.473 2.896
-    Vector od(4);
-    od[0] = -0.245;
-    od[1] =  0.845;
-    od[2] = -0.473;
-    od[3] =  2.896;
+    if (label == "t170517")
+    {
+        /* -0.300 0.088 0.080 -0.245 0.845 -0.473 2.896 */
+        xd[0] = -0.300;
+        xd[1] =  0.088;
+        xd[2] =  0.080;
+
+        od[0] = -0.245;
+        od[1] =  0.845;
+        od[2] = -0.473;
+        od[3] =  2.896;
+
+        gaze_loc[0] = -0.681;
+        gaze_loc[1] =  0.112;
+        gaze_loc[2] = -0.240;
+
+        unsetTorsoDOF();
+    }
+
+    if (label == "sfm300517")
+    {
+        /* -0.333 0.203 -0.053 0.094 0.937 -0.335 3.111 */
+        xd[0] = -0.333;
+        xd[1] =  0.203;
+        xd[2] = -0.053;
+
+        od[0] =  0.094;
+        od[1] =  0.937;
+        od[2] = -0.335;
+        od[3] =  3.111;
+
+        /* -0.589 0.252 -0.409 */
+        gaze_loc[0] = -0.589;
+        gaze_loc[1] =  0.252;
+        gaze_loc[2] = -0.409;
+
+        setTorsoDOF();
+        itf_rightarm_cart_->setLimits(0,  25.0,  25.0);
+    }
 
     /* KARATE */
     // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
+//    xd[0] = -0.319;
+//    xd[1] =  0.128;
+//    xd[2] =  0.075;
 //    Matrix Od = zeros(3, 3);
 //    Od(0, 0) = -1.0;
 //    Od(2, 1) = -1.0;
 //    Od(1, 2) = -1.0;
-//    Vector od = dcm2axis(Od);
+//    od = dcm2axis(Od);
+//    gaze_loc[0] = xd[0];
+//    gaze_loc[1] = xd[1];
+//    gaze_loc[2] = xd[2];
 
     /* GRASPING */
-//    Vector od = zeros(4);
+//    xd[0] = -0.370;
+//    xd[1] =  0.103;
+//    xd[2] =  0.064;
 //    od(0) = -0.141;
 //    od(1) =  0.612;
 //    od(2) = -0.777;
 //    od(4) =  3.012;
+//    gaze_loc[0] = xd[0];
+//    gaze_loc[1] = xd[1];
+//    gaze_loc[2] = xd[2];
 
-    /* SIM */
+
+    /* SIM1 */
+//    xd[0] = -0.416;
+//    xd[1] =  0.024 + 0.1;
+//    xd[2] =  0.055;
 //    Matrix Od(3, 3);
 //    Od(0, 0) = -1.0;
 //    Od(1, 1) = -1.0;
 //    Od(2, 2) =  1.0;
-//    Vector od = dcm2axis(Od);
+//    od = dcm2axis(Od);
+//    gaze_loc[0] = xd[0];
+//    gaze_loc[1] = xd[1];
+//    gaze_loc[2] = xd[2];
+
+
+    /* SIM2 */
+//    xd[0] = -0.35;
+//    xd[1] =  0.025 + 0.05;
+//    xd[2] =  0.10;
+//    Matrix Od(3, 3);
+//    Od(0, 0) = -1.0;
+//    Od(1, 1) = -1.0;
+//    Od(2, 2) =  1.0;
+//    od = dcm2axis(Od);
+//    gaze_loc[0] = xd[0];
+//    gaze_loc[1] = xd[1];
+//    gaze_loc[2] = xd[2];
 
 
     double traj_time = 0.0;
     itf_rightarm_cart_->getTrajTime(&traj_time);
 
-    if (traj_time == traj_time_)
+    if (norm(xd) != 0.0 && norm(od) != 0.0 && norm(gaze_loc) != 0.0 && traj_time == traj_time_)
     {
-        Vector init_pos = zeros(3);
+        yInfo() << "Init position:"    << xd.toString();
+        yInfo() << "Init orientation:" << od.toString();
 
-        //FIXME: to implement
-//        init_pos[0] = -0.345;
-//        init_pos[1] =  0.139;
-//        init_pos[2] =  0.089;
-
-        /* Trial 27/04/17 */
-        // -0.346 0.133 0.162 0.140 -0.989 0.026 2.693
-//        init_pos[0] = -0.346;
-//        init_pos[1] =  0.133;
-//        init_pos[2] =  0.162;
-
-        /* Trial 17/05/17 */
-        // -0.300 0.088 0.080 -0.245 0.845 -0.473 2.896
-        init_pos[0] = -0.300;
-        init_pos[1] =  0.088;
-        init_pos[2] =  0.080;
-
-        /* KARATE init */
-        // -0.319711 0.128912 0.075052 0.03846 -0.732046 0.680169 2.979943
-//        init_pos[0] = -0.319;
-//        init_pos[1] =  0.128;
-//        init_pos[2] =  0.075;
-
-        /* GRASPING init */
-//        init_pos[0] = -0.370;
-//        init_pos[1] =  0.103;
-//        init_pos[2] =  0.064;
-
-        /* SIM init 1 */
-//        init_pos[0] = -0.416;
-//        init_pos[1] =  0.024 + 0.1;
-//        init_pos[2] =  0.055;
-
-        /* SIM init 2 */
-//        init_pos[0] = -0.35;
-//        init_pos[1] =  0.025 + 0.05;
-//        init_pos[2] =  0.10;
-
-        yInfo() << "Init: " << init_pos.toString() << " " << od.toString();
-
-        unsetTorsoDOF();
-
-//        itf_rightarm_cart_->setLimits(0,  15.0,  15.0);
-//        itf_rightarm_cart_->setLimits(2, -23.0, -23.0);
-//        itf_rightarm_cart_->setLimits(3, -16.0, -16.0);
-//        itf_rightarm_cart_->setLimits(4,  53.0,  53.0);
-//        itf_rightarm_cart_->setLimits(5,   0.0,   0.0);
-//        itf_rightarm_cart_->setLimits(7, -58.0, -58.0);
-
-        itf_rightarm_cart_->goToPoseSync(init_pos, od);
+        itf_rightarm_cart_->goToPoseSync(xd, od);
         itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
         itf_rightarm_cart_->stopControl();
 
         itf_rightarm_cart_->removeTipFrame();
 
+        unsetTorsoDOF();
+
         itf_rightarm_cart_->storeContext(&ctx_cart_);
 
-
-        /* Normal trials */
-//        Vector gaze_loc(3);
-//        gaze_loc[0] = init_pos[0];
-//        gaze_loc[1] = init_pos[1];
-//        gaze_loc[2] = init_pos[2];
-
-        /* Trial 27/04/17 */
-        // -6.706 1.394 -3.618
-//        Vector gaze_loc(3);
-//        gaze_loc[0] = -6.706;
-//        gaze_loc[1] =  1.394;
-//        gaze_loc[2] = -3.618;
-
-        /* Trial 17/05/17 */
-        // -0.681 0.112 -0.240
-        Vector gaze_loc(3);
-        gaze_loc[0] = -0.681;
-        gaze_loc[1] =  0.112;
-        gaze_loc[2] = -0.240;
 
         yInfo() << "Fixation point: " << gaze_loc.toString();
 
