@@ -7,59 +7,99 @@
 #include <thrift/ServerVisualServoingIDL.h>
 #include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/GazeControl.h>
+#include <yarp/dev/DeviceDriver.h>
 #include <yarp/dev/IEncoders.h>
+#include <yarp/dev/IVisualServoing.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Port.h>
-#include <yarp/os/ResourceFinder.h>
-#include <yarp/os/RFModule.h>
+#include <yarp/os/RateThread.h>
+#include <yarp/os/Searchable.h>
 #include <yarp/sig/Image.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
 
 
-class ServerVisualServoing : public yarp::os::RFModule,
-                             public ServerVisualServoingIDL
+class ServerVisualServoing : public    yarp::dev::DeviceDriver,
+                             public    yarp::dev::IVisualServoing,
+                             protected yarp::os::RateThread,
+                             public    ServerVisualServoingIDL
 {
 public:
-    bool configure(yarp::os::ResourceFinder &rf);
+    /* DeviceDriver */
+    bool open(yarp::os::Searchable &config) override;
 
-    double getPeriod() { return 0; }
-
-    bool updateModule();
-
-    bool interruptModule();
-
-    bool close();
+    bool close() override;
 
 protected:
-    std::vector<std::string> get_info();
+    /* RateThread */
+    bool threadInit() override;
 
-    bool init(const std::string& label);
+    void run() override;
 
-    bool set_goal(const std::string& label);
+    void threadRelease() override;
 
-    bool get_sfm_points();
+    /* IVisualServoing */
+    bool goToGoal(const yarp::sig::Vector& px_l, const yarp::sig::Vector& px_r) override;
 
-    bool set_modality(const std::string& mode);
+    bool goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r) override;
 
-    bool set_position_gain(const double k);
+    bool setModality(const bool mode) override;
 
-    bool set_orientation_gain(const double k);
+    bool setControlPoint(const yarp::os::ConstString& point) override;
 
-    bool set_position_bound(const double b);
+    bool getVisualServoingInfo(yarp::os::Bottle& info) override;
 
-    bool set_orientation_bound(const double b);
+    bool setGoToGoalTolerance(const double tol) override;
 
-    bool set_goal_tol(const double px);
+    bool checkVisualServoingController(bool& is_running) override;
 
-    bool go();
+    bool waitVisualServoingDone(const double period = 0.1, const double timeout = 0.0) override;
 
-    bool quit();
+    bool stopController() override;
 
+    bool setTranslationGain(const float k_x = 0.5) override;
+
+    bool setMaxTranslationVelocity(const float max_x_dot) override;
+
+    bool setOrientationGain(const float k_o) override;
+
+    bool setMaxOrientationVelocity(const float max_o_dot) override;
+
+    bool get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o,
+                                             std::vector<yarp::sig::Vector> vec_goal_points) override;
+
+
+    /* ServerVisualServoingIDL */
+    std::vector<std::string> get_info() override;
+
+    bool init(const std::string& label) override;
+
+    bool set_goal(const std::string& label) override;
+
+    bool get_sfm_points() override;
+
+    bool set_modality(const std::string& mode) override;
+
+    bool set_position_gain(const double k) override;
+
+    bool set_orientation_gain(const double k) override;
+
+    bool set_position_bound(const double b) override;
+
+    bool set_orientation_bound(const double b) override;
+
+    bool set_goal_tol(const double px) override;
+
+    bool go() override;
+
+    bool quit() override;
+
+
+    /* Enum helpers */
     enum class CamSel { left, right };
 
     enum class ControlPixelMode { origin, origin_x, origin_o };
