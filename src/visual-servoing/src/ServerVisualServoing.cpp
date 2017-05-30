@@ -913,8 +913,10 @@ bool ServerVisualServoing::get_sfm_points()
     {
         Matrix R_ee = zeros(3, 3);
         R_ee(0, 0) = -1.0;
-        R_ee(1, 1) =  1.0;
-        R_ee(2, 2) = -1.0;
+//        R_ee(1, 1) =  1.0;
+        R_ee(1, 2) = -1.0;
+//        R_ee(2, 2) = -1.0;
+        R_ee(2, 1) = -1.0;
         Vector ee_o = dcm2axis(R_ee);
 
         Vector sfm_pos = zeros(3);
