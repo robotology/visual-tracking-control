@@ -30,6 +30,7 @@ protected:
     yarp::dev::IEncoders * itf_arm_enc_;
     yarp::dev::PolyDriver  drv_torso_enc_;
     yarp::dev::IEncoders * itf_torso_enc_;
+
     iCub::iKin::iCubArm    icub_kin_arm_;
 
     Eigen::VectorXd   readPose() override;
@@ -39,12 +40,12 @@ protected:
     yarp::sig::Vector readTorso();
 
 private:
-    yarp::os::ConstString  ID_     = "iCubGatePose";
-    yarp::os::ConstString  log_ID_ = "[" + ID_ + "]";
+    const yarp::os::ConstString ID_     = "iCubGatePose";
+    const yarp::os::ConstString log_ID_ = "[" + ID_ + "]";
 
-    yarp::os::ConstString  robot_;
-    yarp::os::ConstString  laterality_;
-    yarp::os::ConstString  port_prefix_;
+    yarp::os::ConstString robot_;
+    yarp::os::ConstString laterality_;
+    yarp::os::ConstString port_prefix_;
 };
 
 #endif /* ICUBGATEPOSE_H */

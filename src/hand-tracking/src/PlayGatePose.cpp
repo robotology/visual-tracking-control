@@ -23,7 +23,7 @@ PlayGatePose::PlayGatePose(std::unique_ptr<VisualCorrection> visual_correction,
     GatePose(std::move(visual_correction),
              gate_x, gate_y, gate_z,
              gate_rotation, gate_aperture),
-    robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
+    icub_kin_arm_(iCubArm(laterality + "_v2")), robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
 {
     /* Arm encoders:   /icub/right_arm/state:o
        Torso encoders: /icub/torso/state:o     */
