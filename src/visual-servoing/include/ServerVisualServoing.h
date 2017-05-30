@@ -29,6 +29,12 @@ class ServerVisualServoing : public    yarp::dev::DeviceDriver,
                              public    ServerVisualServoingIDL
 {
 public:
+    /* Class methods */
+    ServerVisualServoing();
+
+    ~ServerVisualServoing() { };
+
+
     /* DeviceDriver */
     bool open(yarp::os::Searchable &config) override;
 
