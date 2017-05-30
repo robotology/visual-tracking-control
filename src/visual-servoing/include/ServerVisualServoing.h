@@ -12,6 +12,7 @@
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
 #include <yarp/os/ConstString.h>
+#include <yarp/os/LogStream.h>
 #include <yarp/os/Port.h>
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/os/RFModule.h>
@@ -66,6 +67,7 @@ protected:
     enum class OperatingMode { position, orientation, pose };
 
 private:
+    bool                          verbosity_ = false;
     yarp::os::ConstString         robot_name_;
 
     bool                          should_stop_ = false;
@@ -145,6 +147,10 @@ private:
     yarp::sig::Vector getJacobianV(const CamSel cam, const yarp::sig::Vector& px);
     
     yarp::sig::Vector getAxisAngle(const yarp::sig::Vector& v);
+
+    void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo(str);    };
+    void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning(str); };
+    void yErrorVerbose  (const yarp::os::ConstString& str) const { if(verbosity_) yError(str);   };
 };
 
-#endif
+#endif /* SERVERVISUALSERVOING_H */

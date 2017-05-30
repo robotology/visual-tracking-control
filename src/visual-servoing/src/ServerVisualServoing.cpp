@@ -8,7 +8,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <yarp/math/Math.h>
 #include <yarp/math/SVD.h>
-#include <yarp/os/LogStream.h>
 #include <yarp/os/Property.h>
 #include <yarp/os/RpcClient.h>
 #include <yarp/os/Time.h>
@@ -20,58 +19,63 @@ using namespace yarp::sig;
 using namespace iCub::ctrl;
 
 
-bool ServerVisualServoing::configure(ResourceFinder &rf)
+bool ServerVisualServoing::open(Searchable &config)
 {
-    robot_name_ = rf.find("robot").asString();
+    yInfo("*** Configuring ServerVisualServoing ***");
+
+    verbosity_ = config.check("verbosity", Value(false)).asBool();
+    yInfoVerbose("|> Verbosity:" + ConstString(verbosity_? "ON" : "OFF"));
+
+    robot_name_ = config.find("robot").asString();
     if (robot_name_.empty())
     {
-        yError() << "Robot name not provided! Closing.";
+        yErrorVerbose("Robot name not provided! Closing.");
         return false;
     }
 
 
     if (!port_pose_left_in_.open("/visual-servoing/pose/left:i"))
     {
-        yError() << "Could not open /visual-servoing/pose/left:i port! Closing.";
+        yErrorVerbose("Could not open /visual-servoing/pose/left:i port! Closing.");
         return false;
     }
     if (!port_pose_right_in_.open("/visual-servoing/pose/right:i"))
     {
-        yError() << "Could not open /visual-servoing/pose/right:i port! Closing.";
+        yErrorVerbose("Could not open /visual-servoing/pose/right:i port! Closing.");
         return false;
     }
 
 
     if (!port_image_left_in_.open("/visual-servoing/cam_left/img:i"))
     {
-        yError() << "Could not open /visual-servoing/cam_left/img:i port! Closing.";
+        yErrorVerbose("Could not open /visual-servoing/cam_left/img:i port! Closing.");
         return false;
     }
     if (!port_image_left_out_.open("/visual-servoing/cam_left/img:o"))
     {
-        yError() << "Could not open /visual-servoing/cam_left/img:o port! Closing.";
+        yErrorVerbose("Could not open /visual-servoing/cam_left/img:o port! Closing.");
         return false;
     }
     if (!port_click_left_.open("/visual-servoing/cam_left/click:i"))
     {
-        yError() << "Could not open /visual-servoing/cam_left/click:in port! Closing.";
+        yErrorVerbose("Could not open /visual-servoing/cam_left/click:in port! Closing.");
         return false;
     }
 
 
     if (!port_image_right_in_.open("/visual-servoing/cam_right/img:i"))
     {
-        yError() << "Could not open /visual-servoing/cam_right/img:i port! Closing.";
+        yErrorVerbose("Could not open /visual-servoing/cam_right/img:i port! Closing.");
         return false;
     }
     if (!port_image_right_out_.open("/visual-servoing/cam_right/img:o"))
     {
-        yError() << "Could not open /visual-servoing/cam_right/img:o port! Closing.";
+        yErrorVerbose("Could not open /visual-servoing/cam_right/img:o port! Closing.");
         return false;
     }
     if (!port_click_right_.open("/visual-servoing/cam_right/click:i"))
     {
-        yError() << "Could not open /visual-servoing/cam_right/click:i port! Closing.";
+        yErrorVerbose("Could not open /visual-servoing/cam_right/click:i port! Closing.");
         return false;
     }
 
@@ -83,7 +87,7 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
 
     Bottle btl_cam_info;
     itf_gaze_->getInfo(btl_cam_info);
-    yInfo() << "[CAM INFO]" << btl_cam_info.toString();
+    yInfoVerbose("[CAM INFO]" + btl_cam_info.toString());
     Bottle* cam_left_info = btl_cam_info.findGroup("camera_intrinsics_left").get(1).asList();
     Bottle* cam_right_info = btl_cam_info.findGroup("camera_intrinsics_right").get(1).asList();
 
@@ -92,11 +96,11 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     float left_fy = static_cast<float>(cam_left_info->get(5).asDouble());
     float left_cy = static_cast<float>(cam_left_info->get(6).asDouble());
 
-    yInfo() << "[CAM]" << "Left camera:";
-    yInfo() << "[CAM]" << " - fx:"     << left_fx;
-    yInfo() << "[CAM]" << " - fy:"     << left_fy;
-    yInfo() << "[CAM]" << " - cx:"     << left_cx;
-    yInfo() << "[CAM]" << " - cy:"     << left_cy;
+    yInfoVerbose("[CAM] Left camera:");
+    yInfoVerbose("[CAM]  - fx: " + std::to_string(left_fx));
+    yInfoVerbose("[CAM]  - fy: " + std::to_string(left_fy));
+    yInfoVerbose("[CAM]  - cx: " + std::to_string(left_cx));
+    yInfoVerbose("[CAM]  - cy: " + std::to_string(left_cy));
 
     l_proj_       = zeros(3, 4);
     l_proj_(0, 0) = left_fx;
@@ -105,18 +109,18 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     l_proj_(1, 2) = left_cy;
     l_proj_(2, 2) = 1.0;
 
-    yInfo() << "l_proj_ =\n" << l_proj_.toString();
+    yInfoVerbose("l_proj_ =\n" + l_proj_.toString());
 
     float right_fx = static_cast<float>(cam_right_info->get(0).asDouble());
     float right_cx = static_cast<float>(cam_right_info->get(2).asDouble());
     float right_fy = static_cast<float>(cam_right_info->get(5).asDouble());
     float right_cy = static_cast<float>(cam_right_info->get(6).asDouble());
 
-    yInfo() << "[CAM]" << "Right camera:";
-    yInfo() << "[CAM]" << " - fx:"     << right_fx;
-    yInfo() << "[CAM]" << " - fy:"     << right_fy;
-    yInfo() << "[CAM]" << " - cx:"     << right_cx;
-    yInfo() << "[CAM]" << " - cy:"     << right_cy;
+    yInfoVerbose("[CAM] Right camera:");
+    yInfoVerbose("[CAM]  - fx: " + std::to_string(right_fx));
+    yInfoVerbose("[CAM]  - fy: " + std::to_string(right_fy));
+    yInfoVerbose("[CAM]  - cx: " + std::to_string(right_cx));
+    yInfoVerbose("[CAM]  - cy: " + std::to_string(right_cy));
 
     r_proj_       = zeros(3, 4);
     r_proj_(0, 0) = right_fx;
@@ -125,7 +129,7 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     r_proj_(1, 2) = right_cy;
     r_proj_(2, 2) = 1.0;
 
-    yInfo() << "r_proj_ =\n" << r_proj_.toString();
+    yInfoVerbose("r_proj_ =\n" + r_proj_.toString());
 
 
     Vector left_eye_x;
@@ -136,10 +140,10 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     Vector right_eye_o;
     itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
-    yInfo() << "left_eye_o =" << left_eye_o.toString();
-    yInfo() << "left_eye_x =" << left_eye_x.toString();
-    yInfo() << "right_eye_o =" << right_eye_o.toString();
-    yInfo() << "right_eye_x =" << right_eye_x.toString();
+    yInfoVerbose("left_eye_o ="  + left_eye_o.toString());
+    yInfoVerbose("left_eye_x ="  + left_eye_x.toString());
+    yInfoVerbose("right_eye_o =" + right_eye_o.toString());
+    yInfoVerbose("right_eye_x =" + right_eye_x.toString());
 
 
     l_H_eye_to_r_ = axis2dcm(left_eye_o);
@@ -152,21 +156,23 @@ bool ServerVisualServoing::configure(ResourceFinder &rf)
     r_H_eye_to_r_.setCol(3, right_eye_x);
     r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
 
-    yInfo() << "l_H_r_to_eye_ =\n" << l_H_r_to_eye_.toString();
-    yInfo() << "r_H_r_to_eye_ =\n" << r_H_r_to_eye_.toString();
+    yInfoVerbose("l_H_r_to_eye_ =\n" + l_H_r_to_eye_.toString());
+    yInfoVerbose("r_H_r_to_eye_ =\n" + r_H_r_to_eye_.toString());
 
     l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
     r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
 
-    yInfo() << "l_H_r_to_cam_ =\n" << l_H_r_to_cam_.toString();
-    yInfo() << "r_H_r_to_cam_ =\n" << r_H_r_to_cam_.toString();
+    yInfoVerbose("l_H_r_to_cam_ =\n" + l_H_r_to_cam_.toString());
+    yInfoVerbose("r_H_r_to_cam_ =\n" + r_H_r_to_cam_.toString());
 
 
     if (!setCommandPort())
     {
-        yError() << "Could not open /visual-servoing/cmd:i port! Closing.";
+        yErrorVerbose("Could not open /visual-servoing/cmd:i port! Closing.");
         return false;
     }
+
+    yInfo("*** ServerVisualServoing configured! ***");
 
     return true;
 }
@@ -178,7 +184,7 @@ bool ServerVisualServoing::updateModule()
 
     if (should_stop_) return false;
 
-    yInfo() << "RUNNING!\n";
+    yInfoVerbose("\n*** RUNNING! ***\n");
 
     Vector  est_copy_left(6);
     Vector  est_copy_right(6);
@@ -215,7 +221,7 @@ bool ServerVisualServoing::updateModule()
     {
         /* Get the initial end-effector pose from left eye view */
         estimates = port_pose_left_in_.read(true);
-        yInfo() << "Got [" << estimates->toString() << "] from left eye particle filter.";
+        yInfoVerbose("Got [" + estimates->toString() + "] from left eye particle filter.");
         if (estimates->length() == 7)
         {
             est_copy_left = estimates->subVector(0, 5);
@@ -230,7 +236,7 @@ bool ServerVisualServoing::updateModule()
 
         /* Get the initial end-effector pose from right eye view */
         estimates = port_pose_right_in_.read(true);
-        yInfo() << "Got [" << estimates->toString() << "] from right eye particle filter.";
+        yInfoVerbose("Got [" + estimates->toString() + "] from right eye particle filter.");
         if (estimates->length() == 7)
         {
             est_copy_right = estimates->subVector(0, 5);
@@ -243,8 +249,8 @@ bool ServerVisualServoing::updateModule()
         else
             est_copy_right = *estimates;
 
-        yInfo() << "EE estimates left  = ["  << est_copy_left.toString()  << "]";
-        yInfo() << "EE estimates right = [" << est_copy_right.toString() << "]";
+        yInfoVerbose("EE estimates left  = [" + est_copy_left.toString()  + "]");
+        yInfoVerbose("EE estimates right = [" + est_copy_right.toString() + "]");
 
         /* SIM */
 //        /* Simulate reaching starting from the initial position */
@@ -280,34 +286,34 @@ bool ServerVisualServoing::updateModule()
         /* EVALUATING CONTROL POINTS */
         getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_x, l_px0_position, l_px1_position, l_px2_position, l_px3_position);
 
-        yInfo() << "Left (original position) control px0 = [" << l_px0_position.toString() << "]";
-        yInfo() << "Left (original position) control px1 = [" << l_px1_position.toString() << "]";
-        yInfo() << "Left (original position) control px2 = [" << l_px2_position.toString() << "]";
-        yInfo() << "Left (original position) control px3 = [" << l_px3_position.toString() << "]";
+        yInfoVerbose("Left (original position) control px0 = [" + l_px0_position.toString() + "]");
+        yInfoVerbose("Left (original position) control px1 = [" + l_px1_position.toString() + "]");
+        yInfoVerbose("Left (original position) control px2 = [" + l_px2_position.toString() + "]");
+        yInfoVerbose("Left (original position) control px3 = [" + l_px3_position.toString() + "]");
 
 
         getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_o, l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation);
 
-        yInfo() << "Left (original orientation) control px0 = [" << l_px0_orientation.toString() << "]";
-        yInfo() << "Left (original orientation) control px1 = [" << l_px1_orientation.toString() << "]";
-        yInfo() << "Left (original orientation) control px2 = [" << l_px2_orientation.toString() << "]";
-        yInfo() << "Left (original orientation) control px3 = [" << l_px3_orientation.toString() << "]";
+        yInfoVerbose("Left (original orientation) control px0 = [" + l_px0_orientation.toString() + "]");
+        yInfoVerbose("Left (original orientation) control px1 = [" + l_px1_orientation.toString() + "]");
+        yInfoVerbose("Left (original orientation) control px2 = [" + l_px2_orientation.toString() + "]");
+        yInfoVerbose("Left (original orientation) control px3 = [" + l_px3_orientation.toString() + "]");
 
 
         getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_x, r_px0_position, r_px1_position, r_px2_position, r_px3_position);
 
-        yInfo() << "Right (original position) control px0 = [" << r_px0_position.toString() << "]";
-        yInfo() << "Right (original position) control px1 = [" << r_px1_position.toString() << "]";
-        yInfo() << "Right (original position) control px2 = [" << r_px2_position.toString() << "]";
-        yInfo() << "Right (original position) control px3 = [" << r_px3_position.toString() << "]";
+        yInfoVerbose("Right (original position) control px0 = [" + r_px0_position.toString() + "]");
+        yInfoVerbose("Right (original position) control px1 = [" + r_px1_position.toString() + "]");
+        yInfoVerbose("Right (original position) control px2 = [" + r_px2_position.toString() + "]");
+        yInfoVerbose("Right (original position) control px3 = [" + r_px3_position.toString() + "]");
 
 
         getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
 
-        yInfo() << "Right (original orientation) control px0 = [" << r_px0_orientation.toString() << "]";
-        yInfo() << "Right (original orientation) control px1 = [" << r_px1_orientation.toString() << "]";
-        yInfo() << "Right (original orientation) control px2 = [" << r_px2_orientation.toString() << "]";
-        yInfo() << "Right (original orientation) control px3 = [" << r_px3_orientation.toString() << "]";
+        yInfoVerbose("Right (original orientation) control px0 = [" + r_px0_orientation.toString() + "]");
+        yInfoVerbose("Right (original orientation) control px1 = [" + r_px1_orientation.toString() + "]");
+        yInfoVerbose("Right (original orientation) control px2 = [" + r_px2_orientation.toString() + "]");
+        yInfoVerbose("Right (original orientation) control px3 = [" + r_px3_orientation.toString() + "]");
 
 
         /* FEATURES AND JACOBIAN (original position) */
@@ -315,8 +321,8 @@ bool ServerVisualServoing::updateModule()
                                             r_px0_position, r_px1_position, r_px2_position, r_px3_position,
                                             px_ee_cur_position, jacobian_position);
 
-        yInfo() << "px_ee_cur_position = [" << px_ee_cur_position.toString() << "]";
-        yInfo() << "jacobian_position  = [" << jacobian_position.toString() << "]";
+        yInfoVerbose("px_ee_cur_position = [" + px_ee_cur_position.toString() + "]");
+        yInfoVerbose("jacobian_position  = [" + jacobian_position.toString()  + "]");
 
 
         /* FEATURES AND JACOBIAN (original orientation) */
@@ -324,8 +330,8 @@ bool ServerVisualServoing::updateModule()
                                             r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation,
                                             px_ee_cur_orientation, jacobian_orientation);
         
-        yInfo() << "px_ee_cur_orientation = [" << px_ee_cur_orientation.toString() << "]";
-        yInfo() << "jacobian_orientation  = [" << jacobian_orientation.toString() << "]";
+        yInfoVerbose("px_ee_cur_orientation = [" + px_ee_cur_orientation.toString() + "]");
+        yInfoVerbose("jacobian_orientation  = [" + jacobian_orientation.toString()  + "]");
 
 
         Vector e_position               = px_des_ - px_ee_cur_position;
@@ -355,29 +361,29 @@ bool ServerVisualServoing::updateModule()
         }
 
 
-        yInfo() << "px_des_               = [" << px_des_.toString()               << "]";
-        yInfo() << "px_ee_cur_position    = [" << px_ee_cur_position.toString()    << "]";
-        yInfo() << "px_ee_cur_orientation = [" << px_ee_cur_orientation.toString() << "]";
-        yInfo() << "e_position            = [" << e_position.toString()            << "]";
-        yInfo() << "e_orientation         = [" << e_orientation.toString()         << "]";
-        yInfo() << "vel_x                 = [" << vel_x.toString()                 << "]";
-        yInfo() << "vel_o                 = [" << vel_o.toString()                 << "]";
+        yInfoVerbose("px_des_               = [" + px_des_.toString()               + "]");
+        yInfoVerbose("px_ee_cur_position    = [" + px_ee_cur_position.toString()    + "]");
+        yInfoVerbose("px_ee_cur_orientation = [" + px_ee_cur_orientation.toString() + "]");
+        yInfoVerbose("e_position            = [" + e_position.toString()            + "]");
+        yInfoVerbose("e_orientation         = [" + e_orientation.toString()         + "]");
+        yInfoVerbose("vel_x                 = [" + vel_x.toString()                 + "]");
+        yInfoVerbose("vel_o                 = [" + vel_o.toString()                 + "]");
 
         double ang = norm(vel_o);
         vel_o /= ang;
         vel_o.push_back(ang);
-        yInfo() << "axis-angle vel_o      = [" << vel_o.toString()                 << "]";
+        yInfoVerbose("axis-angle vel_o      = [" + vel_o.toString()                 + "]");
 
 
         /* Enforce translational velocity bounds */
         for (size_t i = 0; i < vel_x.length(); ++i)
             vel_x[i] = sign(vel_x[i]) * std::min(vx_max_, std::fabs(vel_x[i]));
-        yInfo() << "bounded vel_x = [" << vel_x.toString() << "]";
+        yInfoVerbose("bounded vel_x = [" + vel_x.toString() + "]");
 
 
         /* Enforce rotational velocity bounds */
         vel_o[3] = sign(vel_o[3]) * std::min(vo_max_, std::fabs(vel_o[3]));
-        yInfo() << "bounded vel_o = [" << vel_o.toString() << "]";
+        yInfoVerbose("bounded vel_o = [" + vel_o.toString() + "]");
 
 
         /* Visual control law */
@@ -417,10 +423,10 @@ bool ServerVisualServoing::updateModule()
 
         if (is_vs_done)
         {
-            yInfo() << "\npx_des ="              << px_des_.toString();
-            yInfo() << "px_ee_cur_position ="    << px_ee_cur_position.toString();
-            yInfo() << "px_ee_cur_orientation =" << px_ee_cur_orientation.toString();
-            yInfo() << "\nTERMINATING!\n";
+            yInfoVerbose("\npx_des ="              + px_des_.toString());
+            yInfoVerbose("px_ee_cur_position ="    + px_ee_cur_position.toString());
+            yInfoVerbose("px_ee_cur_orientation =" + px_ee_cur_orientation.toString());
+            yInfoVerbose("\n*** TERMINATING! ***\n");
         }
 
 
@@ -485,15 +491,15 @@ bool ServerVisualServoing::updateModule()
 
 bool ServerVisualServoing::interruptModule()
 {
-    yInfo() << "Interrupting module...";
+    yInfoVerbose("Interrupting module...");
 
-    yInfo() << "...blocking controllers...";
+    yInfoVerbose("...blocking controllers...");
     itf_rightarm_cart_->stopControl();
     itf_gaze_->stopControl();
 
     Time::delay(3.0);
 
-    yInfo() << "...port cleanup...";
+    yInfoVerbose("...port cleanup...");
     port_pose_left_in_.interrupt();
     port_pose_right_in_.interrupt();
     port_image_left_in_.interrupt();
@@ -503,14 +509,14 @@ bool ServerVisualServoing::interruptModule()
     port_image_right_out_.interrupt();
     port_click_right_.interrupt();
 
-    yInfo() << "...done!";
+    yInfoVerbose("...done!");
     return true;
 }
 
 
 bool ServerVisualServoing::close()
 {
-    yInfo() << "Calling close functions...";
+    yInfoVerbose("Calling close functions...");
 
     port_pose_left_in_.close();
     port_pose_right_in_.close();
@@ -526,7 +532,7 @@ bool ServerVisualServoing::close()
     if (rightarm_cartesian_driver_.isValid()) rightarm_cartesian_driver_.close();
     if (gaze_driver_.isValid())               gaze_driver_.close();
 
-    yInfo() << "...done!";
+    yInfoVerbose("...done!");
     return true;
 }
 
@@ -661,8 +667,8 @@ bool ServerVisualServoing::init(const std::string& label)
 
     if (norm(xd) != 0.0 && norm(od) != 0.0 && norm(gaze_loc) != 0.0 && traj_time == traj_time_)
     {
-        yInfo() << "Init position:"    << xd.toString();
-        yInfo() << "Init orientation:" << od.toString();
+        yInfoVerbose("Init position: "    + xd.toString());
+		yInfoVerbose("Init orientation: " + od.toString());
 
         itf_rightarm_cart_->goToPoseSync(xd, od);
         itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
@@ -675,7 +681,7 @@ bool ServerVisualServoing::init(const std::string& label)
         itf_rightarm_cart_->storeContext(&ctx_cart_);
 
 
-        yInfo() << "Fixation point: " << gaze_loc.toString();
+        yInfoVerbose("Fixation point: " + gaze_loc.toString());
 
         itf_gaze_->lookAtFixationPointSync(gaze_loc);
         itf_gaze_->waitMotionDone(0.1, 10.0);
@@ -694,67 +700,6 @@ bool ServerVisualServoing::init(const std::string& label)
 /* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
 bool ServerVisualServoing::set_goal(const std::string& label)
 {
-    /* Hand pointing forward, palm looking down */
-    //    Matrix R_ee = zeros(3, 3);
-    //    R_ee(0, 0) = -1.0;
-    //    R_ee(1, 1) =  1.0;
-    //    R_ee(2, 2) = -1.0;
-    //    Vector ee_o = dcm2axis(R_ee);
-
-    /* Trial 27/04/17 */
-    // -0.323 0.018 0.121 0.310 -0.873 0.374 3.008
-    //    Vector p = zeros(6);
-    //    p[0] = -0.323;
-    //    p[1] =  0.018;
-    //    p[2] =  0.121;
-    //    p[3] =  0.310 * 3.008;
-    //    p[4] = -0.873 * 3.008;
-    //    p[5] =  0.374 * 3.008;
-
-    /* Trial 17/05/17 */
-    // -0.284 0.013 0.104 -0.370 0.799 -0.471 2.781
-    Vector p = zeros(6);
-    p[0] = -0.284;
-    p[1] =  0.013;
-    p[2] =  0.104;
-    p[3] = -0.370 * 2.781;
-    p[4] =  0.799 * 2.781;
-    p[5] = -0.471 * 2.781;
-
-    /* KARATE */
-    //    Vector p = zeros(6);
-    //    p[0] = -0.319;
-    //    p[1] =  0.128;
-    //    p[2] =  0.075;
-    //    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-
-    /* SIM init 1 */
-    // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
-    //    Vector p = zeros(6);
-    //    p[0] = -0.416;
-    //    p[1] = -0.024;
-    //    p[2] =  0.055;
-    //    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-
-    /* SIM init 2 */
-    //    Vector p = zeros(6);
-    //    p[0] = -0.35;
-    //    p[1] =  0.025;
-    //    p[2] =  0.10;
-    //    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-
-    goal_pose_ = p;
-    yInfo() << "Goal: " << goal_pose_.toString();
-
-    Vector p0 = zeros(4);
-    Vector p1 = zeros(4);
-    Vector p2 = zeros(4);
-    Vector p3 = zeros(4);
-    getControlPointsFromPose(p, p0, p1, p2, p3);
-
-    yInfo() << "Goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
-
-
     Vector left_eye_x;
     Vector left_eye_o;
     itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
@@ -763,8 +708,8 @@ bool ServerVisualServoing::set_goal(const std::string& label)
     Vector right_eye_o;
     itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
-    yInfo() << "left_eye_o = ["  << left_eye_o.toString()  << "]";
-    yInfo() << "right_eye_o = [" << right_eye_o.toString() << "]";
+    yInfoVerbose("left_eye_o = ["  + left_eye_o.toString()  + "]");
+    yInfoVerbose("right_eye_o = [" + right_eye_o.toString() + "]");
 
 
     l_H_eye_to_r_ = axis2dcm(left_eye_o);
@@ -777,11 +722,72 @@ bool ServerVisualServoing::set_goal(const std::string& label)
     r_H_eye_to_r_.setCol(3, right_eye_x);
     r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
 
-    yInfo() << "l_H_r_to_eye_ = [\n" << l_H_r_to_eye_.toString() << "]";
-    yInfo() << "r_H_r_to_eye_ = [\n" << r_H_r_to_eye_.toString() << "]";
+    yInfoVerbose("l_H_r_to_eye_ = [\n" + l_H_r_to_eye_.toString() + "]");
+    yInfoVerbose("r_H_r_to_eye_ = [\n" + r_H_r_to_eye_.toString() + "]");
 
     l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
     r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
+
+
+    /* Hand pointing forward, palm looking down */
+//    Matrix R_ee = zeros(3, 3);
+//    R_ee(0, 0) = -1.0;
+//    R_ee(1, 1) =  1.0;
+//    R_ee(2, 2) = -1.0;
+//    Vector ee_o = dcm2axis(R_ee);
+
+    /* Trial 27/04/17 */
+    // -0.323 0.018 0.121 0.310 -0.873 0.374 3.008
+//    Vector p = zeros(6);
+//    p[0] = -0.323;
+//    p[1] =  0.018;
+//    p[2] =  0.121;
+//    p[3] =  0.310 * 3.008;
+//    p[4] = -0.873 * 3.008;
+//    p[5] =  0.374 * 3.008;
+
+    /* Trial 17/05/17 */
+    // -0.284 0.013 0.104 -0.370 0.799 -0.471 2.781
+    Vector p = zeros(6);
+    p[0] = -0.284;
+    p[1] =  0.013;
+    p[2] =  0.104;
+    p[3] = -0.370 * 2.781;
+    p[4] =  0.799 * 2.781;
+    p[5] = -0.471 * 2.781;
+
+    /* KARATE */
+//    Vector p = zeros(6);
+//    p[0] = -0.319;
+//    p[1] =  0.128;
+//    p[2] =  0.075;
+//    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+    /* SIM init 1 */
+    // -0.416311	-0.026632	 0.055334	-0.381311	-0.036632	 0.055334	-0.381311	-0.016632	 0.055334
+//    Vector p = zeros(6);
+//    p[0] = -0.416;
+//    p[1] = -0.024;
+//    p[2] =  0.055;
+//    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+    /* SIM init 2 */
+//    Vector p = zeros(6);
+//    p[0] = -0.35;
+//    p[1] =  0.025;
+//    p[2] =  0.10;
+//    p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+
+    goal_pose_ = p;
+    yInfoVerbose("Goal: " + goal_pose_.toString());
+
+    Vector p0 = zeros(4);
+    Vector p1 = zeros(4);
+    Vector p2 = zeros(4);
+    Vector p3 = zeros(4);
+    getControlPointsFromPose(p, p0, p1, p2, p3);
+
+    yInfoVerbose("Goal px: [" + p0.toString() + ";" + p1.toString() + ";" + p2.toString() + ";" + p3.toString() + "];");
 
 
     Vector l_px0_goal = l_H_r_to_cam_ * p0;
@@ -831,8 +837,8 @@ bool ServerVisualServoing::set_goal(const std::string& label)
     r_px_goal_[6] = r_px3_goal[0];
     r_px_goal_[7] = r_px3_goal[1];
 
-    yInfo() << "l_px_goal_ = [" << l_px_goal_.toString() << "]";
-    yInfo() << "r_px_goal_ = [" << r_px_goal_.toString() << "]";
+    yInfoVerbose("l_px_goal_ = [" + l_px_goal_.toString() + "]");
+    yInfoVerbose("r_px_goal_ = [" + r_px_goal_.toString() + "]");
 
     px_des_.push_back(l_px_goal_[0]);    /* u_ee_l */
     px_des_.push_back(r_px_goal_[0]);    /* u_ee_r */
@@ -850,7 +856,7 @@ bool ServerVisualServoing::set_goal(const std::string& label)
     px_des_.push_back(r_px_goal_[6]);    /* u_x3_r */
     px_des_.push_back(l_px_goal_[7]);    /* v_x3_l */
 
-    yInfo() << "px_des_ = ["  << px_des_.toString() << "]";
+    yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
 
     return true;
 }
@@ -868,8 +874,8 @@ bool ServerVisualServoing::get_sfm_points()
     Vector right_eye_o;
     itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
-    yInfo() << "left_eye_o =" << left_eye_o.toString();
-    yInfo() << "right_eye_o =" << right_eye_o.toString();
+    yInfoVerbose("left_eye_o ="  + left_eye_o.toString());
+    yInfoVerbose("right_eye_o =" + right_eye_o.toString());
 
 
     l_H_eye_to_r_ = axis2dcm(left_eye_o);
@@ -882,8 +888,8 @@ bool ServerVisualServoing::get_sfm_points()
     r_H_eye_to_r_.setCol(3, right_eye_x);
     r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
 
-    yInfo() << "l_H_r_to_eye_ =\n" << l_H_r_to_eye_.toString();
-    yInfo() << "r_H_r_to_eye_ =\n" << r_H_r_to_eye_.toString();
+    yInfoVerbose("l_H_r_to_eye_ =\n" + l_H_r_to_eye_.toString());
+    yInfoVerbose("r_H_r_to_eye_ =\n" + r_H_r_to_eye_.toString());
 
     l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
     r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
@@ -929,7 +935,7 @@ bool ServerVisualServoing::get_sfm_points()
         p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
 
         goal_pose_ = p;
-        yInfo() << "Goal: " << goal_pose_.toString();
+        yInfoVerbose("Goal: " + goal_pose_.toString());
 
         Vector p0 = zeros(4);
         Vector p1 = zeros(4);
@@ -937,7 +943,7 @@ bool ServerVisualServoing::get_sfm_points()
         Vector p3 = zeros(4);
         getControlPointsFromPose(p, p0, p1, p2, p3);
 
-        yInfo() << "goal px: [" << p0.toString() << ";" << p1.toString() << ";" << p2.toString() << ";" << p3.toString() << "];";
+        yInfoVerbose("goal px: [" + p0.toString() + ";" + p1.toString() + ";" + p2.toString() + ";" + p3.toString() + "];");
 
 
         Vector l_px0_goal = l_H_r_to_cam_ * p0;
@@ -987,8 +993,8 @@ bool ServerVisualServoing::get_sfm_points()
         r_px_goal_[6] = r_px3_goal[0];
         r_px_goal_[7] = r_px3_goal[1];
 
-        yInfo() << "l_px_goal_ = [" << l_px_goal_.toString() << "]";
-        yInfo() << "r_px_goal_ = [" << r_px_goal_.toString() << "]";
+        yInfoVerbose("l_px_goal_ = [" + l_px_goal_.toString() + "]");
+        yInfoVerbose("r_px_goal_ = [" + r_px_goal_.toString() + "]");
 
         px_des_.push_back(l_px_goal_[0]);    /* u_ee_l */
         px_des_.push_back(r_px_goal_[0]);    /* u_ee_r */
@@ -1006,7 +1012,7 @@ bool ServerVisualServoing::get_sfm_points()
         px_des_.push_back(r_px_goal_[6]);    /* u_x3_r */
         px_des_.push_back(l_px_goal_[7]);    /* v_x3_l */
 
-        yInfo() << "px_des_ = ["  << px_des_.toString() << "]";
+        yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
     }
     else
         return false;
@@ -1111,30 +1117,30 @@ bool ServerVisualServoing::setRightArmCartesianController()
         rightarm_cartesian_driver_.view(itf_rightarm_cart_);
         if (!itf_rightarm_cart_)
         {
-            yError() << "Error getting ICartesianControl interface.";
+            yErrorVerbose("Error getting ICartesianControl interface.");
             return false;
         }
-        yInfo() << "cartesiancontrollerclient succefully opened.";
+        yInfoVerbose("cartesiancontrollerclient succefully opened.");
     }
     else
     {
-        yError() << "Error opening cartesiancontrollerclient device.";
+        yErrorVerbose("Error opening cartesiancontrollerclient device.");
         return false;
     }
 
     if (!itf_rightarm_cart_->setTrajTime(traj_time_))
     {
-        yError() << "Error setting ICartesianControl trajectory time.";
+        yErrorVerbose("Error setting ICartesianControl trajectory time.");
         return false;
     }
-    yInfo() << "Succesfully set ICartesianControl trajectory time!";
+    yInfoVerbose("Succesfully set ICartesianControl trajectory time!");
 
     if (!itf_rightarm_cart_->setInTargetTol(0.01))
     {
-        yError() << "Error setting ICartesianControl target tolerance.";
+        yErrorVerbose("Error setting ICartesianControl target tolerance.");
         return false;
     }
-    yInfo() << "Succesfully set ICartesianControl target tolerance!";
+    yInfoVerbose("Succesfully set ICartesianControl target tolerance!");
 
     return true;
 }
@@ -1153,13 +1159,13 @@ bool ServerVisualServoing::setGazeController()
         gaze_driver_.view(itf_gaze_);
         if (!itf_gaze_)
         {
-            yError() << "Error getting IGazeControl interface.";
+            yErrorVerbose("Error getting IGazeControl interface.");
             return false;
         }
     }
     else
     {
-        yError() << "Gaze control device not available.";
+        yErrorVerbose("Gaze control device not available.");
         return false;
     }
 
@@ -1196,19 +1202,19 @@ bool ServerVisualServoing::setTorsoDOF()
 {
     Vector curDOF;
     itf_rightarm_cart_->getDOF(curDOF);
-    yInfo() << "Old DOF: [" + curDOF.toString(0) + "].";
+    yInfoVerbose("Old DOF: [" + curDOF.toString(0) + "].");
 
-    yInfo() << "Setting iCub to use torso DOF.";
+    yInfoVerbose("Setting iCub to use torso DOF.");
     Vector newDOF(curDOF);
     newDOF[0] = 1;
     newDOF[1] = 1;
     newDOF[2] = 1;
     if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
     {
-        yError() << "Unable to set torso DOF.";
+        yErrorVerbose("Unable to set torso DOF.");
         return false;
     }
-    yInfo() << "New DOF: [" + curDOF.toString(0) + "]";
+    yInfoVerbose("New DOF: [" + curDOF.toString(0) + "]");
     
     return true;
 }
@@ -1218,19 +1224,19 @@ bool ServerVisualServoing::unsetTorsoDOF()
 {
     Vector curDOF;
     itf_rightarm_cart_->getDOF(curDOF);
-    yInfo() << "Old DOF: [" + curDOF.toString(0) + "].";
+    yInfoVerbose("Old DOF: [" + curDOF.toString(0) + "].");
 
-    yInfo() << "Setting iCub to block torso DOF.";
+    yInfoVerbose("Setting iCub to block torso DOF.");
     Vector newDOF(curDOF);
     newDOF[0] = 0;
     newDOF[1] = 0;
     newDOF[2] = 0;
     if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
     {
-        yError() << "Unable to set torso DOF.";
+        yErrorVerbose("Unable to set torso DOF.");
         return false;
     }
-    yInfo() << "New DOF: [" + curDOF.toString(0) + "]";
+    yInfoVerbose("New DOF: [" + curDOF.toString(0) + "]");
     
     return true;
 }
