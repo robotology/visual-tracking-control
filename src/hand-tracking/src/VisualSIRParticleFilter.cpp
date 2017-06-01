@@ -310,8 +310,8 @@ VectorXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, con
         if      (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
         else if (ang <=        0.0) ang += 2.0 * M_PI;
 
-        s_ang                  += weights(i) * std::sin(ang);
-        c_ang                  += weights(i) * std::cos(ang);
+        s_ang += weights(i) * std::sin(ang);
+        c_ang += weights(i) * std::cos(ang);
     }
 
     float ang = std::atan2(s_ang, c_ang) + M_PI;
