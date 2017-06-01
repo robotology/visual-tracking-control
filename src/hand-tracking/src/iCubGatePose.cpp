@@ -18,13 +18,21 @@ using namespace yarp::sig;
 
 iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
                            const double gate_x, const double gate_y, const double gate_z,
-                           const double gate_rotation, const double gate_aperture,
+                           const double gate_rotation,
+                           const double gate_aperture,
                            const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
     GatePose(std::move(visual_correction),
              gate_x, gate_y, gate_z,
-             gate_rotation, gate_aperture),
+             gate_rotation,
+             gate_aperture),
     icub_kin_arm_(iCubArm(laterality + "_v2")), robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
 {
+    icub_kin_arm_.setAllConstraints(false);
+    icub_kin_arm_.releaseLink(0);
+    icub_kin_arm_.releaseLink(1);
+    icub_kin_arm_.releaseLink(2);
+
+
     Property opt_arm_enc;
     opt_arm_enc.put("device", "remote_controlboard");
     opt_arm_enc.put("local",  "/hand-tracking/" + ID_ + "/" + port_prefix + "/control_" + laterality_ + "_arm");
@@ -51,10 +59,6 @@ iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
         throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open " + laterality_ + " arm remote_controlboard!");
     }
 
-    icub_kin_arm_.setAllConstraints(false);
-    icub_kin_arm_.releaseLink(0);
-    icub_kin_arm_.releaseLink(1);
-    icub_kin_arm_.releaseLink(2);
 
     Property opt_torso_enc;
     opt_torso_enc.put("device", "remote_controlboard");
