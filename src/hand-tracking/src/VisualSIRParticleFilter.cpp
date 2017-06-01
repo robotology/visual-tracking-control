@@ -116,10 +116,24 @@ void VisualSIRParticleFilter::runFilter()
 
             /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
             VectorXf out_particle(6);
-            if (use_mean_)
-                out_particle = mean(init_particle, init_weight);
-            else if (use_mode_)
-                out_particle = mode(init_particle, init_weight);
+            switch (ext_mode)
+            {
+                case EstimatesExtraction::mean :
+                    out_particle = mean(init_particle, init_weight);
+                    break;
+
+                case EstimatesExtraction::mode :
+                    out_particle = mean(init_particle, init_weight);
+                    break;
+
+                case EstimatesExtraction::aw_average :
+                    out_particle = mobileAverage(init_particle, init_weight);
+                    break;
+
+                default:
+                    out_particle.fill(0.0);
+                    break;
+            }
 
 
             /* RESAMPLING */
@@ -247,8 +261,9 @@ std::vector<std::string> VisualSIRParticleFilter::get_info()
     info.push_back("<| Using encoders from " + laterality_ + " iCub arm |>");
     info.push_back("<| Using " + std::to_string(num_particles_) + " particles |>");
     info.push_back("<| Available estimate extraction methods:" +
-                   std::string(use_mean_ ? "1) Mean <-- In use; " : "1) Mean; ") +
-                   std::string(use_mode_ ? "2) Mode <-- In use; " : "2) Mode") + " |>");
+                   std::string(ext_mode == EstimatesExtraction::mean       ? "1) mean <-- In use; "       : "1) mean; ") +
+                   std::string(ext_mode == EstimatesExtraction::mode       ? "2) mode <-- In use; "       : "2) mode") +
+                   std::string(ext_mode == EstimatesExtraction::aw_average ? "3) aw_average <-- In use; " : "2) aw_average") + " |>");
 
     return info;
 }
@@ -258,16 +273,21 @@ bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string&
 {
     if (method == "mean")
     {
-        use_mean_ = true;
-        use_mode_ = false;
+        ext_mode = EstimatesExtraction::mean;
 
         return true;
     }
-
-    if (method == "mode")
+    else if (method == "mode")
     {
-        use_mode_ = true;
-        use_mean_ = false;
+        ext_mode = EstimatesExtraction::mode;
+
+        return true;
+    }
+    else if (method == "aw_average")
+    {
+        init_filter = true;
+
+        ext_mode = EstimatesExtraction::aw_average;
 
         return true;
     }
@@ -331,4 +351,52 @@ VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, con
     MatrixXf::Index maxCol;
     weights.maxCoeff(&maxRow, &maxCol);
     return particles.col(maxRow);
+}
+
+
+VectorXf VisualSIRParticleFilter::mobileAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
+{
+    VectorXf cur_estimates = mean(particles, weights);
+
+    if (!init_filter)
+    {
+        time_2_ =  std::chrono::steady_clock::now();
+        t_      += std::chrono::duration_cast<std::chrono::milliseconds>(time_2_ - time_1_);
+        time_1_ =  time_2_;
+    }
+    else
+    {
+        t_      = std::chrono::milliseconds(0);
+        time_1_ = std::chrono::steady_clock::now();
+        lin_est_x_.reset();
+        lin_est_o_.reset();
+        lin_est_theta_.reset();
+
+        init_filter = false;
+    }
+
+    Vector x(3);
+    toEigen(x) = cur_estimates.head<3>().cast<double>();
+    AWPolyElement element_x;
+    element_x.data = x;
+    element_x.time = t_.count();
+
+    Vector o(3);
+    toEigen(o) = cur_estimates.tail<3>().normalized().cast<double>();
+    AWPolyElement element_o;
+    element_o.data = o;
+    element_o.time = t_.count();
+
+    Vector tetha(1);
+    tetha(0) = cur_estimates.tail<3>().norm();
+    AWPolyElement element_theta;
+    element_theta.data = tetha;
+    element_theta.time = t_.count();
+
+    Vector est_out(6);
+    est_out.setSubvector(0, lin_est_x_.estimate(element_x));
+    est_out.setSubvector(3, lin_est_o_.estimate(element_o));
+    tetha = lin_est_theta_.estimate(element_theta);
+
+    return toEigen(est_out).cast<float>();
 }

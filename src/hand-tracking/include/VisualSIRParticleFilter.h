@@ -1,6 +1,7 @@
 #ifndef VISUALSIRPARTICLEFILTER_H
 #define VISUALSIRPARTICLEFILTER_H
 
+#include <chrono>
 #include <memory>
 #include <vector>
 
@@ -12,6 +13,7 @@
 #include <BayesFilters/VisualCorrection.h>
 #include <BayesFilters/Resampling.h>
 #include <Eigen/Dense>
+#include <iCub/ctrl/adaptWinPolyEstimator.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/cudaobjdetect.hpp>
 #include <thrift/VisualSIRParticleFilterIDL.h>
@@ -76,8 +78,6 @@ protected:
 
     unsigned long int                              filtering_step_ = 0;
     bool                                           is_running_     = false;
-    bool                                           use_mean_       = true;
-    bool                                           use_mode_       = false;
 
 
     yarp::os::Port           port_rpc_command_;
@@ -99,9 +99,21 @@ protected:
 
 
     //!!!: decidere come gestire l'etrazione delle stime.
+    enum class EstimatesExtraction { mean, mode, aw_average };
+    EstimatesExtraction ext_mode = EstimatesExtraction::aw_average;
+
     Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 
     Eigen::VectorXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
+
+    bool                       init_filter = true;
+    iCub::ctrl::AWLinEstimator lin_est_x_    {10, 0.02};
+    iCub::ctrl::AWLinEstimator lin_est_o_    {10, 0.5};
+    iCub::ctrl::AWLinEstimator lin_est_theta_{10, 3.0 * iCub::ctrl::CTRL_DEG2RAD};
+    std::chrono::milliseconds  t_{0};
+    std::chrono::steady_clock::time_point time_1_;
+    std::chrono::steady_clock::time_point time_2_;
+    Eigen::VectorXf mobileAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
 
 private:
     const int          block_size_        = 16;
