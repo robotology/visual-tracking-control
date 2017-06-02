@@ -48,6 +48,8 @@ service VisualSIRParticleFilterIDL
      * @param window specifies the mobile window width.
      *
      * @return true window width changed successfully, false otherwise.
+     *
+     * @note The default value is 20. Minimum value is 2. Maximum value is 90.
      */
     bool set_mobile_average_window(1:i16 window = 20);
 

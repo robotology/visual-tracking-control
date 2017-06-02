@@ -39,8 +39,10 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<Initialization>
     cuda_hog_->setGammaCorrection(true);
     cuda_hog_->setWinStride(Size(img_width_, img_height_));
 
+
     port_image_in_.open     ("/hand-tracking/" + cam_sel_ + "/img:i");
     port_estimates_out_.open("/hand-tracking/" + cam_sel_ + "/result/estimates:o");
+
 
     setCommandPort();
 }
@@ -316,9 +318,10 @@ bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string&
 
 bool VisualSIRParticleFilter::set_mobile_average_window(const int16_t window)
 {
-    window_ = window;
-
-    return true;
+    if (window > 0)
+        return hist_buffer_.setHistorySize(window);
+    else
+        return false;
 }
 
 
@@ -380,19 +383,26 @@ VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, con
 }
 
 
-Eigen::VectorXf smAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights)
+VectorXf VisualSIRParticleFilter::smAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
+{
+    VectorXf cur_estimates = mean(particles, weights);
+
+    hist_buffer_.addElement(cur_estimates);
+
+    MatrixXf history = hist_buffer_.getHistoryBuffer();
+    VectorXf sm_weights = VectorXf::Ones(history.cols()) / history.cols();
+
+    return mean(history, sm_weights);
+}
+
+
+VectorXf VisualSIRParticleFilter::wmAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
 {
     return VectorXf::Zero(6);
 }
 
 
-Eigen::VectorXf wmAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights)
-{
-    return VectorXf::Zero(6);
-}
-
-
-Eigen::VectorXf emAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights)
+VectorXf VisualSIRParticleFilter::emAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
 {
     return VectorXf::Zero(6);
 }
@@ -443,4 +453,45 @@ VectorXf VisualSIRParticleFilter::awAverage(const Ref<const MatrixXf>& particles
     tetha = lin_est_theta_.estimate(element_theta);
 
     return toEigen(est_out).cast<float>();
+}
+
+
+void HistoryBuffer::addElement(const Ref<const VectorXf>& element)
+{
+    hist_buffer_.push_front(element);
+
+    if (hist_buffer_.size() > window_)
+        hist_buffer_.pop_back();
+}
+
+
+MatrixXf HistoryBuffer::getHistoryBuffer()
+{
+    MatrixXf hist_out(6, hist_buffer_.size());
+
+    unsigned int i = 0;
+    for (const Ref<const VectorXf>& element : hist_buffer_)
+        hist_out.col(i++) = element;
+
+    return hist_out;
+}
+
+
+bool HistoryBuffer::setHistorySize(const unsigned int window)
+{
+    unsigned int tmp;
+    if      (window == window_)     return true;
+    else if (window < 2)            tmp = 2;
+    else if (window >= max_window_) tmp = max_window_;
+    else                            tmp = window;
+
+    if (tmp < window_ && tmp < hist_buffer_.size())
+    {
+        for (unsigned int i = 0; i < (window_ - tmp); ++i)
+            hist_buffer_.pop_back();
+    }
+
+    window_ = tmp;
+
+    return true;
 }

@@ -2,6 +2,7 @@
 #define VISUALSIRPARTICLEFILTER_H
 
 #include <chrono>
+#include <deque>
 #include <memory>
 #include <vector>
 
@@ -26,6 +27,30 @@
 #include <yarp/sig/Image.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
+
+
+//!!!: Should be templated
+//!!!: Implement rule of 5
+class HistoryBuffer
+{
+public:
+    HistoryBuffer() noexcept { };
+
+    ~HistoryBuffer() noexcept { };
+
+    void            addElement(const Eigen::Ref<const Eigen::VectorXf>& element);
+
+    Eigen::MatrixXf getHistoryBuffer();
+
+    bool            setHistorySize(const unsigned int window);
+
+private:
+    unsigned int                window_     = 20;
+
+    const unsigned int          max_window_ = 90;
+
+    std::deque<Eigen::VectorXf> hist_buffer_;
+};
 
 
 class VisualSIRParticleFilter: public bfl::FilteringAlgorithm,
@@ -88,12 +113,8 @@ protected:
 
     std::vector<std::string> get_info() override;
 
-    bool                     set_estimates_extraction_method(const std::string& method) override;
-
-    int16_t window_ = 20;
-    bool                     set_mobile_average_window(const int16_t window) override;
-
     bool                     quit() override;
+
 
     /* EXPERIMENTAL */
     bool                     visual_correction(const bool status) override;
@@ -103,6 +124,12 @@ protected:
 
     /* ESTIMATE EXTRACTION METHODS */
     //!!!: decidere come gestire l'etrazione delle stime.
+    bool            set_estimates_extraction_method(const std::string& method) override;
+
+    bool            set_mobile_average_window(const int16_t window) override;
+
+    HistoryBuffer   hist_buffer_;
+
     enum class EstimatesExtraction
     {
         mean,
@@ -113,7 +140,7 @@ protected:
         aw_average
     };
 
-    EstimatesExtraction ext_mode = EstimatesExtraction::aw_average;
+    EstimatesExtraction ext_mode = EstimatesExtraction::sm_average;
 
     Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 
