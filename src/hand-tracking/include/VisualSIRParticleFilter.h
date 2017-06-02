@@ -90,6 +90,9 @@ protected:
 
     bool                     set_estimates_extraction_method(const std::string& method) override;
 
+    int16_t window_ = 20;
+    bool                     set_mobile_average_window(const int16_t window) override;
+
     bool                     quit() override;
 
     /* EXPERIMENTAL */
@@ -98,6 +101,7 @@ protected:
     /* ************ */
 
 
+    /* ESTIMATE EXTRACTION METHODS */
     //!!!: decidere come gestire l'etrazione delle stime.
     enum class EstimatesExtraction
     {
@@ -129,6 +133,7 @@ protected:
     std::chrono::steady_clock::time_point time_1_;
     std::chrono::steady_clock::time_point time_2_;
     Eigen::VectorXf awAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+    /* *************************** */
 
 private:
     const int          block_size_        = 16;

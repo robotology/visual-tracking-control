@@ -31,16 +31,25 @@ service VisualSIRParticleFilterIDL
     list<string> get_info();
 
     /**
-     * Cheange the current method to extract the state estimate from the
+     * Cheange the current method to extract the state estimates from the
      * particle set.
      *
      * @param status a string with the state estimete extraction method to use;
      *               the string shall be one of the available methods returned
      *               by the get_info() method.
      *
-     * @return true method change success, false otherwise.
+     * @return true method changed successfully, false otherwise.
      */
     bool set_estimates_extraction_method(1:string method);
+
+    /**
+     * Cheange the window width of mobile averages for estimates extraction.
+     *
+     * @param window specifies the mobile window width.
+     *
+     * @return true window width changed successfully, false otherwise.
+     */
+    bool set_mobile_average_window(1:i16 window = 20);
 
     /**
      * Enable/Disable the visual correction step of the SIR Particle Filter.

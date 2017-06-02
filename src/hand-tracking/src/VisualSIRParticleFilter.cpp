@@ -283,6 +283,24 @@ bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string&
 
         return true;
     }
+    else if (method == "sm_average")
+    {
+        ext_mode = EstimatesExtraction::sm_average;
+
+        return true;
+    }
+    else if (method == "wm_average")
+    {
+        ext_mode = EstimatesExtraction::wm_average;
+
+        return true;
+    }
+    else if (method == "em_average")
+    {
+        ext_mode = EstimatesExtraction::em_average;
+
+        return true;
+    }
     else if (method == "aw_average")
     {
         init_filter = true;
@@ -293,6 +311,14 @@ bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string&
     }
 
     return false;
+}
+
+
+bool VisualSIRParticleFilter::set_mobile_average_window(const int16_t window)
+{
+    window_ = window;
+
+    return true;
 }
 
 
