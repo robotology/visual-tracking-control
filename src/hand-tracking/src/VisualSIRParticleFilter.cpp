@@ -127,7 +127,7 @@ void VisualSIRParticleFilter::runFilter()
                     break;
 
                 case EstimatesExtraction::aw_average :
-                    out_particle = mobileAverage(init_particle, init_weight);
+                    out_particle = awAverage(init_particle, init_weight);
                     break;
 
                 default:
@@ -354,7 +354,25 @@ VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, con
 }
 
 
-VectorXf VisualSIRParticleFilter::mobileAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
+Eigen::VectorXf smAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights)
+{
+    return VectorXf::Zero(6);
+}
+
+
+Eigen::VectorXf wmAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights)
+{
+    return VectorXf::Zero(6);
+}
+
+
+Eigen::VectorXf emAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights)
+{
+    return VectorXf::Zero(6);
+}
+
+
+VectorXf VisualSIRParticleFilter::awAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
 {
     VectorXf cur_estimates = mean(particles, weights);
 

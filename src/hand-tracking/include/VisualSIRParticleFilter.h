@@ -99,12 +99,27 @@ protected:
 
 
     //!!!: decidere come gestire l'etrazione delle stime.
-    enum class EstimatesExtraction { mean, mode, aw_average };
+    enum class EstimatesExtraction
+    {
+        mean,
+        mode,
+        sm_average,
+        wm_average,
+        em_average,
+        aw_average
+    };
+
     EstimatesExtraction ext_mode = EstimatesExtraction::aw_average;
 
     Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 
     Eigen::VectorXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
+
+    Eigen::VectorXf smAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+
+    Eigen::VectorXf wmAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+
+    Eigen::VectorXf emAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
 
     bool                       init_filter = true;
     iCub::ctrl::AWLinEstimator lin_est_x_    {10, 0.02};
@@ -113,7 +128,7 @@ protected:
     std::chrono::milliseconds  t_{0};
     std::chrono::steady_clock::time_point time_1_;
     std::chrono::steady_clock::time_point time_2_;
-    Eigen::VectorXf mobileAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+    Eigen::VectorXf awAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
 
 private:
     const int          block_size_        = 16;
