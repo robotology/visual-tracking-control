@@ -45,7 +45,7 @@ public:
     bool            setHistorySize(const unsigned int window);
 
 private:
-    unsigned int                window_     = 20;
+    unsigned int                window_     = 30;
 
     const unsigned int          max_window_ = 90;
 
