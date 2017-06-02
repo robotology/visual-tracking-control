@@ -128,6 +128,18 @@ void VisualSIRParticleFilter::runFilter()
                     out_particle = mean(init_particle, init_weight);
                     break;
 
+                case EstimatesExtraction::sm_average :
+                    out_particle = smAverage(init_particle, init_weight);
+                    break;
+
+                case EstimatesExtraction::wm_average :
+                    out_particle = wmAverage(init_particle, init_weight);
+                    break;
+
+                case EstimatesExtraction::em_average :
+                    out_particle = emAverage(init_particle, init_weight);
+                    break;
+
                 case EstimatesExtraction::aw_average :
                     out_particle = awAverage(init_particle, init_weight);
                     break;
