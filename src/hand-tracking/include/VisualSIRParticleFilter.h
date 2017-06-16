@@ -137,7 +137,7 @@ protected:
         sm_average,
         wm_average,
         em_average,
-        aw_average
+        am_average
     };
 
     EstimatesExtraction ext_mode = EstimatesExtraction::sm_average;
@@ -159,7 +159,7 @@ protected:
     std::chrono::milliseconds  t_{0};
     std::chrono::steady_clock::time_point time_1_;
     std::chrono::steady_clock::time_point time_2_;
-    Eigen::VectorXf awAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+    Eigen::VectorXf amAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
     /* *************************** */
 
 private:

@@ -140,8 +140,8 @@ void VisualSIRParticleFilter::runFilter()
                     out_particle = emAverage(init_particle, init_weight);
                     break;
 
-                case EstimatesExtraction::aw_average :
-                    out_particle = awAverage(init_particle, init_weight);
+                case EstimatesExtraction::am_average :
+                    out_particle = amAverage(init_particle, init_weight);
                     break;
 
                 default:
@@ -277,7 +277,10 @@ std::vector<std::string> VisualSIRParticleFilter::get_info()
     info.push_back("<| Available estimate extraction methods:" +
                    std::string(ext_mode == EstimatesExtraction::mean       ? "1) mean <-- In use; "       : "1) mean; ") +
                    std::string(ext_mode == EstimatesExtraction::mode       ? "2) mode <-- In use; "       : "2) mode") +
-                   std::string(ext_mode == EstimatesExtraction::aw_average ? "3) aw_average <-- In use; " : "2) aw_average") + " |>");
+                   std::string(ext_mode == EstimatesExtraction::sm_average ? "3) sm_average <-- In use; " : "3) sm_average") +
+                   std::string(ext_mode == EstimatesExtraction::wm_average ? "4) wm_average <-- In use; " : "4) wm_average") +
+                   std::string(ext_mode == EstimatesExtraction::em_average ? "5) em_average <-- In use; " : "5) em_average") +
+                   std::string(ext_mode == EstimatesExtraction::am_average ? "6) am_average <-- In use; " : "6) am_average") + " |>");
 
     return info;
 }
@@ -315,11 +318,11 @@ bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string&
 
         return true;
     }
-    else if (method == "aw_average")
+    else if (method == "am_average")
     {
         init_filter = true;
 
-        ext_mode = EstimatesExtraction::aw_average;
+        ext_mode = EstimatesExtraction::am_average;
 
         return true;
     }
@@ -420,7 +423,7 @@ VectorXf VisualSIRParticleFilter::emAverage(const Ref<const MatrixXf>& particles
 }
 
 
-VectorXf VisualSIRParticleFilter::awAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
+VectorXf VisualSIRParticleFilter::amAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
 {
     VectorXf cur_estimates = mean(particles, weights);
 
