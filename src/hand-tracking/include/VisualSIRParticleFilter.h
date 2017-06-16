@@ -140,7 +140,7 @@ protected:
         am_average
     };
 
-    EstimatesExtraction ext_mode = EstimatesExtraction::wm_average;
+    EstimatesExtraction ext_mode = EstimatesExtraction::em_average;
 
     Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 
