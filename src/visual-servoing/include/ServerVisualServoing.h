@@ -135,7 +135,7 @@ private:
     double                        K_o_    = 0.5;
     double                        vx_max_ = 0.025; /* [m/s] */
     double                        vo_max_ = 5 * M_PI / 180.0; /* [rad/s] */
-    double                        px_tol_ = 5.0;
+    double                        px_tol_ = 10.0;
 
     yarp::sig::Vector             goal_pose_;
     yarp::sig::Matrix             l_proj_;

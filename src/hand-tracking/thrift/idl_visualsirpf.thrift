@@ -31,28 +31,27 @@ service VisualSIRParticleFilterIDL
     list<string> get_info();
 
     /**
-     * Cheange the current method to extract the state estimate from the
+     * Cheange the current method to extract the state estimates from the
      * particle set.
      *
      * @param status a string with the state estimete extraction method to use;
      *               the string shall be one of the available methods returned
      *               by the get_info() method.
      *
-     * @return true method change success, false otherwise.
+     * @return true method changed successfully, false otherwise.
      */
     bool set_estimates_extraction_method(1:string method);
 
     /**
-     * Enable/Disable the visual correction step of the SIR Particle Filter.
+     * Cheange the window width of mobile averages for estimates extraction.
      *
-     * @param status true/false to enable/disable visual correction
+     * @param window specifies the mobile window width.
      *
-     * @return true activation/deactivation success, false otherwise.
+     * @return true window width changed successfully, false otherwise.
      *
-     * @note By disabling the visual correction step the particles will be only
-     *       propageted over time with the prediction step.
+     * @note The default value is 20. Minimum value is 2. Maximum value is 90.
      */
-    bool visual_correction(1:bool status)
+    bool set_mobile_average_window(1:i16 window = 20);
 
     /**
      * Gently close the application deallocating resources.

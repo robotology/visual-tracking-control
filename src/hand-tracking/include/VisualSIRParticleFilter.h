@@ -1,6 +1,8 @@
 #ifndef VISUALSIRPARTICLEFILTER_H
 #define VISUALSIRPARTICLEFILTER_H
 
+#include <chrono>
+#include <deque>
 #include <memory>
 #include <vector>
 
@@ -12,6 +14,7 @@
 #include <BayesFilters/VisualCorrection.h>
 #include <BayesFilters/Resampling.h>
 #include <Eigen/Dense>
+#include <iCub/ctrl/adaptWinPolyEstimator.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/cudaobjdetect.hpp>
 #include <thrift/VisualSIRParticleFilterIDL.h>
@@ -24,6 +27,30 @@
 #include <yarp/sig/Image.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
+
+
+//!!!: Should be templated
+//!!!: Implement rule of 5
+class HistoryBuffer
+{
+public:
+    HistoryBuffer() noexcept { };
+
+    ~HistoryBuffer() noexcept { };
+
+    void            addElement(const Eigen::Ref<const Eigen::VectorXf>& element);
+
+    Eigen::MatrixXf getHistoryBuffer();
+
+    bool            setHistorySize(const unsigned int window);
+
+private:
+    unsigned int                window_     = 60;
+
+    const unsigned int          max_window_ = 90;
+
+    std::deque<Eigen::VectorXf> hist_buffer_;
+};
 
 
 class VisualSIRParticleFilter: public bfl::FilteringAlgorithm,
@@ -76,8 +103,6 @@ protected:
 
     unsigned long int                              filtering_step_ = 0;
     bool                                           is_running_     = false;
-    bool                                           use_mean_       = true;
-    bool                                           use_mode_       = false;
 
 
     yarp::os::Port           port_rpc_command_;
@@ -88,19 +113,51 @@ protected:
 
     std::vector<std::string> get_info() override;
 
-    bool                     set_estimates_extraction_method(const std::string& method) override;
-
     bool                     quit() override;
 
-    /* EXPERIMENTAL */
-    bool                     visual_correction(const bool status) override;
-    bool                     do_visual_correction_ = true;
-    /* ************ */
 
+    /* ESTIMATE EXTRACTION METHODS */
+    //!!!: decidere come gestire l'etrazione delle stime.
+    bool            set_estimates_extraction_method(const std::string& method) override;
+
+    bool            set_mobile_average_window(const int16_t window) override;
+
+    HistoryBuffer   hist_buffer_;
+
+    enum class EstimatesExtraction
+    {
+        mean,
+        mode,
+        sm_average,
+        wm_average,
+        em_average,
+        am_average
+    };
+
+    EstimatesExtraction ext_mode = EstimatesExtraction::em_average;
 
     Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 
     Eigen::VectorXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
+
+    Eigen::VectorXf smAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+    Eigen::VectorXf sm_weights_;
+
+    Eigen::VectorXf wmAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+    Eigen::VectorXf wm_weights_;
+
+    Eigen::VectorXf emAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+    Eigen::VectorXf em_weights_;
+
+    bool                       init_filter = true;
+    iCub::ctrl::AWLinEstimator lin_est_x_    {10, 0.02};
+    iCub::ctrl::AWLinEstimator lin_est_o_    {10, 0.5};
+    iCub::ctrl::AWLinEstimator lin_est_theta_{10, 3.0 * iCub::ctrl::CTRL_DEG2RAD};
+    std::chrono::milliseconds  t_{0};
+    std::chrono::steady_clock::time_point time_1_;
+    std::chrono::steady_clock::time_point time_2_;
+    Eigen::VectorXf amAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+    /* *************************** */
 
 private:
     const int          block_size_        = 16;
