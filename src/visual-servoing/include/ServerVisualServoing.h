@@ -25,7 +25,7 @@
 
 class ServerVisualServoing : public    yarp::dev::DeviceDriver,
                              public    yarp::dev::IVisualServoing,
-                             protected yarp::os::RateThread,
+                             protected yarp::os::Thread,
                              public    ServerVisualServoingIDL
 {
 public:
@@ -41,10 +41,16 @@ public:
     bool close() override;
 
 protected:
-    /* RateThread */
+    /* Thread overrides */
+    void beforeStart() override;
+
     bool threadInit() override;
 
     void run() override;
+
+    void afterStart(bool success) override;
+
+    void onStop() override;
 
     void threadRelease() override;
 
@@ -121,7 +127,6 @@ private:
     yarp::os::ConstString         robot_name_;
 
     bool                          should_stop_ = false;
-    bool                          shall_go_    = false;
     OperatingMode                 op_mode_     = OperatingMode::pose;
 
     yarp::dev::PolyDriver         rightarm_cartesian_driver_;

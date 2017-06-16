@@ -178,14 +178,46 @@ bool ServerVisualServoing::open(Searchable &config)
 }
 
 
+bool ServerVisualServoing::close()
+{
+    yInfoVerbose("Calling close functions...");
+
+    port_pose_left_in_.close();
+    port_pose_right_in_.close();
+    port_image_left_in_.close();
+    port_image_left_out_.close();
+    port_click_left_.close();
+    port_image_right_in_.close();
+    port_image_right_out_.close();
+    port_click_right_.close();
+
+    itf_rightarm_cart_->removeTipFrame();
+
+    if (rightarm_cartesian_driver_.isValid()) rightarm_cartesian_driver_.close();
+    if (gaze_driver_.isValid())               gaze_driver_.close();
+
+    yInfoVerbose("...done!");
+    return true;
+}
+
+
+/* Thread overrides */
+void ServerVisualServoing::beforeStart()
+{
+
+}
+
+
+bool ServerVisualServoing::threadInit()
+{
+    yInfoVerbose("Thread initialized!");
+    yInfoVerbose("\n*** Running visual-servoing! ***\n");
+    return true;
+}
+
+
 void ServerVisualServoing::run()
 {
-    while (!shall_go_);
-
-    if (should_stop_) return false;
-
-    yInfoVerbose("\n*** RUNNING! ***\n");
-
     Vector  est_copy_left(6);
     Vector  est_copy_right(6);
     Vector* estimates;
@@ -217,7 +249,7 @@ void ServerVisualServoing::run()
     Matrix jacobian_orientation  = zeros(12, 6);
 
     bool is_vs_done = false;
-    while (!should_stop_ && !is_vs_done)
+    while (!isStopping() && !is_vs_done)
     {
         /* Get the initial end-effector pose from left eye view */
         estimates = port_pose_left_in_.read(true);
