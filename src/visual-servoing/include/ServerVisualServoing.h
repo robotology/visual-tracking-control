@@ -40,19 +40,6 @@ public:
 
     bool close() override;
 
-protected:
-    /* Thread overrides */
-    void beforeStart() override;
-
-    bool threadInit() override;
-
-    void run() override;
-
-    void afterStart(bool success) override;
-
-    void onStop() override;
-
-    void threadRelease() override;
 
     /* IVisualServoing overrides */
     bool goToGoal(const yarp::sig::Vector& px_l, const yarp::sig::Vector& px_r) override;
@@ -83,6 +70,20 @@ protected:
 
     bool get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o,
                                      std::vector<yarp::sig::Vector> vec_goal_points) override;
+
+protected:
+    /* Thread overrides */
+    void beforeStart() override;
+
+    bool threadInit() override;
+
+    void run() override;
+
+    void afterStart(bool success) override;
+
+    void onStop() override;
+
+    void threadRelease() override;
 
 
     /* ServerVisualServoingIDL overrides */

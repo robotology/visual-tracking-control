@@ -215,6 +215,92 @@ bool ServerVisualServoing::close()
 }
 
 
+/* IVisualServoing overrides */
+bool ServerVisualServoing::goToGoal(const yarp::sig::Vector& px_l, const yarp::sig::Vector& px_r)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setModality(const bool mode)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setControlPoint(const yarp::os::ConstString& point)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::getVisualServoingInfo(yarp::os::Bottle& info)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setGoToGoalTolerance(const double tol)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::checkVisualServoingController(bool& is_running)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::waitVisualServoingDone(const double period, const double timeout)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::stopController()
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setTranslationGain(const float k_x)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setMaxTranslationVelocity(const float max_x_dot)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setOrientationGain(const float k_o)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setMaxOrientationVelocity(const float max_o_dot)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o,
+                                                       std::vector<yarp::sig::Vector> vec_goal_points)
+{
+    return false;
+}
+
+
 /* Thread overrides */
 void ServerVisualServoing::beforeStart()
 {
@@ -546,92 +632,6 @@ void ServerVisualServoing::onStop()
 void ServerVisualServoing::threadRelease()
 {
     yInfoVerbose("Thread terminated!");
-}
-
-
-/* IVisualServoing overrides */
-bool ServerVisualServoing::goToGoal(const yarp::sig::Vector& px_l, const yarp::sig::Vector& px_r)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::setModality(const bool mode)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::setControlPoint(const yarp::os::ConstString& point)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::getVisualServoingInfo(yarp::os::Bottle& info)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::setGoToGoalTolerance(const double tol)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::checkVisualServoingController(bool& is_running)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::waitVisualServoingDone(const double period, const double timeout)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::stopController()
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::setTranslationGain(const float k_x)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::setMaxTranslationVelocity(const float max_x_dot)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::setOrientationGain(const float k_o)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::setMaxOrientationVelocity(const float max_o_dot)
-{
-    return false;
-}
-
-
-bool ServerVisualServoing::get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o,
-                                 std::vector<yarp::sig::Vector> vec_goal_points)
-{
-    return false;
 }
 
 
