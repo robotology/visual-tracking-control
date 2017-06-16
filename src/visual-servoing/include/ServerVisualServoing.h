@@ -29,13 +29,13 @@ class ServerVisualServoing : public    yarp::dev::DeviceDriver,
                              public    ServerVisualServoingIDL
 {
 public:
-    /* Class methods */
+    /* Ctors and Dtors */
     ServerVisualServoing();
 
     ~ServerVisualServoing();
 
 
-    /* DeviceDriver */
+    /* DeviceDriver overrides */
     bool open(yarp::os::Searchable &config) override;
 
     bool close() override;
@@ -54,7 +54,7 @@ protected:
 
     void threadRelease() override;
 
-    /* IVisualServoing */
+    /* IVisualServoing overrides */
     bool goToGoal(const yarp::sig::Vector& px_l, const yarp::sig::Vector& px_r) override;
 
     bool goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r) override;
@@ -85,7 +85,7 @@ protected:
                                      std::vector<yarp::sig::Vector> vec_goal_points) override;
 
 
-    /* ServerVisualServoingIDL */
+    /* ServerVisualServoingIDL overrides */
     std::vector<std::string> get_info() override;
 
     bool init(const std::string& label) override;
@@ -111,7 +111,7 @@ protected:
     bool quit() override;
 
 
-    /* Class methods */
+    /* Protected class methods */
     bool interrupt();
 
 
@@ -172,13 +172,14 @@ private:
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_right_out_;
     yarp::os::BufferedPort<yarp::os::Bottle>                        port_click_right_;
 
+    yarp::os::Port                                                  port_rpc_command_;
 
+    /* Private class methods */
     bool setRightArmCartesianController();
 
     bool setGazeController();
 
 
-    yarp::os::Port port_rpc_command_;
     bool           attach(yarp::os::Port &source);
     bool           setCommandPort();
 

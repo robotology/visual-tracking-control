@@ -1070,7 +1070,6 @@ bool ServerVisualServoing::get_sfm_points()
 }
 
 
-/* Set visual servoing operating mode */
 bool ServerVisualServoing::set_modality(const std::string& mode)
 {
     if (mode == "position")
@@ -1126,23 +1125,18 @@ bool ServerVisualServoing::set_goal_tol(const double px)
 }
 
 
-/* Start visual servoing */
 bool ServerVisualServoing::go()
 {
-    shall_go_ = true;
-
-    return true;
+    return start();
 }
 
 
-/* Safely close the application */
 bool ServerVisualServoing::quit()
 {
     itf_rightarm_cart_->stopControl();
     itf_gaze_->stopControl();
 
     should_stop_ = true;
-    shall_go_    = true;
 
     interrupt();
 
@@ -1150,6 +1144,33 @@ bool ServerVisualServoing::quit()
 }
 
 
+/* Protected class methods */
+bool ServerVisualServoing::interrupt()
+{
+    yInfoVerbose("Interrupting...");
+
+    yInfoVerbose("...blocking controllers...");
+    itf_rightarm_cart_->stopControl();
+    itf_gaze_->stopControl();
+
+    Time::delay(3.0);
+
+    yInfoVerbose("...port cleanup...");
+    port_pose_left_in_.interrupt();
+    port_pose_right_in_.interrupt();
+    port_image_left_in_.interrupt();
+    port_image_left_out_.interrupt();
+    port_click_left_.interrupt();
+    port_image_right_in_.interrupt();
+    port_image_right_out_.interrupt();
+    port_click_right_.interrupt();
+
+    yInfoVerbose("...done!");
+    return true;
+}
+
+
+/* Private class methods */
 bool ServerVisualServoing::setRightArmCartesianController()
 {
     Property rightarm_cartesian_options;
