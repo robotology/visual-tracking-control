@@ -528,61 +528,114 @@ void ServerVisualServoing::run()
 
     itf_rightarm_cart_->stopControl();
     itf_gaze_->stopControl();
+}
 
-    Time::delay(0.5);
 
+void ServerVisualServoing::afterStart(bool success)
+{
+
+}
+
+
+void ServerVisualServoing::onStop()
+{
+
+}
+
+
+void ServerVisualServoing::threadRelease()
+{
+    yInfoVerbose("Thread terminated!");
+}
+
+
+/* IVisualServoing overrides */
+bool ServerVisualServoing::goToGoal(const yarp::sig::Vector& px_l, const yarp::sig::Vector& px_r)
+{
     return false;
 }
 
 
-bool ServerVisualServoing::interrupt()
+bool ServerVisualServoing::goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r)
 {
-    yInfoVerbose("Interrupting...");
-
-    yInfoVerbose("...blocking controllers...");
-    itf_rightarm_cart_->stopControl();
-    itf_gaze_->stopControl();
-
-    Time::delay(3.0);
-
-    yInfoVerbose("...port cleanup...");
-    port_pose_left_in_.interrupt();
-    port_pose_right_in_.interrupt();
-    port_image_left_in_.interrupt();
-    port_image_left_out_.interrupt();
-    port_click_left_.interrupt();
-    port_image_right_in_.interrupt();
-    port_image_right_out_.interrupt();
-    port_click_right_.interrupt();
-
-    yInfoVerbose("...done!");
-    return true;
+    return false;
 }
 
 
-bool ServerVisualServoing::close()
+bool ServerVisualServoing::setModality(const bool mode)
 {
-    yInfoVerbose("Calling close functions...");
-
-    port_pose_left_in_.close();
-    port_pose_right_in_.close();
-    port_image_left_in_.close();
-    port_image_left_out_.close();
-    port_click_left_.close();
-    port_image_right_in_.close();
-    port_image_right_out_.close();
-    port_click_right_.close();
-
-    itf_rightarm_cart_->removeTipFrame();
-
-    if (rightarm_cartesian_driver_.isValid()) rightarm_cartesian_driver_.close();
-    if (gaze_driver_.isValid())               gaze_driver_.close();
-
-    yInfoVerbose("...done!");
-    return true;
+    return false;
 }
 
 
+bool ServerVisualServoing::setControlPoint(const yarp::os::ConstString& point)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::getVisualServoingInfo(yarp::os::Bottle& info)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setGoToGoalTolerance(const double tol)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::checkVisualServoingController(bool& is_running)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::waitVisualServoingDone(const double period, const double timeout)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::stopController()
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setTranslationGain(const float k_x)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setMaxTranslationVelocity(const float max_x_dot)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setOrientationGain(const float k_o)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::setMaxOrientationVelocity(const float max_o_dot)
+{
+    return false;
+}
+
+
+bool ServerVisualServoing::get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o,
+                                 std::vector<yarp::sig::Vector> vec_goal_points)
+{
+    return false;
+}
+
+
+/* ServerVisualServoingIDL overrides */
 std::vector<std::string> ServerVisualServoing::get_info()
 {
     std::vector<std::string> info;
