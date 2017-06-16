@@ -116,12 +116,6 @@ protected:
     bool                     quit() override;
 
 
-    /* EXPERIMENTAL */
-    bool                     visual_correction(const bool status) override;
-    bool                     do_visual_correction_ = true;
-    /* ************ */
-
-
     /* ESTIMATE EXTRACTION METHODS */
     //!!!: decidere come gestire l'etrazione delle stime.
     bool            set_estimates_extraction_method(const std::string& method) override;

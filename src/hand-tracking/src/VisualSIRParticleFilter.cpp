@@ -108,12 +108,9 @@ void VisualSIRParticleFilter::runFilter()
             }
 
             /* CORRECTION */
-            if (do_visual_correction_)
-            {
-                correction_->setObservationModelProperty("VP_PARAMS");
-                correction_->correct(init_particle, descriptors_cam_left, init_weight);
-                init_weight /= init_weight.sum();
-            }
+            correction_->setObservationModelProperty("VP_PARAMS");
+            correction_->correct(init_particle, descriptors_cam_left, init_weight);
+            init_weight /= init_weight.sum();
 
 
             /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
@@ -345,14 +342,6 @@ bool VisualSIRParticleFilter::quit()
     port_image_in_.interrupt();
 
     is_running_ = false;
-
-    return true;
-}
-
-
-bool VisualSIRParticleFilter::visual_correction(const bool status)
-{
-    do_visual_correction_ = status;
 
     return true;
 }
