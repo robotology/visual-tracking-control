@@ -32,7 +32,7 @@ public:
     /* Class methods */
     ServerVisualServoing();
 
-    ~ServerVisualServoing() { };
+    ~ServerVisualServoing();
 
 
     /* DeviceDriver */

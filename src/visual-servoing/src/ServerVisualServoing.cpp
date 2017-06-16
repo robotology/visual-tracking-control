@@ -19,6 +19,20 @@ using namespace yarp::sig;
 using namespace iCub::ctrl;
 
 
+/* Ctors and Dtors */
+ServerVisualServoing::ServerVisualServoing()
+{
+    yInfoVerbose("ServerVisualServoing succesfully constructed.");
+}
+
+
+ServerVisualServoing::~ServerVisualServoing()
+{
+    yInfoVerbose("ServerVisualServoing succesfully destroyed.");
+}
+
+
+/* DeviceDriver overrides */
 bool ServerVisualServoing::open(Searchable &config)
 {
     yInfo("*** Configuring ServerVisualServoing ***");
