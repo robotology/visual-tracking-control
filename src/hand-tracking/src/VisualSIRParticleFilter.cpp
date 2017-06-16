@@ -405,21 +405,50 @@ VectorXf VisualSIRParticleFilter::smAverage(const Ref<const MatrixXf>& particles
     hist_buffer_.addElement(cur_estimates);
 
     MatrixXf history = hist_buffer_.getHistoryBuffer();
-    VectorXf sm_weights = VectorXf::Ones(history.cols()) / history.cols();
+    if (sm_weights_.size() != history.cols())
+        sm_weights_ = VectorXf::Ones(history.cols()) / history.cols();
 
-    return mean(history, sm_weights);
+    return mean(history, sm_weights_);
 }
 
 
 VectorXf VisualSIRParticleFilter::wmAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
 {
-    return VectorXf::Zero(6);
+    VectorXf cur_estimates = mean(particles, weights);
+
+    hist_buffer_.addElement(cur_estimates);
+
+    MatrixXf history = hist_buffer_.getHistoryBuffer();
+    if (wm_weights_.size() != history.cols())
+    {
+        wm_weights_.resize(history.cols());
+        for (unsigned int i = 0; i < history.cols(); ++i)
+            wm_weights_(i) = history.cols() - i;
+
+        wm_weights_ /= wm_weights_.sum();
+    }
+
+    return mean(history, wm_weights_);
 }
 
 
 VectorXf VisualSIRParticleFilter::emAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
 {
-    return VectorXf::Zero(6);
+    VectorXf cur_estimates = mean(particles, weights);
+
+    hist_buffer_.addElement(cur_estimates);
+
+    MatrixXf history = hist_buffer_.getHistoryBuffer();
+    if (em_weights_.size() != history.cols())
+    {
+        em_weights_.resize(history.cols());
+        for (unsigned int i = 0; i < history.cols(); ++i)
+            em_weights_(i) = std::exp(-(static_cast<double>(i) / history.cols()));
+
+        em_weights_ /= em_weights_.sum();
+    }
+
+    return mean(history, em_weights_);
 }
 
 

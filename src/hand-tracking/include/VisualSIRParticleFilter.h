@@ -140,17 +140,20 @@ protected:
         am_average
     };
 
-    EstimatesExtraction ext_mode = EstimatesExtraction::sm_average;
+    EstimatesExtraction ext_mode = EstimatesExtraction::wm_average;
 
     Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 
     Eigen::VectorXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
 
     Eigen::VectorXf smAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+    Eigen::VectorXf sm_weights_;
 
     Eigen::VectorXf wmAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+    Eigen::VectorXf wm_weights_;
 
     Eigen::VectorXf emAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
+    Eigen::VectorXf em_weights_;
 
     bool                       init_filter = true;
     iCub::ctrl::AWLinEstimator lin_est_x_    {10, 0.02};
