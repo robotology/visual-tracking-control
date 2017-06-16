@@ -1,26 +1,31 @@
 #include "ServerVisualServoing.h"
 
 #include <yarp/os/LogStream.h>
-#include <yarp/os/Network.h>
-#include <yarp/os/ResourceFinder.h>
 
 using namespace yarp::os;
+using namespace yarp::sig;
+using namespace yarp::dev;
 
 
 int main(int argc, char **argv)
 {
-    Network yarp;
-    if (!yarp.checkNetwork(3.0))
+    DriverCreator *server_vs = new DriverCreatorOf<ServerVisualServoing>("server_visualsevoing", "","ServerVisualServoing");
+    Drivers::factory().add(server_vs);
+
+    PolyDriver drv_server_vs("server_visualsevoing");
+    if (!drv_server_vs.isValid())
     {
-        yError() << "YARP seems unavailable!";
+        yError("drv_server_vs not available.");
         return EXIT_FAILURE;
     }
 
-    ResourceFinder rf;
-    rf.configure(argc, argv);
-
-    ServerVisualServoing reaching;
-    reaching.open(rf);
+    IVisualServoing *visual_servoing;
+    drv_server_vs.view(visual_servoing);
+    if (visual_servoing == YARP_NULLPTR)
+    {
+        yError("Could not view the visual servoing.");
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
