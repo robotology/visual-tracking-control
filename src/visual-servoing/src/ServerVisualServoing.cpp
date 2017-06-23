@@ -295,7 +295,7 @@ bool ServerVisualServoing::setMaxOrientationVelocity(const float max_o_dot)
 
 
 bool ServerVisualServoing::get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o,
-                                                       std::vector<yarp::sig::Vector> vec_goal_points)
+                                                       std::vector<yarp::sig::Vector>& vec_goal_points)
 {
     return false;
 }

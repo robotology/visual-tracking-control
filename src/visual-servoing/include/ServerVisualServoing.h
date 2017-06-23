@@ -69,7 +69,7 @@ public:
     bool setMaxOrientationVelocity(const float max_o_dot) override;
 
     bool get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o,
-                                     std::vector<yarp::sig::Vector> vec_goal_points) override;
+                                     std::vector<yarp::sig::Vector>& vec_goal_points) override;
 
 protected:
     /* Thread overrides */
