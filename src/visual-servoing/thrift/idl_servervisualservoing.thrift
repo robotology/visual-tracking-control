@@ -12,15 +12,6 @@
 service ServerVisualServoingIDL
 {
     /**
-     * Get information about the visual servoing server, like it's status, the
-     * available initial positions, the available goals and any other available
-     * option.
-     *
-     * @return a string with all the available information, 'none' otherwise
-     */
-    list<string> get_info();
-
-    /**
      * Initialize the robot to an initial position.
      *
      * @param label a label referring to one of the available initial positions;
@@ -53,65 +44,6 @@ service ServerVisualServoingIDL
     bool get_sfm_points();
 
     /**
-     * Set visual servoing operating mode between:
-     *  1. 'position': position-only visual servo control;
-     *  2. 'orientation': orientation-only visual servo control;
-     *  3. 'pose': position + orientation visual servo control.
-     *
-     * @note The default operating mode is 'pose'.
-     *
-     * @param mode a label referring to one of the three operating mode, i.e.
-     *             'position', 'orientation' or 'pose'.
-     *
-     * @return true upon success, false otherwise.
-     */
-    bool set_modality(1:string mode);
-
-    /**
-     * Set visual servoing position gain.
-     *
-     * @note The default value is 0.5.
-     *
-     * @param k a positive value.
-     *
-     * @return true upon success, false otherwise.
-     */
-    bool set_position_gain(1:double k);
-
-    /**
-     * Set a translational velocity bound in [m/s].
-     *
-     * @note The default value is 0.025 [m/s].
-     *
-     * @param b a positive value.
-     *
-     * @return true upon success, false otherwise.
-     */
-    bool set_position_bound(1:double b);
-
-    /**
-     * Set an orientation velocity bound in [deg/s].
-     *
-     * @note The default value is 5 [deg/s].
-     *
-     * @param b a positive value.
-     *
-     * @return true upon success, false otherwise.
-     */
-    bool set_orientation_bound(1:double b);
-
-    /**
-     * Set goal tolerance [pixel].
-     *
-     * @note The default value is 5 [pixel].
-     *
-     * @param px a positive value.
-     *
-     * @return true upon success, false otherwise.
-     */
-    bool set_goal_tol(1:double px);
-
-    /**
      * Start the visual servoing controller.
      *
      * @note This is a non-blocking function.
@@ -124,6 +56,8 @@ service ServerVisualServoingIDL
      * Gently close the application deallocating resources.
      */
     bool quit();
+
+
 
     /* NEW METHODS FROM IVISUALSERVOING */
     /**
@@ -153,13 +87,17 @@ service ServerVisualServoingIDL
     bool go_to_plane_goal(1: list<list<double>> vec_px_l, 2: list<list<double>> vec_px_r);
 
     /**
-     * Set the controller position-only or pose mode.
+     *  Set visual servoing operating mode between:
+     *  1. 'position': position-only visual servo control;
+     *  2. 'orientation': orientation-only visual servo control;
+     *  3. 'pose': position + orientation visual servo control.
      *
-     * @param mode true for pose mode, false for position-only.
+     * @param mode a label referring to one of the three operating mode, i.e.
+     *             'position', 'orientation' or 'pose'.
      *
      * @return true/false on success/failure.
      */
-    bool set_modality_2(1: bool mode);
+    bool set_modality(1:string mode);
 
     /**
      * Set the point controlled during visual servoing.
@@ -191,9 +129,7 @@ service ServerVisualServoingIDL
     /**
      * Check once whether the visual servoing controller is running or not.
      *
-     * @param is_running where the result is returned.
-     *
-     * @return true/false on success/failure.
+     * @return true/false on it is running/not running.
      *
      * @note The visual servoing controller may be terminated due to many
      *       different reasons, not strictly related to reaching the goal.
@@ -235,7 +171,7 @@ service ServerVisualServoingIDL
      *       translatinal velocities.
      *       Default value: k_x = 0.5
      */
-    bool set_translation_gain(1: double k_x);
+    bool set_translation_gain(1: double K_x);
 
     /**
      * Set the maximum translation velocity of the visual servoing control
@@ -257,7 +193,7 @@ service ServerVisualServoingIDL
              translatinal velocities.
              Default value: 0.5.
      */
-    bool set_orientation_gain(1: double k_o);
+    bool set_orientation_gain(1: double K_o);
 
     /**
      * Set the maximum angular velocity of the axis-angle velocity vector of the
@@ -277,6 +213,7 @@ service ServerVisualServoingIDL
      * @param x a 3D vector which is filled with the actual position x,y,z [m].
      * @param o a 4D vector which is filled with the actual orientation using
      *          axis-angle representation xa, ya, za, theta [m]/[rad].
+     * @param vec_goal_points
      *
      * @return a collection of three Cartesian points (position only) extracted
      *         by the plane defined by x and o.

@@ -46,7 +46,7 @@ public:
 
     bool goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r) override;
 
-    bool setModality(const bool mode) override;
+    bool setModality(const std::string& mode) override;
 
     bool setControlPoint(const yarp::os::ConstString& point) override;
 
@@ -54,22 +54,21 @@ public:
 
     bool setGoToGoalTolerance(const double tol) override;
 
-    bool checkVisualServoingController(bool& is_running) override;
+    bool checkVisualServoingController() override;
 
     bool waitVisualServoingDone(const double period = 0.1, const double timeout = 0.0) override;
 
     bool stopController() override;
 
-    bool setTranslationGain(const float k_x = 0.5) override;
+    bool setTranslationGain(const float K_x = 0.5) override;
 
     bool setMaxTranslationVelocity(const float max_x_dot) override;
 
-    bool setOrientationGain(const float k_o) override;
+    bool setOrientationGain(const float K_o = 0.5) override;
 
     bool setMaxOrientationVelocity(const float max_o_dot) override;
 
-    bool get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o,
-                                     std::vector<yarp::sig::Vector>& vec_goal_points) override;
+    std::vector<yarp::sig::Vector> get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o) override;
 
 protected:
     /* Thread overrides */
@@ -87,29 +86,50 @@ protected:
 
 
     /* ServerVisualServoingIDL overrides */
-    std::vector<std::string> get_info() override;
-
+    /* TO MOVE */
     bool init(const std::string& label) override;
 
+    /* INTERESTING */
     bool set_goal(const std::string& label) override;
-
-    bool get_sfm_points() override;
-
-    bool set_modality(const std::string& mode) override;
-
-    bool set_position_gain(const double k) override;
-
-    bool set_orientation_gain(const double k) override;
-
-    bool set_position_bound(const double b) override;
-
-    bool set_orientation_bound(const double b) override;
-
-    bool set_goal_tol(const double px) override;
 
     bool go() override;
 
+    /* TO DELETE */
+    bool get_sfm_points() override;
+
+
+    /* TO CONSIDER */
     bool quit() override;
+
+
+    /* FROM INTERFACE */
+    bool go_to_point_goal(const std::vector<double>& px_l, const std::vector<double>& px_r) override;
+
+    bool go_to_plane_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r) override;
+
+    bool set_modality(const std::string& mode) override;
+
+    bool set_control_point(const std::string& point) override;
+
+    std::vector<std::string> get_visual_servoing_info() override;
+
+    bool set_go_to_goal_tolerance(const double tol) override;
+
+    bool check_visual_servoing_controller() override;
+
+    bool wait_visual_servoing_done(const double period, const double timeout) override;
+
+    bool stop_controller() override;
+
+    bool set_translation_gain(const double K_x) override;
+
+    bool set_max_translation_velocity(const double max_x_dot) override;
+
+    bool set_orientation_gain(const double K_o) override;
+
+    bool set_max_orientation_velocity(const double max_o_dot) override;
+
+    std::vector<std::vector<double>> get_3D_position_goal_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o) override;
 
 
     /* Protected class methods */
@@ -136,12 +156,12 @@ private:
     yarp::dev::PolyDriver         gaze_driver_;
     yarp::dev::IGazeControl     * itf_gaze_;
 
-    const double                  Ts_     = 0.1;
-    double                        K_x_    = 0.5;
-    double                        K_o_    = 0.5;
-    double                        vx_max_ = 0.025; /* [m/s] */
-    double                        vo_max_ = 5 * M_PI / 180.0; /* [rad/s] */
-    double                        px_tol_ = 10.0;
+    const double                  Ts_        = 0.1; /* [s] */
+    double                        K_x_       = 0.5;
+    double                        K_o_       = 0.5;
+    double                        max_x_dot_ = 0.025; /* [m/s] */
+    double                        max_o_dot_ = 5 * M_PI / 180.0; /* [rad/s] */
+    double                        px_tol_    = 10.0;
 
     yarp::sig::Vector             goal_pose_;
     yarp::sig::Matrix             l_proj_;
@@ -181,8 +201,8 @@ private:
     bool setGazeController();
 
 
-    bool           attach(yarp::os::Port &source);
-    bool           setCommandPort();
+    bool attach(yarp::os::Port &source);
+    bool setCommandPort();
 
 
     bool setTorsoDOF();

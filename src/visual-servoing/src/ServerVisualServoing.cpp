@@ -216,50 +216,71 @@ bool ServerVisualServoing::close()
 
 
 /* IVisualServoing overrides */
-bool ServerVisualServoing::goToGoal(const yarp::sig::Vector& px_l, const yarp::sig::Vector& px_r)
+bool ServerVisualServoing::goToGoal(const Vector& px_l, const Vector& px_r)
 {
-    return false;
+    // TODO: to implement based on start() and given Goal.
+    return start();
 }
 
 
-bool ServerVisualServoing::goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r)
+bool ServerVisualServoing::goToGoal(const std::vector<Vector>& vec_px_l, const std::vector<Vector>& vec_px_r)
 {
-    return false;
+    // TODO: to implement based on start() and given Goal.
+    return start();
 }
 
 
-bool ServerVisualServoing::setModality(const bool mode)
+bool ServerVisualServoing::setModality(const std::string& mode)
 {
-    return false;
+    if (mode == "position")
+        op_mode_ = OperatingMode::position;
+    else if (mode == "orientation")
+        op_mode_ = OperatingMode::orientation;
+    else if (mode == "pose")
+        op_mode_ = OperatingMode::pose;
+    else
+        return false;
+
+    return true;
 }
 
 
 bool ServerVisualServoing::setControlPoint(const yarp::os::ConstString& point)
 {
+    yWarningVerbose("*** The current service is unimplemented. ***");
+
     return false;
 }
 
 
 bool ServerVisualServoing::getVisualServoingInfo(yarp::os::Bottle& info)
 {
+    yWarningVerbose("*** The current service is unimplemented. ***");
+
     return false;
 }
 
 
 bool ServerVisualServoing::setGoToGoalTolerance(const double tol)
 {
-    return false;
+    px_tol_ = tol;
+
+    return true;
 }
 
 
-bool ServerVisualServoing::checkVisualServoingController(bool& is_running)
+bool ServerVisualServoing::checkVisualServoingController()
 {
+    yWarningVerbose("*** The current service is unimplemented. ***");
+
     return false;
 }
 
 
 bool ServerVisualServoing::waitVisualServoingDone(const double period, const double timeout)
 {
+    yWarningVerbose("*** The current service is unimplemented. ***");
+
     return false;
 }
 
@@ -270,34 +291,61 @@ bool ServerVisualServoing::stopController()
 }
 
 
-bool ServerVisualServoing::setTranslationGain(const float k_x)
+bool ServerVisualServoing::setTranslationGain(const float K_x)
 {
+    K_x_ = K_x;
+
     return false;
 }
 
 
 bool ServerVisualServoing::setMaxTranslationVelocity(const float max_x_dot)
 {
+    max_x_dot_ = max_x_dot;
+
     return false;
 }
 
 
-bool ServerVisualServoing::setOrientationGain(const float k_o)
+bool ServerVisualServoing::setOrientationGain(const float K_o)
 {
+    K_o_ = K_o;
+
     return false;
 }
 
 
 bool ServerVisualServoing::setMaxOrientationVelocity(const float max_o_dot)
 {
+    max_o_dot_ = max_o_dot;
+
     return false;
 }
 
 
-bool ServerVisualServoing::get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o,
-                                                       std::vector<yarp::sig::Vector>& vec_goal_points)
+std::vector<Vector> ServerVisualServoing::get3DPositionGoalFrom3DPose(const Vector& x, const Vector& o)
 {
-    return false;
+    std::vector<Vector> vec_goal_points;
+
+    if (x.length() != 3 || o.length() != 4)
+        return vec_goal_points;
+
+    Vector pose(7);
+    pose.setSubvector(0, x);
+    pose.setSubvector(3, o);
+
+    Vector p0 = zeros(4);
+    Vector p1 = zeros(4);
+    Vector p2 = zeros(4);
+    Vector p3 = zeros(4);
+    getControlPointsFromPose(pose, p0, p1, p2, p3);
+
+    vec_goal_points.push_back(p0);
+    vec_goal_points.push_back(p1);
+    vec_goal_points.push_back(p2);
+    vec_goal_points.push_back(p3);
+
+    return vec_goal_points;
 }
 
 
@@ -509,12 +557,12 @@ void ServerVisualServoing::run()
 
         /* Enforce translational velocity bounds */
         for (size_t i = 0; i < vel_x.length(); ++i)
-            vel_x[i] = sign(vel_x[i]) * std::min(vx_max_, std::fabs(vel_x[i]));
+            vel_x[i] = sign(vel_x[i]) * std::min(max_x_dot_, std::fabs(vel_x[i]));
         yInfoVerbose("bounded vel_x = [" + vel_x.toString() + "]");
 
 
         /* Enforce rotational velocity bounds */
-        vel_o[3] = sign(vel_o[3]) * std::min(vo_max_, std::fabs(vel_o[3]));
+        vel_o[3] = sign(vel_o[3]) * std::min(max_o_dot_, std::fabs(vel_o[3]));
         yInfoVerbose("bounded vel_o = [" + vel_o.toString() + "]");
 
 
@@ -636,16 +684,6 @@ void ServerVisualServoing::threadRelease()
 
 
 /* ServerVisualServoingIDL overrides */
-std::vector<std::string> ServerVisualServoing::get_info()
-{
-    std::vector<std::string> info;
-
-    info.push_back("Unimplemented...!");
-
-    return info;
-}
-
-
 /* Go to initial position (open-loop) */
 bool ServerVisualServoing::init(const std::string& label)
 {
@@ -1123,61 +1161,6 @@ bool ServerVisualServoing::get_sfm_points()
 }
 
 
-bool ServerVisualServoing::set_modality(const std::string& mode)
-{
-    if (mode == "position")
-        op_mode_ = OperatingMode::position;
-    else if (mode == "orientation")
-        op_mode_ = OperatingMode::orientation;
-    else if (mode == "pose")
-        op_mode_ = OperatingMode::pose;
-    else
-        return false;
-
-    return true;
-}
-
-
-bool ServerVisualServoing::set_position_gain(const double k)
-{
-    K_x_ = k;
-
-    return true;
-}
-
-
-bool ServerVisualServoing::set_orientation_gain(const double k)
-{
-    K_o_ = k;
-
-    return true;
-}
-
-
-bool ServerVisualServoing::set_position_bound(const double b)
-{
-    vx_max_ = b;
-
-    return true;
-}
-
-
-bool ServerVisualServoing::set_orientation_bound(const double b)
-{
-    vo_max_ = b;
-
-    return true;
-}
-
-
-bool ServerVisualServoing::set_goal_tol(const double px)
-{
-    px_tol_ = px;
-
-    return true;
-}
-
-
 bool ServerVisualServoing::go()
 {
     return start();
@@ -1194,6 +1177,134 @@ bool ServerVisualServoing::quit()
     interrupt();
 
     return true;
+}
+
+
+bool ServerVisualServoing::go_to_point_goal(const std::vector<double>& px_l, const std::vector<double>& px_r)
+{
+    if (px_l.size() != 6 || px_r.size() != 6)
+        return false;
+
+    return goToGoal(Vector(px_l.size(), px_l.data()), Vector(px_r.size(), px_r.data()));
+}
+
+
+bool ServerVisualServoing::go_to_plane_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r)
+{
+    if (vec_px_l.size() != 3 || vec_px_l.size() != 3)
+        return false;
+
+    std::vector<Vector> yvec_px_l;
+    for (std::vector<double> vec : vec_px_l)
+    {
+        if (vec.size() != 2)
+            return false;
+
+        yvec_px_l.emplace_back(Vector(vec.size(), vec.data()));
+    }
+
+    std::vector<Vector> yvec_px_r;
+    for (std::vector<double> vec : vec_px_r)
+    {
+        if (vec.size() != 2)
+            return false;
+
+        yvec_px_r.emplace_back(Vector(vec.size(), vec.data()));
+    }
+
+    return goToGoal(yvec_px_l, yvec_px_r);
+}
+
+
+bool ServerVisualServoing::set_modality(const std::string& mode)
+{
+    return setModality(mode);
+}
+
+
+bool ServerVisualServoing::set_control_point(const std::string& point)
+{
+    return setControlPoint(point);
+}
+
+
+std::vector<std::string> ServerVisualServoing::get_visual_servoing_info()
+{
+    //???: Come si fa a mettere una Bottle acon Thrift?
+
+    Bottle info;
+    getVisualServoingInfo(info);
+
+    std::vector<std::string> info_str;
+    info_str.emplace_back(info.toString());
+
+    return info_str;
+}
+
+
+bool ServerVisualServoing::set_go_to_goal_tolerance(const double tol)
+{
+    return setGoToGoalTolerance(tol);
+}
+
+
+bool ServerVisualServoing::check_visual_servoing_controller()
+{
+    return checkVisualServoingController();
+}
+
+
+bool ServerVisualServoing::wait_visual_servoing_done(const double period, const double timeout)
+{
+    return waitVisualServoingDone(period, timeout);
+}
+
+
+bool ServerVisualServoing::stop_controller()
+{
+    return stopController();
+}
+
+
+bool ServerVisualServoing::set_translation_gain(const double K_x)
+{
+    return setTranslationGain(K_x);
+}
+
+
+bool ServerVisualServoing::set_max_translation_velocity(const double max_x_dot)
+{
+    return setMaxTranslationVelocity(max_x_dot);
+}
+
+
+bool ServerVisualServoing::set_orientation_gain(const double K_o)
+{
+    return setOrientationGain(K_o);
+}
+
+
+bool ServerVisualServoing::set_max_orientation_velocity(const double max_o_dot)
+{
+    return setMaxOrientationVelocity(max_o_dot);
+}
+
+
+std::vector<std::vector<double>> ServerVisualServoing::get_3D_position_goal_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o)
+{
+    std::vector<std::vector<double>> vec_goal_points;
+
+    if (x.size() != 3 || o.size() != 4)
+        return vec_goal_points;
+
+    Vector yx(x.size(), x.data());
+    Vector yo(o.size(), o.data());
+    std::vector<Vector> yvec_goal_points = get3DPositionGoalFrom3DPose(yx, yo);
+
+    for (Vector yvec_goal : yvec_goal_points)
+        vec_goal_points.emplace_back(std::vector<double>(yvec_goal.data(), yvec_goal.data() + yvec_goal.size()));
+
+    return vec_goal_points;
 }
 
 
