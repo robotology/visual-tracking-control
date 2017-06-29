@@ -194,8 +194,28 @@ bool ServerVisualServoing::open(Searchable &config)
 
 bool ServerVisualServoing::close()
 {
-    yInfoVerbose("Calling close functions...");
+    yInfoVerbose("Interrupting...");
 
+    yInfoVerbose("...ensure controllers are stopped...");
+    itf_rightarm_cart_->stopControl();
+    itf_gaze_->stopControl();
+
+    yInfoVerbose("...interrupting ports...");
+    port_pose_left_in_.interrupt();
+    port_pose_right_in_.interrupt();
+    port_image_left_in_.interrupt();
+    port_image_left_out_.interrupt();
+    port_click_left_.interrupt();
+    port_image_right_in_.interrupt();
+    port_image_right_out_.interrupt();
+    port_click_right_.interrupt();
+
+    yInfoVerbose("...done interrupting!");
+
+
+    yInfoVerbose("Now closing...");
+
+    yInfoVerbose("...closing ports...");
     port_pose_left_in_.close();
     port_pose_right_in_.close();
     port_image_left_in_.close();
@@ -205,12 +225,16 @@ bool ServerVisualServoing::close()
     port_image_right_out_.close();
     port_click_right_.close();
 
+    yInfoVerbose("...removing frames...");
     itf_rightarm_cart_->removeTipFrame();
 
+    yInfoVerbose("...closing drivers...");
     if (rightarm_cartesian_driver_.isValid()) rightarm_cartesian_driver_.close();
     if (gaze_driver_.isValid())               gaze_driver_.close();
 
-    yInfoVerbose("...done!");
+    yInfoVerbose("...done closing!");
+
+
     return true;
 }
 
@@ -287,7 +311,7 @@ bool ServerVisualServoing::waitVisualServoingDone(const double period, const dou
 
 bool ServerVisualServoing::stopController()
 {
-    return false;
+    return stop();
 }
 
 
@@ -673,12 +697,13 @@ void ServerVisualServoing::afterStart(bool success)
 
 void ServerVisualServoing::onStop()
 {
-
+    yInfoVerbose("*** onStop invoked ***");
 }
 
 
 void ServerVisualServoing::threadRelease()
 {
+    yInfoVerbose("*** threadRelease invoked ***");
     yInfoVerbose("Thread terminated!");
 }
 
@@ -1169,12 +1194,19 @@ bool ServerVisualServoing::go()
 
 bool ServerVisualServoing::quit()
 {
-    itf_rightarm_cart_->stopControl();
-    itf_gaze_->stopControl();
+    bool is_stopping_controller = stopController();
+    if (!is_stopping_controller)
+    {
+        yWarningVerbose("*** Could not stop visual servoing controller ***");
+        return false;
+    }
 
-    should_stop_ = true;
-
-    interrupt();
+    bool is_closing = close();
+    if (!is_closing)
+    {
+        yWarningVerbose("*** Could not close visual servoing server ***");
+        return false;
+    }
 
     return true;
 }
@@ -1305,32 +1337,6 @@ std::vector<std::vector<double>> ServerVisualServoing::get_3D_position_goal_from
         vec_goal_points.emplace_back(std::vector<double>(yvec_goal.data(), yvec_goal.data() + yvec_goal.size()));
 
     return vec_goal_points;
-}
-
-
-/* Protected class methods */
-bool ServerVisualServoing::interrupt()
-{
-    yInfoVerbose("Interrupting...");
-
-    yInfoVerbose("...blocking controllers...");
-    itf_rightarm_cart_->stopControl();
-    itf_gaze_->stopControl();
-
-    Time::delay(3.0);
-
-    yInfoVerbose("...port cleanup...");
-    port_pose_left_in_.interrupt();
-    port_pose_right_in_.interrupt();
-    port_image_left_in_.interrupt();
-    port_image_left_out_.interrupt();
-    port_click_left_.interrupt();
-    port_image_right_in_.interrupt();
-    port_image_right_out_.interrupt();
-    port_click_right_.interrupt();
-
-    yInfoVerbose("...done!");
-    return true;
 }
 
 
