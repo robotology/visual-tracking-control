@@ -8,6 +8,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <yarp/math/Math.h>
 #include <yarp/math/SVD.h>
+#include <yarp/os/Network.h>
 #include <yarp/os/Property.h>
 #include <yarp/os/RpcClient.h>
 #include <yarp/os/Time.h>
@@ -23,22 +24,26 @@ using namespace iCub::ctrl;
 ServerVisualServoing::ServerVisualServoing()
 {
     yInfo("*** Invoked ServerVisualServoing ctor ***");
+    yInfo("*** ServerVisualServoing constructed ***");
 }
 
 
 ServerVisualServoing::~ServerVisualServoing()
 {
     yInfo("*** Invoked ServerVisualServoing dtor ***");
+    yInfo("*** ServerVisualServoing destructed ***");
 }
 
 
 /* DeviceDriver overrides */
 bool ServerVisualServoing::open(Searchable &config)
 {
-    yInfo("*** Configuring ServerVisualServoing ***");
-
     verbosity_ = config.check("verbosity", Value(false)).asBool();
     yInfo("|> Verbosity: " + ConstString(verbosity_? "ON" : "OFF"));
+
+
+    yInfoVerbose("*** Configuring ServerVisualServoing ***");
+
 
     robot_name_ = config.find("robot").asString();
     if (robot_name_.empty())
@@ -48,6 +53,14 @@ bool ServerVisualServoing::open(Searchable &config)
     }
     else
         yInfoVerbose("|> Robot name: " + robot_name_);
+
+
+    Network yarp;
+    if (!yarp.checkNetwork(3.0))
+    {
+        yErrorVerbose("YARP seems unavailable!");
+        return false;
+    }
 
 
     if (!port_pose_left_in_.open("/visual-servoing/pose/left:i"))
