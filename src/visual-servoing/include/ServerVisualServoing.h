@@ -143,7 +143,7 @@ private:
     bool                          verbosity_ = false;
     yarp::os::ConstString         robot_name_;
 
-    OperatingMode                 op_mode_     = OperatingMode::pose;
+    OperatingMode                 op_mode_ = OperatingMode::pose;
 
     yarp::dev::PolyDriver         rightarm_cartesian_driver_;
     yarp::dev::ICartesianControl* itf_rightarm_cart_;

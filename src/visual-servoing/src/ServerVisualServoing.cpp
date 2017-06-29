@@ -20,16 +20,10 @@ using namespace iCub::ctrl;
 
 
 /* Ctors and Dtors */
-ServerVisualServoing::ServerVisualServoing()
-{
-    yInfoVerbose("ServerVisualServoing succesfully constructed.");
-}
+ServerVisualServoing::ServerVisualServoing() { }
 
 
-ServerVisualServoing::~ServerVisualServoing()
-{
-    yInfoVerbose("ServerVisualServoing succesfully destroyed.");
-}
+ServerVisualServoing::~ServerVisualServoing() { }
 
 
 /* DeviceDriver overrides */
@@ -101,7 +95,7 @@ bool ServerVisualServoing::open(Searchable &config)
 
     Bottle btl_cam_info;
     itf_gaze_->getInfo(btl_cam_info);
-    yInfoVerbose("[CAM INFO]" + btl_cam_info.toString());
+    yInfoVerbose("[CAM]" + btl_cam_info.toString());
     Bottle* cam_left_info = btl_cam_info.findGroup("camera_intrinsics_left").get(1).asList();
     Bottle* cam_right_info = btl_cam_info.findGroup("camera_intrinsics_right").get(1).asList();
 
@@ -194,9 +188,9 @@ bool ServerVisualServoing::open(Searchable &config)
 
 bool ServerVisualServoing::close()
 {
-    yInfoVerbose("Interrupting...");
+    yInfoVerbose("*** Interrupting ***");
 
-    yInfoVerbose("...ensure controllers are stopped...");
+    yInfoVerbose("Ensure controllers are stopped...");
     itf_rightarm_cart_->stopControl();
     itf_gaze_->stopControl();
 
@@ -210,12 +204,12 @@ bool ServerVisualServoing::close()
     port_image_right_out_.interrupt();
     port_click_right_.interrupt();
 
-    yInfoVerbose("...done interrupting!");
+    yInfoVerbose("*** Interrupting done! ***");
 
 
-    yInfoVerbose("Now closing...");
+    yInfoVerbose("*** Closing ***");
 
-    yInfoVerbose("...closing ports...");
+    yInfoVerbose("Closing ports...");
     port_pose_left_in_.close();
     port_pose_right_in_.close();
     port_image_left_in_.close();
@@ -232,7 +226,7 @@ bool ServerVisualServoing::close()
     if (rightarm_cartesian_driver_.isValid()) rightarm_cartesian_driver_.close();
     if (gaze_driver_.isValid())               gaze_driver_.close();
 
-    yInfoVerbose("...done closing!");
+    yInfoVerbose("*** Closing done! ***");
 
 
     return true;
@@ -271,7 +265,7 @@ bool ServerVisualServoing::setModality(const std::string& mode)
 
 bool ServerVisualServoing::setControlPoint(const yarp::os::ConstString& point)
 {
-    yWarningVerbose("*** The current service is unimplemented. ***");
+    yWarningVerbose("*** Service setControlPoint is unimplemented. ***");
 
     return false;
 }
@@ -279,7 +273,7 @@ bool ServerVisualServoing::setControlPoint(const yarp::os::ConstString& point)
 
 bool ServerVisualServoing::getVisualServoingInfo(yarp::os::Bottle& info)
 {
-    yWarningVerbose("*** The current service is unimplemented. ***");
+    yWarningVerbose("*** Service getVisualServoingInfo is unimplemented. ***");
 
     return false;
 }
@@ -295,7 +289,7 @@ bool ServerVisualServoing::setGoToGoalTolerance(const double tol)
 
 bool ServerVisualServoing::checkVisualServoingController()
 {
-    yWarningVerbose("*** The current service is unimplemented. ***");
+    yWarningVerbose("*** Service checkVisualServoingController is unimplemented. ***");
 
     return false;
 }
@@ -303,7 +297,7 @@ bool ServerVisualServoing::checkVisualServoingController()
 
 bool ServerVisualServoing::waitVisualServoingDone(const double period, const double timeout)
 {
-    yWarningVerbose("*** The current service is unimplemented. ***");
+    yWarningVerbose("*** Service waitVisualServoingDone is unimplemented. ***");
 
     return false;
 }
@@ -376,13 +370,13 @@ std::vector<Vector> ServerVisualServoing::get3DPositionGoalFrom3DPose(const Vect
 /* Thread overrides */
 void ServerVisualServoing::beforeStart()
 {
-
+    yInfoVerbose("*** Thread::beforeStart invoked ***");
 }
 
 
 bool ServerVisualServoing::threadInit()
 {
-    yInfoVerbose("Thread initialized!");
+    yInfoVerbose("*** Thread::threadInit invoked ***");
     yInfoVerbose("\n*** Running visual-servoing! ***\n");
     return true;
 }
@@ -691,20 +685,20 @@ void ServerVisualServoing::run()
 
 void ServerVisualServoing::afterStart(bool success)
 {
-
+    yInfoVerbose("*** Thread::afterStart invoked ***");
 }
 
 
 void ServerVisualServoing::onStop()
 {
-    yInfoVerbose("*** onStop invoked ***");
+    yInfoVerbose("*** Thread::onStop invoked ***");
 }
 
 
 void ServerVisualServoing::threadRelease()
 {
-    yInfoVerbose("*** threadRelease invoked ***");
-    yInfoVerbose("Thread terminated!");
+    yInfoVerbose("*** Thread::threadRelease invoked ***");
+    yInfoVerbose("*** Visual servoing terminated! ***");
 }
 
 
@@ -1194,17 +1188,19 @@ bool ServerVisualServoing::go()
 
 bool ServerVisualServoing::quit()
 {
+    yInfoVerbose("*** Quitting visual servoing server ***");
+
     bool is_stopping_controller = stopController();
     if (!is_stopping_controller)
     {
-        yWarningVerbose("*** Could not stop visual servoing controller ***");
+        yWarningVerbose("Could not stop visual servoing controller!");
         return false;
     }
 
     bool is_closing = close();
     if (!is_closing)
     {
-        yWarningVerbose("*** Could not close visual servoing server ***");
+        yWarningVerbose("Could not close visual servoing server!");
         return false;
     }
 
