@@ -1,6 +1,10 @@
 #include "ServerVisualServoing.h"
 
 #include <yarp/os/LogStream.h>
+#include <yarp/os/Property.h>
+#include <yarp/dev/Drivers.h>
+#include <yarp/dev/IVisualServoing.h>
+#include <yarp/dev/PolyDriver.h>
 
 using namespace yarp::os;
 using namespace yarp::sig;
@@ -9,10 +13,15 @@ using namespace yarp::dev;
 
 int main(int argc, char **argv)
 {
-    DriverCreator *server_vs = new DriverCreatorOf<ServerVisualServoing>("server_visualsevoing", "","ServerVisualServoing");
+    DriverCreator *server_vs = new DriverCreatorOf<ServerVisualServoing>("server_visualsevoing", "", "ServerVisualServoing");
     Drivers::factory().add(server_vs);
 
-    PolyDriver drv_server_vs("server_visualsevoing");
+    Property prop_server_vs;
+    prop_server_vs.put("device",    "server_visualsevoing");
+    prop_server_vs.put("verbosity", true);
+    prop_server_vs.put("robot",     "iCub");
+
+    PolyDriver drv_server_vs(prop_server_vs);
     if (!drv_server_vs.isValid())
     {
         yError("drv_server_vs not available.");
