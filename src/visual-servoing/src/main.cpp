@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     PolyDriver drv_server_vs(prop_server_vs);
     if (!drv_server_vs.isValid())
     {
-        yError("drv_server_vs not available.");
+        yError("Could not run ServerVisualServoing!");
         return EXIT_FAILURE;
     }
 
@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     drv_server_vs.view(visual_servoing);
     if (visual_servoing == YARP_NULLPTR)
     {
-        yError("Could not view the visual servoing.");
+        yError("Could not get interfacate to ServerVisualServoing!");
         return EXIT_FAILURE;
     }
 
