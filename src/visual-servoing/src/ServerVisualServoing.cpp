@@ -20,10 +20,16 @@ using namespace iCub::ctrl;
 
 
 /* Ctors and Dtors */
-ServerVisualServoing::ServerVisualServoing() { }
+ServerVisualServoing::ServerVisualServoing()
+{
+    yInfo("*** Invoked ServerVisualServoing ctor ***");
+}
 
 
-ServerVisualServoing::~ServerVisualServoing() { }
+ServerVisualServoing::~ServerVisualServoing()
+{
+    yInfo("*** Invoked ServerVisualServoing dtor ***");
+}
 
 
 /* DeviceDriver overrides */
@@ -32,7 +38,7 @@ bool ServerVisualServoing::open(Searchable &config)
     yInfo("*** Configuring ServerVisualServoing ***");
 
     verbosity_ = config.check("verbosity", Value(false)).asBool();
-    yInfoVerbose("|> Verbosity:" + ConstString(verbosity_? "ON" : "OFF"));
+    yInfo("|> Verbosity: " + ConstString(verbosity_? "ON" : "OFF"));
 
     robot_name_ = config.find("robot").asString();
     if (robot_name_.empty())
@@ -40,6 +46,8 @@ bool ServerVisualServoing::open(Searchable &config)
         yErrorVerbose("Robot name not provided! Closing.");
         return false;
     }
+    else
+        yInfoVerbose("|> Robot name: " + robot_name_);
 
 
     if (!port_pose_left_in_.open("/visual-servoing/pose/left:i"))
