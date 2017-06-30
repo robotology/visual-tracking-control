@@ -305,7 +305,7 @@ bool ServerVisualServoing::checkVisualServoingController()
     yInfoVerbose("");
     yInfoVerbose("*** Checking visual servoing controller ***");
     yInfoVerbose(" |> Controller: " + ConstString(vs_control_running_ ? "running." : "idle."));
-    yInfoVerbose(" |> Goal: "       + ConstString(vs_goal_reached_    ? "" : "not") + "reached.");
+    yInfoVerbose(" |> Goal: "       + ConstString(vs_goal_reached_    ? "" : "not ") + "reached.");
     yInfoVerbose("");
 
     return vs_control_running_;
@@ -317,7 +317,7 @@ bool ServerVisualServoing::waitVisualServoingDone(const double period, const dou
     yInfoVerbose("");
     yInfoVerbose("*** Joining visual servoing control thread ***");
     yInfoVerbose(" |> Controller: " + ConstString(vs_control_running_ ? "running." : "idle."));
-    yInfoVerbose(" |> Goal: "       + ConstString(vs_goal_reached_    ? "" : "not") + "reached.");
+    yInfoVerbose(" |> Goal: "       + ConstString(vs_goal_reached_    ? "" : "not ") + "reached.");
     yInfoVerbose("");
 
     return join();
@@ -329,7 +329,7 @@ bool ServerVisualServoing::stopController()
     yInfoVerbose("");
     yInfoVerbose("*** Stopping visual servoing controller ***");
     yInfoVerbose(" |> Controller: " + ConstString(vs_control_running_ ? "running." : "idle."));
-    yInfoVerbose(" |> Goal: "       + ConstString(vs_goal_reached_    ? "" : "not") + "reached.");
+    yInfoVerbose(" |> Goal: "       + ConstString(vs_goal_reached_    ? "" : "not ") + "reached.");
     yInfoVerbose("");
 
     return stop();
@@ -1023,7 +1023,7 @@ void ServerVisualServoing::run()
                                             px_ee_cur_position, jacobian_position);
 
         yInfoVerbose("px_ee_cur_position = [" + px_ee_cur_position.toString() + "]");
-        yInfoVerbose("jacobian_position  = [" + jacobian_position.toString()  + "]");
+        yInfoVerbose("jacobian_position  = [\n" + jacobian_position.toString() + "]");
 
 
         /* FEATURES AND JACOBIAN (original orientation) */
@@ -1032,7 +1032,7 @@ void ServerVisualServoing::run()
                                             px_ee_cur_orientation, jacobian_orientation);
         
         yInfoVerbose("px_ee_cur_orientation = [" + px_ee_cur_orientation.toString() + "]");
-        yInfoVerbose("jacobian_orientation  = [" + jacobian_orientation.toString()  + "]");
+        yInfoVerbose("jacobian_orientation  = [\n" + jacobian_orientation.toString() + "]");
 
 
         Vector e_position               = px_des_ - px_ee_cur_position;
@@ -1062,18 +1062,18 @@ void ServerVisualServoing::run()
         }
 
 
-        yInfoVerbose("px_des_               = [" + px_des_.toString()               + "]");
-        yInfoVerbose("px_ee_cur_position    = [" + px_ee_cur_position.toString()    + "]");
+        yInfoVerbose("px_des_ = [" + px_des_.toString() + "]");
+        yInfoVerbose("px_ee_cur_position = [" + px_ee_cur_position.toString() + "]");
         yInfoVerbose("px_ee_cur_orientation = [" + px_ee_cur_orientation.toString() + "]");
-        yInfoVerbose("e_position            = [" + e_position.toString()            + "]");
-        yInfoVerbose("e_orientation         = [" + e_orientation.toString()         + "]");
-        yInfoVerbose("vel_x                 = [" + vel_x.toString()                 + "]");
-        yInfoVerbose("vel_o                 = [" + vel_o.toString()                 + "]");
+        yInfoVerbose("e_position = [" + e_position.toString() + "]");
+        yInfoVerbose("e_orientation = [" + e_orientation.toString() + "]");
+        yInfoVerbose("vel_x = [" + vel_x.toString() + "]");
+        yInfoVerbose("vel_o = [" + vel_o.toString()  + "]");
 
         double ang = norm(vel_o);
         vel_o /= ang;
         vel_o.push_back(ang);
-        yInfoVerbose("axis-angle vel_o      = [" + vel_o.toString()                 + "]");
+        yInfoVerbose("axis-angle vel_o = [" + vel_o.toString() + "]");
 
 
         /* Enforce translational velocity bounds */
@@ -1090,6 +1090,7 @@ void ServerVisualServoing::run()
         /* Visual control law */
         vel_x    *= K_x_;
         vel_o(3) *= K_o_;
+
 
         if (op_mode_ == OperatingMode::position)
             itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
@@ -1159,7 +1160,7 @@ void ServerVisualServoing::run()
         {
             yInfoVerbose("");
             yInfoVerbose("*** Goal reached! ***");
-            yInfoVerbose("px_des = "              + px_des_.toString());
+            yInfoVerbose("px_des = "                + px_des_.toString());
             yInfoVerbose("px_ee_cur_position = "    + px_ee_cur_position.toString());
             yInfoVerbose("px_ee_cur_orientation = " + px_ee_cur_orientation.toString());
             yInfoVerbose("*** ------------- ***");
