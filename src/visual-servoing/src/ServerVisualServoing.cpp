@@ -492,10 +492,10 @@ bool ServerVisualServoing::storedInit(const std::string& label)
     else if (label == "sim1")
     {
         xd[0] = -0.416;
-        xd[1] =  0.024 + 0.1;
+        xd[1] = -0.024 + 0.1;
         xd[2] =  0.055;
 
-        Matrix Od(3, 3);
+        Matrix Od = zeros(3, 3);
         Od(0, 0) = -1.0;
         Od(1, 1) = -1.0;
         Od(2, 2) =  1.0;
@@ -511,7 +511,7 @@ bool ServerVisualServoing::storedInit(const std::string& label)
         xd[1] =  0.025 + 0.05;
         xd[2] =  0.10;
 
-        Matrix Od(3, 3);
+        Matrix Od = zeros(3, 3);
         Od(0, 0) = -1.0;
         Od(1, 1) = -1.0;
         Od(2, 2) =  1.0;
@@ -621,8 +621,8 @@ bool ServerVisualServoing::storedGoToGoal(const std::string& label)
         /* Hand pointing forward, palm looking down */
         Matrix R_ee = zeros(3, 3);
         R_ee(0, 0) = -1.0;
-        R_ee(1, 1) =  1.0;
-        R_ee(2, 2) = -1.0;
+        R_ee(1, 1) = -1.0;
+        R_ee(2, 2) =  1.0;
         Vector ee_o = dcm2axis(R_ee);
 
         p[0] = -0.416;
@@ -789,9 +789,9 @@ bool ServerVisualServoing::goToSFMGoal()
     {
         Matrix R_ee = zeros(3, 3);
         R_ee(0, 0) = -1.0;
-        //        R_ee(1, 1) =  1.0;
+//        R_ee(1, 1) =  1.0;
         R_ee(1, 2) = -1.0;
-        //        R_ee(2, 2) = -1.0;
+//        R_ee(2, 2) = -1.0;
         R_ee(2, 1) = -1.0;
         Vector ee_o = dcm2axis(R_ee);
 
