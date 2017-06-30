@@ -431,6 +431,7 @@ bool ServerVisualServoing::storedInit(const std::string& label)
         od[2] = -0.473;
         od[3] =  2.896;
 
+        /* -0.681 0.112 -0.240 */
         gaze_loc[0] = -0.681;
         gaze_loc[1] =  0.112;
         gaze_loc[2] = -0.240;
