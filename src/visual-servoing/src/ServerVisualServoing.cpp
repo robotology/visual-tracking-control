@@ -983,36 +983,6 @@ void ServerVisualServoing::run()
         yInfoVerbose("EE estimates left  = [" + est_copy_left.toString()  + "]");
         yInfoVerbose("EE estimates right = [" + est_copy_right.toString() + "]");
 
-        /* SIM */
-//        /* Simulate reaching starting from the initial position */
-//        /* Comment any previous write on variable 'estimates' */
-//
-//        /* Evaluate the new orientation vector from axis-angle representation */
-//        /* The following code is a copy of the setTaskVelocities() code */
-//        Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
-//        Matrix l_R = axis2dcm(l_o);
-//        Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
-//        Matrix r_R = axis2dcm(r_o);
-//
-//        vel_o[3] *= Ts_;
-//        l_R = axis2dcm(vel_o) * l_R;
-//        r_R = axis2dcm(vel_o) * r_R;
-//
-//        Vector l_new_o = dcm2axis(l_R);
-//        double l_ang = l_new_o(3);
-//        l_new_o.pop_back();
-//        l_new_o *= l_ang;
-//
-//        Vector r_new_o = dcm2axis(r_R);
-//        double r_ang = r_new_o(3);
-//        r_new_o.pop_back();
-//        r_new_o *= r_ang;
-//
-//        est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
-//        est_copy_left.setSubvector(3, l_new_o);
-//        est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
-//        est_copy_right.setSubvector(3, r_new_o);
-        /* **************************************************** */
 
         /* EVALUATING CONTROL POINTS */
         getControlPixelsFromPose(est_copy_left, CamSel::left, PixelControlMode::x, l_px0_position, l_px1_position, l_px2_position, l_px3_position);
@@ -1127,6 +1097,39 @@ void ServerVisualServoing::run()
             itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
         else if (op_mode_ == OperatingMode::pose)
             itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+
+
+        /* *********************** SIM ************************ */
+//        /* Simulate reaching starting from the initial position */
+//        /* 1) Get the initial end-effector pose from left/right eye view: must execute only once */
+//        /* 2) itf_rightarm_cart_->setTaskVelocities() calls: must be commented */
+//
+//        /* Evaluate the new orientation vector from axis-angle representation */
+//        /* The following code is a copy of the setTaskVelocities() code */
+//        Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
+//        Matrix l_R = axis2dcm(l_o);
+//        Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
+//        Matrix r_R = axis2dcm(r_o);
+//
+//        vel_o[3] *= Ts_;
+//        l_R = axis2dcm(vel_o) * l_R;
+//        r_R = axis2dcm(vel_o) * r_R;
+//
+//        Vector l_new_o = dcm2axis(l_R);
+//        double l_ang = l_new_o(3);
+//        l_new_o.pop_back();
+//        l_new_o *= l_ang;
+//
+//        Vector r_new_o = dcm2axis(r_R);
+//        double r_ang = r_new_o(3);
+//        r_new_o.pop_back();
+//        r_new_o *= r_ang;
+//
+//        est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
+//        est_copy_left.setSubvector(3, l_new_o);
+//        est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
+//        est_copy_right.setSubvector(3, r_new_o);
+        /* **************************************************** */
 
 
         /* Wait for some motion */
