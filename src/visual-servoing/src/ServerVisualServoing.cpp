@@ -616,7 +616,7 @@ bool ServerVisualServoing::storedGoToGoal(const std::string& label)
         p[4] =  0.799 * 2.781;
         p[5] = -0.471 * 2.781;
     }
-    else if ("sim1")
+    else if (label == "sim1")
     {
         /* Hand pointing forward, palm looking down */
         Matrix R_ee = zeros(3, 3);
@@ -630,7 +630,7 @@ bool ServerVisualServoing::storedGoToGoal(const std::string& label)
         p[2] =  0.055;
         p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
     }
-    else if ("sim2")
+    else if (label == "sim2")
     {
         /* Hand pointing forward, palm looking down */
         Matrix R_ee = zeros(3, 3);
