@@ -458,70 +458,6 @@ bool ServerVisualServoing::storedInit(const std::string& label)
         setTorsoDOF();
         itf_rightarm_cart_->setLimits(0,  25.0,  25.0);
     }
-    else if (label == "karate")
-    {
-        /* -0.319 0.128 0.075 0.038 -0.732 0.680 2.979 */
-        xd[0] = -0.319;
-        xd[1] =  0.128;
-        xd[2] =  0.075;
-
-        Matrix Od = zeros(3, 3);
-        Od(0, 0) = -1.0;
-        Od(2, 1) = -1.0;
-        Od(1, 2) = -1.0;
-        od = dcm2axis(Od);
-
-        gaze_loc[0] = xd[0];
-        gaze_loc[1] = xd[1];
-        gaze_loc[2] = xd[2];
-    }
-    else if (label == "grasping")
-    {
-        xd[0] = -0.370;
-        xd[1] =  0.103;
-        xd[2] =  0.064;
-
-        od(0) = -0.141;
-        od(1) =  0.612;
-        od(2) = -0.777;
-        od(4) =  3.012;
-
-        gaze_loc[0] = xd[0];
-        gaze_loc[1] = xd[1];
-        gaze_loc[2] = xd[2];
-    }
-    else if (label == "sim1")
-    {
-        xd[0] = -0.416;
-        xd[1] = -0.024 + 0.1;
-        xd[2] =  0.055;
-
-        Matrix Od = zeros(3, 3);
-        Od(0, 0) = -1.0;
-        Od(1, 1) = -1.0;
-        Od(2, 2) =  1.0;
-        od = dcm2axis(Od);
-
-        gaze_loc[0] = xd[0];
-        gaze_loc[1] = xd[1];
-        gaze_loc[2] = xd[2];
-    }
-    else if (label == "sim2")
-    {
-        xd[0] = -0.35;
-        xd[1] =  0.025 + 0.05;
-        xd[2] =  0.10;
-
-        Matrix Od = zeros(3, 3);
-        Od(0, 0) = -1.0;
-        Od(1, 1) = -1.0;
-        Od(2, 2) =  1.0;
-        od = dcm2axis(Od);
-
-        gaze_loc[0] = xd[0];
-        gaze_loc[1] = xd[1];
-        gaze_loc[2] = xd[2];
-    }
     else
         return false;
 
@@ -616,34 +552,6 @@ bool ServerVisualServoing::storedGoToGoal(const std::string& label)
         p[3] = -0.370 * 2.781;
         p[4] =  0.799 * 2.781;
         p[5] = -0.471 * 2.781;
-    }
-    else if (label == "sim1")
-    {
-        /* Hand pointing forward, palm looking down */
-        Matrix R_ee = zeros(3, 3);
-        R_ee(0, 0) = -1.0;
-        R_ee(1, 1) = -1.0;
-        R_ee(2, 2) =  1.0;
-        Vector ee_o = dcm2axis(R_ee);
-
-        p[0] = -0.416;
-        p[1] = -0.024;
-        p[2] =  0.055;
-        p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
-    }
-    else if (label == "sim2")
-    {
-        /* Hand pointing forward, palm looking down */
-        Matrix R_ee = zeros(3, 3);
-        R_ee(0, 0) = -1.0;
-        R_ee(1, 1) =  1.0;
-        R_ee(2, 2) = -1.0;
-        Vector ee_o = dcm2axis(R_ee);
-
-        p[0] = -0.35;
-        p[1] =  0.025;
-        p[2] =  0.10;
-        p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
     }
     else
         return false;
