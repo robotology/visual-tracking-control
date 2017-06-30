@@ -302,22 +302,36 @@ bool ServerVisualServoing::setGoToGoalTolerance(const double tol)
 
 bool ServerVisualServoing::checkVisualServoingController()
 {
-    yWarningVerbose("*** Service checkVisualServoingController is unimplemented. ***");
+    yInfoVerbose("");
+    yInfoVerbose("*** Checking visual servoing controller ***");
+    yInfoVerbose(" |> Controller: " + ConstString(vs_control_running_ ? "running." : "idle."));
+    yInfoVerbose(" |> Goal: "       + ConstString(vs_goal_reached_    ? "" : "not") + "reached.");
+    yInfoVerbose("");
 
-    return false;
+    return vs_control_running_;
 }
 
 
 bool ServerVisualServoing::waitVisualServoingDone(const double period, const double timeout)
 {
-    yWarningVerbose("*** Service waitVisualServoingDone is unimplemented. ***");
+    yInfoVerbose("");
+    yInfoVerbose("*** Joining visual servoing control thread ***");
+    yInfoVerbose(" |> Controller: " + ConstString(vs_control_running_ ? "running." : "idle."));
+    yInfoVerbose(" |> Goal: "       + ConstString(vs_goal_reached_    ? "" : "not") + "reached.");
+    yInfoVerbose("");
 
-    return false;
+    return join();
 }
 
 
 bool ServerVisualServoing::stopController()
 {
+    yInfoVerbose("");
+    yInfoVerbose("*** Stopping visual servoing controller ***");
+    yInfoVerbose(" |> Controller: " + ConstString(vs_control_running_ ? "running." : "idle."));
+    yInfoVerbose(" |> Goal: "       + ConstString(vs_goal_reached_    ? "" : "not") + "reached.");
+    yInfoVerbose("");
+
     return stop();
 }
 
@@ -390,7 +404,14 @@ void ServerVisualServoing::beforeStart()
 bool ServerVisualServoing::threadInit()
 {
     yInfoVerbose("*** Thread::threadInit invoked ***");
-    yInfoVerbose("\n*** Running visual-servoing! ***\n");
+
+    vs_control_running_ = true;
+    vs_goal_reached_    = false;
+
+    yInfoVerbose("");
+    yInfoVerbose("*** Running visual-servoing! ***");
+    yInfoVerbose("");
+
     return true;
 }
 
@@ -427,8 +448,7 @@ void ServerVisualServoing::run()
     Vector px_ee_cur_orientation = zeros(12);
     Matrix jacobian_orientation  = zeros(12, 6);
 
-    bool is_vs_done = false;
-    while (!isStopping() && !is_vs_done)
+    while (!isStopping() && !vs_goal_reached_)
     {
         /* Get the initial end-effector pose from left eye view */
         estimates = port_pose_left_in_.read(true);
@@ -625,19 +645,22 @@ void ServerVisualServoing::run()
                                (std::abs(px_des_(9) - px_ee_cur_orientation(9)) < px_tol_) && (std::abs(px_des_(10) - px_ee_cur_orientation(10)) < px_tol_) && (std::abs(px_des_(11) - px_ee_cur_orientation(11)) < px_tol_));
 
         if (op_mode_ == OperatingMode::position)
-            is_vs_done = is_pos_done;
+            vs_goal_reached_ = is_pos_done;
         else if (op_mode_ == OperatingMode::orientation)
-            is_vs_done = is_orient_done;
+            vs_goal_reached_ = is_orient_done;
         else if (op_mode_ == OperatingMode::pose)
-            is_vs_done = is_pos_done && is_orient_done;
+            vs_goal_reached_ = is_pos_done && is_orient_done;
 
 
-        if (is_vs_done)
+        if (vs_goal_reached_)
         {
-            yInfoVerbose("\npx_des ="              + px_des_.toString());
-            yInfoVerbose("px_ee_cur_position ="    + px_ee_cur_position.toString());
-            yInfoVerbose("px_ee_cur_orientation =" + px_ee_cur_orientation.toString());
-            yInfoVerbose("\n*** TERMINATING! ***\n");
+            yInfoVerbose("");
+            yInfoVerbose("*** Goal reached! ***");
+            yInfoVerbose("px_des = "              + px_des_.toString());
+            yInfoVerbose("px_ee_cur_position = "    + px_ee_cur_position.toString());
+            yInfoVerbose("px_ee_cur_orientation = " + px_ee_cur_orientation.toString());
+            yInfoVerbose("*** ------------- ***");
+            yInfoVerbose("");
         }
 
 
@@ -693,12 +716,27 @@ void ServerVisualServoing::run()
 
     itf_rightarm_cart_->stopControl();
     itf_gaze_->stopControl();
+
+    vs_control_running_ = false;
 }
 
 
 void ServerVisualServoing::afterStart(bool success)
 {
     yInfoVerbose("*** Thread::afterStart invoked ***");
+
+    if (success)
+    {
+        yInfoVerbose("Visual servoing controller status report:");
+        yInfoVerbose(" |> Controller: " + ConstString(vs_control_running_ ? "running." : "idle."));
+        yInfoVerbose(" |> Goal: "       + ConstString(vs_goal_reached_    ? "" : "not") + "reached.");
+    }
+    else
+    {
+        yInfoVerbose("Visual servoing controller failed to start!");
+        vs_control_running_ = false;
+        vs_goal_reached_    = false;
+    }
 }
 
 
