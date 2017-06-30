@@ -130,7 +130,7 @@ bool ServerVisualServoing::open(Searchable &config)
     l_proj_(1, 2) = left_cy;
     l_proj_(2, 2) = 1.0;
 
-    yInfoVerbose("l_proj_ =\n" + l_proj_.toString());
+    yInfoVerbose("l_proj_ = [\n" + l_proj_.toString() + "]");
 
     float right_fx = static_cast<float>(cam_right_info->get(0).asDouble());
     float right_cx = static_cast<float>(cam_right_info->get(2).asDouble());
@@ -150,7 +150,7 @@ bool ServerVisualServoing::open(Searchable &config)
     r_proj_(1, 2) = right_cy;
     r_proj_(2, 2) = 1.0;
 
-    yInfoVerbose("r_proj_ =\n" + r_proj_.toString());
+    yInfoVerbose("r_proj_ = [\n" + r_proj_.toString() + "]");
 
 
     Vector left_eye_x;
@@ -161,10 +161,10 @@ bool ServerVisualServoing::open(Searchable &config)
     Vector right_eye_o;
     itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
-    yInfoVerbose("left_eye_o ="  + left_eye_o.toString());
-    yInfoVerbose("left_eye_x ="  + left_eye_x.toString());
-    yInfoVerbose("right_eye_o =" + right_eye_o.toString());
-    yInfoVerbose("right_eye_x =" + right_eye_x.toString());
+    yInfoVerbose("left_eye_o = "  + left_eye_o.toString());
+    yInfoVerbose("left_eye_x = "  + left_eye_x.toString());
+    yInfoVerbose("right_eye_o = " + right_eye_o.toString());
+    yInfoVerbose("right_eye_x = " + right_eye_x.toString());
 
 
     l_H_eye_to_r_ = axis2dcm(left_eye_o);
@@ -177,14 +177,14 @@ bool ServerVisualServoing::open(Searchable &config)
     r_H_eye_to_r_.setCol(3, right_eye_x);
     r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
 
-    yInfoVerbose("l_H_r_to_eye_ =\n" + l_H_r_to_eye_.toString());
-    yInfoVerbose("r_H_r_to_eye_ =\n" + r_H_r_to_eye_.toString());
+    yInfoVerbose("l_H_r_to_eye_ = [\n" + l_H_r_to_eye_.toString() + "]");
+    yInfoVerbose("r_H_r_to_eye_ = [\n" + r_H_r_to_eye_.toString() + "]");
 
     l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
     r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
 
-    yInfoVerbose("l_H_r_to_cam_ =\n" + l_H_r_to_cam_.toString());
-    yInfoVerbose("r_H_r_to_cam_ =\n" + r_H_r_to_cam_.toString());
+    yInfoVerbose("l_H_r_to_cam_ = [\n" + l_H_r_to_cam_.toString() + "]");
+    yInfoVerbose("r_H_r_to_cam_ = [\n" + r_H_r_to_cam_.toString() + "]");
 
 
     if (!setCommandPort())
@@ -1081,8 +1081,8 @@ bool ServerVisualServoing::get_sfm_points()
     Vector right_eye_o;
     itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
 
-    yInfoVerbose("left_eye_o ="  + left_eye_o.toString());
-    yInfoVerbose("right_eye_o =" + right_eye_o.toString());
+    yInfoVerbose("left_eye_o = "  + left_eye_o.toString());
+    yInfoVerbose("right_eye_o = " + right_eye_o.toString());
 
 
     l_H_eye_to_r_ = axis2dcm(left_eye_o);
@@ -1095,8 +1095,8 @@ bool ServerVisualServoing::get_sfm_points()
     r_H_eye_to_r_.setCol(3, right_eye_x);
     r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
 
-    yInfoVerbose("l_H_r_to_eye_ =\n" + l_H_r_to_eye_.toString());
-    yInfoVerbose("r_H_r_to_eye_ =\n" + r_H_r_to_eye_.toString());
+    yInfoVerbose("l_H_r_to_eye_ = [\n" + l_H_r_to_eye_.toString() + "]");
+    yInfoVerbose("r_H_r_to_eye_ = [\n" + r_H_r_to_eye_.toString() + "]");
 
     l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
     r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
@@ -1418,6 +1418,7 @@ bool ServerVisualServoing::setRightArmCartesianController()
         return false;
     }
     yInfoVerbose("Succesfully set ICartesianControl trajectory time!");
+
 
     if (!itf_rightarm_cart_->setInTargetTol(0.01))
     {
