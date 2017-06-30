@@ -5,21 +5,30 @@
 #include <yarp/dev/Drivers.h>
 #include <yarp/dev/IVisualServoing.h>
 #include <yarp/dev/PolyDriver.h>
+#include <yarp/math/Math.h>
 
 using namespace yarp::os;
 using namespace yarp::sig;
 using namespace yarp::dev;
+using namespace yarp::math;
 
 
 int main(int argc, char **argv)
 {
+    Network yarp;
+    if (!yarp.checkNetwork(3.0))
+    {
+        yError("YARP seems unavailable!");
+        return EXIT_FAILURE;
+    }
+
     DriverCreator *server_vs = new DriverCreatorOf<ServerVisualServoing>("server_visualsevoing", "", "ServerVisualServoing");
     Drivers::factory().add(server_vs);
 
     Property prop_server_vs;
     prop_server_vs.put("device",    "server_visualsevoing");
     prop_server_vs.put("verbosity", true);
-    prop_server_vs.put("robot",     "iCub");
+    prop_server_vs.put("robot",     "icubSim");
 
     PolyDriver drv_server_vs(prop_server_vs);
     if (!drv_server_vs.isValid())
@@ -35,6 +44,7 @@ int main(int argc, char **argv)
         yError("Could not get interfacate to ServerVisualServoing!");
         return EXIT_FAILURE;
     }
+
 
     return EXIT_SUCCESS;
 }

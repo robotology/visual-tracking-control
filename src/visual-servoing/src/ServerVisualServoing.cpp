@@ -55,14 +55,6 @@ bool ServerVisualServoing::open(Searchable &config)
         yInfoVerbose("|> Robot name: " + robot_name_);
 
 
-    Network yarp;
-    if (!yarp.checkNetwork(3.0))
-    {
-        yErrorVerbose("YARP seems unavailable!");
-        return false;
-    }
-
-
     if (!port_pose_left_in_.open("/visual-servoing/pose/left:i"))
     {
         yErrorVerbose("Could not open /visual-servoing/pose/left:i port! Closing.");
