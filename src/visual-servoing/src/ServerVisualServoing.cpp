@@ -1015,7 +1015,7 @@ void ServerVisualServoing::run()
         /* **************************************************** */
 
         /* EVALUATING CONTROL POINTS */
-        getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_x, l_px0_position, l_px1_position, l_px2_position, l_px3_position);
+        getControlPixelsFromPose(est_copy_left, CamSel::left, PixelControlMode::x, l_px0_position, l_px1_position, l_px2_position, l_px3_position);
 
         yInfoVerbose("Left (original position) control px0 = [" + l_px0_position.toString() + "]");
         yInfoVerbose("Left (original position) control px1 = [" + l_px1_position.toString() + "]");
@@ -1023,7 +1023,7 @@ void ServerVisualServoing::run()
         yInfoVerbose("Left (original position) control px3 = [" + l_px3_position.toString() + "]");
 
 
-        getControlPixelsFromPose(est_copy_left, CamSel::left, ControlPixelMode::origin_o, l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation);
+        getControlPixelsFromPose(est_copy_left, CamSel::left, PixelControlMode::o, l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation);
 
         yInfoVerbose("Left (original orientation) control px0 = [" + l_px0_orientation.toString() + "]");
         yInfoVerbose("Left (original orientation) control px1 = [" + l_px1_orientation.toString() + "]");
@@ -1031,7 +1031,7 @@ void ServerVisualServoing::run()
         yInfoVerbose("Left (original orientation) control px3 = [" + l_px3_orientation.toString() + "]");
 
 
-        getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_x, r_px0_position, r_px1_position, r_px2_position, r_px3_position);
+        getControlPixelsFromPose(est_copy_right, CamSel::right, PixelControlMode::x, r_px0_position, r_px1_position, r_px2_position, r_px3_position);
 
         yInfoVerbose("Right (original position) control px0 = [" + r_px0_position.toString() + "]");
         yInfoVerbose("Right (original position) control px1 = [" + r_px1_position.toString() + "]");
@@ -1039,7 +1039,7 @@ void ServerVisualServoing::run()
         yInfoVerbose("Right (original position) control px3 = [" + r_px3_position.toString() + "]");
 
 
-        getControlPixelsFromPose(est_copy_right, CamSel::right, ControlPixelMode::origin_o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
+        getControlPixelsFromPose(est_copy_right, CamSel::right, PixelControlMode::o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
 
         yInfoVerbose("Right (original orientation) control px0 = [" + r_px0_orientation.toString() + "]");
         yInfoVerbose("Right (original orientation) control px1 = [" + r_px1_orientation.toString() + "]");
@@ -1562,16 +1562,16 @@ bool ServerVisualServoing::unsetTorsoDOF()
 }
 
 
-void ServerVisualServoing::getControlPixelsFromPose(const Vector& pose, const CamSel cam, const ControlPixelMode mode, Vector& px0, Vector& px1, Vector& px2, Vector& px3)
+void ServerVisualServoing::getControlPixelsFromPose(const Vector& pose, const CamSel cam, const PixelControlMode mode, Vector& px0, Vector& px1, Vector& px2, Vector& px3)
 {
     yAssert(cam == CamSel::left || cam == CamSel::right);
-    yAssert(mode == ControlPixelMode::origin || mode == ControlPixelMode::origin_o || mode == ControlPixelMode::origin_x);
+    yAssert(mode == PixelControlMode::all || mode == PixelControlMode::x || mode == PixelControlMode::o);
 
 
     Vector control_pose = pose;
-    if (mode == ControlPixelMode::origin_x)
+    if (mode == PixelControlMode::x)
         control_pose.setSubvector(3, goal_pose_.subVector(3, 5));
-    else if (mode == ControlPixelMode::origin_o)
+    else if (mode == PixelControlMode::o)
         control_pose.setSubvector(0, goal_pose_.subVector(0, 2));
 
 

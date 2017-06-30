@@ -135,7 +135,7 @@ protected:
     /* Enum helpers */
     enum class CamSel { left, right };
 
-    enum class ControlPixelMode { origin, origin_x, origin_o };
+    enum class PixelControlMode { all, x, o };
 
     enum class OperatingMode { position, orientation, pose };
 
@@ -206,7 +206,7 @@ private:
 
     bool unsetTorsoDOF();
 
-    void getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel cam, const ControlPixelMode mode, yarp::sig::Vector& px0, yarp::sig::Vector& px1, yarp::sig::Vector& px2, yarp::sig::Vector& px3);
+    void getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel cam, const PixelControlMode mode, yarp::sig::Vector& px0, yarp::sig::Vector& px1, yarp::sig::Vector& px2, yarp::sig::Vector& px3);
 
     void getControlPointsFromPose(const yarp::sig::Vector& pose, yarp::sig::Vector& p0, yarp::sig::Vector& p1, yarp::sig::Vector& p2, yarp::sig::Vector& p3);
 
