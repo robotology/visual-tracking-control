@@ -154,7 +154,7 @@ private:
     bool                          vs_control_running_ = false;
     bool                          vs_goal_reached_    = false;
     const double                  Ts_                 = 0.1; /* [s] */
-    double                        K_x_                = 1.5;
+    double                        K_x_                = 0.75;
     double                        K_o_                = 1.5;
     double                        max_x_dot_          = 0.025; /* [m/s] */
     double                        max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
