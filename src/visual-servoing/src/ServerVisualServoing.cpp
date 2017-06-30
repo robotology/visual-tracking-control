@@ -396,6 +396,7 @@ std::vector<Vector> ServerVisualServoing::get3DPositionGoalFrom3DPose(const Vect
 
 /* ServerVisualServoingIDL overrides */
 /* Go to initial position (open-loop) */
+//!!!: hard-coded poses need to be deleted and parsed from an external file.
 bool ServerVisualServoing::storedInit(const std::string& label)
 {
     Vector xd       = zeros(3);
@@ -560,6 +561,7 @@ bool ServerVisualServoing::storedInit(const std::string& label)
 
 /* Set a fixed goal in pixel coordinates */
 /* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
+//!!!: hard-coded poses need to be deleted and parsed from an external file.
 bool ServerVisualServoing::storedGoToGoal(const std::string& label)
 {
     Vector left_eye_x;
@@ -731,7 +733,7 @@ bool ServerVisualServoing::storedGoToGoal(const std::string& label)
 
 /* Get 3D point from Structure From Motion clicking on the left camera image */
 /* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
-
+//!!!: this method may be deleted in a future relese
 bool ServerVisualServoing::goToSFMGoal()
 {
     Vector left_eye_x;
