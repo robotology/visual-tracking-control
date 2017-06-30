@@ -45,6 +45,10 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
+    visual_servoing->storedInit("sim2");
+    visual_servoing->storedGoToGoal("sim2");
+    visual_servoing->checkVisualServoingController();
+    visual_servoing->waitVisualServoingDone();
 
     return EXIT_SUCCESS;
 }

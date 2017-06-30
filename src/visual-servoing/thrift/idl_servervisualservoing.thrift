@@ -13,6 +13,8 @@ service ServerVisualServoingIDL
 {
     /**
      * Initialize the robot to an initial position.
+     * The initial positions are stored on an external file and are referenced
+     * by a unique label.
      *
      * @param label a label referring to one of the available initial positions;
      *              the string shall be one of the available modes returned
@@ -20,18 +22,20 @@ service ServerVisualServoingIDL
      *
      * @return true upon success, false otherwise.
      */
-    bool init(1:string label);
+    bool stored_init(1:string label);
 
     /**
      * Set the robot visual servoing goal.
+     * The goals are stored on an external file and are referenced by a unique
+     * label.
      *
-     * @param label a label referring to one of the available goal positions;
+     * @param label a label referring to one of the available goals;
      *              the string shall be one of the available modes returned
      *              by the get_info() method.
      *
      * @return true upon success, false otherwise.
      */
-    bool set_goal(1:string label);
+    bool stored_go_to_goal(1:string label);
 
     /**
      * Get goal point from SFM module. The point is taken by clicking on a
@@ -41,19 +45,10 @@ service ServerVisualServoingIDL
      *
      * @return true upon success, false otherwise.
      */
-    bool get_sfm_points();
+    bool get_goal_from_sfm();
 
     /**
-     * Start the visual servoing controller.
-     *
-     * @note This is a non-blocking function.
-     *
-     * @return true upon success, false otherwise.
-     */
-    bool go();
-
-    /**
-     * Gently close the application deallocating resources.
+     * Gently close the visual servoing server, deallocating resources.
      */
     bool quit();
 

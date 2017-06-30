@@ -70,6 +70,12 @@ public:
 
     std::vector<yarp::sig::Vector> get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o) override;
 
+    bool storedInit(const std::string& label) override;
+
+    bool storedGoToGoal(const std::string& label) override;
+
+    bool goToSFMGoal() override;
+
 protected:
     /* Thread overrides */
     void beforeStart() override;
@@ -86,21 +92,15 @@ protected:
 
 
     /* ServerVisualServoingIDL overrides */
-    /* TO MOVE */
-    bool init(const std::string& label) override;
+    /* EXPERIMENTAL */
+    bool stored_init(const std::string& label) override;
 
-    /* INTERESTING */
-    bool set_goal(const std::string& label) override;
+    bool stored_go_to_goal(const std::string& label) override;
 
-    bool go() override;
-
-    /* TO DELETE */
-    bool get_sfm_points() override;
-
+    bool get_goal_from_sfm() override;
 
     /* TO CONSIDER */
     bool quit() override;
-
 
     /* FROM INTERFACE */
     bool go_to_point_goal(const std::vector<double>& px_l, const std::vector<double>& px_r) override;
