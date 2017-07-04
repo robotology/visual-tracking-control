@@ -153,40 +153,6 @@ bool ServerVisualServoing::open(Searchable &config)
     yInfoVerbose("r_proj_ = [\n" + r_proj_.toString() + "]");
 
 
-    Vector left_eye_x;
-    Vector left_eye_o;
-    itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
-
-    Vector right_eye_x;
-    Vector right_eye_o;
-    itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
-
-    yInfoVerbose("left_eye_o = "  + left_eye_o.toString());
-    yInfoVerbose("left_eye_x = "  + left_eye_x.toString());
-    yInfoVerbose("right_eye_o = " + right_eye_o.toString());
-    yInfoVerbose("right_eye_x = " + right_eye_x.toString());
-
-
-    l_H_eye_to_r_ = axis2dcm(left_eye_o);
-    left_eye_x.push_back(1.0);
-    l_H_eye_to_r_.setCol(3, left_eye_x);
-    l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
-
-    r_H_eye_to_r_ = axis2dcm(right_eye_o);
-    right_eye_x.push_back(1.0);
-    r_H_eye_to_r_.setCol(3, right_eye_x);
-    r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
-
-    yInfoVerbose("l_H_r_to_eye_ = [\n" + l_H_r_to_eye_.toString() + "]");
-    yInfoVerbose("r_H_r_to_eye_ = [\n" + r_H_r_to_eye_.toString() + "]");
-
-    l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
-    r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
-
-    yInfoVerbose("l_H_r_to_cam_ = [\n" + l_H_r_to_cam_.toString() + "]");
-    yInfoVerbose("r_H_r_to_cam_ = [\n" + r_H_r_to_cam_.toString() + "]");
-
-
     if (!setCommandPort())
     {
         yErrorVerbose("Could not open /visual-servoing/cmd:i port! Closing.");
@@ -249,14 +215,16 @@ bool ServerVisualServoing::close()
 /* IVisualServoing overrides */
 bool ServerVisualServoing::goToGoal(const Vector& px_l, const Vector& px_r)
 {
-    // TODO: to implement based on start() and given Goal.
+    setGoal(px_l, px_r);
+
     return start();
 }
 
 
 bool ServerVisualServoing::goToGoal(const std::vector<Vector>& vec_px_l, const std::vector<Vector>& vec_px_r)
 {
-    // TODO: to implement based on start() and given Goal.
+    setGoal(vec_px_l, vec_px_r);
+
     return start();
 }
 
@@ -493,194 +461,65 @@ bool ServerVisualServoing::storedInit(const std::string& label)
         itf_gaze_->lookAtFixationPointSync(gaze_loc);
         itf_gaze_->waitMotionDone(0.1, 10.0);
         itf_gaze_->stopControl();
-        
-        itf_gaze_->storeContext(&ctx_gaze_);
     }
     else
         return false;
+
+    
+    itf_rightarm_cart_->restoreContext(ctx_remote_cart_);
+    itf_gaze_->restoreContext(ctx_remote_gaze_);
 
     return true;
 }
 
 
 /* Set a fixed goal in pixel coordinates */
-/* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
 //!!!: hard-coded poses need to be deleted and parsed from an external file.
 bool ServerVisualServoing::storedGoToGoal(const std::string& label)
 {
-    Vector left_eye_x;
-    Vector left_eye_o;
-    itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
-
-    Vector right_eye_x;
-    Vector right_eye_o;
-    itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
-
-    yInfoVerbose("left_eye_o = ["  + left_eye_o.toString()  + "]");
-    yInfoVerbose("right_eye_o = [" + right_eye_o.toString() + "]");
-
-
-    l_H_eye_to_r_ = axis2dcm(left_eye_o);
-    left_eye_x.push_back(1.0);
-    l_H_eye_to_r_.setCol(3, left_eye_x);
-    l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
-
-    r_H_eye_to_r_ = axis2dcm(right_eye_o);
-    right_eye_x.push_back(1.0);
-    r_H_eye_to_r_.setCol(3, right_eye_x);
-    r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
-
-    yInfoVerbose("l_H_r_to_eye_ = [\n" + l_H_r_to_eye_.toString() + "]");
-    yInfoVerbose("r_H_r_to_eye_ = [\n" + r_H_r_to_eye_.toString() + "]");
-
-    l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
-    r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
-
-
-    Vector p = zeros(6);
     if (label == "t170427")
     {
         /* -0.323 0.018 0.121 0.310 -0.873 0.374 3.008 */
-        p[0] = -0.323;
-        p[1] =  0.018;
-        p[2] =  0.121;
+        goal_pose_[0] = -0.323;
+        goal_pose_[1] =  0.018;
+        goal_pose_[2] =  0.121;
 
-        p[3] =  0.310 * 3.008;
-        p[4] = -0.873 * 3.008;
-        p[5] =  0.374 * 3.008;
+        goal_pose_[3] =  0.310 * 3.008;
+        goal_pose_[4] = -0.873 * 3.008;
+        goal_pose_[5] =  0.374 * 3.008;
     }
     else if (label == "t170517")
     {
         /* -0.284 0.013 0.104 -0.370 0.799 -0.471 2.781 */
-        p[0] = -0.284;
-        p[1] =  0.013;
-        p[2] =  0.104;
+        goal_pose_[0] = -0.284;
+        goal_pose_[1] =  0.013;
+        goal_pose_[2] =  0.104;
 
-        p[3] = -0.370 * 2.781;
-        p[4] =  0.799 * 2.781;
-        p[5] = -0.471 * 2.781;
+        goal_pose_[3] = -0.370 * 2.781;
+        goal_pose_[4] =  0.799 * 2.781;
+        goal_pose_[5] = -0.471 * 2.781;
     }
     else
         return false;
 
-    goal_pose_ = p;
-    yInfoVerbose("Goal: " + goal_pose_.toString());
+    yInfoVerbose("6D goal: " + goal_pose_.toString());
 
-    Vector p0 = zeros(4);
-    Vector p1 = zeros(4);
-    Vector p2 = zeros(4);
-    Vector p3 = zeros(4);
-    getControlPointsFromPose(p, p0, p1, p2, p3);
+    beforeStart();
 
-    yInfoVerbose("Goal px: [" + p0.toString() + ";" + p1.toString() + ";" + p2.toString() + ";" + p3.toString() + "];");
+    std::vector<Vector> l_control_px_from_pose = getControlPixelsFromPose(goal_pose_, CamSel::left,  PixelControlMode::all);
+    std::vector<Vector> r_control_px_from_pose = getControlPixelsFromPose(goal_pose_, CamSel::right, PixelControlMode::all);
+
+    setGoal(l_control_px_from_pose, r_control_px_from_pose);
 
 
-    Vector l_px0_goal = l_H_r_to_cam_ * p0;
-    l_px0_goal[0] /= l_px0_goal[2];
-    l_px0_goal[1] /= l_px0_goal[2];
-    Vector l_px1_goal = l_H_r_to_cam_ * p1;
-    l_px1_goal[0] /= l_px1_goal[2];
-    l_px1_goal[1] /= l_px1_goal[2];
-    Vector l_px2_goal = l_H_r_to_cam_ * p2;
-    l_px2_goal[0] /= l_px2_goal[2];
-    l_px2_goal[1] /= l_px2_goal[2];
-    Vector l_px3_goal = l_H_r_to_cam_ * p3;
-    l_px3_goal[0] /= l_px3_goal[2];
-    l_px3_goal[1] /= l_px3_goal[2];
-
-    l_px_goal_.resize(8);
-    l_px_goal_[0] = l_px0_goal[0];
-    l_px_goal_[1] = l_px0_goal[1];
-    l_px_goal_[2] = l_px1_goal[0];
-    l_px_goal_[3] = l_px1_goal[1];
-    l_px_goal_[4] = l_px2_goal[0];
-    l_px_goal_[5] = l_px2_goal[1];
-    l_px_goal_[6] = l_px3_goal[0];
-    l_px_goal_[7] = l_px3_goal[1];
-
-
-    Vector r_px0_goal = r_H_r_to_cam_ * p0;
-    r_px0_goal[0] /= r_px0_goal[2];
-    r_px0_goal[1] /= r_px0_goal[2];
-    Vector r_px1_goal = r_H_r_to_cam_ * p1;
-    r_px1_goal[0] /= r_px1_goal[2];
-    r_px1_goal[1] /= r_px1_goal[2];
-    Vector r_px2_goal = r_H_r_to_cam_ * p2;
-    r_px2_goal[0] /= r_px2_goal[2];
-    r_px2_goal[1] /= r_px2_goal[2];
-    Vector r_px3_goal = r_H_r_to_cam_ * p3;
-    r_px3_goal[0] /= r_px3_goal[2];
-    r_px3_goal[1] /= r_px3_goal[2];
-
-    r_px_goal_.resize(8);
-    r_px_goal_[0] = r_px0_goal[0];
-    r_px_goal_[1] = r_px0_goal[1];
-    r_px_goal_[2] = r_px1_goal[0];
-    r_px_goal_[3] = r_px1_goal[1];
-    r_px_goal_[4] = r_px2_goal[0];
-    r_px_goal_[5] = r_px2_goal[1];
-    r_px_goal_[6] = r_px3_goal[0];
-    r_px_goal_[7] = r_px3_goal[1];
-
-    yInfoVerbose("l_px_goal_ = [" + l_px_goal_.toString() + "]");
-    yInfoVerbose("r_px_goal_ = [" + r_px_goal_.toString() + "]");
-
-    px_des_.push_back(l_px_goal_[0]);    /* u_ee_l */
-    px_des_.push_back(r_px_goal_[0]);    /* u_ee_r */
-    px_des_.push_back(l_px_goal_[1]);    /* v_ee_l */
-
-    px_des_.push_back(l_px_goal_[2]);    /* u_x1_l */
-    px_des_.push_back(r_px_goal_[2]);    /* u_x1_r */
-    px_des_.push_back(l_px_goal_[3]);    /* v_x1_l */
-
-    px_des_.push_back(l_px_goal_[4]);    /* u_x2_l */
-    px_des_.push_back(r_px_goal_[4]);    /* u_x2_r */
-    px_des_.push_back(l_px_goal_[5]);    /* v_x2_l */
-
-    px_des_.push_back(l_px_goal_[6]);    /* u_x3_l */
-    px_des_.push_back(r_px_goal_[6]);    /* u_x3_r */
-    px_des_.push_back(l_px_goal_[7]);    /* v_x3_l */
-    
-    yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
-    
     return start();
 }
 
 
 /* Get 3D point from Structure From Motion clicking on the left camera image */
-/* PLUS: Compute again the roto-translation and projection matrices from root to left and right camera planes */
 //!!!: this method may be deleted in a future relese
 bool ServerVisualServoing::goToSFMGoal()
 {
-    Vector left_eye_x;
-    Vector left_eye_o;
-    itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
-
-    Vector right_eye_x;
-    Vector right_eye_o;
-    itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
-
-    yInfoVerbose("left_eye_o = "  + left_eye_o.toString());
-    yInfoVerbose("right_eye_o = " + right_eye_o.toString());
-
-
-    l_H_eye_to_r_ = axis2dcm(left_eye_o);
-    left_eye_x.push_back(1.0);
-    l_H_eye_to_r_.setCol(3, left_eye_x);
-    l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
-
-    r_H_eye_to_r_ = axis2dcm(right_eye_o);
-    right_eye_x.push_back(1.0);
-    r_H_eye_to_r_.setCol(3, right_eye_x);
-    r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
-
-    yInfoVerbose("l_H_r_to_eye_ = [\n" + l_H_r_to_eye_.toString() + "]");
-    yInfoVerbose("r_H_r_to_eye_ = [\n" + r_H_r_to_eye_.toString() + "]");
-
-    l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
-    r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
-
-
     Network yarp;
     Bottle  cmd;
     Bottle  rep;
@@ -721,84 +560,14 @@ bool ServerVisualServoing::goToSFMGoal()
         p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
 
         goal_pose_ = p;
-        yInfoVerbose("Goal: " + goal_pose_.toString());
+        yInfoVerbose("6D goal: " + goal_pose_.toString());
 
-        Vector p0 = zeros(4);
-        Vector p1 = zeros(4);
-        Vector p2 = zeros(4);
-        Vector p3 = zeros(4);
-        getControlPointsFromPose(p, p0, p1, p2, p3);
+        beforeStart();
 
-        yInfoVerbose("goal px: [" + p0.toString() + ";" + p1.toString() + ";" + p2.toString() + ";" + p3.toString() + "];");
+        std::vector<Vector> l_control_px_from_pose = getControlPixelsFromPose(goal_pose_, CamSel::left,  PixelControlMode::all);
+        std::vector<Vector> r_control_px_from_pose = getControlPixelsFromPose(goal_pose_, CamSel::right, PixelControlMode::all);
 
-
-        Vector l_px0_goal = l_H_r_to_cam_ * p0;
-        l_px0_goal[0] /= l_px0_goal[2];
-        l_px0_goal[1] /= l_px0_goal[2];
-        Vector l_px1_goal = l_H_r_to_cam_ * p1;
-        l_px1_goal[0] /= l_px1_goal[2];
-        l_px1_goal[1] /= l_px1_goal[2];
-        Vector l_px2_goal = l_H_r_to_cam_ * p2;
-        l_px2_goal[0] /= l_px2_goal[2];
-        l_px2_goal[1] /= l_px2_goal[2];
-        Vector l_px3_goal = l_H_r_to_cam_ * p3;
-        l_px3_goal[0] /= l_px3_goal[2];
-        l_px3_goal[1] /= l_px3_goal[2];
-
-        l_px_goal_.resize(8);
-        l_px_goal_[0] = l_px0_goal[0];
-        l_px_goal_[1] = l_px0_goal[1];
-        l_px_goal_[2] = l_px1_goal[0];
-        l_px_goal_[3] = l_px1_goal[1];
-        l_px_goal_[4] = l_px2_goal[0];
-        l_px_goal_[5] = l_px2_goal[1];
-        l_px_goal_[6] = l_px3_goal[0];
-        l_px_goal_[7] = l_px3_goal[1];
-
-
-        Vector r_px0_goal = r_H_r_to_cam_ * p0;
-        r_px0_goal[0] /= r_px0_goal[2];
-        r_px0_goal[1] /= r_px0_goal[2];
-        Vector r_px1_goal = r_H_r_to_cam_ * p1;
-        r_px1_goal[0] /= r_px1_goal[2];
-        r_px1_goal[1] /= r_px1_goal[2];
-        Vector r_px2_goal = r_H_r_to_cam_ * p2;
-        r_px2_goal[0] /= r_px2_goal[2];
-        r_px2_goal[1] /= r_px2_goal[2];
-        Vector r_px3_goal = r_H_r_to_cam_ * p3;
-        r_px3_goal[0] /= r_px3_goal[2];
-        r_px3_goal[1] /= r_px3_goal[2];
-
-        r_px_goal_.resize(8);
-        r_px_goal_[0] = r_px0_goal[0];
-        r_px_goal_[1] = r_px0_goal[1];
-        r_px_goal_[2] = r_px1_goal[0];
-        r_px_goal_[3] = r_px1_goal[1];
-        r_px_goal_[4] = r_px2_goal[0];
-        r_px_goal_[5] = r_px2_goal[1];
-        r_px_goal_[6] = r_px3_goal[0];
-        r_px_goal_[7] = r_px3_goal[1];
-
-        yInfoVerbose("l_px_goal_ = [" + l_px_goal_.toString() + "]");
-        yInfoVerbose("r_px_goal_ = [" + r_px_goal_.toString() + "]");
-
-        px_des_.push_back(l_px_goal_[0]);    /* u_ee_l */
-        px_des_.push_back(r_px_goal_[0]);    /* u_ee_r */
-        px_des_.push_back(l_px_goal_[1]);    /* v_ee_l */
-
-        px_des_.push_back(l_px_goal_[2]);    /* u_x1_l */
-        px_des_.push_back(r_px_goal_[2]);    /* u_x1_r */
-        px_des_.push_back(l_px_goal_[3]);    /* v_x1_l */
-
-        px_des_.push_back(l_px_goal_[4]);    /* u_x2_l */
-        px_des_.push_back(r_px_goal_[4]);    /* u_x2_r */
-        px_des_.push_back(l_px_goal_[5]);    /* v_x2_l */
-
-        px_des_.push_back(l_px_goal_[6]);    /* u_x3_l */
-        px_des_.push_back(r_px_goal_[6]);    /* u_x3_r */
-        px_des_.push_back(l_px_goal_[7]);    /* v_x3_l */
-
-        yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
+        setGoal(l_control_px_from_pose, r_control_px_from_pose);
     }
     else
         return false;
@@ -814,6 +583,34 @@ bool ServerVisualServoing::goToSFMGoal()
 void ServerVisualServoing::beforeStart()
 {
     yInfoVerbose("*** Thread::beforeStart invoked ***");
+
+    Vector left_eye_x;
+    Vector left_eye_o;
+    itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+
+    Vector right_eye_x;
+    Vector right_eye_o;
+    itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+
+    yInfoVerbose("left_eye_o = ["  + left_eye_o.toString()  + "]");
+    yInfoVerbose("right_eye_o = [" + right_eye_o.toString() + "]");
+
+
+    l_H_eye_to_r_ = axis2dcm(left_eye_o);
+    left_eye_x.push_back(1.0);
+    l_H_eye_to_r_.setCol(3, left_eye_x);
+    l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
+
+    r_H_eye_to_r_ = axis2dcm(right_eye_o);
+    right_eye_x.push_back(1.0);
+    r_H_eye_to_r_.setCol(3, right_eye_x);
+    r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
+
+    yInfoVerbose("l_H_r_to_eye_ = [\n" + l_H_r_to_eye_.toString() + "]");
+    yInfoVerbose("r_H_r_to_eye_ = [\n" + r_H_r_to_eye_.toString() + "]");
+
+    l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
+    r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
 }
 
 
@@ -1829,4 +1626,56 @@ Vector ServerVisualServoing::getAxisAngle(const Vector& v)
     aa.push_back(ang);
     
     return aa;
+}
+
+
+bool ServerVisualServoing::setGoal(const Vector& l_px_goal, const Vector& r_px_goal)
+{
+    l_px_goal_ = l_px_goal;
+    r_px_goal_ = r_px_goal;
+
+    yInfoVerbose("l_px_goal_ = [" + l_px_goal_.toString() + "]");
+    yInfoVerbose("r_px_goal_ = [" + r_px_goal_.toString() + "]");
+
+    px_des_[0]   = l_px_goal_[0];   /* u_x0_l */
+    px_des_[1]   = r_px_goal_[0];   /* u_x0_r */
+    px_des_[2]   = l_px_goal_[1];   /* v_x0_l */
+
+    px_des_[3]   = l_px_goal_[2];   /* u_x1_l */
+    px_des_[4]   = r_px_goal_[2];   /* u_x1_r */
+    px_des_[5]   = l_px_goal_[3];   /* v_x1_l */
+
+    px_des_[6]   = l_px_goal_[4];   /* u_x2_l */
+    px_des_[7]   = r_px_goal_[4];   /* u_x2_r */
+    px_des_[8]   = l_px_goal_[5];   /* v_x2_l */
+
+    px_des_[9]   = l_px_goal_[6];   /* u_x3_l */
+    px_des_[10]  = r_px_goal_[6];   /* u_x3_r */
+    px_des_[11]  = l_px_goal_[7];   /* v_x3_l */
+
+    yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
+
+    return true;
+}
+
+
+bool ServerVisualServoing::setGoal(const std::vector<Vector>& l_px_goal, const std::vector<Vector>& r_px_goal)
+{
+    return setGoal(collectionOfVector2Vector(l_px_goal), collectionOfVector2Vector(r_px_goal));
+}
+
+
+Vector ServerVisualServoing::collectionOfVector2Vector(const std::vector<Vector>& vectors)
+{
+    Vector out_vec = zeros(vectors.size() * 2);
+
+    unsigned int offset = 0;
+    for (Vector in_vec : vectors)
+    {
+        out_vec[2 * offset + 0] = in_vec[0];
+        out_vec[2 * offset + 1] = in_vec[1];
+        ++offset;
+    }
+
+    return out_vec;
 }
