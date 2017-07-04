@@ -401,10 +401,13 @@ std::vector<Vector> ServerVisualServoing::getPixelPositionGoalFrom3DPose(const V
 
 
 /* ServerVisualServoingIDL overrides */
-/* Go to initial position (open-loop) */
 //!!!: hard-coded poses need to be deleted and parsed from an external file.
 bool ServerVisualServoing::storedInit(const std::string& label)
 {
+    itf_rightarm_cart_->restoreContext(ctx_local_cart_);
+    itf_gaze_->restoreContext(ctx_local_gaze_);
+
+
     Vector xd       = zeros(3);
     Vector od       = zeros(4);
     Vector gaze_loc = zeros(3);
@@ -483,8 +486,6 @@ bool ServerVisualServoing::storedInit(const std::string& label)
         itf_rightarm_cart_->removeTipFrame();
 
         unsetTorsoDOF();
-
-        itf_rightarm_cart_->storeContext(&ctx_cart_);
         
         
         yInfoVerbose("Fixation point: " + gaze_loc.toString());
@@ -833,13 +834,14 @@ bool ServerVisualServoing::threadInit()
 
 void ServerVisualServoing::run()
 {
+    /* Restoring cartesian and gaze context */
+    itf_rightarm_cart_->restoreContext(ctx_local_cart_);
+    itf_gaze_->restoreContext(ctx_local_gaze_);
+
+
     Vector  est_copy_left(6);
     Vector  est_copy_right(6);
     Vector* estimates;
-
-    /* Restoring cartesian and gaze context */
-    itf_rightarm_cart_->restoreContext(ctx_cart_);
-    itf_gaze_->restoreContext(ctx_gaze_);
 
     Vector l_px0_position    = zeros(2);
     Vector l_px1_position    = zeros(2);
@@ -1136,6 +1138,12 @@ void ServerVisualServoing::run()
     itf_rightarm_cart_->stopControl();
     itf_gaze_->stopControl();
 
+
+    /* Restoring remote cartesian and gaze context */
+    itf_rightarm_cart_->restoreContext(ctx_remote_cart_);
+    itf_gaze_->restoreContext(ctx_remote_gaze_);
+
+
     vs_control_running_ = false;
 }
 
@@ -1386,6 +1394,15 @@ bool ServerVisualServoing::setRightArmCartesianController()
         return false;
     }
 
+
+    if (!itf_rightarm_cart_->storeContext(&ctx_remote_cart_))
+    {
+        yErrorVerbose("Error storing remote ICartesianControl context.");
+        return false;
+    }
+    yInfoVerbose("Remote ICartesianControl context stored!");
+
+
     if (!itf_rightarm_cart_->setTrajTime(traj_time_))
     {
         yErrorVerbose("Error setting ICartesianControl trajectory time.");
@@ -1399,7 +1416,32 @@ bool ServerVisualServoing::setRightArmCartesianController()
         yErrorVerbose("Error setting ICartesianControl target tolerance.");
         return false;
     }
-    yInfoVerbose("Succesfully set ICartesianControl target tolerance!");
+    yInfoVerbose("Succesfully set ICartesianControl target tolerance.");
+
+
+    if (!unsetTorsoDOF())
+    {
+        yErrorVerbose("Unable to change torso DOF.");
+        return false;
+    }
+    yInfoVerbose("Succesfully changed torso DOF.");
+
+
+    if (!itf_rightarm_cart_->storeContext(&ctx_local_cart_))
+    {
+        yErrorVerbose("Error storing local ICartesianControl context.");
+        return false;
+    }
+    yInfoVerbose("Local ICartesianControl context stored.");
+
+
+    if (!itf_rightarm_cart_->restoreContext(ctx_remote_cart_))
+    {
+        yErrorVerbose("Error restoring remote ICartesianControl context.");
+        return false;
+    }
+    yInfoVerbose("Remote ICartesianControl context restored.");
+
 
     return true;
 }
@@ -1427,6 +1469,31 @@ bool ServerVisualServoing::setGazeController()
         yErrorVerbose("Gaze control device not available.");
         return false;
     }
+
+
+    if (!itf_gaze_->storeContext(&ctx_remote_gaze_))
+    {
+        yErrorVerbose("Error storing remote IGazeControl context.");
+        return false;
+    }
+    yInfoVerbose("Remote IGazeControl context stored.");
+
+
+    if (!itf_gaze_->storeContext(&ctx_local_gaze_))
+    {
+        yErrorVerbose("Error storing local IGazeControl context.");
+        return false;
+    }
+    yInfoVerbose("Local IGazeControl context stored.");
+
+
+    if (!itf_gaze_->restoreContext(ctx_remote_gaze_))
+    {
+        yErrorVerbose("Error restoring remote IGazeControl context.");
+        return false;
+    }
+    yInfoVerbose("Remote IGazeControl context restored.");
+
 
     return true;
 }
@@ -1469,10 +1536,8 @@ bool ServerVisualServoing::setTorsoDOF()
     newDOF[1] = 1;
     newDOF[2] = 1;
     if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
-    {
-        yErrorVerbose("Unable to set torso DOF.");
         return false;
-    }
+
     yInfoVerbose("New DOF: [" + curDOF.toString(0) + "]");
     
     return true;
@@ -1491,10 +1556,8 @@ bool ServerVisualServoing::unsetTorsoDOF()
     newDOF[1] = 0;
     newDOF[2] = 0;
     if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
-    {
-        yErrorVerbose("Unable to set torso DOF.");
         return false;
-    }
+
     yInfoVerbose("New DOF: [" + curDOF.toString(0) + "]");
     
     return true;
@@ -1645,6 +1708,7 @@ std::vector<Vector> ServerVisualServoing::getControlPointsFromPose(const Vector&
 Vector ServerVisualServoing::getPixelFromPoint(const CamSel cam, const Vector& p) const
 {
     yAssert(cam == CamSel::left || cam == CamSel::right);
+
 
     Vector px;
 
