@@ -136,9 +136,8 @@ protected:
 
     std::vector<std::vector<double>> get_pixel_position_goal_from_3D_pose(const std::vector<double> & x, const std::vector<double> & o, const std::string& cam) override;
 
-    /* Enum helpers */
-    enum class CamSel { left, right };
 
+    /* Enum helpers */
     enum class PixelControlMode { all, x, o };
 
     enum class OperatingMode { position, orientation, pose };
