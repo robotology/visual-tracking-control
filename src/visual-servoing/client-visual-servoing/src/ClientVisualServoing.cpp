@@ -1,4 +1,4 @@
-#include "ServerVisualServoing.h"
+#include "ClientVisualServoing.h"
 
 #include <cmath>
 #include <iostream>
@@ -457,10 +457,10 @@ bool ServerVisualServoing::storedInit(const std::string& label)
         itf_rightarm_cart_->removeTipFrame();
 
         unsetTorsoDOF();
-        
-        
+
+
         yInfoVerbose("Fixation point: " + gaze_loc.toString());
-        
+
         itf_gaze_->lookAtFixationPointSync(gaze_loc);
         itf_gaze_->waitMotionDone(0.1, 10.0);
         itf_gaze_->stopControl();
@@ -468,7 +468,7 @@ bool ServerVisualServoing::storedInit(const std::string& label)
     else
         return false;
 
-    
+
     itf_rightarm_cart_->restoreContext(ctx_remote_cart_);
     itf_gaze_->restoreContext(ctx_remote_gaze_);
 
@@ -574,10 +574,10 @@ bool ServerVisualServoing::goToSFMGoal()
     }
     else
         return false;
-    
+
     yarp.disconnect("/visual-servoing/tosfm", "/SFM/rpc");
     port_sfm.close();
-    
+
     return start();
 }
 
@@ -1302,7 +1302,7 @@ bool ServerVisualServoing::setTorsoDOF()
         return false;
 
     yInfoVerbose("New DOF: [" + curDOF.toString(0) + "]");
-    
+
     return true;
 }
 
@@ -1322,7 +1322,7 @@ bool ServerVisualServoing::unsetTorsoDOF()
         return false;
 
     yInfoVerbose("New DOF: [" + curDOF.toString(0) + "]");
-    
+
     return true;
 }
 
@@ -1453,7 +1453,7 @@ void ServerVisualServoing::getCurrentStereoFeaturesAndJacobian(const std::vector
 Vector ServerVisualServoing::getJacobianU(const CamSel cam, const Vector& px)
 {
     Vector jacobian = zeros(6);
-    
+
     if (cam == CamSel::left)
     {
         jacobian(0) = l_proj_(0, 0) / px(2);
@@ -1470,7 +1470,7 @@ Vector ServerVisualServoing::getJacobianU(const CamSel cam, const Vector& px)
         jacobian(4) = (pow(r_proj_(0, 0), 2.0) + pow(px(0) - r_proj_(0, 2), 2.0)) / r_proj_(0, 0);
         jacobian(5) = - r_proj_(0, 0) / r_proj_(1, 1) * (px(1) - r_proj_(1, 2));
     }
-    
+
     return jacobian;
 }
 
@@ -1478,7 +1478,7 @@ Vector ServerVisualServoing::getJacobianU(const CamSel cam, const Vector& px)
 Vector ServerVisualServoing::getJacobianV(const CamSel cam, const Vector& px)
 {
     Vector jacobian = zeros(6);
-    
+
     if (cam == CamSel::left)
     {
         jacobian(1) = l_proj_(1, 1) / px(2);
@@ -1495,7 +1495,7 @@ Vector ServerVisualServoing::getJacobianV(const CamSel cam, const Vector& px)
         jacobian(4) = ((px(0) - r_proj_(0, 2)) * (px(1) - r_proj_(1, 2))) / r_proj_(0, 0);
         jacobian(5) = r_proj_(1, 1) / r_proj_(0, 0) * (px(0) - r_proj_(0, 2));
     }
-    
+
     return jacobian;
 }
 
@@ -1505,7 +1505,7 @@ Vector ServerVisualServoing::getAxisAngle(const Vector& v)
     double ang  = norm(v);
     Vector aa   = v / ang;
     aa.push_back(ang);
-    
+
     return aa;
 }
 
