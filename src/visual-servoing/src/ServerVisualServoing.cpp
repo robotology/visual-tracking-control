@@ -1325,19 +1325,39 @@ bool ServerVisualServoing::set_max_orientation_velocity(const double max_o_dot)
 
 std::vector<std::vector<double>> ServerVisualServoing::get_3D_position_goal_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o)
 {
-    std::vector<std::vector<double>> vec_goal_points;
+    yAssert(x.size() != 3);
+    yAssert(o.size() != 4);
 
-    if (x.size() != 3 || o.size() != 4)
-        return vec_goal_points;
 
     Vector yx(x.size(), x.data());
     Vector yo(o.size(), o.data());
-    std::vector<Vector> yvec_goal_points = get3DPositionGoalFrom3DPose(yx, yo);
+    std::vector<Vector> yvec_3d_goal_points = get3DPositionGoalFrom3DPose(yx, yo);
 
-    for (Vector yvec_goal : yvec_goal_points)
-        vec_goal_points.emplace_back(std::vector<double>(yvec_goal.data(), yvec_goal.data() + yvec_goal.size()));
+    std::vector<std::vector<double>> vec_3d_goal_points;
+    for (Vector yvec_3d_goal : yvec_3d_goal_points)
+        vec_3d_goal_points.emplace_back(std::vector<double>(yvec_3d_goal.data(), yvec_3d_goal.data() + yvec_3d_goal.size()));
 
-    return vec_goal_points;
+    return vec_3d_goal_points;
+}
+
+
+std::vector<std::vector<double>> ServerVisualServoing::get_pixel_position_goal_from_3D_pose(const std::vector<double> & x, const std::vector<double> & o, const std::string& cam)
+{
+    yAssert(x.size() != 3);
+    yAssert(o.size() != 4);
+    yAssert(cam == "left" || cam == "right");
+
+
+    Vector yx(x.size(), x.data());
+    Vector yo(o.size(), o.data());
+    CamSel e_cam = cam == "left" ? CamSel::left : CamSel::right;
+    std::vector<Vector> yvec_px_goal_points = getPixelPositionGoalFrom3DPose(yx, yo, e_cam);
+
+    std::vector<std::vector<double>> vec_px_goal_points;
+    for (Vector yvec_px_goal : yvec_px_goal_points)
+        vec_px_goal_points.emplace_back(std::vector<double>(yvec_px_goal.data(), yvec_px_goal.data() + yvec_px_goal.size()));
+
+    return vec_px_goal_points;
 }
 
 

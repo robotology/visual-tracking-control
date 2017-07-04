@@ -201,18 +201,30 @@ service ServerVisualServoingIDL
     bool set_max_orientation_velocity(1: double max_o_dot);
 
     /**
-     * Helper function: extract three Cartesian points goal_points lying on
-     * the plane defined by the frame o in the position x relative to the robot
-     * base frame.
+     * Helper function: extract four Cartesian points lying on the plane defined
+     * by the frame o in the position x relative to the robot base frame.
+     *
+     * @param x a 3D vector which is filled with the actual position x,y,z [m].
+     * @param o a 4D vector which is filled with the actual orientation using
+     *          axis-angle representation xa, ya, za, theta [rad].
+     *
+     * @return a collection of four Cartesian points (position only) extracted
+     *         by the plane defined by x and o.
+     */
+    list<list<double>> get_3D_position_goal_from_3D_pose(1: list<double> x, 2: list<double> o);
+
+    /**
+     * Helper function: extract four 2D pixel points lying on the plane defined
+     * by the frame o in the position x relative to the robot base frame.
      *
      * @param x a 3D vector which is filled with the actual position x,y,z [m].
      * @param o a 4D vector which is filled with the actual orientation using
      *          axis-angle representation xa, ya, za, theta [m]/[rad].
-     * @param vec_goal_points
+     * @param cam either "left" or "right" to select left or right camera.
      *
      * @return a collection of three Cartesian points (position only) extracted
      *         by the plane defined by x and o.
      */
-    list<list<double>> get_3D_position_goal_from_3D_pose(1: list<double> x, 2: list<double> o);
+    list<list<double>> get_pixel_position_goal_from_3D_pose(1: list<double> x, 2: list<double> o, 3: string cam);
 
 }
