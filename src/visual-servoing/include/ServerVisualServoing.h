@@ -144,6 +144,8 @@ protected:
 
 private:
     bool                          verbosity_ = false;
+    //!!!: rimuovere o gestire meglio la simulazione
+    bool                          sim_       = false;
     yarp::os::ConstString         robot_name_;
 
     OperatingMode                 op_mode_ = OperatingMode::pose;

@@ -41,6 +41,9 @@ bool ServerVisualServoing::open(Searchable &config)
     verbosity_ = config.check("verbosity", Value(false)).asBool();
     yInfo("|> Verbosity: " + ConstString(verbosity_? "ON" : "OFF"));
 
+    sim_ = config.check("simulate", Value(false)).asBool();
+    yInfo("|> Simulation: " + ConstString(sim_? "TRUE" : "FALSE"));
+
 
     yInfoVerbose("*** Configuring ServerVisualServoing ***");
 
@@ -662,37 +665,42 @@ void ServerVisualServoing::run()
     Vector px_ee_cur_orientation = zeros(12);
     Matrix jacobian_orientation  = zeros(12, 6);
 
+    bool do_once = false;
     while (!isStopping() && !vs_goal_reached_)
     {
-        /* Get the initial end-effector pose from left eye view */
-        estimates = port_pose_left_in_.read(true);
-        yInfoVerbose("Got [" + estimates->toString() + "] from left eye particle filter.");
-        if (estimates->length() == 7)
+        if (!do_once)
         {
-            est_copy_left = estimates->subVector(0, 5);
-            float ang     = (*estimates)[6];
+            /* Get the initial end-effector pose from left eye view */
+            estimates = port_pose_left_in_.read(true);
+            yInfoVerbose("Got [" + estimates->toString() + "] from left eye particle filter.");
+            if (estimates->length() == 7)
+            {
+                est_copy_left = estimates->subVector(0, 5);
+                float ang     = (*estimates)[6];
 
-            est_copy_left[3] *= ang;
-            est_copy_left[4] *= ang;
-            est_copy_left[5] *= ang;
+                est_copy_left[3] *= ang;
+                est_copy_left[4] *= ang;
+                est_copy_left[5] *= ang;
+            }
+            else
+                est_copy_left = *estimates;
+
+            /* Get the initial end-effector pose from right eye view */
+            estimates = port_pose_right_in_.read(true);
+            yInfoVerbose("Got [" + estimates->toString() + "] from right eye particle filter.");
+            if (estimates->length() == 7)
+            {
+                est_copy_right = estimates->subVector(0, 5);
+                float ang      = (*estimates)[6];
+
+                est_copy_right[3] *= ang;
+                est_copy_right[4] *= ang;
+                est_copy_right[5] *= ang;
+            }
+            else
+                est_copy_right = *estimates;
         }
-        else
-            est_copy_left = *estimates;
-
-        /* Get the initial end-effector pose from right eye view */
-        estimates = port_pose_right_in_.read(true);
-        yInfoVerbose("Got [" + estimates->toString() + "] from right eye particle filter.");
-        if (estimates->length() == 7)
-        {
-            est_copy_right = estimates->subVector(0, 5);
-            float ang      = (*estimates)[6];
-
-            est_copy_right[3] *= ang;
-            est_copy_right[4] *= ang;
-            est_copy_right[5] *= ang;
-        }
-        else
-            est_copy_right = *estimates;
+        if (sim_) do_once = true;
 
         yInfoVerbose("EE estimates left  = [" + est_copy_left.toString()  + "]");
         yInfoVerbose("EE estimates right = [" + est_copy_right.toString() + "]");
@@ -806,44 +814,50 @@ void ServerVisualServoing::run()
         vel_o(3) *= K_o_;
 
 
-        if (op_mode_ == OperatingMode::position)
-            itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
-        else if (op_mode_ == OperatingMode::orientation)
-            itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
-        else if (op_mode_ == OperatingMode::pose)
-            itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+        if (!sim_)
+        {
+            if (op_mode_ == OperatingMode::position)
+                itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
+            else if (op_mode_ == OperatingMode::orientation)
+                itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
+            else if (op_mode_ == OperatingMode::pose)
+                itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+        }
 
 
         /* *********************** SIM ************************ */
-//        /* Simulate reaching starting from the initial position */
-//        /* 1) Get the initial end-effector pose from left/right eye view: must execute only once */
-//        /* 2) itf_rightarm_cart_->setTaskVelocities() calls: must be commented */
-//
-//        /* Evaluate the new orientation vector from axis-angle representation */
-//        /* The following code is a copy of the setTaskVelocities() code */
-//        Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
-//        Matrix l_R = axis2dcm(l_o);
-//        Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
-//        Matrix r_R = axis2dcm(r_o);
-//
-//        vel_o[3] *= Ts_;
-//        l_R = axis2dcm(vel_o) * l_R;
-//        r_R = axis2dcm(vel_o) * r_R;
-//
-//        Vector l_new_o = dcm2axis(l_R);
-//        double l_ang = l_new_o(3);
-//        l_new_o.pop_back();
-//        l_new_o *= l_ang;
-//
-//        Vector r_new_o = dcm2axis(r_R);
-//        double r_ang = r_new_o(3);
-//        r_new_o.pop_back();
-//        r_new_o *= r_ang;
-//
-//        est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
-//        est_copy_left.setSubvector(3, l_new_o);
-//        est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
-//        est_copy_right.setSubvector(3, r_new_o);
+        if (sim_)
+        {
+            /* Simulate reaching starting from the initial position */
+            /* 1) Get the initial end-effector pose from left/right eye view: must execute only once */
+            /* 2) itf_rightarm_cart_->setTaskVelocities() calls: must be commented */
+
+            /* Evaluate the new orientation vector from axis-angle representation */
+            /* The following code is a copy of the setTaskVelocities() code */
+            Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
+            Matrix l_R = axis2dcm(l_o);
+            Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
+            Matrix r_R = axis2dcm(r_o);
+
+            vel_o[3] *= Ts_;
+            l_R = axis2dcm(vel_o) * l_R;
+            r_R = axis2dcm(vel_o) * r_R;
+
+            Vector l_new_o = dcm2axis(l_R);
+            double l_ang = l_new_o(3);
+            l_new_o.pop_back();
+            l_new_o *= l_ang;
+
+            Vector r_new_o = dcm2axis(r_R);
+            double r_ang = r_new_o(3);
+            r_new_o.pop_back();
+            r_new_o *= r_ang;
+
+            est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
+            est_copy_left.setSubvector(3, l_new_o);
+            est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
+            est_copy_right.setSubvector(3, r_new_o);
+        }
         /* **************************************************** */
 
 
