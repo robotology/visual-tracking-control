@@ -48,7 +48,7 @@ bool ServerVisualServoing::open(Searchable &config)
     yInfoVerbose("*** Configuring ServerVisualServoing ***");
 
 
-    robot_name_ = config.find("robot").asString();
+    robot_name_ = config.check("robot", Value("icub")).asString();
     if (robot_name_.empty())
     {
         yErrorVerbose("Robot name not provided! Closing.");
@@ -649,23 +649,6 @@ void ServerVisualServoing::run()
     std::vector<Vector> r_px_position;
     std::vector<Vector> r_px_orientation;
 
-//    Vector l_px0_position    = zeros(2);
-//    Vector l_px1_position    = zeros(2);
-//    Vector l_px2_position    = zeros(2);
-//    Vector l_px3_position    = zeros(2);
-//    Vector l_px0_orientation = zeros(2);
-//    Vector l_px1_orientation = zeros(2);
-//    Vector l_px2_orientation = zeros(2);
-//    Vector l_px3_orientation = zeros(2);
-//    Vector r_px0_position    = zeros(2);
-//    Vector r_px1_position    = zeros(2);
-//    Vector r_px2_position    = zeros(2);
-//    Vector r_px3_position    = zeros(2);
-//    Vector r_px0_orientation = zeros(2);
-//    Vector r_px1_orientation = zeros(2);
-//    Vector r_px2_orientation = zeros(2);
-//    Vector r_px3_orientation = zeros(2);
-
     Vector px_ee_cur_position    = zeros(12);
     Matrix jacobian_position     = zeros(12, 6);
     Vector px_ee_cur_orientation = zeros(12);
@@ -716,14 +699,8 @@ void ServerVisualServoing::run()
         l_px_position    = getControlPixelsFromPose(est_copy_left, CamSel::left, PixelControlMode::x);
         l_px_orientation = getControlPixelsFromPose(est_copy_left, CamSel::left, PixelControlMode::o);
 
-//        getControlPixelsFromPose(est_copy_left, CamSel::left, PixelControlMode::x, l_px0_position, l_px1_position, l_px2_position, l_px3_position);
-//        getControlPixelsFromPose(est_copy_left, CamSel::left, PixelControlMode::o, l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation);
-
         r_px_position    = getControlPixelsFromPose(est_copy_right, CamSel::right, PixelControlMode::x);
         r_px_orientation = getControlPixelsFromPose(est_copy_right, CamSel::right, PixelControlMode::o);
-
-//        getControlPixelsFromPose(est_copy_right, CamSel::right, PixelControlMode::x, r_px0_position, r_px1_position, r_px2_position, r_px3_position);
-//        getControlPixelsFromPose(est_copy_right, CamSel::right, PixelControlMode::o, r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation);
 
 
         yInfoVerbose("px_des_ = [" + px_des_.toString() + "]");
@@ -732,10 +709,6 @@ void ServerVisualServoing::run()
         getCurrentStereoFeaturesAndJacobian(l_px_position, r_px_position,
                                             px_ee_cur_position, jacobian_position);
 
-//        getCurrentStereoFeaturesAndJacobian(l_px0_position, l_px1_position, l_px2_position, l_px3_position,
-//                                            r_px0_position, r_px1_position, r_px2_position, r_px3_position,
-//                                            px_ee_cur_position, jacobian_position);
-
         yInfoVerbose("px_ee_cur_position = [" + px_ee_cur_position.toString() + "]");
         yInfoVerbose("jacobian_position  = [\n" + jacobian_position.toString() + "]");
 
@@ -743,10 +716,6 @@ void ServerVisualServoing::run()
         /* FEATURES AND JACOBIAN (original orientation) */
         getCurrentStereoFeaturesAndJacobian(l_px_orientation, r_px_orientation,
                                             px_ee_cur_orientation, jacobian_orientation);
-
-//        getCurrentStereoFeaturesAndJacobian(l_px0_orientation, l_px1_orientation, l_px2_orientation, l_px3_orientation,
-//                                            r_px0_orientation, r_px1_orientation, r_px2_orientation, r_px3_orientation,
-//                                            px_ee_cur_orientation, jacobian_orientation);
 
         yInfoVerbose("px_ee_cur_orientation = [" + px_ee_cur_orientation.toString() + "]");
         yInfoVerbose("jacobian_orientation  = [\n" + jacobian_orientation.toString() + "]");
@@ -1358,33 +1327,6 @@ bool ServerVisualServoing::unsetTorsoDOF()
 }
 
 
-//void ServerVisualServoing::getControlPixelsFromPose(const Vector& pose, const CamSel cam, const PixelControlMode mode, Vector& px0, Vector& px1, Vector& px2, Vector& px3)
-//{
-//    yAssert(cam == CamSel::left || cam == CamSel::right);
-//    yAssert(mode == PixelControlMode::all || mode == PixelControlMode::x || mode == PixelControlMode::o);
-//
-//
-//    Vector control_pose = pose;
-//    if (mode == PixelControlMode::x)
-//        control_pose.setSubvector(3, goal_pose_.subVector(3, 5));
-//    else if (mode == PixelControlMode::o)
-//        control_pose.setSubvector(0, goal_pose_.subVector(0, 2));
-//
-//
-//    Vector control_p0 = zeros(4);
-//    Vector control_p1 = zeros(4);
-//    Vector control_p2 = zeros(4);
-//    Vector control_p3 = zeros(4);
-//    getControlPointsFromPose(control_pose, control_p0, control_p1, control_p2, control_p3);
-//
-//
-//    px0 = getPixelFromPoint(cam, control_p0);
-//    px1 = getPixelFromPoint(cam, control_p1);
-//    px2 = getPixelFromPoint(cam, control_p2);
-//    px3 = getPixelFromPoint(cam, control_p3);
-//}
-
-
 std::vector<Vector> ServerVisualServoing::getControlPixelsFromPose(const Vector& pose, const CamSel cam, const PixelControlMode mode)
 {
     yAssert(cam == CamSel::left || cam == CamSel::right);
@@ -1405,54 +1347,6 @@ std::vector<Vector> ServerVisualServoing::getControlPixelsFromPose(const Vector&
 
     return control_px_from_pose;
 }
-
-
-//void ServerVisualServoing::getControlPointsFromPose(const Vector& pose, Vector& p0, Vector& p1, Vector& p2, Vector& p3)
-//{
-//    Vector ee_x = pose.subVector(0, 2);
-//    ee_x.push_back(1.0);
-//    double ang  = norm(pose.subVector(3, 5));
-//    Vector ee_o = pose.subVector(3, 5) / ang;
-//    ee_o.push_back(ang);
-//
-//    Matrix H_ee_to_root = axis2dcm(ee_o);
-//    H_ee_to_root.setCol(3, ee_x);
-//
-//
-//    Vector p = zeros(4);
-//
-//    p(0) =  0;
-//    p(1) = -0.015;
-//    p(2) =  0;
-//    p(3) =  1.0;
-//
-//    p0 = zeros(4);
-//    p0 = H_ee_to_root * p;
-//
-//    p(0) = 0;
-//    p(1) = 0.015;
-//    p(2) = 0;
-//    p(3) = 1.0;
-//
-//    p1 = zeros(4);
-//    p1 = H_ee_to_root * p;
-//
-//    p(0) = -0.035;
-//    p(1) =  0.015;
-//    p(2) =  0;
-//    p(3) =  1.0;
-//
-//    p2 = zeros(4);
-//    p2 = H_ee_to_root * p;
-//
-//    p(0) = -0.035;
-//    p(1) = -0.015;
-//    p(2) =  0;
-//    p(3) =  1.0;
-//
-//    p3 = zeros(4);
-//    p3 = H_ee_to_root * p;
-//}
 
 
 std::vector<Vector> ServerVisualServoing::getControlPointsFromPose(const Vector& pose)
@@ -1516,54 +1410,6 @@ Vector ServerVisualServoing::getPixelFromPoint(const CamSel cam, const Vector& p
 
     return px;
 }
-
-
-//void ServerVisualServoing::getCurrentStereoFeaturesAndJacobian(const Vector& left_px0,  const Vector& left_px1,  const Vector& left_px2,  const Vector& left_px3,
-//                                                               const Vector& right_px0, const Vector& right_px1, const Vector& right_px2, const Vector& right_px3,
-//                                                               Vector& features, Matrix& jacobian)
-//{
-//    if (features.length() != 12)
-//        features.resize(12);
-//
-//    if (jacobian.rows() != 12 || jacobian.cols() != 6)
-//        jacobian.resize(12, 6);
-//
-//
-//    /* FEATURES */
-//    features[0]  = left_px0 [0];    /* u_ee_l */
-//    features[1]  = right_px0[0];    /* u_ee_r */
-//    features[2]  = left_px0 [1];    /* v_ee_l */
-//
-//    features[3]  = left_px1 [0];    /* u_x1_l */
-//    features[4]  = right_px1[0];    /* u_x1_r */
-//    features[5]  = left_px1 [1];    /* v_x1_l */
-//
-//    features[6]  = left_px2 [0];    /* u_x2_l */
-//    features[7]  = right_px2[0];    /* u_x2_r */
-//    features[8]  = left_px2 [1];    /* v_x2_l */
-//
-//    features[9]  = left_px3 [0];    /* u_x3_l */
-//    features[10] = right_px3[0];    /* u_x3_r */
-//    features[11] = left_px3 [1];    /* v_x3_l */
-//
-//
-//    /* JACOBIAN */
-//    jacobian.setRow(0,  getJacobianU(CamSel::left,  left_px0));
-//    jacobian.setRow(1,  getJacobianU(CamSel::right, right_px0));
-//    jacobian.setRow(2,  getJacobianV(CamSel::left,  left_px0));
-//
-//    jacobian.setRow(3,  getJacobianU(CamSel::left,  left_px1));
-//    jacobian.setRow(4,  getJacobianU(CamSel::right, right_px1));
-//    jacobian.setRow(5,  getJacobianV(CamSel::left,  left_px1));
-//
-//    jacobian.setRow(6,  getJacobianU(CamSel::left,  left_px2));
-//    jacobian.setRow(7,  getJacobianU(CamSel::right, right_px2));
-//    jacobian.setRow(8,  getJacobianV(CamSel::left,  left_px2));
-//
-//    jacobian.setRow(9,  getJacobianU(CamSel::left,  left_px3));
-//    jacobian.setRow(10, getJacobianU(CamSel::right, right_px3));
-//    jacobian.setRow(11, getJacobianV(CamSel::left,  left_px3));
-//}
 
 
 void ServerVisualServoing::getCurrentStereoFeaturesAndJacobian(const std::vector<Vector>& left_px,  const std::vector<Vector>& right_px,
