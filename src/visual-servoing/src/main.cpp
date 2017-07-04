@@ -28,7 +28,8 @@ int main(int argc, char **argv)
     Property prop_server_vs;
     prop_server_vs.put("device",    "server_visualsevoing");
     prop_server_vs.put("verbosity", true);
-    prop_server_vs.put("robot",     "icub");
+    prop_server_vs.put("simulate",  true);
+    prop_server_vs.put("robot",     "icubSim");
 
     PolyDriver drv_server_vs(prop_server_vs);
     if (!drv_server_vs.isValid())
@@ -45,7 +46,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    visual_servoing->storedInit("t170517");
+    visual_servoing->storedInit("t170427");
     visual_servoing->storedGoToGoal("t170517");
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
