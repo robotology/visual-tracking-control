@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     }
 
     visual_servoing->storedInit("t170427");
-    visual_servoing->storedGoToGoal("t170517");
+    visual_servoing->storedGoToGoal("t170427");
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
 
