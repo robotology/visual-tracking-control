@@ -1508,6 +1508,28 @@ void ServerVisualServoing::getControlPixelsFromPose(const Vector& pose, const Ca
 }
 
 
+std::vector<Vector> ServerVisualServoing::getControlPixelsFromPose(const Vector& pose, const CamSel cam, const PixelControlMode mode)
+{
+    yAssert(cam == CamSel::left || cam == CamSel::right);
+    yAssert(mode == PixelControlMode::all || mode == PixelControlMode::x || mode == PixelControlMode::o);
+
+
+    Vector control_pose = pose;
+    if (mode == PixelControlMode::x)
+        control_pose.setSubvector(3, goal_pose_.subVector(3, 5));
+    else if (mode == PixelControlMode::o)
+        control_pose.setSubvector(0, goal_pose_.subVector(0, 2));
+
+    std::vector<Vector> control_pt_from_pose = getControlPointsFromPose(control_pose);
+
+    std::vector<Vector> control_px_from_pose;
+    for (Vector v : control_pt_from_pose)
+        control_px_from_pose.emplace_back(getPixelFromPoint(cam, v));
+
+    return control_px_from_pose;
+}
+
+
 void ServerVisualServoing::getControlPointsFromPose(const Vector& pose, Vector& p0, Vector& p1, Vector& p2, Vector& p3)
 {
     Vector ee_x = pose.subVector(0, 2);
@@ -1553,6 +1575,50 @@ void ServerVisualServoing::getControlPointsFromPose(const Vector& pose, Vector& 
 
     p3 = zeros(4);
     p3 = H_ee_to_root * p;
+}
+
+
+std::vector<Vector> ServerVisualServoing::getControlPointsFromPose(const Vector& pose)
+{
+    Vector ee_x = pose.subVector(0, 2);
+    ee_x.push_back(1.0);
+    double ang  = norm(pose.subVector(3, 5));
+    Vector ee_o = pose.subVector(3, 5) / ang;
+    ee_o.push_back(ang);
+
+    Matrix H_ee_to_root = axis2dcm(ee_o);
+    H_ee_to_root.setCol(3, ee_x);
+
+
+    Vector p = zeros(4);
+    std::vector<Vector> control_pt_from_pose;
+
+    p(0) =  0;
+    p(1) = -0.015;
+    p(2) =  0;
+    p(3) =  1.0;
+    control_pt_from_pose.emplace_back(H_ee_to_root * p);
+
+    p(0) = 0;
+    p(1) = 0.015;
+    p(2) = 0;
+    p(3) = 1.0;
+    control_pt_from_pose.emplace_back(H_ee_to_root * p);
+
+    p(0) = -0.035;
+    p(1) =  0.015;
+    p(2) =  0;
+    p(3) =  1.0;
+    control_pt_from_pose.emplace_back(H_ee_to_root * p);
+
+    p(0) = -0.035;
+    p(1) = -0.015;
+    p(2) =  0;
+    p(3) =  1.0;
+    control_pt_from_pose.emplace_back(H_ee_to_root * p);
+
+
+    return control_pt_from_pose;
 }
 
 
