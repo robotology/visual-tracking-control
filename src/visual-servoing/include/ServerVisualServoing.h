@@ -11,6 +11,7 @@
 #include <yarp/dev/IEncoders.h>
 #include <yarp/dev/IVisualServoing.h>
 #include <yarp/dev/PolyDriver.h>
+#include <yarp/math/Math.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
 #include <yarp/os/ConstString.h>
@@ -160,7 +161,7 @@ private:
     double                        max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
     double                        px_tol_             = 10.0;
 
-    yarp::sig::Vector             goal_pose_;
+    yarp::sig::Vector             goal_pose_ = yarp::math::zeros(6);
     yarp::sig::Matrix             l_proj_;
     yarp::sig::Matrix             r_proj_;
     yarp::sig::Matrix             l_H_r_to_eye_;
@@ -172,9 +173,9 @@ private:
     yarp::sig::Matrix             px_to_cartesian_;
 
     double                        traj_time_ = 3.0;
-    yarp::sig::Vector             l_px_goal_;
-    yarp::sig::Vector             r_px_goal_;
-    yarp::sig::Vector             px_des_;
+    yarp::sig::Vector             l_px_goal_ = yarp::math::zeros(8);
+    yarp::sig::Vector             r_px_goal_ = yarp::math::zeros(8);
+    yarp::sig::Vector             px_des_    = yarp::math::zeros(12);
 
     int                           ctx_cart_;
     int                           ctx_gaze_;
