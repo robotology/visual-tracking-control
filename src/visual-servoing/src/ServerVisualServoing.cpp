@@ -370,25 +370,31 @@ bool ServerVisualServoing::setMaxOrientationVelocity(const float max_o_dot)
 
 std::vector<Vector> ServerVisualServoing::get3DPositionGoalFrom3DPose(const Vector& x, const Vector& o)
 {
-    std::vector<Vector> vec_goal_points;
+    yAssert(x.length() != 3);
+    yAssert(o.length() != 4);
 
-    if (x.length() != 3 || o.length() != 4)
-        return vec_goal_points;
 
     Vector pose(7);
     pose.setSubvector(0, x);
     pose.setSubvector(3, o);
 
-    Vector p0 = zeros(4);
-    Vector p1 = zeros(4);
-    Vector p2 = zeros(4);
-    Vector p3 = zeros(4);
-    getControlPointsFromPose(pose, p0, p1, p2, p3);
+    std::vector<Vector> vec_goal_points = getControlPointsFromPose(pose);
 
-    vec_goal_points.push_back(p0);
-    vec_goal_points.push_back(p1);
-    vec_goal_points.push_back(p2);
-    vec_goal_points.push_back(p3);
+    return vec_goal_points;
+}
+
+
+std::vector<Vector> ServerVisualServoing::getPixelPositionGoalFrom3DPose(const Vector& x, const Vector& o, const CamSel& cam)
+{
+    yAssert(x.length() != 3);
+    yAssert(o.length() != 4);
+
+
+    Vector pose(7);
+    pose.setSubvector(0, x);
+    pose.setSubvector(3, o);
+
+    std::vector<Vector> vec_goal_points = getControlPixelsFromPose(pose, cam, PixelControlMode::all);
 
     return vec_goal_points;
 }
