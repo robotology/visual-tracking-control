@@ -1186,7 +1186,7 @@ bool ServerVisualServoing::setRightArmCartesianController()
     Property rightarm_cartesian_options;
     rightarm_cartesian_options.put("device", "cartesiancontrollerclient");
     rightarm_cartesian_options.put("local",  "/visual-servoing/cart_right_arm");
-    rightarm_cartesian_options.put("remote", "/"+robot_name_+"/cartesianController/right_arm");
+    rightarm_cartesian_options.put("remote", "/" + robot_name_ + "/cartesianController/right_arm");
 
     rightarm_cartesian_driver_.open(rightarm_cartesian_options);
     if (rightarm_cartesian_driver_.isValid())

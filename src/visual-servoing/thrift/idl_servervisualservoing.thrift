@@ -56,25 +56,27 @@ service ServerVisualServoingIDL
 
     /* NEW METHODS FROM IVISUALSERVOING */
     /**
-    * Set the goal point on both left and right camera image plane and start
+    * Set the goal points on both left and right camera image plane and start
     * visual servoing.
     *
-    * @param px_l a 2D vector which contains the (u,v) coordinates of the pixel
-    *             within the left image plane.
-    * @param px_r a 2D vector which contains the (u,v) coordinates of the pixel
-    *             within the right image plane.
+    * @param px_l a 8D vector which contains the (u,v) coordinates of the pixels
+    *             within the left image plane. Pixels are to be provided
+    *             sequentially, i.e. (u1, v1, u2, v2, ...).
+    * @param px_r a 8D vector which contains the (u,v) coordinates of the pixels
+    *             within the right image plane. Pixels are to be provided
+    *             sequentially, i.e. (u1, v1, u2, v2, ...).
     *
     * @return true/false on success/failure.
     */
     bool go_to_point_goal(1: list<double> px_l, 2: list<double> px_r);
 
     /**
-    * Set the plane goal defined by three pixel points on both left and right
-    * camera image plane and start visual servoing.
+    * Set the goal points on both left and right camera image plane and start
+    * visual servoing.
     *
-    * @param vec_px_l a collection of three 2D vectors which contains the (u,v)
+    * @param vec_px_l a collection of four 2D vectors which contains the (u,v)
     *                 coordinates of the pixels within the left image plane.
-    * @param vec_px_r a collection of three 2D vectors which contains the (u,v)
+    * @param vec_px_r a collection of four 2D vectors which contains the (u,v)
     *                 coordinates of the pixels within the right image plane.
     *
     * @return true/false on success/failure.
