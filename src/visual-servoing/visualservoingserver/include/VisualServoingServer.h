@@ -1,10 +1,10 @@
-#ifndef SERVERVISUALSERVOING_H
-#define SERVERVISUALSERVOING_H
+#ifndef VISUALSERVOINGSERVER_H
+#define VISUALSERVOINGSERVER_H
 
 #include <cmath>
 #include <vector>
 
-#include <thrift/ClientVisualServoingIDL.h>
+#include <thrift/VisualServoingServerIDL.h>
 #include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/DeviceDriver.h>
@@ -24,16 +24,16 @@
 #include <yarp/sig/Vector.h>
 
 
-class ServerVisualServoing : public    yarp::dev::DeviceDriver,
+class VisualServoingServer : public    yarp::dev::DeviceDriver,
                              public    yarp::dev::IVisualServoing,
                              protected yarp::os::Thread,
-                             public    ClientVisualServoingIDL
+                             public    VisualServoingServerIDL
 {
 public:
     /* Ctors and Dtors */
-    ServerVisualServoing();
+    VisualServoingServer();
 
-    ~ServerVisualServoing();
+    ~VisualServoingServer();
 
 
     /* DeviceDriver overrides */
@@ -94,7 +94,7 @@ protected:
     void threadRelease() override;
 
 
-    /* ServerVisualServoingIDL overrides */
+    /* VisualServoingServerIDL overrides */
     /* EXPERIMENTAL */
     bool stored_init(const std::string& label) override;
 
@@ -239,4 +239,4 @@ private:
     void yErrorVerbose  (const yarp::os::ConstString& str) const { if(verbosity_) yError(str);   };
 };
 
-#endif /* SERVERVISUALSERVOING_H */
+#endif /* VISUALSERVOINGSERVER_H */

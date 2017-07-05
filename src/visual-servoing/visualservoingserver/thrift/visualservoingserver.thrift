@@ -1,15 +1,15 @@
 # Copyright: (C) 2017 iCub Facility - Istituto Italiano di Tecnologia
 # Authors: Claudio Fantacci
 #
-# idl_servervisualservoing.thrift
+# visualservoingserver.thrift
 
 /**
- * ServerVisualServoingIDL
+ * VisualServoingServerIDL
  *
  * IDL Interface to \ref ServerVisualServoing functionalities.
  */
 
-service ServerVisualServoingIDL
+service VisualServoingServerIDL
 {
     /**
      * Initialize the robot to an initial position.

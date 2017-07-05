@@ -1,5 +1,3 @@
-#include "ServerVisualServoing.h"
-
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Property.h>
 #include <yarp/dev/Drivers.h>
@@ -12,6 +10,7 @@ using namespace yarp::sig;
 using namespace yarp::dev;
 using namespace yarp::math;
 
+YARP_DECLARE_PLUGINS(visualservoingplugin);
 
 int main(int argc, char **argv)
 {
@@ -22,11 +21,10 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    DriverCreator *server_vs = new DriverCreatorOf<ServerVisualServoing>("server_visualsevoing", "", "ServerVisualServoing");
-    Drivers::factory().add(server_vs);
+    YARP_REGISTER_PLUGINS(visualservoingplugin);
 
     Property prop_server_vs;
-    prop_server_vs.put("device",    "server_visualsevoing");
+    prop_server_vs.put("device",    "visualservoingserver");
     prop_server_vs.put("verbosity", true);
     prop_server_vs.put("simulate",  true);
     prop_server_vs.put("robot",     "icubSim");
@@ -34,7 +32,7 @@ int main(int argc, char **argv)
     PolyDriver drv_server_vs(prop_server_vs);
     if (!drv_server_vs.isValid())
     {
-        yError("Could not run ServerVisualServoing!");
+        yError("Could not run VisualServoingServer!");
         return EXIT_FAILURE;
     }
 
@@ -42,7 +40,7 @@ int main(int argc, char **argv)
     drv_server_vs.view(visual_servoing);
     if (visual_servoing == YARP_NULLPTR)
     {
-        yError("Could not get interfacate to ServerVisualServoing!");
+        yError("Could not get interfacate to VisualServoingServer!");
         return EXIT_FAILURE;
     }
 

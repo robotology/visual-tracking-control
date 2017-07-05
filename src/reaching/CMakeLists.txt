@@ -7,8 +7,7 @@ find_package(SuperimposeMesh REQUIRED)
 find_package(YARP            REQUIRED)
 
 LIST(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
-                              ${ICUB_MODULE_PATH}
-                              ${ICUBCONTRIB_MODULE_PATH})
+                              ${ICUB_MODULE_PATH})
 
 include(YarpInstallationHelpers)
 
