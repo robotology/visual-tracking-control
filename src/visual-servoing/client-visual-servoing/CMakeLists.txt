@@ -1,9 +1,7 @@
 set(EXE_TARGET_NAME client-visual-servoing)
 
-find_package(glew            REQUIRED)
 find_package(ICUB            REQUIRED)
 find_package(OpenCV          REQUIRED)
-find_package(SuperimposeMesh REQUIRED)
 find_package(YARP            REQUIRED)
 
 LIST(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
@@ -38,10 +36,9 @@ target_link_libraries(${EXE_TARGET_NAME} ctrlLib
                                          ${ICUB_LIBRARIES}
                                          iKin
                                          ${OpenCV_LIBS}
-                                         SuperimposeMesh::SuperimposeMesh
                                          ${YARP_LIBRARIES})
 
-target_compile_features(${EXE_TARGET_NAME} PUBLIC cxx_nullptr cxx_constexpr)
+target_compile_features(${EXE_TARGET_NAME} PUBLIC cxx_override cxx_range_for)
 
 set(${EXE_TARGET_NAME}_APP
         ${PROJECT_SOURCE_DIR}/app/visual-servoing.xml
