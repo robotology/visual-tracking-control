@@ -22,7 +22,7 @@ include(ICUBcontribOptions)
 icubcontrib_set_default_prefix()
 icubcontrib_add_uninstall_target()
 
-option(BUILD_TESTING "Create tests using CMake" OFF)
+option(BUILD_TESTING "Build CMake tests" OFF)
 if(BUILD_TESTING)
     enable_testing()
 endif()
