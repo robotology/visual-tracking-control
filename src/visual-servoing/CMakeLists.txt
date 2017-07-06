@@ -10,6 +10,7 @@ yarp_begin_plugin_library(visualservoingplugin)
     option(BUILD_VISUAL_SERVOING_CLIENT "Build visual-servoing-client YARP plugin" OFF)
     if(BUILD_VISUAL_SERVOING_CLIENT)
         add_subdirectory(visualservoingclient)
+        add_subdirectory(visualservoingclient-app)
     endif()
 
     option(BUILD_VISUAL_SERVOING_SERVER "Build visual-servoing-server YARP plugin" OFF)
