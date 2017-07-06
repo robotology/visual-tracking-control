@@ -4,12 +4,12 @@
 # visualservoingserver.thrift
 
 /**
- * VisualServoingServerIDL
+ * VisualServoingIDL
  *
  * IDL Interface to \ref ServerVisualServoing functionalities.
  */
 
-service VisualServoingServerIDL
+service VisualServoingIDL
 {
     /**
      * Initialize the robot to an initial position.
@@ -59,21 +59,6 @@ service VisualServoingServerIDL
     * Set the goal points on both left and right camera image plane and start
     * visual servoing.
     *
-    * @param px_l a 8D vector which contains the (u,v) coordinates of the pixels
-    *             within the left image plane. Pixels are to be provided
-    *             sequentially, i.e. (u1, v1, u2, v2, ...).
-    * @param px_r a 8D vector which contains the (u,v) coordinates of the pixels
-    *             within the right image plane. Pixels are to be provided
-    *             sequentially, i.e. (u1, v1, u2, v2, ...).
-    *
-    * @return true/false on success/failure.
-    */
-    bool go_to_point_goal(1: list<double> px_l, 2: list<double> px_r);
-
-    /**
-    * Set the goal points on both left and right camera image plane and start
-    * visual servoing.
-    *
     * @param vec_px_l a collection of four 2D vectors which contains the (u,v)
     *                 coordinates of the pixels within the left image plane.
     * @param vec_px_r a collection of four 2D vectors which contains the (u,v)
@@ -81,7 +66,7 @@ service VisualServoingServerIDL
     *
     * @return true/false on success/failure.
     */
-    bool go_to_plane_goal(1: list<list<double>> vec_px_l, 2: list<list<double>> vec_px_r);
+    bool go_to_goal(1: list<list<double>> vec_px_l, 2: list<list<double>> vec_px_r);
 
     /**
      *  Set visual servoing operating mode between:

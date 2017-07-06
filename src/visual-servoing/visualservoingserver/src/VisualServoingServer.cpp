@@ -216,14 +216,6 @@ bool VisualServoingServer::close()
 
 
 /* IVisualServoing overrides */
-bool VisualServoingServer::goToGoal(const Vector& px_l, const Vector& px_r)
-{
-    setGoal(px_l, px_r);
-
-    return start();
-}
-
-
 bool VisualServoingServer::goToGoal(const std::vector<Vector>& vec_px_l, const std::vector<Vector>& vec_px_r)
 {
     setGoal(vec_px_l, vec_px_r);
@@ -984,16 +976,7 @@ bool VisualServoingServer::quit()
 }
 
 
-bool VisualServoingServer::go_to_point_goal(const std::vector<double>& px_l, const std::vector<double>& px_r)
-{
-    if (px_l.size() != 6 || px_r.size() != 6)
-        return false;
-
-    return goToGoal(Vector(px_l.size(), px_l.data()), Vector(px_r.size(), px_r.data()));
-}
-
-
-bool VisualServoingServer::go_to_plane_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r)
+bool VisualServoingServer::go_to_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r)
 {
     if (vec_px_l.size() != 3 || vec_px_l.size() != 3)
         return false;

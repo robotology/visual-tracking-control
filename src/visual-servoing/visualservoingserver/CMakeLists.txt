@@ -25,7 +25,7 @@ set(${PLUGIN_TARGET_NAME}_CONF
         conf/visualservoingserver.ini)
 
 set(${PLUGIN_TARGET_NAME}_THRIFT_HDR
-        thrift/visualservoingserver.thrift)
+        thrift/visualservoing.thrift)
 
 # Plugin target calls
 yarp_add_idl(${PLUGIN_TARGET_NAME}_THRIFT_SRC ${${PLUGIN_TARGET_NAME}_THRIFT_HDR})

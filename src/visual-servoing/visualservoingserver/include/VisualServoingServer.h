@@ -1,10 +1,11 @@
 #ifndef VISUALSERVOINGSERVER_H
 #define VISUALSERVOINGSERVER_H
 
+#include "thrift/VisualServoingIDL.h"
+
 #include <cmath>
 #include <vector>
 
-#include <thrift/VisualServoingServerIDL.h>
 #include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/DeviceDriver.h>
@@ -27,7 +28,7 @@
 class VisualServoingServer : public    yarp::dev::DeviceDriver,
                              public    yarp::dev::IVisualServoing,
                              protected yarp::os::Thread,
-                             public    VisualServoingServerIDL
+                             public    VisualServoingIDL
 {
 public:
     /* Ctors and Dtors */
@@ -43,8 +44,6 @@ public:
 
 
     /* IVisualServoing overrides */
-    bool goToGoal(const yarp::sig::Vector& px_l, const yarp::sig::Vector& px_r) override;
-
     bool goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r) override;
 
     bool setModality(const std::string& mode) override;
@@ -94,7 +93,7 @@ protected:
     void threadRelease() override;
 
 
-    /* VisualServoingServerIDL overrides */
+    /* VisualServoingIDL overrides */
     /* EXPERIMENTAL */
     bool stored_init(const std::string& label) override;
 
@@ -106,9 +105,7 @@ protected:
     bool quit() override;
 
     /* FROM INTERFACE */
-    bool go_to_point_goal(const std::vector<double>& px_l, const std::vector<double>& px_r) override;
-
-    bool go_to_plane_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r) override;
+    bool go_to_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r) override;
 
     bool set_modality(const std::string& mode) override;
 
