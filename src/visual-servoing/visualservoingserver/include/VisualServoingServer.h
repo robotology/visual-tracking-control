@@ -17,7 +17,7 @@
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Port.h>
-#include <yarp/os/RateThread.h>
+#include <yarp/os/Thread.h>
 #include <yarp/os/Searchable.h>
 #include <yarp/sig/Image.h>
 #include <yarp/sig/Matrix.h>
