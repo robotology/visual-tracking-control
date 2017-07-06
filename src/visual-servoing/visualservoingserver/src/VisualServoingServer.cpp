@@ -1,8 +1,5 @@
 #include "VisualServoingServer.h"
 
-#include <cmath>
-#include <iostream>
-
 #include <iCub/ctrl/minJerkCtrl.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -515,7 +512,6 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
 //!!!: this method may be deleted in a future relese
 bool VisualServoingServer::goToSFMGoal()
 {
-    Network yarp;
     Bottle  cmd;
     Bottle  rep;
 
@@ -526,7 +522,7 @@ bool VisualServoingServer::goToSFMGoal()
 
     RpcClient port_sfm;
     port_sfm.open("/visual-servoing/tosfm");
-    yarp.connect("/visual-servoing/tosfm", "/SFM/rpc");
+    Network::connect("/visual-servoing/tosfm", "/SFM/rpc");
 
     cmd.clear();
 
@@ -567,7 +563,7 @@ bool VisualServoingServer::goToSFMGoal()
     else
         return false;
 
-    yarp.disconnect("/visual-servoing/tosfm", "/SFM/rpc");
+    Network::disconnect("/visual-servoing/tosfm", "/SFM/rpc");
     port_sfm.close();
 
     return start();
@@ -1129,37 +1125,37 @@ bool VisualServoingServer::setRightArmCartesianController()
         rightarm_cartesian_driver_.view(itf_rightarm_cart_);
         if (!itf_rightarm_cart_)
         {
-            yErrorVerbose("Error getting ICartesianControl interface.");
+            yErrorVerbose("Error getting ICartesianControl interface!");
             return false;
         }
         yInfoVerbose("cartesiancontrollerclient succefully opened.");
     }
     else
     {
-        yErrorVerbose("Error opening cartesiancontrollerclient device.");
+        yErrorVerbose("Error opening cartesiancontrollerclient device!");
         return false;
     }
 
 
     if (!itf_rightarm_cart_->storeContext(&ctx_remote_cart_))
     {
-        yErrorVerbose("Error storing remote ICartesianControl context.");
+        yErrorVerbose("Error storing remote ICartesianControl context!");
         return false;
     }
-    yInfoVerbose("Remote ICartesianControl context stored!");
+    yInfoVerbose("Remote ICartesianControl context stored.");
 
 
     if (!itf_rightarm_cart_->setTrajTime(traj_time_))
     {
-        yErrorVerbose("Error setting ICartesianControl trajectory time.");
+        yErrorVerbose("Error setting ICartesianControl trajectory time!");
         return false;
     }
-    yInfoVerbose("Succesfully set ICartesianControl trajectory time!");
+    yInfoVerbose("Succesfully set ICartesianControl trajectory time.");
 
 
     if (!itf_rightarm_cart_->setInTargetTol(0.01))
     {
-        yErrorVerbose("Error setting ICartesianControl target tolerance.");
+        yErrorVerbose("Error setting ICartesianControl target tolerance!");
         return false;
     }
     yInfoVerbose("Succesfully set ICartesianControl target tolerance.");
@@ -1167,7 +1163,7 @@ bool VisualServoingServer::setRightArmCartesianController()
 
     if (!unsetTorsoDOF())
     {
-        yErrorVerbose("Unable to change torso DOF.");
+        yErrorVerbose("Unable to change torso DOF!");
         return false;
     }
     yInfoVerbose("Succesfully changed torso DOF.");
@@ -1175,7 +1171,7 @@ bool VisualServoingServer::setRightArmCartesianController()
 
     if (!itf_rightarm_cart_->storeContext(&ctx_local_cart_))
     {
-        yErrorVerbose("Error storing local ICartesianControl context.");
+        yErrorVerbose("Error storing local ICartesianControl context!");
         return false;
     }
     yInfoVerbose("Local ICartesianControl context stored.");
@@ -1183,7 +1179,7 @@ bool VisualServoingServer::setRightArmCartesianController()
 
     if (!itf_rightarm_cart_->restoreContext(ctx_remote_cart_))
     {
-        yErrorVerbose("Error restoring remote ICartesianControl context.");
+        yErrorVerbose("Error restoring remote ICartesianControl context!");
         return false;
     }
     yInfoVerbose("Remote ICartesianControl context restored.");
@@ -1206,20 +1202,20 @@ bool VisualServoingServer::setGazeController()
         gaze_driver_.view(itf_gaze_);
         if (!itf_gaze_)
         {
-            yErrorVerbose("Error getting IGazeControl interface.");
+            yErrorVerbose("Error getting IGazeControl interface!");
             return false;
         }
     }
     else
     {
-        yErrorVerbose("Gaze control device not available.");
+        yErrorVerbose("Gaze control device not available!");
         return false;
     }
 
 
     if (!itf_gaze_->storeContext(&ctx_remote_gaze_))
     {
-        yErrorVerbose("Error storing remote IGazeControl context.");
+        yErrorVerbose("Error storing remote IGazeControl contex!");
         return false;
     }
     yInfoVerbose("Remote IGazeControl context stored.");
@@ -1227,7 +1223,7 @@ bool VisualServoingServer::setGazeController()
 
     if (!itf_gaze_->storeContext(&ctx_local_gaze_))
     {
-        yErrorVerbose("Error storing local IGazeControl context.");
+        yErrorVerbose("Error storing local IGazeControl context!");
         return false;
     }
     yInfoVerbose("Local IGazeControl context stored.");
@@ -1235,7 +1231,7 @@ bool VisualServoingServer::setGazeController()
 
     if (!itf_gaze_->restoreContext(ctx_remote_gaze_))
     {
-        yErrorVerbose("Error restoring remote IGazeControl context.");
+        yErrorVerbose("Error restoring remote IGazeControl context!");
         return false;
     }
     yInfoVerbose("Remote IGazeControl context restored.");
@@ -1247,18 +1243,20 @@ bool VisualServoingServer::setGazeController()
 
 bool VisualServoingServer::setCommandPort()
 {
-    std::cout << "Opening RPC command port." << std::endl;
+    yInfoVerbose("Opening RPC command port.");
+
     if (!port_rpc_command_.open("/visual-servoing/cmd:i"))
     {
-        std::cerr << "Cannot open the RPC command port." << std::endl;
+        yErrorVerbose("Cannot open the RPC server command port!");
         return false;
     }
     if (!this->yarp().attachAsServer(port_rpc_command_))
     {
-        std::cerr << "Cannot attach the RPC command port." << std::endl;
+        yErrorVerbose("Cannot attach the RPC server command port!");
         return false;
     }
-    std::cout << "RPC command port opened and attached. Ready to recieve commands!" << std::endl;
+
+    yInfoVerbose("RPC command port opened and attached. Ready to recieve commands.");
 
     return true;
 }
@@ -1404,7 +1402,6 @@ void VisualServoingServer::getCurrentStereoFeaturesAndJacobian(const std::vector
     auto iter_left_px   = left_px.cbegin();
     auto iter_right_px  = right_px.cbegin();
     unsigned int offset = 0;
-
     while (iter_left_px != left_px.cend() && iter_right_px != right_px.cend())
     {
         const Vector& l_v = (*iter_left_px);
