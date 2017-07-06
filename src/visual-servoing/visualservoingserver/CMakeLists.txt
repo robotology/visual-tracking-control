@@ -15,7 +15,7 @@ include(YarpInstallationHelpers)
 
 # Plugin source and header files
 set(${PLUGIN_TARGET_NAME}_HDR
-        ../visualservoing-common/VisualServoingCommon.h
+        ../visualservoingcommon/VisualServoingCommon.h
         include/VisualServoingServer.h)
 
 set(${PLUGIN_TARGET_NAME}_SRC
