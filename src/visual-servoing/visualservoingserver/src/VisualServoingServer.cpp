@@ -51,7 +51,7 @@ bool VisualServoingServer::open(Searchable &config)
     robot_name_ = config.check("robot", Value("icub")).asString();
     if (robot_name_.empty())
     {
-        yErrorVerbose("Robot name not provided! Closing.");
+        yErrorVerbose("Robot name not provided!");
         return false;
     }
     else
@@ -60,46 +60,46 @@ bool VisualServoingServer::open(Searchable &config)
 
     if (!port_pose_left_in_.open("/visual-servoing/pose/left:i"))
     {
-        yErrorVerbose("Could not open /visual-servoing/pose/left:i port! Closing.");
+        yErrorVerbose("Could not open /visual-servoing/pose/left:i port!");
         return false;
     }
     if (!port_pose_right_in_.open("/visual-servoing/pose/right:i"))
     {
-        yErrorVerbose("Could not open /visual-servoing/pose/right:i port! Closing.");
+        yErrorVerbose("Could not open /visual-servoing/pose/right:i port!");
         return false;
     }
 
 
     if (!port_image_left_in_.open("/visual-servoing/cam_left/img:i"))
     {
-        yErrorVerbose("Could not open /visual-servoing/cam_left/img:i port! Closing.");
+        yErrorVerbose("Could not open /visual-servoing/cam_left/img:i port!");
         return false;
     }
     if (!port_image_left_out_.open("/visual-servoing/cam_left/img:o"))
     {
-        yErrorVerbose("Could not open /visual-servoing/cam_left/img:o port! Closing.");
+        yErrorVerbose("Could not open /visual-servoing/cam_left/img:o port!");
         return false;
     }
     if (!port_click_left_.open("/visual-servoing/cam_left/click:i"))
     {
-        yErrorVerbose("Could not open /visual-servoing/cam_left/click:in port! Closing.");
+        yErrorVerbose("Could not open /visual-servoing/cam_left/click:in port!");
         return false;
     }
 
 
     if (!port_image_right_in_.open("/visual-servoing/cam_right/img:i"))
     {
-        yErrorVerbose("Could not open /visual-servoing/cam_right/img:i port! Closing.");
+        yErrorVerbose("Could not open /visual-servoing/cam_right/img:i port!");
         return false;
     }
     if (!port_image_right_out_.open("/visual-servoing/cam_right/img:o"))
     {
-        yErrorVerbose("Could not open /visual-servoing/cam_right/img:o port! Closing.");
+        yErrorVerbose("Could not open /visual-servoing/cam_right/img:o port!");
         return false;
     }
     if (!port_click_right_.open("/visual-servoing/cam_right/click:i"))
     {
-        yErrorVerbose("Could not open /visual-servoing/cam_right/click:i port! Closing.");
+        yErrorVerbose("Could not open /visual-servoing/cam_right/click:i port!");
         return false;
     }
 
@@ -158,11 +158,11 @@ bool VisualServoingServer::open(Searchable &config)
 
     if (!setCommandPort())
     {
-        yErrorVerbose("Could not open /visual-servoing/cmd:i port! Closing.");
+        yErrorVerbose("Could not open /visual-servoing/cmd:i port!");
         return false;
     }
 
-    yInfo("*** VisualServoingServer configured! ***");
+    yInfoVerbose("*** VisualServoingServer configured! ***");
 
     return true;
 }
@@ -170,13 +170,13 @@ bool VisualServoingServer::open(Searchable &config)
 
 bool VisualServoingServer::close()
 {
-    yInfoVerbose("*** Interrupting ***");
+    yInfoVerbose("*** Interrupting VisualServoingServer ***");
 
     yInfoVerbose("Ensure controllers are stopped...");
     itf_rightarm_cart_->stopControl();
     itf_gaze_->stopControl();
 
-    yInfoVerbose("...interrupting ports...");
+    yInfoVerbose("...interrupting ports.");
     port_pose_left_in_.interrupt();
     port_pose_right_in_.interrupt();
     port_image_left_in_.interrupt();
@@ -186,10 +186,10 @@ bool VisualServoingServer::close()
     port_image_right_out_.interrupt();
     port_click_right_.interrupt();
 
-    yInfoVerbose("*** Interrupting done! ***");
+    yInfoVerbose("*** Interrupting VisualServoingServer done! ***");
 
 
-    yInfoVerbose("*** Closing ***");
+    yInfoVerbose("*** Closing VisualServoingServer ***");
 
     yInfoVerbose("Closing ports...");
     port_pose_left_in_.close();
@@ -204,11 +204,11 @@ bool VisualServoingServer::close()
     yInfoVerbose("...removing frames...");
     itf_rightarm_cart_->removeTipFrame();
 
-    yInfoVerbose("...closing drivers...");
+    yInfoVerbose("...closing drivers.");
     if (rightarm_cartesian_driver_.isValid()) rightarm_cartesian_driver_.close();
     if (gaze_driver_.isValid())               gaze_driver_.close();
 
-    yInfoVerbose("*** Closing done! ***");
+    yInfoVerbose("*** Closing VisualServoingServer done! ***");
 
 
     return true;

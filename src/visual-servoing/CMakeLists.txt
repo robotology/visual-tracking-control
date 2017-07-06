@@ -1,6 +1,6 @@
-find_package(YARP REQUIRED)
-
 set(PLUGIN_NAME visualservoing)
+
+find_package(YARP REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH})
 include(YarpPlugin)
