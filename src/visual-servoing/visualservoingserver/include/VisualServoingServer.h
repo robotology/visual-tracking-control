@@ -201,10 +201,7 @@ private:
 
     bool setGazeController();
 
-
-    bool attach(yarp::os::Port &source);
     bool setCommandPort();
-
 
     bool setTorsoDOF();
 

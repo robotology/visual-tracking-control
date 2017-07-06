@@ -1245,12 +1245,6 @@ bool VisualServoingServer::setGazeController()
 }
 
 
-bool VisualServoingServer::attach(yarp::os::Port &source)
-{
-    return this->yarp().attachAsServer(source);
-}
-
-
 bool VisualServoingServer::setCommandPort()
 {
     std::cout << "Opening RPC command port." << std::endl;
@@ -1259,7 +1253,7 @@ bool VisualServoingServer::setCommandPort()
         std::cerr << "Cannot open the RPC command port." << std::endl;
         return false;
     }
-    if (!attach(port_rpc_command_))
+    if (!this->yarp().attachAsServer(port_rpc_command_))
     {
         std::cerr << "Cannot attach the RPC command port." << std::endl;
         return false;
