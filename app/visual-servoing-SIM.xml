@@ -5,7 +5,7 @@
     <!-- GENERIC INFORMATION -->
     <name>visual-servoing-SIM</name>
     <description>This app allows the iCub_SIM to perform visual servoing tasks. Must be used with the hand-tracking app.</description>
-    <version>0.3.2</version>
+    <version>0.4.0</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -14,8 +14,8 @@
 
     <!-- REQUIRED MODULES -->
     <module>
-        <name>visual-servoing</name>
-        <parameters>--robot icubSim</parameters>
+        <name>yarpdev</name>
+        <parameters>--device visualservoingserver --verbosity true --simulate true --robot icubSim</parameters>
         <node>yarprun</node>
     </module>
 

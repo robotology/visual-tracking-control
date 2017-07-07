@@ -20,10 +20,4 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE ${YARP_INCLUDE_DIRS})
 target_link_libraries(${APP_TARGET_NAME} ${YARP_LIBRARIES}
                                          visualservoingplugin)
 
-# Application XML app files
-set(${APP_TARGET_NAME}_APP
-        ${PROJECT_SOURCE_DIR}/app/visual-servoing.xml
-        ${PROJECT_SOURCE_DIR}/app/visual-servoing-SIM.xml)
-
 install(TARGETS ${APP_TARGET_NAME}          DESTINATION bin)
-install(FILES   ${${APP_TARGET_NAME}_APP}   DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR})
