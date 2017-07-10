@@ -20,4 +20,4 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE ${YARP_INCLUDE_DIRS})
 target_link_libraries(${APP_TARGET_NAME} ${YARP_LIBRARIES}
                                          visualservoingplugin)
 
-install(TARGETS ${APP_TARGET_NAME}          DESTINATION bin)
+install(TARGETS ${APP_TARGET_NAME} DESTINATION bin)
