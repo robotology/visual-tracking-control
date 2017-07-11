@@ -354,6 +354,8 @@ std::vector<Vector> VisualServoingServer::getPixelPositionGoalFrom3DPose(const V
     pose.setSubvector(0, x);
     pose.setSubvector(3, o);
 
+    beforeStart();
+
     std::vector<Vector> vec_goal_points = getControlPixelsFromPose(pose, cam, PixelControlMode::all);
 
     return vec_goal_points;
@@ -1383,7 +1385,7 @@ Vector VisualServoingServer::getPixelFromPoint(const CamSel cam, const Vector& p
     px[0] /= px[2];
     px[1] /= px[2];
 
-    return px;
+    return px.subVector(0, 1);
 }
 
 
