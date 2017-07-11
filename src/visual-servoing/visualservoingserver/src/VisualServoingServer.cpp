@@ -507,6 +507,17 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
         goal_pose_[4] =  0.799 * 2.781;
         goal_pose_[5] = -0.471 * 2.781;
     }
+    else if (label == "t170711")
+    {
+        /* -0.356 0.024 -0.053 0.057 0.98 -0.189 2.525 */
+        goal_pose_[0] = -0.356;
+        goal_pose_[1] =  0.024;
+        goal_pose_[2] = -0.053;
+
+        goal_pose_[3] =  0.057 * 2.525;
+        goal_pose_[4] =  0.980 * 2.525;
+        goal_pose_[5] = -0.189 * 2.525;
+    }
     else
         return false;
 
