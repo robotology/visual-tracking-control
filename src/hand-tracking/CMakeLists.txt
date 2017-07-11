@@ -80,8 +80,6 @@ if(NOT APPLE)
     target_link_libraries(${EXE_TARGET_NAME} Threads::Threads)
 endif()
 
-target_compile_features(${EXE_TARGET_NAME} PUBLIC cxx_nullptr cxx_constexpr cxx_override)
-
 
 # Custom command for RESOURCE/EXTRA files
 set(${EXE_TARGET_NAME}_APP

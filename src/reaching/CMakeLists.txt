@@ -28,8 +28,6 @@ target_link_libraries(${EXE_TARGET_NAME} ctrlLib
                                          SuperimposeMesh::SuperimposeMesh
                                          ${YARP_LIBRARIES})
 
-target_compile_features(${EXE_TARGET_NAME} PUBLIC cxx_nullptr cxx_constexpr)
-
 set(${EXE_TARGET_NAME}_APP
         ${PROJECT_SOURCE_DIR}/app/reaching.xml
         ${PROJECT_SOURCE_DIR}/app/reaching-SIM.xml)

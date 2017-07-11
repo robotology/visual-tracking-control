@@ -43,8 +43,6 @@ target_link_libraries(${PLUGIN_TARGET_NAME} ctrlLib
                                             ${OpenCV_LIBS}
                                             ${YARP_LIBRARIES})
 
-target_compile_features(${PLUGIN_TARGET_NAME} PUBLIC cxx_override cxx_range_for)
-
 yarp_install(TARGETS ${PLUGIN_TARGET_NAME}
              COMPONENT plugin
              LIBRARY DESTINATION ${ICUBCONTRIB_DYNAMIC_PLUGINS_INSTALL_DIR})
