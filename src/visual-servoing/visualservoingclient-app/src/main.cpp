@@ -23,26 +23,28 @@ int main(int argc, char **argv)
 
     YARP_REGISTER_PLUGINS(visualservoingplugin);
 
-    Property prop_server_vs;
-    prop_server_vs.put("device",    "visualservoingclient");
-    prop_server_vs.put("verbosity", true);
-    prop_server_vs.put("local",     "/VisualServoingClientTest");
-    prop_server_vs.put("remote",    "/visual-servoing");
+    Property prop_client_vs;
+    prop_client_vs.put("device",    "visualservoingclient");
+    prop_client_vs.put("verbosity", true);
+    prop_client_vs.put("local",     "/VisualServoingClientTest");
+    prop_client_vs.put("remote",    "/visual-servoing");
 
-    PolyDriver drv_server_vs(prop_server_vs);
-    if (!drv_server_vs.isValid())
+    PolyDriver drv_client_vs(prop_client_vs);
+    if (!drv_client_vs.isValid())
     {
         yError("Could not run VisualServoingClient!");
         return EXIT_FAILURE;
     }
 
     IVisualServoing *visual_servoing;
-    drv_server_vs.view(visual_servoing);
+    drv_client_vs.view(visual_servoing);
     if (visual_servoing == YARP_NULLPTR)
     {
         yError("Could not get interfacate to VisualServoingClient!");
         return EXIT_FAILURE;
     }
+
+    visual_servoing->storedInit("t170427");
 
     Vector x(3);
     Vector o(4);
@@ -51,9 +53,9 @@ int main(int argc, char **argv)
     std::vector<Vector> px_l = visual_servoing->getPixelPositionGoalFrom3DPose(x, o, IVisualServoing::CamSel::left);
     std::vector<Vector> px_r = visual_servoing->getPixelPositionGoalFrom3DPose(x, o, IVisualServoing::CamSel::right);
 
-    visual_servoing->storedInit("t170427");
-//    visual_servoing->storedGoToGoal("t170427");
+    //    visual_servoing->storedGoToGoal("t170711");
 
+    //    visual_servoing->setModality("position");
     visual_servoing->goToGoal(px_l, px_r);
 
     visual_servoing->checkVisualServoingController();
