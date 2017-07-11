@@ -1014,7 +1014,7 @@ bool VisualServoingServer::quit()
 
 bool VisualServoingServer::go_to_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r)
 {
-    if (vec_px_l.size() != 3 || vec_px_l.size() != 3)
+    if (vec_px_l.size() != 4 || vec_px_l.size() != 4)
         return false;
 
     std::vector<Vector> yvec_px_l;
