@@ -330,8 +330,8 @@ bool VisualServoingServer::setMaxOrientationVelocity(const float max_o_dot)
 
 std::vector<Vector> VisualServoingServer::get3DPositionGoalFrom3DPose(const Vector& x, const Vector& o)
 {
-    yAssert(x.length() != 3);
-    yAssert(o.length() != 4);
+    yAssert(x.length() == 3);
+    yAssert(o.length() == 4);
 
 
     Vector pose(7);
@@ -346,8 +346,8 @@ std::vector<Vector> VisualServoingServer::get3DPositionGoalFrom3DPose(const Vect
 
 std::vector<Vector> VisualServoingServer::getPixelPositionGoalFrom3DPose(const Vector& x, const Vector& o, const CamSel& cam)
 {
-    yAssert(x.length() != 3);
-    yAssert(o.length() != 4);
+    yAssert(x.length() == 3);
+    yAssert(o.length() == 4);
 
 
     Vector pose(7);
@@ -1075,8 +1075,8 @@ bool VisualServoingServer::set_max_orientation_velocity(const double max_o_dot)
 
 std::vector<std::vector<double>> VisualServoingServer::get_3D_position_goal_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o)
 {
-    yAssert(x.size() != 3);
-    yAssert(o.size() != 4);
+    yAssert(x.size() == 3);
+    yAssert(o.size() == 4);
 
 
     Vector yx(x.size(), x.data());
@@ -1091,10 +1091,10 @@ std::vector<std::vector<double>> VisualServoingServer::get_3D_position_goal_from
 }
 
 
-std::vector<std::vector<double>> VisualServoingServer::get_pixel_position_goal_from_3D_pose(const std::vector<double> & x, const std::vector<double> & o, const std::string& cam)
+std::vector<std::vector<double>> VisualServoingServer::get_pixel_position_goal_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o, const std::string& cam)
 {
-    yAssert(x.size() != 3);
-    yAssert(o.size() != 4);
+    yAssert(x.size() == 3);
+    yAssert(o.size() == 4);
     yAssert(cam == "left" || cam == "right");
 
 

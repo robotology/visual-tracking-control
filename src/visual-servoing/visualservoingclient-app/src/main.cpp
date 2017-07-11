@@ -44,8 +44,16 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
+//    Vector x(3);
+//    Vector o(4);
+//    x[0] = -0.356; x[1] = 0.024; x[2] = -0.053;
+//    o[0] = 0.057;  o[1] = 0.98;  o[2] = -0.189; o[3] = 2.525;
+//    std::vector<Vector> px_l = visual_servoing->getPixelPositionGoalFrom3DPose(x, o, IVisualServoing::CamSel::left);
+//    std::vector<Vector> px_r = visual_servoing->getPixelPositionGoalFrom3DPose(x, o, IVisualServoing::CamSel::right);
+
     visual_servoing->storedInit("t170427");
     visual_servoing->storedGoToGoal("t170427");
+
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
 
