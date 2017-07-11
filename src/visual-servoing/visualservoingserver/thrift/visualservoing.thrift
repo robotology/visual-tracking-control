@@ -105,6 +105,8 @@ service VisualServoingIDL
      * Set visual servoing goal tolerance.
      *
      * @param tol the tolerance in pixel.
+     *
+     * @note Default value: 10 [pixel].
      */
     bool set_go_to_goal_tolerance(1: double tol);
 
@@ -131,6 +133,8 @@ service VisualServoingIDL
      *
      * @note The tolerance to which the goal is considered achieved can be set
      *       with the method setGoToGoalTolerance().
+     *
+     * @note Default values: period 0.1 [s], timeout 0.0 [s].
      */
     bool wait_visual_servoing_done(1: double period, 2: double timeout);
 
@@ -139,8 +143,6 @@ service VisualServoingIDL
      * [wait for reply]
      *
      * @return true/false on success/failure.
-     *
-     * @note Default value: period = 0.5, timeout = 0.0
      */
     bool stop_controller();
 
@@ -151,7 +153,8 @@ service VisualServoingIDL
      *
      * @note Warning: higher values of the gain corresponds to higher
      *       translatinal velocities.
-     *       Default value: k_x = 0.5
+     *
+     * @note Default value: k_x = 0.5.
      */
     bool set_translation_gain(1: double K_x);
 
@@ -163,6 +166,8 @@ service VisualServoingIDL
      *                  [m/s].
      *
      * @return true/false on success/failure.
+     *
+     * @note Default value: max_x_dot = 0.025 [m/s].
      */
     bool set_max_translation_velocity(1: double max_x_dot);
 
@@ -172,8 +177,9 @@ service VisualServoingIDL
      * @return true/false on success/failure.
      *
      * @note Warning: higher values of the gain corresponds to higher
-             translatinal velocities.
-             Default value: 0.5.
+     *       translatinal velocities.
+     *
+     * @note Default value: 0.5.
      */
     bool set_orientation_gain(1: double K_o);
 
@@ -184,6 +190,8 @@ service VisualServoingIDL
      * @param max_x_dot the maximum allowed angular velocity [rad/s].
      *
      * @return true/false on success/failure.
+     *
+     * @note Default value: 5 * (PI / 180.0) [rad/s].
      */
     bool set_max_orientation_velocity(1: double max_o_dot);
 

@@ -52,7 +52,7 @@ public:
 
     bool getVisualServoingInfo(yarp::os::Bottle& info) override;
 
-    bool setGoToGoalTolerance(const double tol) override;
+    bool setGoToGoalTolerance(const double tol = 10.0) override;
 
     bool checkVisualServoingController() override;
 
