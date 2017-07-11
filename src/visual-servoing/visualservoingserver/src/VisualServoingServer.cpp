@@ -539,8 +539,8 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
 //!!!: this method may be deleted in a future relese
 bool VisualServoingServer::goToSFMGoal()
 {
-    Bottle  cmd;
-    Bottle  rep;
+    Bottle cmd;
+    Bottle rep;
 
     Bottle* click_left = port_click_left_.read(true);
     Vector l_click = zeros(2);
@@ -896,16 +896,16 @@ void VisualServoingServer::run()
             const Vector&      l_px_o = l_px_orientation[i];
             const Vector&      r_px_p = r_px_position[i];
             const Vector&      r_px_o = r_px_orientation[i];
-            const cv::Scalar&  r_v    = color[i];
+            const cv::Scalar&  col    = color[i];
             const unsigned int j      = 2 * i;
 
-            cv::circle(l_img, cv::Point(l_px_p[0],     l_px_p[1]),         4, r_v, 4);
-            cv::circle(l_img, cv::Point(l_px_o[0],     l_px_o[1]),         4, r_v, 4);
-            cv::circle(l_img, cv::Point(l_px_goal_[j], l_px_goal_[j + 1]), 4, r_v, 4);
+            cv::circle(l_img, cv::Point(l_px_p[0],     l_px_p[1]),         4, col, 4);
+            cv::circle(l_img, cv::Point(l_px_o[0],     l_px_o[1]),         4, col, 4);
+            cv::circle(l_img, cv::Point(l_px_goal_[j], l_px_goal_[j + 1]), 4, col, 4);
 
-            cv::circle(r_img, cv::Point(r_px_p[0],     r_px_p[1]),         4, r_v, 4);
-            cv::circle(r_img, cv::Point(r_px_o[0],     r_px_o[1]),         4, r_v, 4);
-            cv::circle(r_img, cv::Point(r_px_goal_[j], r_px_goal_[j + 1]), 4, r_v, 4);
+            cv::circle(r_img, cv::Point(r_px_p[0],     r_px_p[1]),         4, col, 4);
+            cv::circle(r_img, cv::Point(r_px_o[0],     r_px_o[1]),         4, col, 4);
+            cv::circle(r_img, cv::Point(r_px_goal_[j], r_px_goal_[j + 1]), 4, col, 4);
         }
 
         port_image_left_out_.write();
