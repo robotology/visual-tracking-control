@@ -110,7 +110,7 @@ bool VisualServoingClient::close()
 /* IVisualServoing overrides */
 bool VisualServoingClient::goToGoal(const std::vector<Vector>& vec_px_l, const std::vector<Vector>& vec_px_r)
 {
-    if (vec_px_l.size() == vec_px_r.size())
+    if (vec_px_l.size() != vec_px_r.size())
         return false;
 
     const size_t num_points = vec_px_l.size();
