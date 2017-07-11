@@ -334,9 +334,14 @@ std::vector<Vector> VisualServoingServer::get3DPositionGoalFrom3DPose(const Vect
     yAssert(o.length() == 4);
 
 
-    Vector pose(7);
+    Vector pose(6);
     pose.setSubvector(0, x);
-    pose.setSubvector(3, o);
+    pose.setSubvector(3, o.subVector(0, 2));
+    pose.setSubvector(3, pose.subVector(3, 5) * o[3]);
+
+    goal_pose_.setSubvector(0, x);
+    goal_pose_.setSubvector(3, o.subVector(0, 2));
+    goal_pose_.setSubvector(3, goal_pose_.subVector(0, 2) * o[3]);
 
     std::vector<Vector> vec_goal_points = getControlPointsFromPose(pose);
 
@@ -350,9 +355,14 @@ std::vector<Vector> VisualServoingServer::getPixelPositionGoalFrom3DPose(const V
     yAssert(o.length() == 4);
 
 
-    Vector pose(7);
+    Vector pose(6);
     pose.setSubvector(0, x);
-    pose.setSubvector(3, o);
+    pose.setSubvector(3, o.subVector(0, 2));
+    pose.setSubvector(3, pose.subVector(3, 5) * o[3]);
+
+    goal_pose_.setSubvector(0, x);
+    goal_pose_.setSubvector(3, o.subVector(0, 2));
+    goal_pose_.setSubvector(3, goal_pose_.subVector(3, 5) * o[3]);
 
     beforeStart();
 
