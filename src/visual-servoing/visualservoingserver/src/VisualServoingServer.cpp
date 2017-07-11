@@ -215,8 +215,12 @@ bool VisualServoingServer::close()
 /* IVisualServoing overrides */
 bool VisualServoingServer::goToGoal(const std::vector<Vector>& vec_px_l, const std::vector<Vector>& vec_px_r)
 {
+    yInfoVerbose("*** Invoking setGoal() ***");
     setGoal(vec_px_l, vec_px_r);
 
+    unsetTorsoDOF();
+
+    yInfoVerbose("*** Invoking start() ***");
     return start();
 }
 
