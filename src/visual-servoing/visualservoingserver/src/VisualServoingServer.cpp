@@ -828,10 +828,23 @@ void VisualServoingServer::run()
             r_new_o.pop_back();
             r_new_o *= r_ang;
 
-            est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
-            est_copy_left.setSubvector(3, l_new_o);
-            est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
-            est_copy_right.setSubvector(3, r_new_o);
+            if (op_mode_ == OperatingMode::position)
+            {
+                est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
+                est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
+            }
+            else if (op_mode_ == OperatingMode::orientation)
+            {
+                est_copy_left.setSubvector(3, l_new_o);
+                est_copy_right.setSubvector(3, r_new_o);
+            }
+            else if (op_mode_ == OperatingMode::pose)
+            {
+                est_copy_left.setSubvector(3, l_new_o);
+                est_copy_right.setSubvector(3, r_new_o);
+                est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
+                est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
+            }
         }
         /* **************************************************** */
 
