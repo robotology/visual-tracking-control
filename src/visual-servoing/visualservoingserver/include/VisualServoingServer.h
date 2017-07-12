@@ -207,11 +207,15 @@ private:
 
     bool unsetTorsoDOF();
 
-    std::vector<yarp::sig::Vector> getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel cam, const PixelControlMode mode);
+    std::vector<yarp::sig::Vector> getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel& cam, const PixelControlMode& mode);
+
+    std::vector<yarp::sig::Vector> getPixelsFromPose(const yarp::sig::Vector& pose, const CamSel& cam);
 
     std::vector<yarp::sig::Vector> getControlPointsFromPose(const yarp::sig::Vector& pose);
 
-    yarp::sig::Vector getPixelFromPoint(const CamSel cam, const yarp::sig::Vector& p) const;
+    yarp::sig::Vector getPixelFromPoint(const CamSel& cam, const yarp::sig::Vector& p) const;
+
+    yarp::sig::Vector getControlPixelFromPoint(const CamSel& cam, const yarp::sig::Vector& p) const;
 
     void getCurrentStereoFeaturesAndJacobian(const std::vector<yarp::sig::Vector>& left_px,  const std::vector<yarp::sig::Vector>& right_px,
                                              yarp::sig::Vector& features, yarp::sig::Matrix& jacobian);

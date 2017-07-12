@@ -368,7 +368,7 @@ std::vector<Vector> VisualServoingServer::getPixelPositionGoalFrom3DPose(const V
 
     beforeStart();
 
-    std::vector<Vector> vec_goal_points = getControlPixelsFromPose(pose, cam, PixelControlMode::all);
+    std::vector<Vector> vec_goal_points = getPixelsFromPose(pose, cam);
 
     return vec_goal_points;
 }
@@ -523,8 +523,8 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
 
     beforeStart();
 
-    std::vector<Vector> l_control_px_from_pose = getControlPixelsFromPose(goal_pose_, CamSel::left,  PixelControlMode::all);
-    std::vector<Vector> r_control_px_from_pose = getControlPixelsFromPose(goal_pose_, CamSel::right, PixelControlMode::all);
+    std::vector<Vector> l_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::left);
+    std::vector<Vector> r_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::right);
 
     setGoal(l_control_px_from_pose, r_control_px_from_pose);
 
@@ -580,8 +580,8 @@ bool VisualServoingServer::goToSFMGoal()
 
         beforeStart();
 
-        std::vector<Vector> l_control_px_from_pose = getControlPixelsFromPose(goal_pose_, CamSel::left,  PixelControlMode::all);
-        std::vector<Vector> r_control_px_from_pose = getControlPixelsFromPose(goal_pose_, CamSel::right, PixelControlMode::all);
+        std::vector<Vector> l_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::left);
+        std::vector<Vector> r_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::right);
 
         setGoal(l_control_px_from_pose, r_control_px_from_pose);
     }
@@ -1340,7 +1340,22 @@ bool VisualServoingServer::unsetTorsoDOF()
 }
 
 
-std::vector<Vector> VisualServoingServer::getControlPixelsFromPose(const Vector& pose, const CamSel cam, const PixelControlMode mode)
+std::vector<Vector> VisualServoingServer::getPixelsFromPose(const Vector& pose, const CamSel& cam)
+{
+    yAssert(cam == CamSel::left || cam == CamSel::right);
+
+
+    std::vector<Vector> pt_from_pose = getControlPointsFromPose(pose);
+
+    std::vector<Vector> px_from_pose;
+    for (const Vector& v : pt_from_pose)
+        px_from_pose.emplace_back(getPixelFromPoint(cam, v));
+
+    return px_from_pose;
+}
+
+
+std::vector<Vector> VisualServoingServer::getControlPixelsFromPose(const Vector& pose, const CamSel& cam, const PixelControlMode& mode)
 {
     yAssert(cam == CamSel::left || cam == CamSel::right);
     yAssert(mode == PixelControlMode::all || mode == PixelControlMode::x || mode == PixelControlMode::o);
@@ -1356,7 +1371,7 @@ std::vector<Vector> VisualServoingServer::getControlPixelsFromPose(const Vector&
 
     std::vector<Vector> control_px_from_pose;
     for (const Vector& v : control_pt_from_pose)
-        control_px_from_pose.emplace_back(getPixelFromPoint(cam, v));
+        control_px_from_pose.emplace_back(getControlPixelFromPoint(cam, v));
 
     return control_px_from_pose;
 }
@@ -1406,7 +1421,13 @@ std::vector<Vector> VisualServoingServer::getControlPointsFromPose(const Vector&
 }
 
 
-Vector VisualServoingServer::getPixelFromPoint(const CamSel cam, const Vector& p) const
+Vector VisualServoingServer::getPixelFromPoint(const CamSel& cam, const Vector& p) const
+{
+    return getControlPixelFromPoint(cam, p).subVector(0, 1);
+}
+
+
+Vector VisualServoingServer::getControlPixelFromPoint(const CamSel& cam, const Vector& p) const
 {
     yAssert(cam == CamSel::left || cam == CamSel::right);
 
@@ -1421,7 +1442,7 @@ Vector VisualServoingServer::getPixelFromPoint(const CamSel cam, const Vector& p
     px[0] /= px[2];
     px[1] /= px[2];
 
-    return px.subVector(0, 1);
+    return px;
 }
 
 
