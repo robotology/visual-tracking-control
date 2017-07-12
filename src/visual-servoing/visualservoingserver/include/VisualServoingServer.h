@@ -226,6 +226,8 @@ private:
     
     yarp::sig::Vector getAxisAngle(const yarp::sig::Vector& v);
 
+    bool setCameraTransformations();
+
     bool setGoal(const yarp::sig::Vector& l_px_goal, const yarp::sig::Vector& r_px_goal);
 
     bool setGoal(const std::vector<yarp::sig::Vector>& l_px_goal, const std::vector<yarp::sig::Vector>& r_px_goal);

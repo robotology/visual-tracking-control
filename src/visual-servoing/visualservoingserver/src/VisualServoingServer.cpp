@@ -366,7 +366,7 @@ std::vector<Vector> VisualServoingServer::getPixelPositionGoalFrom3DPose(const V
     goal_pose_.setSubvector(3, o.subVector(0, 2));
     goal_pose_.setSubvector(3, goal_pose_.subVector(3, 5) * o[3]);
 
-    beforeStart();
+    setCameraTransformations();
 
     std::vector<Vector> vec_goal_points = getPixelsFromPose(pose, cam);
 
@@ -521,7 +521,7 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
 
     yInfoVerbose("6D goal: " + goal_pose_.toString());
 
-    beforeStart();
+    setCameraTransformations();
 
     std::vector<Vector> l_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::left);
     std::vector<Vector> r_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::right);
@@ -578,7 +578,7 @@ bool VisualServoingServer::goToSFMGoal()
         goal_pose_ = p;
         yInfoVerbose("6D goal: " + goal_pose_.toString());
 
-        beforeStart();
+        setCameraTransformations();
 
         std::vector<Vector> l_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::left);
         std::vector<Vector> r_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::right);
@@ -600,33 +600,7 @@ void VisualServoingServer::beforeStart()
 {
     yInfoVerbose("*** Thread::beforeStart invoked ***");
 
-    Vector left_eye_x;
-    Vector left_eye_o;
-    itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
-
-    Vector right_eye_x;
-    Vector right_eye_o;
-    itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
-
-    yInfoVerbose("left_eye_o = ["  + left_eye_o.toString()  + "]");
-    yInfoVerbose("right_eye_o = [" + right_eye_o.toString() + "]");
-
-
-    l_H_eye_to_r_ = axis2dcm(left_eye_o);
-    left_eye_x.push_back(1.0);
-    l_H_eye_to_r_.setCol(3, left_eye_x);
-    l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
-
-    r_H_eye_to_r_ = axis2dcm(right_eye_o);
-    right_eye_x.push_back(1.0);
-    r_H_eye_to_r_.setCol(3, right_eye_x);
-    r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
-
-    yInfoVerbose("l_H_r_to_eye_ = [\n" + l_H_r_to_eye_.toString() + "]");
-    yInfoVerbose("r_H_r_to_eye_ = [\n" + r_H_r_to_eye_.toString() + "]");
-
-    l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
-    r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
+    setCameraTransformations();
 }
 
 
@@ -1554,6 +1528,38 @@ Vector VisualServoingServer::getAxisAngle(const Vector& v)
     aa.push_back(ang);
 
     return aa;
+}
+
+
+bool VisualServoingServer::setCameraTransformations()
+{
+    Vector left_eye_x;
+    Vector left_eye_o;
+    itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+
+    Vector right_eye_x;
+    Vector right_eye_o;
+    itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+
+    yInfoVerbose("left_eye_o = ["  + left_eye_o.toString()  + "]");
+    yInfoVerbose("right_eye_o = [" + right_eye_o.toString() + "]");
+
+
+    l_H_eye_to_r_ = axis2dcm(left_eye_o);
+    left_eye_x.push_back(1.0);
+    l_H_eye_to_r_.setCol(3, left_eye_x);
+    l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
+
+    r_H_eye_to_r_ = axis2dcm(right_eye_o);
+    right_eye_x.push_back(1.0);
+    r_H_eye_to_r_.setCol(3, right_eye_x);
+    r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
+
+    yInfoVerbose("l_H_r_to_eye_ = [\n" + l_H_r_to_eye_.toString() + "]");
+    yInfoVerbose("r_H_r_to_eye_ = [\n" + r_H_r_to_eye_.toString() + "]");
+
+    l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
+    r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
 }
 
 
