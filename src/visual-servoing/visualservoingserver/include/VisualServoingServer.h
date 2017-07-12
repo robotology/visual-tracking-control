@@ -220,9 +220,9 @@ private:
     void getCurrentStereoFeaturesAndJacobian(const std::vector<yarp::sig::Vector>& left_px,  const std::vector<yarp::sig::Vector>& right_px,
                                              yarp::sig::Vector& features, yarp::sig::Matrix& jacobian);
 
-    yarp::sig::Vector getJacobianU(const CamSel cam, const yarp::sig::Vector& px);
+    yarp::sig::Vector getJacobianU(const CamSel& cam, const yarp::sig::Vector& px);
 
-    yarp::sig::Vector getJacobianV(const CamSel cam, const yarp::sig::Vector& px);
+    yarp::sig::Vector getJacobianV(const CamSel& cam, const yarp::sig::Vector& px);
     
     yarp::sig::Vector getAxisAngle(const yarp::sig::Vector& v);
 

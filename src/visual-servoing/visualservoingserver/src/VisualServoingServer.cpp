@@ -1483,7 +1483,7 @@ void VisualServoingServer::getCurrentStereoFeaturesAndJacobian(const std::vector
 }
 
 
-Vector VisualServoingServer::getJacobianU(const CamSel cam, const Vector& px)
+Vector VisualServoingServer::getJacobianU(const CamSel& cam, const Vector& px)
 {
     Vector jacobian = zeros(6);
 
@@ -1508,7 +1508,7 @@ Vector VisualServoingServer::getJacobianU(const CamSel cam, const Vector& px)
 }
 
 
-Vector VisualServoingServer::getJacobianV(const CamSel cam, const Vector& px)
+Vector VisualServoingServer::getJacobianV(const CamSel& cam, const Vector& px)
 {
     Vector jacobian = zeros(6);
 
