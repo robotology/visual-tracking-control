@@ -228,9 +228,9 @@ private:
 
     yarp::sig::Vector collectionOfVector2Vector(const std::vector<yarp::sig::Vector>& vectors);
 
-    void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo(str);    };
-    void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning(str); };
-    void yErrorVerbose  (const yarp::os::ConstString& str) const { if(verbosity_) yError(str);   };
+    void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo()    << str; };
+    void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning() << str; };
+    void yErrorVerbose  (const yarp::os::ConstString& str) const { if(verbosity_) yError()   << str; };
 };
 
 #endif /* VISUALSERVOINGSERVER_H */

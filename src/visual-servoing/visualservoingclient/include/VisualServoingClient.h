@@ -76,9 +76,9 @@ private:
     VisualServoingIDL     visualservoing_control;
     yarp::os::Port        port_rpc_command_;
 
-    void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo(str);    };
-    void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning(str); };
-    void yErrorVerbose  (const yarp::os::ConstString& str) const { if(verbosity_) yError(str);   };
+    void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo()    << str; };
+    void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning() << str; };
+    void yErrorVerbose  (const yarp::os::ConstString& str) const { if(verbosity_) yError()   << str; };
 };
 
 #endif /* VISUALSERVOINGCLIENT_H */
