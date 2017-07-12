@@ -718,7 +718,7 @@ void VisualServoingServer::run()
 
         yInfoVerbose("px_des_ = [" + px_des_.toString() + "]");
 
-        /* FEATURES AND JACOBIAN (original position) */
+        /* POSITION: FEATURES AND JACOBIAN */
         getCurrentStereoFeaturesAndJacobian(l_px_position, r_px_position,
                                             px_ee_cur_position, jacobian_position);
 
@@ -726,7 +726,7 @@ void VisualServoingServer::run()
         yInfoVerbose("jacobian_position  = [\n" + jacobian_position.toString() + "]");
 
 
-        /* FEATURES AND JACOBIAN (original orientation) */
+        /* ORIENTATION: FEATURES AND JACOBIAN */
         getCurrentStereoFeaturesAndJacobian(l_px_orientation, r_px_orientation,
                                             px_ee_cur_orientation, jacobian_orientation);
 
