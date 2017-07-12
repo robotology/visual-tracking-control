@@ -773,12 +773,26 @@ void VisualServoingServer::run()
 
         /* Enforce translational velocity bounds */
         for (size_t i = 0; i < vel_x.length(); ++i)
-            vel_x[i] = sign(vel_x[i]) * std::min(max_x_dot_, std::fabs(vel_x[i]));
+        {
+            if (!isnan(vel_x[i]) && !isinf(vel_x[i]))
+                vel_x[i] = sign(vel_x[i]) * std::min(max_x_dot_, std::fabs(vel_x[i]));
+            else
+            {
+                vel_x = Vector(3, 0.0);
+                break;
+            }
+        }
         yInfoVerbose("bounded vel_x = [" + vel_x.toString() + "]");
 
 
         /* Enforce rotational velocity bounds */
-        vel_o[3] = sign(vel_o[3]) * std::min(max_o_dot_, std::fabs(vel_o[3]));
+        if (!isnan(vel_o[0]) && !isinf(vel_x[0]) &&
+            !isnan(vel_o[1]) && !isinf(vel_x[1]) &&
+            !isnan(vel_o[2]) && !isinf(vel_x[2]) &&
+            !isnan(vel_o[3]) && !isinf(vel_x[3]))
+            vel_o[3] = sign(vel_o[3]) * std::min(max_o_dot_, std::fabs(vel_o[3]));
+        else
+            vel_o = Vector(4, 0.0);
         yInfoVerbose("bounded vel_o = [" + vel_o.toString() + "]");
 
 
