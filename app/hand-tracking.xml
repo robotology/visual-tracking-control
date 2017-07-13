@@ -5,7 +5,7 @@
     <!-- GENERIC INFORMATION -->
     <name>hand-tracking</name>
     <description>Visual tracking of the iCub hand by means of a 3D model-aided particle filter</description>
-    <version>0.5.1</version>
+    <version>0.5.2</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -40,30 +40,30 @@
         <protocol>tcp</protocol>
     </connection>
 
+    <!-- Initialitazion connections -->
     <connection>
-        <from>/icub/right_arm/state:o</from>
-        <to>/hand-tracking/left/right_arm:i</to>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/InitiCubArm/cam/left/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/icub/right_arm/state:o</from>
-        <to>/hand-tracking/right/right_arm:i</to>
+        <to>/hand-tracking/InitiCubArm/cam/left/right_arm:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/icub/torso/state:o</from>
-        <to>/hand-tracking/left/torso:i</to>
+        <to>/hand-tracking/InitiCubArm/cam/right/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/icub/torso/state:o</from>
-        <to>/hand-tracking/right/torso:i</to>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/InitiCubArm/cam/right/right_arm:i</to>
         <protocol>tcp</protocol>
     </connection>
-
 
     <!-- VisualProprioception connections -->
     <connection>
@@ -102,6 +102,30 @@
         <protocol>tcp</protocol>
     </connection>
 
+    <!-- ResamplingWithPriorConnections -->
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/ResamplingWithPrior/cam/left/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/ResamplingWithPrior/cam/left/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/ResamplingWithPrior/cam/right/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/ResamplingWithPrior/cam/right/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
 
     <!-- iCubProprioception connection for displaying results -->
     <connection>

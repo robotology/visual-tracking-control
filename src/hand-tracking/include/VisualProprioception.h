@@ -3,10 +3,10 @@
 
 #include <string>
 
-#include <BayesFiltersLib/VisualObservationModel.h>
+#include <BayesFilters/VisualObservationModel.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/core/core.hpp>
-#include <SuperImpose/SICAD.h>
+#include <SuperimposeMesh/SICAD.h>
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/IAnalogSensor.h>
 #include <yarp/dev/PolyDriver.h>
@@ -86,7 +86,7 @@ protected:
 
     void              setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds);
 
-    void              getPoses(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, std::vector<SuperImpose::ObjPoseMap>& hand_poses);
+    void              getPoses(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, std::vector<Superimpose::ObjPoseMap>& hand_poses);
 
     yarp::sig::Vector readArmEncoders();
     yarp::sig::Vector readTorso();
@@ -104,7 +104,7 @@ protected:
     float                    cam_fy_;
     float                    cam_cy_;
 
-    SuperImpose::ObjFileMap  cad_obj_;
+    Superimpose::ObjFileMap  cad_obj_;
     SICAD                  * si_cad_;
     int                      ogl_tiles_rows_;
     int                      ogl_tiles_cols_;

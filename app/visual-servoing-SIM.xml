@@ -3,9 +3,9 @@
 <application>
 
     <!-- GENERIC INFORMATION -->
-    <name>reaching_pose-SIM</name>
-    <description>This app allows the iCub_SIM to reach a pose with the hand. Must be used with the hand-tracking app.</description>
-    <version>0.2.1</version>
+    <name>visual-servoing-SIM</name>
+    <description>This app allows the iCub_SIM to perform visual servoing tasks. Must be used with the hand-tracking app.</description>
+    <version>0.4.0</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -14,8 +14,8 @@
 
     <!-- REQUIRED MODULES -->
     <module>
-        <name>raching_pose</name>
-        <parameters>--robot icubSim</parameters>
+        <name>yarpdev</name>
+        <parameters>--device visualservoingserver --verbosity true --simulate true --robot icubSim</parameters>
         <node>yarprun</node>
     </module>
 
@@ -47,13 +47,13 @@
     <!-- REQUIRED CONNECTIONS -->
     <connection>
         <from>/icubSim/cartesianController/right_arm/state:o</from>
-        <to>/reaching_pose/estimates/left:i</to>
+        <to>/visual-servoing/pose/left:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/icubSim/cartesianController/right_arm/state:o</from>
-        <to>/reaching_pose/estimates/right:i</to>
+        <to>/visual-servoing/pose/right:i</to>
         <protocol>tcp</protocol>
     </connection>
 
@@ -65,19 +65,19 @@
 
     <connection>
         <from>/icubSim/cam/left</from>
-        <to>/reaching_pose/cam_left/img:i</to>
+        <to>/visual-servoing/cam_left/img:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/reaching_pose/cam_left/img:o</from>
+        <from>/visual-servoing/cam_left/img:o</from>
         <to>/view/cam_left/ee</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/view/cam_left/click:o</from>
-        <to>/reaching_pose/cam_left/click:i</to>
+        <to>/visual-servoing/cam_left/click:i</to>
         <protocol>tcp</protocol>
     </connection>
 
@@ -89,19 +89,19 @@
 
     <connection>
         <from>/icubSim/cam/right</from>
-        <to>/reaching_pose/cam_right/img:i</to>
+        <to>/visual-servoing/cam_right/img:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/reaching_pose/cam_right/img:o</from>
+        <from>/visual-servoing/cam_right/img:o</from>
         <to>/view/cam_right/ee</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/view/cam_right/click:o</from>
-        <to>/reaching_pose/cam_right/click:i</to>
+        <to>/visual-servoing/cam_right/click:i</to>
         <protocol>tcp</protocol>
     </connection>
 

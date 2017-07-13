@@ -4,8 +4,8 @@
 #include <memory>
 #include <random>
 
-#include <BayesFiltersLib/ParticleFilterPrediction.h>
-#include <BayesFiltersLib/StateModel.h>
+#include <BayesFilters/ParticleFilterPrediction.h>
+#include <BayesFilters/StateModel.h>
 
 namespace bfl {
     class CartesianAxisAnglePrediction;

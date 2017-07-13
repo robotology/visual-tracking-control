@@ -4,9 +4,11 @@ else()
     cmake_minimum_required(VERSION 3.0)
 endif()
 
-project(hand-tracking-suite
+project(visual-tracking-control
         LANGUAGES CXX
-        VERSION 0.4.0.0)
+        VERSION 0.5.0.0)
+
+set(CMAKE_CXX_STANDARD 11)
 
 include(GNUInstallDirs)
 
@@ -22,7 +24,7 @@ include(ICUBcontribOptions)
 icubcontrib_set_default_prefix()
 icubcontrib_add_uninstall_target()
 
-option(BUILD_TESTING "Create tests using CMake" OFF)
+option(BUILD_TESTING "Build CMake tests" OFF)
 if(BUILD_TESTING)
     enable_testing()
 endif()

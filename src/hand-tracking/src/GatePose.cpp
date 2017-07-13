@@ -8,10 +8,13 @@ using namespace Eigen;
 
 
 GatePose::GatePose(std::unique_ptr<VisualCorrection> visual_correction,
-                   double gate_x, double gate_y, double gate_z,
-                   double gate_rotation, double gate_aperture) noexcept :
+                   const double gate_x, const double gate_y, const double gate_z,
+                   const double gate_rotation,
+                   const double gate_aperture) noexcept :
     VisualCorrectionDecorator(std::move(visual_correction)),
-    gate_x_(gate_x), gate_y_(gate_y), gate_z_(gate_z), gate_aperture_((M_PI / 180.0) * gate_aperture), gate_rotation_((M_PI / 180.0) * gate_rotation)
+    gate_x_(gate_x), gate_y_(gate_y), gate_z_(gate_z),
+    gate_aperture_((M_PI / 180.0) * gate_aperture),
+    gate_rotation_((M_PI / 180.0) * gate_rotation)
 {
     ee_pose_ = VectorXd::Zero(6);
 }

@@ -22,8 +22,6 @@ PlayFwdKinMotion::PlayFwdKinMotion(std::unique_ptr<StateModel> state_model, cons
     robot_(robot), laterality_(laterality), port_prefix_(port_prefix),
     delta_hand_pose_(VectorXd::Zero(6)), delta_angle_(0.0)
 {
-    /* Arm encoders:   /icub/right_arm/state:o
-       Torso encoders: /icub/torso/state:o     */
     port_arm_enc_.open  ("/hand-tracking/" + ID_ + "/" + port_prefix_ + "/" + laterality_ + "_arm:i");
     port_torso_enc_.open("/hand-tracking/" + ID_ + "/" + port_prefix_ + "/torso:i");
 

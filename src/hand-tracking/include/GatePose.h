@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include <BayesFiltersLib/VisualCorrectionDecorator.h>
-#include <BayesFiltersLib/StateModel.h>
+#include <BayesFilters/VisualCorrectionDecorator.h>
+#include <BayesFilters/StateModel.h>
 
 
 class GatePose : public bfl::VisualCorrectionDecorator
@@ -12,8 +12,9 @@ class GatePose : public bfl::VisualCorrectionDecorator
 public:
     /* Constructor */
     GatePose(std::unique_ptr<VisualCorrection> visual_correction,
-             double gate_x, double gate_y, double gate_z,
-             double gate_rotation, double gate_aperture) noexcept;
+             const double gate_x, const double gate_y, const double gate_z,
+             const double gate_rotation,
+             const double gate_aperture) noexcept;
 
     GatePose(std::unique_ptr<VisualCorrection> visual_correction) noexcept;
 

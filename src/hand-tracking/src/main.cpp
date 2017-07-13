@@ -3,8 +3,8 @@
 #include <iostream>
 #include <memory>
 
-#include <BayesFiltersLib/Resampling.h>
-#include <BayesFiltersLib/SIRParticleFilter.h>
+#include <BayesFilters/Resampling.h>
+#include <BayesFilters/SIRParticleFilter.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
@@ -17,8 +17,10 @@
 #include "CartesianAxisAnglePrediction.h"
 #include "iCubGatePose.h"
 #include "iCubFwdKinMotion.h"
+#include "InitiCubArm.h"
 #include "PlayFwdKinMotion.h"
 #include "PlayGatePose.h"
+#include "ResamplingWithPrior.h"
 #include "VisualProprioception.h"
 #include "VisualParticleFilterCorrection.h"
 #include "VisualSIRParticleFilter.h"
@@ -68,6 +70,7 @@ int main(int argc, char *argv[])
     ConstString robot_laterality = rf.check("laterality", Value("right")).asString();
     bool        play             = ((rf.findGroup("play").size() == 1 ? true : (rf.findGroup("play").size() == 2 ? rf.find("play").asBool() : false)));
     int         num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
+    int         gpu_count        = 1;
 
     yInfo() << log_ID << "Running with:";
     yInfo() << log_ID << " - robot name:"          << robot_name;
@@ -76,8 +79,12 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - use data from ports:" << (play ? "true" : "false");
     yInfo() << log_ID << " - number of particles:" << num_particles;
 
+    /* INITIALIZATION */
+    std::unique_ptr<Initialization> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", robot_cam_sel, robot_laterality));
+
+
     /* MOTION MODEL */
-    std::unique_ptr<StateModel> brown(new BrownianMotion(0.005, 0.005, 5.0, 5.0, 1));
+    std::unique_ptr<StateModel> brown(new BrownianMotion(0.005, 0.005, 3.0, 2.5, 1));
     std::unique_ptr<StateModel> icub_motion;
     if (!play)
     {
@@ -98,12 +105,10 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles, robot_cam_sel, robot_laterality, rf.getContext()));
-//        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_dev.multiProcessorCount(), robot_cam_sel, robot_laterality, rf.getContext()));
+        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_count, robot_cam_sel, robot_laterality, rf.getContext()));
 
         proprio = std::move(vp);
-        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols();
-//        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * gpu_dev.multiProcessorCount();
+        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * gpu_count;
     }
     catch (const std::runtime_error& e)
     {
@@ -112,8 +117,7 @@ int main(int argc, char *argv[])
     }
 
     /* CORRECTION */
-    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), 1));
-//    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_dev.multiProcessorCount()));
+    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_count));
 
     std::unique_ptr<VisualCorrection> vpf_correction_gated;
     if (!play)
@@ -133,11 +137,13 @@ int main(int argc, char *argv[])
 
 
     /* RESAMPLING */
-    std::unique_ptr<Resampling> resampling(new Resampling());
+//    std::unique_ptr<Resampling> resampling(new Resampling());
+    std::unique_ptr<Resampling> resampling(new ResamplingWithPrior("hand-tracking/ResamplingWithPrior", robot_cam_sel, robot_laterality));
 
 
     /* PARTICLE FILTER */
-    VisualSIRParticleFilter vsir_pf(std::move(pf_prediction), std::move(vpf_correction_gated),
+    VisualSIRParticleFilter vsir_pf(std::move(init_arm),
+                                    std::move(pf_prediction), std::move(vpf_correction_gated),
                                     std::move(resampling),
                                     robot_cam_sel, robot_laterality, num_particles);
 
