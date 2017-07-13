@@ -234,11 +234,7 @@ private:
 
     bool setPoseGoal(const yarp::sig::Vector& goal_x, const yarp::sig::Vector& goal_o);
 
-//    bool setPixelGoal(const yarp::sig::Vector& l_px_goal, const yarp::sig::Vector& r_px_goal);
-
     bool setPixelGoal(const std::vector<yarp::sig::Vector>& l_px_goal, const std::vector<yarp::sig::Vector>& r_px_goal);
-
-    yarp::sig::Vector collectionOfVector2Vector(const std::vector<yarp::sig::Vector>& vectors);
 
     void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo()    << str; };
     void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning() << str; };

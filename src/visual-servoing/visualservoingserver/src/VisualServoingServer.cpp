@@ -1640,36 +1640,6 @@ bool VisualServoingServer::setPoseGoal(const yarp::sig::Vector& goal_x, const ya
 }
 
 
-//bool VisualServoingServer::setPixelGoal(const Vector& l_px_goal, const Vector& r_px_goal)
-//{
-//    l_px_goal_ = l_px_goal;
-//    r_px_goal_ = r_px_goal;
-//
-//    yInfoVerbose("l_px_goal_ = [" + l_px_goal_.toString() + "]");
-//    yInfoVerbose("r_px_goal_ = [" + r_px_goal_.toString() + "]");
-//
-//    px_des_[0]  = l_px_goal_[0];   /* u_x0_l */
-//    px_des_[1]  = r_px_goal_[0];   /* u_x0_r */
-//    px_des_[2]  = l_px_goal_[1];   /* v_x0_l */
-//
-//    px_des_[3]  = l_px_goal_[2];   /* u_x1_l */
-//    px_des_[4]  = r_px_goal_[2];   /* u_x1_r */
-//    px_des_[5]  = l_px_goal_[3];   /* v_x1_l */
-//
-//    px_des_[6]  = l_px_goal_[4];   /* u_x2_l */
-//    px_des_[7]  = r_px_goal_[4];   /* u_x2_r */
-//    px_des_[8]  = l_px_goal_[5];   /* v_x2_l */
-//
-//    px_des_[9]  = l_px_goal_[6];   /* u_x3_l */
-//    px_des_[10] = r_px_goal_[6];   /* u_x3_r */
-//    px_des_[11] = l_px_goal_[7];   /* v_x3_l */
-//
-//    yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
-//
-//    return true;
-//}
-
-
 bool VisualServoingServer::setPixelGoal(const std::vector<Vector>& l_px_goal, const std::vector<Vector>& r_px_goal)
 {
     l_px_goal_ = l_px_goal;
@@ -1680,28 +1650,12 @@ bool VisualServoingServer::setPixelGoal(const std::vector<Vector>& l_px_goal, co
         yInfoVerbose("l_px_goal_" + std::to_string(i) + " = [" + l_px_goal_[i].toString() + "]");
         yInfoVerbose("r_px_goal_" + std::to_string(i) + " = [" + r_px_goal_[i].toString() + "]");
 
-        px_des_[3 * i]     = l_px_goal_[i][0];   /* u_xi_l */
-        px_des_[3 * i + 1] = r_px_goal_[i][0];   /* u_xi_r */
-        px_des_[3 * i + 2] = l_px_goal_[i][1];   /* v_xi_l */
+        px_des_[3 * i]     = l_px_goal_[i][0];   /* l_u_xi */
+        px_des_[3 * i + 1] = r_px_goal_[i][0];   /* r_u_xi */
+        px_des_[3 * i + 2] = l_px_goal_[i][1];   /* l_v_xi */
     }
 
     yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
 
     return true;
-}
-
-
-Vector VisualServoingServer::collectionOfVector2Vector(const std::vector<Vector>& vectors)
-{
-    Vector out_vec = zeros(vectors.size() * 2);
-
-    unsigned int offset = 0;
-    for (const Vector& in_vec : vectors)
-    {
-        out_vec[2 * offset + 0] = in_vec[0];
-        out_vec[2 * offset + 1] = in_vec[1];
-        ++offset;
-    }
-
-    return out_vec;
 }
