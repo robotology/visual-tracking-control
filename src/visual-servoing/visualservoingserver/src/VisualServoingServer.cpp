@@ -443,6 +443,25 @@ bool VisualServoingServer::storedInit(const std::string& label)
 
         unsetTorsoDOF();
     }
+    else if (label == "t170713")
+    {
+        /* -0.288 0.15 0.118 0.131 -0.492 0.86 2.962 */
+        xd[0] = -0.288;
+        xd[1] =  0.15;
+        xd[2] =  0.118;
+
+        od[0] =  0.131;
+        od[1] = -0.492;
+        od[2] =  0.86;
+        od[3] =  2.962;
+
+        /* -0.627 0.164 -0.283 */
+        gaze_loc[0] = -0.627;
+        gaze_loc[1] =  0.164;
+        gaze_loc[2] = -0.283;
+
+        unsetTorsoDOF();
+    }
     else if (label == "sfm300517")
     {
         /* -0.333 0.203 -0.053 0.094 0.937 -0.335 3.111 */
@@ -537,6 +556,17 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
         goal_pose_[3] =  0.057 * 2.525;
         goal_pose_[4] =  0.980 * 2.525;
         goal_pose_[5] = -0.189 * 2.525;
+    }
+    else if (label == "t170711")
+    {
+        /* -0.282 0.061 0.068 0.213 -0.94 0.265 2.911 */
+        goal_pose_[0] = -0.282;
+        goal_pose_[1] =  0.061;
+        goal_pose_[2] =  0.068;
+
+        goal_pose_[3] =  0.213 * 2.911;
+        goal_pose_[4] = -0.94  * 2.911;
+        goal_pose_[5] =  0.265 * 2.911;
     }
     else
         return false;
