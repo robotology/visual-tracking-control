@@ -44,6 +44,8 @@ public:
 
 
     /* IVisualServoing overrides */
+    bool goToGoal(const yarp::sig::Vector& vec_x, const yarp::sig::Vector& vec_o) override;
+
     bool goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r) override;
 
     bool setModality(const std::string& mode) override;
@@ -105,7 +107,9 @@ protected:
     bool quit() override;
 
     /* FROM INTERFACE */
-    bool go_to_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r) override;
+    bool go_to_px_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r) override;
+
+    bool go_to_pose_goal(const std::vector<double>& vec_x, const std::vector<double>& vec_o) override;
 
     bool set_modality(const std::string& mode) override;
 
@@ -140,48 +144,48 @@ protected:
     enum class OperatingMode { position, orientation, pose };
 
 private:
-    bool                          verbosity_  = false;
+    bool                           verbosity_  = false;
     //!!!: rimuovere o gestire meglio la simulazione
-    bool                          sim_        = false;
-    yarp::os::ConstString         robot_name_ = "icub";
+    bool                           sim_        = false;
+    yarp::os::ConstString          robot_name_ = "icub";
 
-    OperatingMode                 op_mode_ = OperatingMode::pose;
+    OperatingMode                  op_mode_ = OperatingMode::pose;
 
-    yarp::dev::PolyDriver         rightarm_cartesian_driver_;
-    yarp::dev::ICartesianControl* itf_rightarm_cart_;
+    yarp::dev::PolyDriver          rightarm_cartesian_driver_;
+    yarp::dev::ICartesianControl*  itf_rightarm_cart_;
 
-    yarp::dev::PolyDriver         gaze_driver_;
-    yarp::dev::IGazeControl     * itf_gaze_;
+    yarp::dev::PolyDriver          gaze_driver_;
+    yarp::dev::IGazeControl     *  itf_gaze_;
 
-    bool                          vs_control_running_ = false;
-    bool                          vs_goal_reached_    = false;
-    const double                  Ts_                 = 0.1; /* [s] */
-    double                        K_x_                = 0.75;
-    double                        K_o_                = 1.5;
-    double                        max_x_dot_          = 0.025; /* [m/s] */
-    double                        max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
-    double                        px_tol_             = 10.0;
+    bool                           vs_control_running_ = false;
+    bool                           vs_goal_reached_    = false;
+    const double                   Ts_                 = 0.1; /* [s] */
+    double                         K_x_                = 0.75;
+    double                         K_o_                = 1.5;
+    double                         max_x_dot_          = 0.025; /* [m/s] */
+    double                         max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
+    double                         px_tol_             = 10.0;
 
-    yarp::sig::Vector             goal_pose_ = yarp::math::zeros(6);
-    yarp::sig::Matrix             l_proj_;
-    yarp::sig::Matrix             r_proj_;
-    yarp::sig::Matrix             l_H_r_to_eye_;
-    yarp::sig::Matrix             r_H_r_to_eye_;
-    yarp::sig::Matrix             l_H_eye_to_r_;
-    yarp::sig::Matrix             r_H_eye_to_r_;
-    yarp::sig::Matrix             l_H_r_to_cam_;
-    yarp::sig::Matrix             r_H_r_to_cam_;
-    yarp::sig::Matrix             px_to_cartesian_;
+    yarp::sig::Vector              goal_pose_ = yarp::math::zeros(6);
+    yarp::sig::Matrix              l_proj_;
+    yarp::sig::Matrix              r_proj_;
+    yarp::sig::Matrix              l_H_r_to_eye_;
+    yarp::sig::Matrix              r_H_r_to_eye_;
+    yarp::sig::Matrix              l_H_eye_to_r_;
+    yarp::sig::Matrix              r_H_eye_to_r_;
+    yarp::sig::Matrix              l_H_r_to_cam_;
+    yarp::sig::Matrix              r_H_r_to_cam_;
+    yarp::sig::Matrix              px_to_cartesian_;
 
-    double                        traj_time_ = 3.0;
-    yarp::sig::Vector             l_px_goal_ = yarp::math::zeros(8);
-    yarp::sig::Vector             r_px_goal_ = yarp::math::zeros(8);
-    yarp::sig::Vector             px_des_    = yarp::math::zeros(12);
+    double                         traj_time_ = 3.0;
+    std::vector<yarp::sig::Vector> l_px_goal_ = std::vector<yarp::sig::Vector>(4);
+    std::vector<yarp::sig::Vector> r_px_goal_ = std::vector<yarp::sig::Vector>(4);
+    yarp::sig::Vector              px_des_    = yarp::math::zeros(12);
 
-    int                           ctx_local_cart_;
-    int                           ctx_remote_cart_;
-    int                           ctx_local_gaze_;
-    int                           ctx_remote_gaze_;
+    int                            ctx_local_cart_;
+    int                            ctx_remote_cart_;
+    int                            ctx_local_gaze_;
+    int                            ctx_remote_gaze_;
 
     yarp::os::BufferedPort<yarp::sig::Vector>                       port_pose_left_in_;
     yarp::os::BufferedPort<yarp::sig::Vector>                       port_pose_right_in_;
@@ -228,9 +232,11 @@ private:
 
     bool setCameraTransformations();
 
-    bool setGoal(const yarp::sig::Vector& l_px_goal, const yarp::sig::Vector& r_px_goal);
+    bool setPoseGoal(const yarp::sig::Vector& goal_x, const yarp::sig::Vector& goal_o);
 
-    bool setGoal(const std::vector<yarp::sig::Vector>& l_px_goal, const std::vector<yarp::sig::Vector>& r_px_goal);
+//    bool setPixelGoal(const yarp::sig::Vector& l_px_goal, const yarp::sig::Vector& r_px_goal);
+
+    bool setPixelGoal(const std::vector<yarp::sig::Vector>& l_px_goal, const std::vector<yarp::sig::Vector>& r_px_goal);
 
     yarp::sig::Vector collectionOfVector2Vector(const std::vector<yarp::sig::Vector>& vectors);
 

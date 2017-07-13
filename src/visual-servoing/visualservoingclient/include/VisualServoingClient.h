@@ -33,6 +33,8 @@ public:
 
 
     /* IVisualServoing overrides */
+    bool goToGoal(const yarp::sig::Vector& vec_x, const yarp::sig::Vector& vec_o) override;
+
     bool goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r) override;
 
     bool setModality(const std::string& mode) override;

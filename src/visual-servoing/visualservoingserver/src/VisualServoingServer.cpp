@@ -213,11 +213,32 @@ bool VisualServoingServer::close()
 
 
 /* IVisualServoing overrides */
+bool VisualServoingServer::goToGoal(const Vector& vec_x, const Vector& vec_o)
+{
+    yInfoVerbose("*** VisualServoingServer::goToGoal with pose goal invoked ***");
+
+    std::vector<Vector> vec_px_l = getPixelPositionGoalFrom3DPose(vec_x, vec_o, CamSel::left);
+    std::vector<Vector> vec_px_r = getPixelPositionGoalFrom3DPose(vec_x, vec_o, CamSel::right);
+
+    setPoseGoal(vec_x, vec_o);
+    setPixelGoal(vec_px_l, vec_px_r);
+
+    return start();
+}
+
+
 bool VisualServoingServer::goToGoal(const std::vector<Vector>& vec_px_l, const std::vector<Vector>& vec_px_r)
 {
-    yInfoVerbose("*** VisualServoingServer::goToGoal invoked ***");
+    yInfoVerbose("*** VisualServoingServer::goToGoal with pixel goal invoked ***");
 
-    setGoal(vec_px_l, vec_px_r);
+    yWarningVerbose("<!-- If you did not invoke either one of:");
+    yWarningVerbose("<!--  1. get3DPositionGoalFrom3DPose()");
+    yWarningVerbose("<!--  2. getPixelPositionGoalFrom3DPose");
+    yWarningVerbose("<!-- visual servoing will just not work, and the server may also close.");
+    yWarningVerbose("<!-- To the current implementation, this behaviour is intentional.");
+    yWarningVerbose("<!-- Upcoming releases will change the behaviour of this method.");
+
+    setPixelGoal(vec_px_l, vec_px_r);
 
     return start();
 }
@@ -341,9 +362,9 @@ std::vector<Vector> VisualServoingServer::get3DPositionGoalFrom3DPose(const Vect
     pose.setSubvector(3, o.subVector(0, 2));
     pose.setSubvector(3, pose.subVector(3, 5) * o[3]);
 
-    goal_pose_.setSubvector(0, x);
-    goal_pose_.setSubvector(3, o.subVector(0, 2));
-    goal_pose_.setSubvector(3, goal_pose_.subVector(0, 2) * o[3]);
+    yWarningVerbose("<!-- Invoking setPoseGoal() to set the goal pose for visual servoing.");
+    yWarningVerbose("<!-- Be warned that this specific invokation will be removed in upcoming releases.");
+    setPoseGoal(x, o);
 
     std::vector<Vector> vec_goal_points = getControlPointsFromPose(pose);
 
@@ -355,6 +376,7 @@ std::vector<Vector> VisualServoingServer::getPixelPositionGoalFrom3DPose(const V
 {
     yAssert(x.length() == 3);
     yAssert(o.length() == 4);
+    yAssert(cam == CamSel::left || cam == CamSel::right);
 
 
     Vector pose(6);
@@ -362,9 +384,9 @@ std::vector<Vector> VisualServoingServer::getPixelPositionGoalFrom3DPose(const V
     pose.setSubvector(3, o.subVector(0, 2));
     pose.setSubvector(3, pose.subVector(3, 5) * o[3]);
 
-    goal_pose_.setSubvector(0, x);
-    goal_pose_.setSubvector(3, o.subVector(0, 2));
-    goal_pose_.setSubvector(3, goal_pose_.subVector(3, 5) * o[3]);
+    yWarningVerbose("<!-- Invoking setPoseGoal() to set the goal pose for visual servoing.");
+    yWarningVerbose("<!-- Be warned that this specific invokation will be removed in upcoming releases.");
+    setPoseGoal(x, o);
 
     setCameraTransformations();
 
@@ -523,11 +545,10 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
 
     setCameraTransformations();
 
-    std::vector<Vector> l_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::left);
-    std::vector<Vector> r_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::right);
+    std::vector<Vector> l_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::left);
+    std::vector<Vector> r_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::right);
 
-    setGoal(l_control_px_from_pose, r_control_px_from_pose);
-
+    setPixelGoal(l_px_from_pose, r_px_from_pose);
 
     return start();
 }
@@ -580,10 +601,10 @@ bool VisualServoingServer::goToSFMGoal()
 
         setCameraTransformations();
 
-        std::vector<Vector> l_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::left);
-        std::vector<Vector> r_control_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::right);
+        std::vector<Vector> l_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::left);
+        std::vector<Vector> r_px_from_pose = getPixelsFromPose(goal_pose_, CamSel::right);
 
-        setGoal(l_control_px_from_pose, r_control_px_from_pose);
+        setPixelGoal(l_px_from_pose, r_px_from_pose);
     }
     else
         return false;
@@ -891,20 +912,20 @@ void VisualServoingServer::run()
 
         for (unsigned int i = 0; i < l_px_position.size(); ++i)
         {
-            const Vector&      l_px_p = l_px_position[i];
-            const Vector&      l_px_o = l_px_orientation[i];
-            const Vector&      r_px_p = r_px_position[i];
-            const Vector&      r_px_o = r_px_orientation[i];
-            const cv::Scalar&  col    = color[i];
-            const unsigned int j      = 2 * i;
+            const Vector& l_px_p = l_px_position[i];
+            const Vector& l_px_o = l_px_orientation[i];
+            const Vector& r_px_p = r_px_position[i];
+            const Vector& r_px_o = r_px_orientation[i];
+            const Vector& l_px_g = l_px_goal_[i];
+            const Vector& r_px_g = r_px_goal_[i];
 
-            cv::circle(l_img, cv::Point(l_px_p[0],     l_px_p[1]),         4, col, 4);
-            cv::circle(l_img, cv::Point(l_px_o[0],     l_px_o[1]),         4, col, 4);
-            cv::circle(l_img, cv::Point(l_px_goal_[j], l_px_goal_[j + 1]), 4, col, 4);
+            cv::circle(l_img, cv::Point(l_px_p[0], l_px_p[1]), 4, color[i], 4);
+            cv::circle(l_img, cv::Point(l_px_o[0], l_px_o[1]), 4, color[i], 4);
+            cv::circle(l_img, cv::Point(l_px_g[0], l_px_g[1]), 4, color[i], 4);
 
-            cv::circle(r_img, cv::Point(r_px_p[0],     r_px_p[1]),         4, col, 4);
-            cv::circle(r_img, cv::Point(r_px_o[0],     r_px_o[1]),         4, col, 4);
-            cv::circle(r_img, cv::Point(r_px_goal_[j], r_px_goal_[j + 1]), 4, col, 4);
+            cv::circle(r_img, cv::Point(r_px_p[0], r_px_p[1]), 4, color[i], 4);
+            cv::circle(r_img, cv::Point(r_px_o[0], r_px_o[1]), 4, color[i], 4);
+            cv::circle(r_img, cv::Point(r_px_g[0], r_px_g[1]), 4, color[i], 4);
         }
 
         port_image_left_out_.write();
@@ -998,7 +1019,7 @@ bool VisualServoingServer::quit()
 }
 
 
-bool VisualServoingServer::go_to_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r)
+bool VisualServoingServer::go_to_px_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r)
 {
     if (vec_px_l.size() != 4 || vec_px_l.size() != 4)
         return false;
@@ -1022,6 +1043,18 @@ bool VisualServoingServer::go_to_goal(const std::vector<std::vector<double>>& ve
     }
 
     return goToGoal(yvec_px_l, yvec_px_r);
+}
+
+
+bool VisualServoingServer::go_to_pose_goal(const std::vector<double>& vec_x, const std::vector<double>& vec_o)
+{
+    if (vec_x.size() != 3 || vec_o.size() != 4)
+        return false;
+
+    Vector yvec_x(vec_x.size(), vec_x.data());
+    Vector yvec_o(vec_o.size(), vec_o.data());
+
+    return goToGoal(yvec_x, yvec_o);
 }
 
 
@@ -1330,6 +1363,7 @@ bool VisualServoingServer::unsetTorsoDOF()
 
 std::vector<Vector> VisualServoingServer::getPixelsFromPose(const Vector& pose, const CamSel& cam)
 {
+    yAssert(pose.length() == 6);
     yAssert(cam == CamSel::left || cam == CamSel::right);
 
 
@@ -1535,11 +1569,13 @@ bool VisualServoingServer::setCameraTransformations()
 {
     Vector left_eye_x;
     Vector left_eye_o;
-    itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o);
+    if (!itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o))
+        return false;
 
     Vector right_eye_x;
     Vector right_eye_o;
-    itf_gaze_->getRightEyePose(right_eye_x, right_eye_o);
+    if (!itf_gaze_->getRightEyePose(right_eye_x, right_eye_o))
+        return false;
 
     yInfoVerbose("left_eye_o = ["  + left_eye_o.toString()  + "]");
     yInfoVerbose("right_eye_o = [" + right_eye_o.toString() + "]");
@@ -1560,42 +1596,68 @@ bool VisualServoingServer::setCameraTransformations()
 
     l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
     r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
-}
-
-
-bool VisualServoingServer::setGoal(const Vector& l_px_goal, const Vector& r_px_goal)
-{
-    l_px_goal_ = l_px_goal;
-    r_px_goal_ = r_px_goal;
-
-    yInfoVerbose("l_px_goal_ = [" + l_px_goal_.toString() + "]");
-    yInfoVerbose("r_px_goal_ = [" + r_px_goal_.toString() + "]");
-
-    px_des_[0]  = l_px_goal_[0];   /* u_x0_l */
-    px_des_[1]  = r_px_goal_[0];   /* u_x0_r */
-    px_des_[2]  = l_px_goal_[1];   /* v_x0_l */
-
-    px_des_[3]  = l_px_goal_[2];   /* u_x1_l */
-    px_des_[4]  = r_px_goal_[2];   /* u_x1_r */
-    px_des_[5]  = l_px_goal_[3];   /* v_x1_l */
-
-    px_des_[6]  = l_px_goal_[4];   /* u_x2_l */
-    px_des_[7]  = r_px_goal_[4];   /* u_x2_r */
-    px_des_[8]  = l_px_goal_[5];   /* v_x2_l */
-
-    px_des_[9]  = l_px_goal_[6];   /* u_x3_l */
-    px_des_[10] = r_px_goal_[6];   /* u_x3_r */
-    px_des_[11] = l_px_goal_[7];   /* v_x3_l */
-
-    yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
 
     return true;
 }
 
 
-bool VisualServoingServer::setGoal(const std::vector<Vector>& l_px_goal, const std::vector<Vector>& r_px_goal)
+bool VisualServoingServer::setPoseGoal(const yarp::sig::Vector& goal_x, const yarp::sig::Vector& goal_o)
 {
-    return setGoal(collectionOfVector2Vector(l_px_goal), collectionOfVector2Vector(r_px_goal));
+    goal_pose_.setSubvector(0, goal_x);
+    goal_pose_.setSubvector(3, goal_o.subVector(0, 2) * goal_o[3]);
+
+    return true;
+}
+
+
+//bool VisualServoingServer::setPixelGoal(const Vector& l_px_goal, const Vector& r_px_goal)
+//{
+//    l_px_goal_ = l_px_goal;
+//    r_px_goal_ = r_px_goal;
+//
+//    yInfoVerbose("l_px_goal_ = [" + l_px_goal_.toString() + "]");
+//    yInfoVerbose("r_px_goal_ = [" + r_px_goal_.toString() + "]");
+//
+//    px_des_[0]  = l_px_goal_[0];   /* u_x0_l */
+//    px_des_[1]  = r_px_goal_[0];   /* u_x0_r */
+//    px_des_[2]  = l_px_goal_[1];   /* v_x0_l */
+//
+//    px_des_[3]  = l_px_goal_[2];   /* u_x1_l */
+//    px_des_[4]  = r_px_goal_[2];   /* u_x1_r */
+//    px_des_[5]  = l_px_goal_[3];   /* v_x1_l */
+//
+//    px_des_[6]  = l_px_goal_[4];   /* u_x2_l */
+//    px_des_[7]  = r_px_goal_[4];   /* u_x2_r */
+//    px_des_[8]  = l_px_goal_[5];   /* v_x2_l */
+//
+//    px_des_[9]  = l_px_goal_[6];   /* u_x3_l */
+//    px_des_[10] = r_px_goal_[6];   /* u_x3_r */
+//    px_des_[11] = l_px_goal_[7];   /* v_x3_l */
+//
+//    yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
+//
+//    return true;
+//}
+
+
+bool VisualServoingServer::setPixelGoal(const std::vector<Vector>& l_px_goal, const std::vector<Vector>& r_px_goal)
+{
+    l_px_goal_ = l_px_goal;
+    r_px_goal_ = r_px_goal;
+
+    for (unsigned int i = 0; i < l_px_goal_.size(); ++i)
+    {
+        yInfoVerbose("l_px_goal_" + std::to_string(i) + " = [" + l_px_goal_[i].toString() + "]");
+        yInfoVerbose("r_px_goal_" + std::to_string(i) + " = [" + r_px_goal_[i].toString() + "]");
+
+        px_des_[3 * i]     = l_px_goal_[i][0];   /* u_xi_l */
+        px_des_[3 * i + 1] = r_px_goal_[i][0];   /* u_xi_r */
+        px_des_[3 * i + 2] = l_px_goal_[i][1];   /* v_xi_l */
+    }
+
+    yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
+
+    return true;
 }
 
 

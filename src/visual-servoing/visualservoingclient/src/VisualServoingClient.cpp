@@ -108,6 +108,18 @@ bool VisualServoingClient::close()
 
 
 /* IVisualServoing overrides */
+bool VisualServoingClient::goToGoal(const Vector& vec_x, const Vector& vec_o)
+{
+    if (vec_x.size() != 3 || vec_o.size() != 4)
+        return false;
+
+    std::vector<double> std_vec_x(vec_x.data(), vec_x.data() + vec_x.size());
+    std::vector<double> std_vec_o(vec_o.data(), vec_o.data() + vec_o.size());
+
+    return visualservoing_control.go_to_pose_goal(std_vec_x, std_vec_o);
+}
+
+
 bool VisualServoingClient::goToGoal(const std::vector<Vector>& vec_px_l, const std::vector<Vector>& vec_px_r)
 {
     if (vec_px_l.size() != vec_px_r.size())
@@ -130,7 +142,7 @@ bool VisualServoingClient::goToGoal(const std::vector<Vector>& vec_px_l, const s
         v_r = std::vector<double>(yv_r.data(), yv_r.data() + yv_r.size());
     }
 
-    return visualservoing_control.go_to_goal(std_vec_px_l, std_vec_px_r);
+    return visualservoing_control.go_to_px_goal(std_vec_px_l, std_vec_px_r);
 }
 
 
