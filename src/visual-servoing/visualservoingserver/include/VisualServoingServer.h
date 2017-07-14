@@ -159,7 +159,7 @@ private:
     yarp::dev::ICartesianControl*  itf_rightarm_cart_;
 
     yarp::dev::PolyDriver          gaze_driver_;
-    yarp::dev::IGazeControl     *  itf_gaze_;
+    yarp::dev::IGazeControl*       itf_gaze_;
 
     bool                           vs_control_running_ = false;
     bool                           vs_goal_reached_    = false;
@@ -184,7 +184,7 @@ private:
     std::mutex                     mtx_px_des_;
     std::mutex                     mtx_H_eye_cam_;
 
-    std::thread                    thr_background_update_params_;
+    std::thread*                   thr_background_update_params_;
 
     std::vector<yarp::sig::Vector> l_px_goal_ = std::vector<yarp::sig::Vector>(4);
     std::vector<yarp::sig::Vector> r_px_goal_ = std::vector<yarp::sig::Vector>(4);

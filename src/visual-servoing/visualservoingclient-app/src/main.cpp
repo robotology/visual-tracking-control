@@ -52,14 +52,14 @@ int main(int argc, char **argv)
     visual_servoing->waitVisualServoingDone();
 
     /* Stored set-up */
-    visual_servoing->storedInit("t170713");
+    visual_servoing->storedInit("t170427");
     visual_servoing->storedGoToGoal("t170713");
 
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
 
     /* Pixel go to goal */
-    visual_servoing->storedInit("t170713");
+    visual_servoing->storedInit("t170427");
 
     Vector x(3);
     Vector o(4);
@@ -74,8 +74,15 @@ int main(int argc, char **argv)
     visual_servoing->waitVisualServoingDone();
 
     /* Pose go to goal */
-    visual_servoing->storedInit("t170713");
+    visual_servoing->storedInit("t170427");
     visual_servoing->goToGoal(x, o);
+
+    visual_servoing->checkVisualServoingController();
+    visual_servoing->waitVisualServoingDone();
+
+    /* Pose go to goal */
+    visual_servoing->storedInit("t170427");
+    visual_servoing->storedGoToGoal("t170711");
 
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();

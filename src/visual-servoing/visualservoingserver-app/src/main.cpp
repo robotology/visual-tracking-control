@@ -80,5 +80,12 @@ int main(int argc, char **argv)
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
 
+    /* Pose go to goal */
+    visual_servoing->storedInit("t170713");
+    visual_servoing->storedGoToGoal("t170711");
+
+    visual_servoing->checkVisualServoingController();
+    visual_servoing->waitVisualServoingDone();
+
     return EXIT_SUCCESS;
 }

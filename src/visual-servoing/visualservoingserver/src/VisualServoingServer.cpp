@@ -440,8 +440,6 @@ bool VisualServoingServer::storedInit(const std::string& label)
         gaze_loc[0] = -0.681;
         gaze_loc[1] =  0.112;
         gaze_loc[2] = -0.240;
-
-//        unsetTorsoDOF();
     }
     else if (label == "t170713")
     {
@@ -459,8 +457,6 @@ bool VisualServoingServer::storedInit(const std::string& label)
         gaze_loc[0] = -0.627;
         gaze_loc[1] =  0.164;
         gaze_loc[2] = -0.283;
-
-//        unsetTorsoDOF();
     }
     else if (label == "sfm300517")
     {
@@ -479,15 +475,16 @@ bool VisualServoingServer::storedInit(const std::string& label)
         gaze_loc[1] =  0.252;
         gaze_loc[2] = -0.409;
 
-//        setTorsoDOF();
         itf_rightarm_cart_->setLimits(0,  25.0,  25.0);
     }
     else
         return false;
 
-
     yInfoVerbose("Init position: "    + xd.toString());
     yInfoVerbose("Init orientation: " + od.toString());
+
+
+    unsetTorsoDOF();
 
     itf_rightarm_cart_->goToPoseSync(xd, od);
     itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
@@ -495,7 +492,8 @@ bool VisualServoingServer::storedInit(const std::string& label)
 
     itf_rightarm_cart_->removeTipFrame();
 
-//    unsetTorsoDOF();
+    setTorsoDOF();
+
 
     yInfoVerbose("Fixation point: " + gaze_loc.toString());
 
@@ -641,10 +639,6 @@ bool VisualServoingServer::goToSFMGoal()
 void VisualServoingServer::beforeStart()
 {
     yInfoVerbose("*** Thread::beforeStart invoked ***");
-
-    yInfoVerbose("*** Launching background process UpdateVisualServoingParamters ***");
-    is_stopping_backproc_update_vs_params = false;
-    thr_background_update_params_ = std::thread(&VisualServoingServer::backproc_UpdateVisualServoingParamters, this);
 }
 
 
@@ -652,12 +646,22 @@ bool VisualServoingServer::threadInit()
 {
     yInfoVerbose("*** Thread::threadInit invoked ***");
 
+
+    /* SETTING STATUS */
     vs_control_running_ = true;
     vs_goal_reached_    = false;
+
 
     /* RESTORING CARTESIAN AND GAZE CONTEXT */
     itf_rightarm_cart_->restoreContext(ctx_local_cart_);
     itf_gaze_->restoreContext(ctx_local_gaze_);
+
+
+    /* SETTING BACKGROUND THREAD */
+    yInfoVerbose("*** Launching background process UpdateVisualServoingParamters ***");
+    is_stopping_backproc_update_vs_params = false;
+    thr_background_update_params_ = new std::thread(&VisualServoingServer::backproc_UpdateVisualServoingParamters, this);
+
 
     yInfoVerbose("");
     yInfoVerbose("*** Running visual-servoing! ***");
@@ -986,10 +990,6 @@ void VisualServoingServer::afterStart(bool success)
 void VisualServoingServer::onStop()
 {
     yInfoVerbose("*** Thread::onStop invoked ***");
-
-    yInfoVerbose("*** Stopping background process UpdateVisualServoingParamters ***");
-    is_stopping_backproc_update_vs_params = true;
-    thr_background_update_params_.join();
 }
 
 
@@ -997,9 +997,17 @@ void VisualServoingServer::threadRelease()
 {
     yInfoVerbose("*** Thread::threadRelease invoked ***");
 
+
     /* ENSURE CONTROLLERS ARE STOPPED */
     itf_rightarm_cart_->stopControl();
     itf_gaze_->stopControl();
+
+
+    /* STOPPING AND JOINING BACKGROUND THREAD */
+    yInfoVerbose("*** Stopping background process UpdateVisualServoingParamters ***");
+    is_stopping_backproc_update_vs_params = true;
+    thr_background_update_params_->join();
+    delete thr_background_update_params_;
 
 
     /* RESTORING REMOTE CARTESIAN AND GAZE CONTEXTS */
