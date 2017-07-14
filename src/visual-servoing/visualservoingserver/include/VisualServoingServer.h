@@ -4,6 +4,8 @@
 #include "thrift/VisualServoingIDL.h"
 
 #include <cmath>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 #include <yarp/dev/CartesianControl.h>
@@ -165,22 +167,25 @@ private:
     double                         max_x_dot_          = 0.025; /* [m/s] */
     double                         max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
     double                         px_tol_             = 10.0;
+    double                         traj_time_          = 3.0;
 
-    yarp::sig::Vector              goal_pose_ = yarp::math::zeros(6);
     yarp::sig::Matrix              l_proj_;
     yarp::sig::Matrix              r_proj_;
-    yarp::sig::Matrix              l_H_r_to_eye_;
-    yarp::sig::Matrix              r_H_r_to_eye_;
-    yarp::sig::Matrix              l_H_eye_to_r_;
-    yarp::sig::Matrix              r_H_eye_to_r_;
-    yarp::sig::Matrix              l_H_r_to_cam_;
-    yarp::sig::Matrix              r_H_r_to_cam_;
-    yarp::sig::Matrix              px_to_cartesian_;
 
-    double                         traj_time_ = 3.0;
+    yarp::sig::Vector              goal_pose_    = yarp::math::zeros(6);
+    yarp::sig::Vector              px_des_       = yarp::math::zeros(12);
+    yarp::sig::Matrix              l_H_eye_to_r_ = yarp::math::zeros(4, 4);
+    yarp::sig::Matrix              r_H_eye_to_r_ = yarp::math::zeros(4, 4);
+    yarp::sig::Matrix              l_H_r_to_cam_ = yarp::math::zeros(4, 4);
+    yarp::sig::Matrix              r_H_r_to_cam_ = yarp::math::zeros(4, 4);
+
+    std::mutex                     mtx_px_des_;
+    std::mutex                     mtx_H_eye_cam_;
+
+    std::thread                    thr_background_update_params_;
+
     std::vector<yarp::sig::Vector> l_px_goal_ = std::vector<yarp::sig::Vector>(4);
     std::vector<yarp::sig::Vector> r_px_goal_ = std::vector<yarp::sig::Vector>(4);
-    yarp::sig::Vector              px_des_    = yarp::math::zeros(12);
 
     int                            ctx_local_cart_;
     int                            ctx_remote_cart_;
@@ -235,6 +240,9 @@ private:
     bool setPoseGoal(const yarp::sig::Vector& goal_x, const yarp::sig::Vector& goal_o);
 
     bool setPixelGoal(const std::vector<yarp::sig::Vector>& l_px_goal, const std::vector<yarp::sig::Vector>& r_px_goal);
+
+    void backproc_UpdateVisualServoingParamters();
+    bool is_stopping_backproc_update_vs_params = true;
 
     void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo()    << str; };
     void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning() << str; };

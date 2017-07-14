@@ -441,7 +441,7 @@ bool VisualServoingServer::storedInit(const std::string& label)
         gaze_loc[1] =  0.112;
         gaze_loc[2] = -0.240;
 
-        unsetTorsoDOF();
+//        unsetTorsoDOF();
     }
     else if (label == "t170713")
     {
@@ -460,7 +460,7 @@ bool VisualServoingServer::storedInit(const std::string& label)
         gaze_loc[1] =  0.164;
         gaze_loc[2] = -0.283;
 
-        unsetTorsoDOF();
+//        unsetTorsoDOF();
     }
     else if (label == "sfm300517")
     {
@@ -479,38 +479,29 @@ bool VisualServoingServer::storedInit(const std::string& label)
         gaze_loc[1] =  0.252;
         gaze_loc[2] = -0.409;
 
-        setTorsoDOF();
+//        setTorsoDOF();
         itf_rightarm_cart_->setLimits(0,  25.0,  25.0);
     }
     else
         return false;
 
 
-    double traj_time = 0.0;
-    itf_rightarm_cart_->getTrajTime(&traj_time);
+    yInfoVerbose("Init position: "    + xd.toString());
+    yInfoVerbose("Init orientation: " + od.toString());
 
-    if (norm(xd) != 0.0 && norm(od) != 0.0 && norm(gaze_loc) != 0.0 && traj_time == traj_time_)
-    {
-        yInfoVerbose("Init position: "    + xd.toString());
-        yInfoVerbose("Init orientation: " + od.toString());
+    itf_rightarm_cart_->goToPoseSync(xd, od);
+    itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
+    itf_rightarm_cart_->stopControl();
 
-        itf_rightarm_cart_->goToPoseSync(xd, od);
-        itf_rightarm_cart_->waitMotionDone(0.1, 10.0);
-        itf_rightarm_cart_->stopControl();
+    itf_rightarm_cart_->removeTipFrame();
 
-        itf_rightarm_cart_->removeTipFrame();
+//    unsetTorsoDOF();
 
-        unsetTorsoDOF();
+    yInfoVerbose("Fixation point: " + gaze_loc.toString());
 
-
-        yInfoVerbose("Fixation point: " + gaze_loc.toString());
-
-        itf_gaze_->lookAtFixationPointSync(gaze_loc);
-        itf_gaze_->waitMotionDone(0.1, 10.0);
-        itf_gaze_->stopControl();
-    }
-    else
-        return false;
+    itf_gaze_->lookAtFixationPointSync(gaze_loc);
+    itf_gaze_->waitMotionDone(0.1, 10.0);
+    itf_gaze_->stopControl();
 
 
     itf_rightarm_cart_->restoreContext(ctx_remote_cart_);
@@ -651,7 +642,9 @@ void VisualServoingServer::beforeStart()
 {
     yInfoVerbose("*** Thread::beforeStart invoked ***");
 
-    setCameraTransformations();
+    yInfoVerbose("*** Launching background process UpdateVisualServoingParamters ***");
+    is_stopping_backproc_update_vs_params = false;
+    thr_background_update_params_ = std::thread(&VisualServoingServer::backproc_UpdateVisualServoingParamters, this);
 }
 
 
@@ -661,6 +654,10 @@ bool VisualServoingServer::threadInit()
 
     vs_control_running_ = true;
     vs_goal_reached_    = false;
+
+    /* RESTORING CARTESIAN AND GAZE CONTEXT */
+    itf_rightarm_cart_->restoreContext(ctx_local_cart_);
+    itf_gaze_->restoreContext(ctx_local_gaze_);
 
     yInfoVerbose("");
     yInfoVerbose("*** Running visual-servoing! ***");
@@ -672,11 +669,6 @@ bool VisualServoingServer::threadInit()
 
 void VisualServoingServer::run()
 {
-    /* Restoring cartesian and gaze context */
-    itf_rightarm_cart_->restoreContext(ctx_local_cart_);
-    itf_gaze_->restoreContext(ctx_local_gaze_);
-
-
     Vector  est_copy_left(6);
     Vector  est_copy_right(6);
     Vector* estimates;
@@ -759,6 +751,9 @@ void VisualServoingServer::run()
         yInfoVerbose("jacobian_orientation  = [\n" + jacobian_orientation.toString() + "]");
 
 
+        /* EVALUATING ERRORS */
+        mtx_px_des_.lock();
+
         Vector e_position               = px_des_ - px_ee_cur_position;
         Matrix inv_jacobian_position    = pinv(jacobian_position);
 
@@ -768,6 +763,11 @@ void VisualServoingServer::run()
         yInfoVerbose("e_position = [" + e_position.toString() + "]");
         yInfoVerbose("e_orientation = [" + e_orientation.toString() + "]");
 
+        mtx_px_des_.unlock();
+
+
+        /* EVALUATING CONTROL VELOCITIES */
+        mtx_H_eye_cam_.lock();
 
         Vector vel_x = zeros(3);
         Vector vel_o = zeros(3);
@@ -787,6 +787,8 @@ void VisualServoingServer::run()
                 vel_o += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_orientation.subVector(3, 5);
             }
         }
+
+        mtx_H_eye_cam_.unlock();
 
         double ang = norm(vel_o);
         vel_o /= ang;
@@ -890,7 +892,9 @@ void VisualServoingServer::run()
         Time::delay(Ts_);
 
 
-        /* Check for goal */
+        /* CHECK FOR GOAL */
+        mtx_px_des_.lock();
+
         bool is_pos_done = ((std::abs(px_des_(0) - px_ee_cur_position(0)) < px_tol_) && (std::abs(px_des_(1)  - px_ee_cur_position(1))  < px_tol_) && (std::abs(px_des_(2)  - px_ee_cur_position(2))  < px_tol_) &&
                             (std::abs(px_des_(3) - px_ee_cur_position(3)) < px_tol_) && (std::abs(px_des_(4)  - px_ee_cur_position(4))  < px_tol_) && (std::abs(px_des_(5)  - px_ee_cur_position(5))  < px_tol_) &&
                             (std::abs(px_des_(6) - px_ee_cur_position(6)) < px_tol_) && (std::abs(px_des_(7)  - px_ee_cur_position(7))  < px_tol_) && (std::abs(px_des_(8)  - px_ee_cur_position(8))  < px_tol_) &&
@@ -900,6 +904,8 @@ void VisualServoingServer::run()
                                (std::abs(px_des_(3) - px_ee_cur_orientation(3)) < px_tol_) && (std::abs(px_des_(4)  - px_ee_cur_orientation(4))  < px_tol_) && (std::abs(px_des_(5)  - px_ee_cur_orientation(5))  < px_tol_) &&
                                (std::abs(px_des_(6) - px_ee_cur_orientation(6)) < px_tol_) && (std::abs(px_des_(7)  - px_ee_cur_orientation(7))  < px_tol_) && (std::abs(px_des_(8)  - px_ee_cur_orientation(8))  < px_tol_) &&
                                (std::abs(px_des_(9) - px_ee_cur_orientation(9)) < px_tol_) && (std::abs(px_des_(10) - px_ee_cur_orientation(10)) < px_tol_) && (std::abs(px_des_(11) - px_ee_cur_orientation(11)) < px_tol_));
+
+        mtx_px_des_.unlock();
 
         if (op_mode_ == OperatingMode::position)
             vs_goal_reached_ = is_pos_done;
@@ -962,17 +968,6 @@ void VisualServoingServer::run()
         port_image_right_out_.write();
         /* *** *** ***  *** *** *** *** *** *** *** *** *** *** */
     }
-
-    itf_rightarm_cart_->stopControl();
-    itf_gaze_->stopControl();
-
-
-    /* Restoring remote cartesian and gaze context */
-    itf_rightarm_cart_->restoreContext(ctx_remote_cart_);
-    itf_gaze_->restoreContext(ctx_remote_gaze_);
-
-
-    vs_control_running_ = false;
 }
 
 
@@ -998,13 +993,32 @@ void VisualServoingServer::afterStart(bool success)
 void VisualServoingServer::onStop()
 {
     yInfoVerbose("*** Thread::onStop invoked ***");
+
+    yInfoVerbose("*** Stopping background process UpdateVisualServoingParamters ***");
+    is_stopping_backproc_update_vs_params = true;
+    thr_background_update_params_.join();
 }
 
 
 void VisualServoingServer::threadRelease()
 {
     yInfoVerbose("*** Thread::threadRelease invoked ***");
+
+    /* ENSURE CONTROLLERS ARE STOPPED */
+    itf_rightarm_cart_->stopControl();
+    itf_gaze_->stopControl();
+
+
+    /* RESTORING REMOTE CARTESIAN AND GAZE CONTEXTS */
+    itf_rightarm_cart_->restoreContext(ctx_remote_cart_);
+    itf_gaze_->restoreContext(ctx_remote_gaze_);
+
+
+    vs_control_running_ = false;
+
+    yInfoVerbose("");
     yInfoVerbose("*** Visual servoing terminated! ***");
+    yInfoVerbose("");
 }
 
 
@@ -1250,7 +1264,7 @@ bool VisualServoingServer::setRightArmCartesianController()
     yInfoVerbose("Succesfully set ICartesianControl target tolerance.");
 
 
-    if (!unsetTorsoDOF())
+    if (!setTorsoDOF())
     {
         yErrorVerbose("Unable to change torso DOF!");
         return false;
@@ -1597,6 +1611,8 @@ Vector VisualServoingServer::getAxisAngle(const Vector& v)
 
 bool VisualServoingServer::setCameraTransformations()
 {
+    std::lock_guard<std::mutex> lock(mtx_H_eye_cam_);
+
     Vector left_eye_x;
     Vector left_eye_o;
     if (!itf_gaze_->getLeftEyePose(left_eye_x, left_eye_o))
@@ -1614,18 +1630,15 @@ bool VisualServoingServer::setCameraTransformations()
     l_H_eye_to_r_ = axis2dcm(left_eye_o);
     left_eye_x.push_back(1.0);
     l_H_eye_to_r_.setCol(3, left_eye_x);
-    l_H_r_to_eye_ = SE3inv(l_H_eye_to_r_);
+    Matrix l_H_r_to_eye = SE3inv(l_H_eye_to_r_);
 
     r_H_eye_to_r_ = axis2dcm(right_eye_o);
     right_eye_x.push_back(1.0);
     r_H_eye_to_r_.setCol(3, right_eye_x);
-    r_H_r_to_eye_ = SE3inv(r_H_eye_to_r_);
+    Matrix r_H_r_to_eye = SE3inv(r_H_eye_to_r_);
 
-    yInfoVerbose("l_H_r_to_eye_ = [\n" + l_H_r_to_eye_.toString() + "]");
-    yInfoVerbose("r_H_r_to_eye_ = [\n" + r_H_r_to_eye_.toString() + "]");
-
-    l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye_;
-    r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye_;
+    l_H_r_to_cam_ = l_proj_ * l_H_r_to_eye;
+    r_H_r_to_cam_ = r_proj_ * r_H_r_to_eye;
 
     return true;
 }
@@ -1642,6 +1655,9 @@ bool VisualServoingServer::setPoseGoal(const yarp::sig::Vector& goal_x, const ya
 
 bool VisualServoingServer::setPixelGoal(const std::vector<Vector>& l_px_goal, const std::vector<Vector>& r_px_goal)
 {
+    std::lock_guard<std::mutex> lock(mtx_px_des_);
+
+
     l_px_goal_ = l_px_goal;
     r_px_goal_ = r_px_goal;
 
@@ -1658,4 +1674,28 @@ bool VisualServoingServer::setPixelGoal(const std::vector<Vector>& l_px_goal, co
     yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
 
     return true;
+}
+
+
+void VisualServoingServer::backproc_UpdateVisualServoingParamters()
+{
+    yInfoVerbose("*** Started background process UpdateVisualServoingParamters ***");
+
+    while (!is_stopping_backproc_update_vs_params)
+    {
+        Vector vec_x = goal_pose_.subVector(0, 2);
+
+        double ang   = norm(goal_pose_.subVector(3, 5));
+        Vector vec_o = goal_pose_.subVector(3, 5) / ang;
+        vec_o.push_back(ang);
+
+        std::vector<Vector> vec_px_l = getPixelPositionGoalFrom3DPose(vec_x, vec_o, CamSel::left);
+        std::vector<Vector> vec_px_r = getPixelPositionGoalFrom3DPose(vec_x, vec_o, CamSel::right);
+
+        setPoseGoal(vec_x, vec_o);
+
+        setPixelGoal(vec_px_l, vec_px_r);
+    }
+
+    yInfoVerbose("*** Stopped background process UpdateVisualServoingParamters ***");
 }
