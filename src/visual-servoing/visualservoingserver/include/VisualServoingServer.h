@@ -72,8 +72,10 @@ public:
 
     bool setMaxOrientationVelocity(const float max_o_dot) override;
 
+    //!!!: change to -> get3DGoalPositionsFrom3DPose
     std::vector<yarp::sig::Vector> get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o) override;
 
+    //!!!: change to -> getGoalPixelsFrom3DPose
     std::vector<yarp::sig::Vector> getPixelPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o, const CamSel& cam) override;
 
     bool storedInit(const std::string& label) override;
@@ -216,9 +218,10 @@ private:
 
     bool unsetTorsoDOF();
 
-    std::vector<yarp::sig::Vector> getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel& cam, const PixelControlMode& mode);
-
+    //!!!: questa funzione non dovrebbe esistere vista la presenza di getPixelPositionGoalFrom3DPose()
     std::vector<yarp::sig::Vector> getPixelsFromPose(const yarp::sig::Vector& pose, const CamSel& cam);
+
+    std::vector<yarp::sig::Vector> getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel& cam, const PixelControlMode& mode);
 
     std::vector<yarp::sig::Vector> getControlPointsFromPose(const yarp::sig::Vector& pose);
 

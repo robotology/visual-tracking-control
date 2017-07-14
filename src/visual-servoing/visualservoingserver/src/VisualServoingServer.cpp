@@ -689,7 +689,7 @@ void VisualServoingServer::run()
     {
         if (!do_once)
         {
-            /* Get the initial end-effector pose from left eye view */
+            /* GET THE END-EFFECTOR POSE ESTIMATES FOR THE LEFT EYE */
             estimates = port_pose_left_in_.read(true);
             yInfoVerbose("Got [" + estimates->toString() + "] from left eye particle filter.");
             if (estimates->length() == 7)
@@ -704,7 +704,7 @@ void VisualServoingServer::run()
             else
                 est_copy_left = *estimates;
 
-            /* Get the initial end-effector pose from right eye view */
+            /* GET THE END-EFFECTOR POSE ESTIMATES FOR THE RIGHT EYE */
             estimates = port_pose_right_in_.read(true);
             yInfoVerbose("Got [" + estimates->toString() + "] from right eye particle filter.");
             if (estimates->length() == 7)
@@ -798,7 +798,7 @@ void VisualServoingServer::run()
         yInfoVerbose("vel_o = [" + vel_o.toString()  + "]");
 
 
-        /* Enforce translational velocity bounds */
+        /* ENFORCE TRANSLATIONAL VELOCITY BOUNDS */
         for (size_t i = 0; i < vel_x.length(); ++i)
         {
             if (!std::isnan(vel_x[i]) && !std::isinf(vel_x[i]))
@@ -812,7 +812,7 @@ void VisualServoingServer::run()
         yInfoVerbose("bounded vel_x = [" + vel_x.toString() + "]");
 
 
-        /* Enforce rotational velocity bounds */
+        /* ENFORCE ROTATIONAL VELOCITY BOUNDS */
         if (!std::isnan(vel_o[0]) && !std::isinf(vel_x[0]) &&
             !std::isnan(vel_o[1]) && !std::isinf(vel_x[1]) &&
             !std::isnan(vel_o[2]) && !std::isinf(vel_x[2]) &&
@@ -823,7 +823,7 @@ void VisualServoingServer::run()
         yInfoVerbose("bounded vel_o = [" + vel_o.toString() + "]");
 
 
-        /* Visual control law */
+        /* VISUAL CONTROL LAW */
         vel_x    *= K_x_;
         vel_o(3) *= K_o_;
 
@@ -842,12 +842,6 @@ void VisualServoingServer::run()
         /* *********************** SIM ************************ */
         if (sim_)
         {
-            /* Simulate reaching starting from the initial position */
-            /* 1) Get the initial end-effector pose from left/right eye view: must execute only once */
-            /* 2) itf_rightarm_cart_->setTaskVelocities() calls: must be commented */
-
-            /* Evaluate the new orientation vector from axis-angle representation */
-            /* The following code is a copy of the setTaskVelocities() code */
             Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
             Matrix l_R = axis2dcm(l_o);
             Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
@@ -888,7 +882,7 @@ void VisualServoingServer::run()
         /* **************************************************** */
 
 
-        /* Wait for some motion */
+        /* WAIT FOR SOME MOTION */
         Time::delay(Ts_);
 
 
@@ -925,7 +919,6 @@ void VisualServoingServer::run()
             yInfoVerbose("*** ------------- ***");
             yInfoVerbose("");
         }
-
 
         /* *** *** *** DEBUG OUTPUT - TO BE DELETED *** *** *** */
         std::vector<cv::Scalar> color;
