@@ -401,7 +401,7 @@ std::vector<Vector> VisualServoingServer::getPixelPositionGoalFrom3DPose(const V
 bool VisualServoingServer::storedInit(const std::string& label)
 {
     itf_rightarm_cart_->restoreContext(ctx_local_cart_);
-    itf_gaze_->restoreContext(ctx_local_gaze_);
+//    itf_gaze_->restoreContext(ctx_local_gaze_);
 
 
     Vector xd       = zeros(3);
@@ -503,7 +503,7 @@ bool VisualServoingServer::storedInit(const std::string& label)
 
 
     itf_rightarm_cart_->restoreContext(ctx_remote_cart_);
-    itf_gaze_->restoreContext(ctx_remote_gaze_);
+//    itf_gaze_->restoreContext(ctx_remote_gaze_);
 
     return true;
 }
@@ -654,7 +654,7 @@ bool VisualServoingServer::threadInit()
 
     /* RESTORING CARTESIAN AND GAZE CONTEXT */
     itf_rightarm_cart_->restoreContext(ctx_local_cart_);
-    itf_gaze_->restoreContext(ctx_local_gaze_);
+//    itf_gaze_->restoreContext(ctx_local_gaze_);
 
 
     /* SETTING BACKGROUND THREAD */
@@ -1012,7 +1012,7 @@ void VisualServoingServer::threadRelease()
 
     /* RESTORING REMOTE CARTESIAN AND GAZE CONTEXTS */
     itf_rightarm_cart_->restoreContext(ctx_remote_cart_);
-    itf_gaze_->restoreContext(ctx_remote_gaze_);
+//    itf_gaze_->restoreContext(ctx_remote_gaze_);
 
 
     vs_control_running_ = false;
@@ -1317,28 +1317,28 @@ bool VisualServoingServer::setGazeController()
     }
 
 
-    if (!itf_gaze_->storeContext(&ctx_remote_gaze_))
-    {
-        yErrorVerbose("Error storing remote IGazeControl contex!");
-        return false;
-    }
-    yInfoVerbose("Remote IGazeControl context stored.");
-
-
-    if (!itf_gaze_->storeContext(&ctx_local_gaze_))
-    {
-        yErrorVerbose("Error storing local IGazeControl context!");
-        return false;
-    }
-    yInfoVerbose("Local IGazeControl context stored.");
-
-
-    if (!itf_gaze_->restoreContext(ctx_remote_gaze_))
-    {
-        yErrorVerbose("Error restoring remote IGazeControl context!");
-        return false;
-    }
-    yInfoVerbose("Remote IGazeControl context restored.");
+//    if (!itf_gaze_->storeContext(&ctx_remote_gaze_))
+//    {
+//        yErrorVerbose("Error storing remote IGazeControl contex!");
+//        return false;
+//    }
+//    yInfoVerbose("Remote IGazeControl context stored.");
+//
+//
+//    if (!itf_gaze_->storeContext(&ctx_local_gaze_))
+//    {
+//        yErrorVerbose("Error storing local IGazeControl context!");
+//        return false;
+//    }
+//    yInfoVerbose("Local IGazeControl context stored.");
+//
+//
+//    if (!itf_gaze_->restoreContext(ctx_remote_gaze_))
+//    {
+//        yErrorVerbose("Error restoring remote IGazeControl context!");
+//        return false;
+//    }
+//    yInfoVerbose("Remote IGazeControl context restored.");
 
 
     return true;
