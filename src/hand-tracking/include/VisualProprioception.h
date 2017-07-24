@@ -86,7 +86,7 @@ protected:
 
     void              setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds);
 
-    void              getPoses(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, std::vector<Superimpose::ObjPoseMap>& hand_poses);
+    void              getPoses(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, std::vector<Superimpose::ModelPoseContainer>& hand_poses);
 
     yarp::sig::Vector readArmEncoders();
     yarp::sig::Vector readTorso();
@@ -94,20 +94,20 @@ protected:
     yarp::sig::Vector readRootToEye(const yarp::os::ConstString cam_sel);
     /* **** */
 
-    yarp::os::ConstString    cam_sel_;
-    double                   cam_x_[3];
-    double                   cam_o_[4];
-    unsigned int             cam_width_;
-    unsigned int             cam_height_;
-    float                    cam_fx_;
-    float                    cam_cx_;
-    float                    cam_fy_;
-    float                    cam_cy_;
+    yarp::os::ConstString     cam_sel_;
+    double                    cam_x_[3];
+    double                    cam_o_[4];
+    unsigned int              cam_width_;
+    unsigned int              cam_height_;
+    float                     cam_fx_;
+    float                     cam_cx_;
+    float                     cam_fy_;
+    float                     cam_cy_;
 
-    Superimpose::ObjFileMap  cad_obj_;
-    SICAD                  * si_cad_;
-    int                      ogl_tiles_rows_;
-    int                      ogl_tiles_cols_;
+    SICAD::ModelPathContainer cad_obj_;
+    SICAD*                    si_cad_;
+    int                       ogl_tiles_rows_;
+    int                       ogl_tiles_cols_;
 
     bool file_found(const yarp::os::ConstString& file);
 

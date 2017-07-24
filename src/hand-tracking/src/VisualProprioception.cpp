@@ -159,8 +159,16 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
 
     try
     {
-        si_cad_ = new SICAD(cad_obj_, cam_width_, cam_height_, num_images, shader_path,
-                            cam_fx_, cam_fy_, cam_cx_, cam_cy_);
+        std::vector<float> root_to_ogl({0.0f, 0.0f, 1.0f, 0.0f,
+                                        1.0f, 0.0f, 0.0f, 0.0f,
+                                        0.0f, 1.0f, 0.0f, 0.0f,
+                                        0.0f, 0.0f, 0.0f, 1.0f});
+
+        si_cad_ = new SICAD(cad_obj_,
+                            cam_width_, cam_height_,cam_fx_, cam_fy_, cam_cx_, cam_cy_,
+                            num_images,
+                            root_to_ogl,
+                            shader_path);
     }
     catch (const std::runtime_error& e)
     {
@@ -319,15 +327,15 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 }
 
 
-void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::vector<Superimpose::ObjPoseMap>& hand_poses)
+void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::vector<Superimpose::ModelPoseContainer>& hand_poses)
 {
     for (int j = 0; j < cur_state.cols(); ++j)
     {
-        Superimpose::ObjPoseMap hand_pose;
-        Superimpose::ObjPose    pose;
-        Vector                  ee_t(4);
-        Vector                  ee_o(4);
-        float                   ang;
+        Superimpose::ModelPoseContainer hand_pose;
+        Superimpose::ModelPose          pose;
+        Vector                          ee_t(4);
+        Vector                          ee_o(4);
+        float                           ang;
 
 
         ee_t(0) = cur_state(0, j);
@@ -396,7 +404,7 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
 
 void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputArray observation)
 {
-    std::vector<Superimpose::ObjPoseMap> hand_poses;
+    std::vector<Superimpose::ModelPoseContainer> hand_poses;
     getPoses(cur_state, hand_poses);
 
     observation.create(cam_height_ * si_cad_->getTilesRows(), cam_width_ * si_cad_->getTilesCols(), CV_8UC3);
