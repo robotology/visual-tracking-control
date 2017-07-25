@@ -327,7 +327,7 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 }
 
 
-void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::vector<Superimpose::ModelPoseContainer>& hand_poses)
+void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_state, std::vector<Superimpose::ModelPoseContainer>& hand_poses)
 {
     for (int j = 0; j < cur_state.cols(); ++j)
     {
@@ -405,7 +405,7 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
 void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputArray observation)
 {
     std::vector<Superimpose::ModelPoseContainer> hand_poses;
-    getPoses(cur_state, hand_poses);
+    getModelPose(cur_state, hand_poses);
 
     observation.create(cam_height_ * si_cad_->getTilesRows(), cam_width_ * si_cad_->getTilesCols(), CV_8UC3);
     Mat hand_ogl = observation.getMat();

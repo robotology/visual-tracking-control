@@ -86,7 +86,7 @@ protected:
 
     void              setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds);
 
-    void              getPoses(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, std::vector<Superimpose::ModelPoseContainer>& hand_poses);
+    void              getModelPose(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, std::vector<Superimpose::ModelPoseContainer>& hand_poses);
 
     yarp::sig::Vector readArmEncoders();
     yarp::sig::Vector readTorso();
