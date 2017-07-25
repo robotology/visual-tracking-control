@@ -67,7 +67,7 @@ void VisualSIRParticleFilter::runFilter()
 
     /* FILTERING */
     is_running_ = true;
-    ImageOf<PixelRgb>* imgin_left  = YARP_NULLPTR;
+    ImageOf<PixelRgb>* img_in  = YARP_NULLPTR;
     while(is_running_)
     {
         std::vector<float> descriptors_cam_left (descriptor_length_);
@@ -75,8 +75,8 @@ void VisualSIRParticleFilter::runFilter()
         cuda::GpuMat       cuda_img_alpha       (Size(img_width_, img_height_), CV_8UC4);
         cuda::GpuMat       descriptors_cam_cuda (Size(descriptor_length_, 1),   CV_32F );
 
-        imgin_left = port_image_in_.read(true);
-        if (imgin_left != YARP_NULLPTR)
+        img_in = port_image_in_.read(true);
+        if (img_in != YARP_NULLPTR)
         {
             MatrixXf temp_particle(6, num_particles_);
             VectorXf temp_weight(num_particles_, 1);
@@ -86,7 +86,7 @@ void VisualSIRParticleFilter::runFilter()
             // ???: Measurement process may be a class
             Mat measurement;
 
-            measurement = cvarrToMat(imgin_left->getIplImage());
+            measurement = cvarrToMat(img_in->getIplImage());
             cuda_img.upload(measurement);
             cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);
             cuda_hog_->compute(cuda_img_alpha, descriptors_cam_cuda);

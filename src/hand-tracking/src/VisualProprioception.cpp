@@ -60,12 +60,12 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
         {
             yInfo() << log_ID_ << "[FALLBACK][CAM PARAMS]" << fallback_intrinsic->toString();
 
-            cam_width_  = fallback_intrinsic->get(0).asDouble();
-            cam_height_ = fallback_intrinsic->get(1).asDouble();
-            cam_fx_     = fallback_intrinsic->get(2).asDouble();
-            cam_cx_     = fallback_intrinsic->get(3).asDouble();
-            cam_fy_     = fallback_intrinsic->get(4).asDouble();
-            cam_cy_     = fallback_intrinsic->get(5).asDouble();
+            cam_width_  = static_cast<unsigned int>(fallback_intrinsic->get(0).asInt());
+            cam_height_ = static_cast<unsigned int>(fallback_intrinsic->get(1).asInt());
+            cam_fx_     = static_cast<float>(fallback_intrinsic->get(2).asDouble());
+            cam_cx_     = static_cast<float>(fallback_intrinsic->get(3).asDouble());
+            cam_fy_     = static_cast<float>(fallback_intrinsic->get(4).asDouble());
+            cam_cy_     = static_cast<float>(fallback_intrinsic->get(5).asDouble());
         }
         else
         {
@@ -73,8 +73,8 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
             cam_width_  = 320;
             cam_height_ = 240;
             cam_fx_     = 257.34;
-            cam_cx_     = 160;
-            cam_fy_     = 120;
+            cam_cx_     = 160.0;
+            cam_fy_     = 120.0;
             cam_cy_     = 257.34;
         }
     }
@@ -86,14 +86,14 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     yInfo() << log_ID_ << "[CAM]" << " - cx:"     << cam_cx_;
     yInfo() << log_ID_ << "[CAM]" << " - cy:"     << cam_cy_;
 
-    cam_x_[0]   = 0;
-    cam_x_[1]   = 0;
-    cam_x_[2]   = 0;
+    cam_x_[0] = 0;
+    cam_x_[1] = 0;
+    cam_x_[2] = 0;
 
-    cam_o_[0]   = 0;
-    cam_o_[1]   = 0;
-    cam_o_[2]   = 0;
-    cam_o_[3]   = 0;
+    cam_o_[0] = 0;
+    cam_o_[1] = 0;
+    cam_o_[2] = 0;
+    cam_o_[3] = 0;
 
     /* Comment/Uncomment to add/remove limbs */
     rf.setDefaultContext(context + "/mesh");
