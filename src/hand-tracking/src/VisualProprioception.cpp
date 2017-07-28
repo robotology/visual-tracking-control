@@ -74,8 +74,8 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
             cam_height_ = 240;
             cam_fx_     = 257.34;
             cam_cx_     = 160.0;
-            cam_fy_     = 120.0;
-            cam_cy_     = 257.34;
+            cam_fy_     = 257.34;
+            cam_cy_     = 120.0;
         }
     }
     yInfo() << log_ID_ << "[CAM]" << "Running with:";
@@ -294,7 +294,7 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
     icub_kin_finger_[0] = std::move(proprio.icub_kin_finger_[0]);
     icub_kin_finger_[1] = std::move(proprio.icub_kin_finger_[1]);
     icub_kin_finger_[2] = std::move(proprio.icub_kin_finger_[2]);
-    
+
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
     cam_x_[2] = proprio.cam_x_[2];
@@ -567,7 +567,7 @@ yarp::sig::Matrix VisualProprioception::getInvertedH(const double a, const doubl
      *  i = 8	0           0           pi/2              90 + ( 10 ->   -65)
      *  i = 9	62.5        25.98       0                180 + (-25 ->    25)
      **/
-    
+
     yarp::sig::Matrix H(4, 4);
 
     double theta = offset + q;
