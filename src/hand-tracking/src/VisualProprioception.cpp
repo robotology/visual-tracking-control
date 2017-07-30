@@ -159,15 +159,10 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
 
     try
     {
-        std::vector<float> root_to_ogl({0.0f, 0.0f, 1.0f, 0.0f,
-                                        1.0f, 0.0f, 0.0f, 0.0f,
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 0.0f, 1.0f});
-
         si_cad_ = new SICAD(cad_obj_,
                             cam_width_, cam_height_,cam_fx_, cam_fy_, cam_cx_, cam_cy_,
                             num_images,
-                            root_to_ogl,
+                            {1.0, 0.0, 0.0, M_PI},
                             shader_path);
     }
     catch (const std::runtime_error& e)
