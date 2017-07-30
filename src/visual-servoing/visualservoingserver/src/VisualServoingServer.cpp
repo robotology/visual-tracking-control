@@ -323,7 +323,7 @@ bool VisualServoingServer::setTranslationGain(const float K_x)
 {
     K_x_ = K_x;
 
-    return false;
+    return true;
 }
 
 
@@ -331,7 +331,7 @@ bool VisualServoingServer::setMaxTranslationVelocity(const float max_x_dot)
 {
     max_x_dot_ = max_x_dot;
 
-    return false;
+    return true;
 }
 
 
@@ -339,7 +339,7 @@ bool VisualServoingServer::setOrientationGain(const float K_o)
 {
     K_o_ = K_o;
 
-    return false;
+    return true;
 }
 
 
@@ -347,7 +347,7 @@ bool VisualServoingServer::setMaxOrientationVelocity(const float max_o_dot)
 {
     max_o_dot_ = max_o_dot;
 
-    return false;
+    return true;
 }
 
 
