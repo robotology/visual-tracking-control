@@ -77,11 +77,6 @@ bool VisualServoingServer::open(Searchable &config)
         yErrorVerbose("Could not open /visual-servoing/cam_left/img:o port!");
         return false;
     }
-    if (!port_click_left_.open("/visual-servoing/cam_left/click:i"))
-    {
-        yErrorVerbose("Could not open /visual-servoing/cam_left/click:in port!");
-        return false;
-    }
 
 
     if (!port_image_right_in_.open("/visual-servoing/cam_right/img:i"))
@@ -92,6 +87,13 @@ bool VisualServoingServer::open(Searchable &config)
     if (!port_image_right_out_.open("/visual-servoing/cam_right/img:o"))
     {
         yErrorVerbose("Could not open /visual-servoing/cam_right/img:o port!");
+        return false;
+    }
+
+
+    if (!port_click_left_.open("/visual-servoing/cam_left/click:i"))
+    {
+        yErrorVerbose("Could not open /visual-servoing/cam_left/click:in port!");
         return false;
     }
     if (!port_click_right_.open("/visual-servoing/cam_right/click:i"))
