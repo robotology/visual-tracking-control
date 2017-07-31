@@ -122,7 +122,7 @@ void VisualSIRParticleFilter::runFilter()
                     break;
 
                 case EstimatesExtraction::mode :
-                    out_particle = mean(init_particle, init_weight);
+                    out_particle = mode(init_particle, init_weight);
                     break;
 
                 case EstimatesExtraction::sm_average :
