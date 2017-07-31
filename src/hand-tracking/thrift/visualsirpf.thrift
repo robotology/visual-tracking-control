@@ -1,7 +1,7 @@
 # Copyright: (C) 2017 iCub Facility - Istituto Italiano di Tecnologia
 # Authors: Claudio Fantacci
 #
-# idl_visualsirpf.thrift
+# visualsirpf.thrift
 
 /**
  * VisualSIRParticleFilterIDL
@@ -11,6 +11,31 @@
 
 service VisualSIRParticleFilterIDL
 {
+    /**
+     * Initialize and run the visual SIR particle filter. Returns upon
+     * successful or failure setup.
+     *
+     * @return true/false on success/failure.
+     */
+    bool run_filter();
+
+    /**
+     * Reset the visual SIR particle filter. Returns upon successful or failure
+     * reset.
+     *
+     * @return true/false on success/failure.
+     */
+    bool reset_filter();
+
+    /**
+     * Stop and reset the SIR particle filter. This method must be called when
+     * the SIR particle filter is no longer needed or a new filtering task
+     * need to be initialized.
+     *
+     * @return true/false on success/failure.
+     */
+    bool stop_filter();
+
     /**
      * Use/Don't use the analog values from the right hand to correct the finger
      * poses.
@@ -54,7 +79,7 @@ service VisualSIRParticleFilterIDL
     bool set_mobile_average_window(1:i16 window = 20);
 
     /**
-     * Gently close the application deallocating resources.
+     * Gently close the application, deallocating resources.
      */
     bool quit();
 }

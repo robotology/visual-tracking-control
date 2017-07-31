@@ -53,7 +53,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/VisualSIRParticleFilter.cpp)
 
 set(${EXE_TARGET_NAME}_THRIFT_HDR
-        thrift/idl_visualsirpf.thrift)
+        thrift/visualsirpf.thrift)
 
 # Application target calls
 yarp_add_idl(${EXE_TARGET_NAME}_THRIFT_SRC ${${EXE_TARGET_NAME}_THRIFT_HDR})
