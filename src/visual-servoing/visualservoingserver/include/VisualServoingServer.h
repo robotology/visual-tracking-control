@@ -46,6 +46,12 @@ public:
 
 
     /* IVisualServoing overrides */
+    bool init(const bool use_direct_kin) override;
+
+    bool reset() override;
+
+    bool teardown() override;
+
     bool goToGoal(const yarp::sig::Vector& vec_x, const yarp::sig::Vector& vec_o) override;
 
     bool goToGoal(const std::vector<yarp::sig::Vector>& vec_px_l, const std::vector<yarp::sig::Vector>& vec_px_r) override;
@@ -72,12 +78,12 @@ public:
 
     bool setMaxOrientationVelocity(const float max_o_dot) override;
 
-    //!!!: change to -> get3DGoalPositionsFrom3DPose
     std::vector<yarp::sig::Vector> get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o) override;
 
-    //!!!: change to -> getGoalPixelsFrom3DPose
     std::vector<yarp::sig::Vector> getPixelPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o, const CamSel& cam) override;
 
+
+    /* TO BE DEPRECATED */
     bool storedInit(const std::string& label) override;
 
     bool storedGoToGoal(const std::string& label) override;
@@ -100,16 +106,6 @@ protected:
 
 
     /* VisualServoingIDL overrides */
-    /* EXPERIMENTAL */
-    bool stored_init(const std::string& label) override;
-
-    bool stored_go_to_goal(const std::string& label) override;
-
-    bool get_goal_from_sfm() override;
-
-    /* TO CONSIDER */
-    bool quit() override;
-
     /* FROM INTERFACE */
     bool go_to_px_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r) override;
 
@@ -140,6 +136,15 @@ protected:
     std::vector<std::vector<double>> get_3D_position_goal_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o) override;
 
     std::vector<std::vector<double>> get_pixel_position_goal_from_3D_pose(const std::vector<double> & x, const std::vector<double> & o, const std::string& cam) override;
+
+    bool quit() override;
+
+    /* TO BE DEPRECATED */
+    bool stored_init(const std::string& label) override;
+
+    bool stored_go_to_goal(const std::string& label) override;
+
+    bool get_goal_from_sfm() override;
 
 
     /* Enum helpers */
@@ -191,8 +196,8 @@ private:
 
     int                            ctx_local_cart_;
     int                            ctx_remote_cart_;
-    int                            ctx_local_gaze_;
-    int                            ctx_remote_gaze_;
+//    int                            ctx_local_gaze_;
+//    int                            ctx_remote_gaze_;
 
     yarp::os::BufferedPort<yarp::sig::Vector>                       port_pose_left_in_;
     yarp::os::BufferedPort<yarp::sig::Vector>                       port_pose_right_in_;

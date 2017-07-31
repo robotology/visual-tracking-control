@@ -108,6 +108,24 @@ bool VisualServoingClient::close()
 
 
 /* IVisualServoing overrides */
+bool VisualServoingClient::init(const bool use_direct_kin)
+{
+    return false;
+}
+
+
+bool VisualServoingClient::reset()
+{
+    return false;
+}
+
+
+bool VisualServoingClient::teardown()
+{
+    return false;
+}
+
+
 bool VisualServoingClient::goToGoal(const Vector& vec_x, const Vector& vec_o)
 {
     if (vec_x.size() != 3 || vec_o.size() != 4)

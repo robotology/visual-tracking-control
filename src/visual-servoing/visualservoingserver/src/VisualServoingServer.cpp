@@ -213,6 +213,36 @@ bool VisualServoingServer::close()
 
 
 /* IVisualServoing overrides */
+bool VisualServoingServer::init(const bool use_direct_kin)
+{
+    bool status = true;
+
+    if (use_direct_kin)
+    {
+        status &= Network::connect("/" + robot_name_ + "/cartesianController/right_arm/state:o", "/visual-servoing/pose/left:i");
+        status &= Network::connect("/" + robot_name_ + "/cartesianController/right_arm/state:o", "/visual-servoing/pose/right:i");
+    }
+    else
+    {
+
+    }
+
+    return status;
+}
+
+
+bool VisualServoingServer::reset()
+{
+
+}
+
+
+bool VisualServoingServer::teardown()
+{
+
+}
+
+
 bool VisualServoingServer::goToGoal(const Vector& vec_x, const Vector& vec_o)
 {
     yInfoVerbose("*** VisualServoingServer::goToGoal with pose goal invoked ***");

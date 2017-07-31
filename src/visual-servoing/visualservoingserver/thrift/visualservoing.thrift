@@ -12,80 +12,82 @@
 service VisualServoingIDL
 {
     /**
-     * Initialize the robot to an initial position.
-     * The initial positions are stored on an external file and are referenced
-     * by a unique label.
+     * Initialize support modules and connections to perform a visual servoing
+     * task. This method must be called before any other visual servoing
+     * methods. Returns upon successful or failure setup.
      *
-     * @param label a label referring to one of the available initial positions;
-     *              the string shall be one of the available modes returned
-     *              by the get_info() method.
+     * @param use_direct_kin instruct the visual servoing control to either use
+     *                       direct kinematic or an estimated/refined pose of
+     *                       the end-effector.
      *
-     * @return true upon success, false otherwise.
+     * @note Default value: false. There usually is an error in the robot
+     *       direct kinematics that should be compensated to perform precise
+     *       visual servoing. To this end, a recursive Bayesian estimation
+     *       filter is used to compensate for this error. Such filter is
+     *       initialized during initialization execution.
+     *
+     * @return true/false on success/failure.
      */
-    bool stored_init(1:string label);
+    bool init_visual_servoing(1: bool use_direct_kin);
 
     /**
-     * Set the robot visual servoing goal.
-     * The goals are stored on an external file and are referenced by a unique
-     * label.
+     * Reset support modules and connections to perform the current initialized
+     * visual servoing task. Returns upon successful or failure setup.
      *
-     * @param label a label referring to one of the available goals;
-     *              the string shall be one of the available modes returned
-     *              by the get_info() method.
+     * @note This method also resets the recursive Bayesian estimation filter.
+     *       It may happen that the recursive Bayesian filter does not provide
+     *       satisfactory pose estimation or diverges. Thus this method can be
+     *       used to reset the filter.
      *
-     * @return true upon success, false otherwise.
+     * @return true/false on success/failure.
      */
-    bool stored_go_to_goal(1:string label);
+    bool reset_visual_servoing();
 
     /**
-     * Get goal point from SFM module. The point is taken by clicking on a
-     * dedicated 'yarpview' GUI and the orientation is hard-coded.
+     * Stop and disconnect support modules and connections used for visual
+     * servoing. This method must be called when visual servoing is no longer
+     * needed or a new visual servoing task need to be initialized.
      *
-     * @note This service is experimental and should be used with care.
+     * @note This method also stops the recursive Bayesian estimation filter.
+     *       Thus it is suggested to call this method every time visual servoing
+     *       has been completed/interrupted to have the filter stopped and
+     *       initialized again during the next init call.
      *
-     * @return true upon success, false otherwise.
+     * @return true/false on success/failure.
      */
-    bool get_goal_from_sfm();
+    bool teardown_visual_servoing();
 
     /**
-     * Gently close the visual servoing server, deallocating resources.
+     * Set the goal points on both left and right camera image plane and start
+     * visual servoing.
+     *
+     * @param vec_px_l a collection of four 2D vectors which contains the (u,v)
+     *                 coordinates of the pixels within the left image plane.
+     * @param vec_px_r a collection of four 2D vectors which contains the (u,v)
+     *                 coordinates of the pixels within the right image plane.
+     *
+     * @note By invoking this method, the visual servoing goal will be reached in
+     *       orientation first, then in position. This is because there may not
+     *       be a feasible position solution for every possible orientation.
+     *
+     * @return true/false on success/failure.
      */
-    bool quit();
-
-
-
-    /* NEW METHODS FROM IVISUALSERVOING */
-    /**
-    * Set the goal points on both left and right camera image plane and start
-    * visual servoing.
-    *
-    * @param vec_px_l a collection of four 2D vectors which contains the (u,v)
-    *                 coordinates of the pixels within the left image plane.
-    * @param vec_px_r a collection of four 2D vectors which contains the (u,v)
-    *                 coordinates of the pixels within the right image plane.
-    *
-    * @note By invoking this method, the visual servoing goal will be reached in
-    *       orientation first, then in position. This is because there may not
-    *       be a feasible position solution for every possible orientation.
-    *
-    * @return true/false on success/failure.
-    */
     bool go_to_px_goal(1: list<list<double>> vec_px_l, 2: list<list<double>> vec_px_r);
 
     /**
-    * Set the goal point (3D for the position + 4D axis-angle for
-    * the orientation) and start visual servoing.
-    *
-    * @param vec_x a 3D vector which contains the (x, y, z) Cartesian
-    *              coordinates of the goal.
-    * @param vec_o a 4D vector which contains the (x, y, z) axis and theta angle
-    *              of rotation of the goal.
-    *
-    * @note By invoking this method, the visual servoing goal will be reached in
-    *       position and orientation together with two parallel tasks.
-    *
-    * @return true/false on success/failure.
-    */
+     * Set the goal point (3D for the position + 4D axis-angle for
+     * the orientation) and start visual servoing.
+     *
+     * @param vec_x a 3D vector which contains the (x, y, z) Cartesian
+     *              coordinates of the goal.
+     * @param vec_o a 4D vector which contains the (x, y, z) axis and theta angle
+     *              of rotation of the goal.
+     *
+     * @note By invoking this method, the visual servoing goal will be reached in
+     *       position and orientation together with two parallel tasks.
+     *
+     * @return true/false on success/failure.
+     */
     bool go_to_pose_goal(1: list<double> vec_x, 2: list<double> vec_o);
 
     /**
@@ -242,4 +244,46 @@ service VisualServoingIDL
      */
     list<list<double>> get_pixel_position_goal_from_3D_pose(1: list<double> x, 2: list<double> o, 3: string cam);
 
+    /**
+     * Gently close the visual servoing server, deallocating resources.
+     */
+    bool quit();
+
+
+    /* TO BE DEPRECATED */
+    /**
+     * Initialize the robot to an initial position.
+     * The initial positions are stored on an external file and are referenced
+     * by a unique label.
+     *
+     * @param label a label referring to one of the available initial positions;
+     *              the string shall be one of the available modes returned
+     *              by the get_info() method.
+     *
+     * @return true upon success, false otherwise.
+     */
+    bool stored_init(1:string label);
+
+    /**
+     * Set the robot visual servoing goal.
+     * The goals are stored on an external file and are referenced by a unique
+     * label.
+     *
+     * @param label a label referring to one of the available goals;
+     *              the string shall be one of the available modes returned
+     *              by the get_info() method.
+     *
+     * @return true upon success, false otherwise.
+     */
+    bool stored_go_to_goal(1:string label);
+
+    /**
+     * Get goal point from SFM module. The point is taken by clicking on a
+     * dedicated 'yarpview' GUI and the orientation is hard-coded.
+     *
+     * @note This service is experimental and should be used with care.
+     *
+     * @return true upon success, false otherwise.
+     */
+    bool get_goal_from_sfm();
 }
