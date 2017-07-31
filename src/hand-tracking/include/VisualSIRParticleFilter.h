@@ -97,17 +97,25 @@ protected:
 
     cv::Ptr<cv::cuda::HOG>                         cuda_hog_;
 
-    yarp::os::BufferedPort<yarp::sig::Vector>                       port_estimates_out_;
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_;
-
-
     unsigned long int                              filtering_step_ = 0;
     bool                                           is_running_     = false;
+    bool                                           is_resetting_   = false;
+    bool                                           is_stopping_    = false;
+
+    yarp::os::BufferedPort<yarp::sig::Vector>                       port_estimates_out_;
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_;
 
 
     yarp::os::Port           port_rpc_command_;
     bool                     attach(yarp::os::Port &source);
     bool                     setCommandPort();
+
+
+    bool                     run_filter() override;
+
+    bool                     reset_filter() override;
+
+    bool                     stop_filter() override;
 
     bool                     use_analogs(const bool status) override;
 

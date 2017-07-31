@@ -106,7 +106,7 @@ bool PlayFwdKinMotion::setProperty(const std::string& property)
         if (property == "ICFW_DELTA")
             return setDeltaMotion();
 
-        if (property == "ICFW_INIT")
+        if (property == "ICFW_PLAY_INIT")
             return setInitialPose();
     }
 
