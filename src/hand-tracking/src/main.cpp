@@ -147,7 +147,8 @@ int main(int argc, char *argv[])
                                     std::move(resampling),
                                     robot_cam_sel, robot_laterality, num_particles);
 
-    vsir_pf.runFilter();
+    vsir_pf.prepare();
+    vsir_pf.wait();
 
     yInfo() << log_ID << "Application closed succesfully.";
     return EXIT_SUCCESS;

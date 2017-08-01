@@ -55,181 +55,165 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
 }
 
 
-void VisualSIRParticleFilter::runFilter()
+void VisualSIRParticleFilter::initialization()
 {
-    do
+    particle_ = MatrixXf(6, num_particles_);
+    weight_   = VectorXf(num_particles_, 1);
+
+    initialization_->initialize(particle_, weight_);
+
+    prediction_->setStateModelProperty("ICFW_PLAY_INIT");
+}
+
+
+void VisualSIRParticleFilter::filteringStep()
+{
+    std::vector<float> descriptors_cam_left (descriptor_length_);
+    cuda::GpuMat       cuda_img             (Size(img_width_, img_height_), CV_8UC3);
+    cuda::GpuMat       cuda_img_alpha       (Size(img_width_, img_height_), CV_8UC4);
+    cuda::GpuMat       descriptors_cam_cuda (Size(descriptor_length_, 1),   CV_32F );
+
+    ImageOf<PixelRgb>* img_in = port_image_in_.read(true);
+    if (img_in != YARP_NULLPTR)
     {
-        is_resetting_ = false;
+        MatrixXf temp_particle(6, num_particles_);
+        VectorXf temp_weight(num_particles_, 1);
+        VectorXf temp_parent(num_particles_, 1);
 
-        /* INITIALIZATION */
-        MatrixXf init_particle(6, num_particles_);
-        VectorXf init_weight(num_particles_, 1);
-        initialization_->initialize(init_particle, init_weight);
+        /* PROCESS CURRENT MEASUREMENT */
+        // ???: Measurement process may be a class
+        Mat measurement;
 
-        prediction_->setStateModelProperty("ICFW_PLAY_INIT");
+        measurement = cvarrToMat(img_in->getIplImage());
+        cuda_img.upload(measurement);
+        cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);
+        cuda_hog_->compute(cuda_img_alpha, descriptors_cam_cuda);
+        descriptors_cam_cuda.download(descriptors_cam_left);
 
-        if (is_stopping_)
+        /* PREDICTION */
+        // !!!: The prediction class shall run over all particles internally, not here
+        VectorXf sorted_pred = weight_;
+        std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
+        float threshold = sorted_pred.tail(6)(0);
+
+        prediction_->setStateModelProperty("ICFW_DELTA");
+        for (int j = 0; j < num_particles_; ++j)
         {
-            is_running_  = false;
-            is_stopping_ = false;
+            if (weight_(j) <= threshold)
+                prediction_->predict(particle_.col(j), particle_.col(j));
+            else
+                prediction_->motion(particle_.col(j), particle_.col(j));
         }
-        while (!is_running_);
-        
-        /* FILTERING */
-        ImageOf<PixelRgb>* img_in = YARP_NULLPTR;
-        while(is_running_ && !is_resetting_ && !is_stopping_)
+
+        /* CORRECTION */
+        correction_->setObservationModelProperty("VP_PARAMS");
+        correction_->correct(particle_, descriptors_cam_left, weight_);
+        weight_ /= weight_.sum();
+
+
+        /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
+        VectorXf out_particle(6);
+        switch (ext_mode)
         {
-            std::vector<float> descriptors_cam_left (descriptor_length_);
-            cuda::GpuMat       cuda_img             (Size(img_width_, img_height_), CV_8UC3);
-            cuda::GpuMat       cuda_img_alpha       (Size(img_width_, img_height_), CV_8UC4);
-            cuda::GpuMat       descriptors_cam_cuda (Size(descriptor_length_, 1),   CV_32F );
+            case EstimatesExtraction::mean :
+                out_particle = mean(particle_, weight_);
+                break;
 
-            img_in = port_image_in_.read(true);
-            if (img_in != YARP_NULLPTR)
-            {
-                MatrixXf temp_particle(6, num_particles_);
-                VectorXf temp_weight(num_particles_, 1);
-                VectorXf temp_parent(num_particles_, 1);
+            case EstimatesExtraction::mode :
+                out_particle = mode(particle_, weight_);
+                break;
 
-                /* PROCESS CURRENT MEASUREMENT */
-                // ???: Measurement process may be a class
-                Mat measurement;
+            case EstimatesExtraction::sm_average :
+                out_particle = smAverage(particle_, weight_);
+                break;
 
-                measurement = cvarrToMat(img_in->getIplImage());
-                cuda_img.upload(measurement);
-                cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);
-                cuda_hog_->compute(cuda_img_alpha, descriptors_cam_cuda);
-                descriptors_cam_cuda.download(descriptors_cam_left);
+            case EstimatesExtraction::wm_average :
+                out_particle = wmAverage(particle_, weight_);
+                break;
 
-                /* PREDICTION */
-                // !!!: The prediction class shall run over all particles internally, not here
-                VectorXf sorted_pred = init_weight;
-                std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
-                float threshold = sorted_pred.tail(6)(0);
+            case EstimatesExtraction::em_average :
+                out_particle = emAverage(particle_, weight_);
+                break;
 
-                prediction_->setStateModelProperty("ICFW_DELTA");
-                for (int j = 0; j < num_particles_; ++j)
-                {
-                    if (init_weight(j) <= threshold)
-                        prediction_->predict(init_particle.col(j), init_particle.col(j));
-                    else
-                        prediction_->motion(init_particle.col(j), init_particle.col(j));
-                }
+            case EstimatesExtraction::am_average :
+                out_particle = amAverage(particle_, weight_);
+                break;
 
-                /* CORRECTION */
-                correction_->setObservationModelProperty("VP_PARAMS");
-                correction_->correct(init_particle, descriptors_cam_left, init_weight);
-                init_weight /= init_weight.sum();
-
-
-                /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
-                VectorXf out_particle(6);
-                switch (ext_mode)
-                {
-                    case EstimatesExtraction::mean :
-                        out_particle = mean(init_particle, init_weight);
-                        break;
-
-                    case EstimatesExtraction::mode :
-                        out_particle = mode(init_particle, init_weight);
-                        break;
-
-                    case EstimatesExtraction::sm_average :
-                        out_particle = smAverage(init_particle, init_weight);
-                        break;
-
-                    case EstimatesExtraction::wm_average :
-                        out_particle = wmAverage(init_particle, init_weight);
-                        break;
-
-                    case EstimatesExtraction::em_average :
-                        out_particle = emAverage(init_particle, init_weight);
-                        break;
-
-                    case EstimatesExtraction::am_average :
-                        out_particle = amAverage(init_particle, init_weight);
-                        break;
-
-                    default:
-                        out_particle.fill(0.0);
-                        break;
-                }
-
-
-                /* RESAMPLING */
-                std::cout << "Step: " << filtering_step_ << "\nNeff: " << resampling_->neff(init_weight) << std::endl;
-                if (resampling_->neff(init_weight) < std::round(num_particles_ / 5.f))
-                {
-                    std::cout << "Resampling!" << std::endl;
-
-                    resampling_->resample(init_particle, init_weight,
-                                          temp_particle, temp_weight,
-                                          temp_parent);
-
-                    init_particle = temp_particle;
-                    init_weight   = temp_weight;
-                }
-
-
-                /* ADVANCE FILTERING STEP COUNTER */
-                filtering_step_++;
-
-                /* STATE ESTIMATE OUTPUT */
-                /* INDEX FINGERTIP */
-    //            Vector q = readRootToEE();
-    //            icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
-    //            Vector chainjoints;
-    //            if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
-    //            else          icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), chainjoints);
-    //            icub_kin_finger_[1].setAng(chainjoints * (M_PI/180.0));
-    //
-    //            Vector l_ee_t(3);
-    //            toEigen(l_ee_t) = out_particle.col(0).head(3).cast<double>();
-    //            l_ee_t.push_back(1.0);
-    //
-    //            Vector l_ee_o(3);
-    //            toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
-    //            l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
-    //
-    //            yarp::sig::Matrix l_Ha = axis2dcm(l_ee_o);
-    //            l_Ha.setCol(3, l_ee_t);
-    //            Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
-    //            Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
-    //            l_i_o.setSubvector(0, l_i_o.subVector(0, 2) * l_i_o[3]);
-    //
-    //
-    //            Vector r_ee_t(3);
-    //            toEigen(r_ee_t) = out_particle.col(1).head(3).cast<double>();
-    //            r_ee_t.push_back(1.0);
-    //
-    //            Vector r_ee_o(3);
-    //            toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
-    //            r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
-    //
-    //            yarp::sig::Matrix r_Ha = axis2dcm(r_ee_o);
-    //            r_Ha.setCol(3, r_ee_t);
-    //            Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
-    //            Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
-    //            r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
-    //
-    //
-    //            Vector& estimates_out = port_estimates_out_.prepare();
-    //            estimates_out.resize(12);
-    //            estimates_out.setSubvector(0, l_i_x);
-    //            estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
-    //            estimates_out.setSubvector(6, r_i_x);
-    //            estimates_out.setSubvector(9, r_i_o.subVector(0, 2));
-    //            port_estimates_out_.write();
-
-                /* PALM */
-                Vector& estimates_out = port_estimates_out_.prepare();
-                estimates_out.resize(6);
-                toEigen(estimates_out) = out_particle.cast<double>();
-                port_estimates_out_.write();
-                /* ********** */
-            }
+            default:
+                out_particle.fill(0.0);
+                break;
         }
-    } while ((is_resetting_ || is_stopping_) && is_running_);
+
+
+        /* RESAMPLING */
+        std::cout << "Step: " << getFilteringStep() << std::endl;
+        std::cout << "Neff: " << resampling_->neff(weight_) << std::endl;
+        if (resampling_->neff(weight_) < std::round(num_particles_ / 5.f))
+        {
+            std::cout << "Resampling!" << std::endl;
+
+            resampling_->resample(particle_, weight_,
+                                  temp_particle, temp_weight,
+                                  temp_parent);
+
+            particle_ = temp_particle;
+            weight_   = temp_weight;
+        }
+
+        /* STATE ESTIMATE OUTPUT */
+        /* INDEX FINGERTIP */
+//        Vector q = readRootToEE();
+//        icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
+//        Vector chainjoints;
+//        if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
+//        else          icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), chainjoints);
+//        icub_kin_finger_[1].setAng(chainjoints * (M_PI/180.0));
+//
+//        Vector l_ee_t(3);
+//        toEigen(l_ee_t) = out_particle.col(0).head(3).cast<double>();
+//        l_ee_t.push_back(1.0);
+//
+//        Vector l_ee_o(3);
+//        toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
+//        l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
+//
+//        yarp::sig::Matrix l_Ha = axis2dcm(l_ee_o);
+//        l_Ha.setCol(3, l_ee_t);
+//        Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
+//        Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
+//        l_i_o.setSubvector(0, l_i_o.subVector(0, 2) * l_i_o[3]);
+//
+//
+//        Vector r_ee_t(3);
+//        toEigen(r_ee_t) = out_particle.col(1).head(3).cast<double>();
+//        r_ee_t.push_back(1.0);
+//
+//        Vector r_ee_o(3);
+//        toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
+//        r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
+//
+//        yarp::sig::Matrix r_Ha = axis2dcm(r_ee_o);
+//        r_Ha.setCol(3, r_ee_t);
+//        Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
+//        Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
+//        r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
+//
+//
+//        Vector& estimates_out = port_estimates_out_.prepare();
+//        estimates_out.resize(12);
+//        estimates_out.setSubvector(0, l_i_x);
+//        estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
+//        estimates_out.setSubvector(6, r_i_x);
+//        estimates_out.setSubvector(9, r_i_o.subVector(0, 2));
+//        port_estimates_out_.write();
+
+        /* PALM */
+        Vector& estimates_out = port_estimates_out_.prepare();
+        estimates_out.resize(6);
+        toEigen(estimates_out) = out_particle.cast<double>();
+        port_estimates_out_.write();
+        /* ********** */
+    }
 }
 
 
@@ -263,7 +247,7 @@ bool VisualSIRParticleFilter::setCommandPort()
 
 bool VisualSIRParticleFilter::run_filter()
 {
-    is_running_ = true;
+    run();
 
     return true;
 }
@@ -271,7 +255,7 @@ bool VisualSIRParticleFilter::run_filter()
 
 bool VisualSIRParticleFilter::reset_filter()
 {
-    is_resetting_ = true;
+    reset();
 
     return false;
 }
@@ -279,7 +263,7 @@ bool VisualSIRParticleFilter::reset_filter()
 
 bool VisualSIRParticleFilter::stop_filter()
 {
-    is_stopping_ = true;
+    reboot();
 
     return false;
 }
@@ -299,8 +283,8 @@ std::vector<std::string> VisualSIRParticleFilter::get_info()
     std::vector<std::string> info;
 
     info.push_back("<| Information about Visual SIR Particle Filter |>");
-    info.push_back("<| The Particle Filter is " + std::string(is_running_     ? "not " : "") + "running |>");
-    info.push_back("<| Filtering step: " + std::to_string(filtering_step_) + " |>");
+    info.push_back("<| The Particle Filter is " + std::string(isRunning() ? "not " : "") + "running |>");
+    info.push_back("<| Filtering step: " + std::to_string(getFilteringStep()) + " |>");
     info.push_back("<| Using " + cam_sel_ + " camera images |>");
     info.push_back("<| Using encoders from " + laterality_ + " iCub arm |>");
     info.push_back("<| Using " + std::to_string(num_particles_) + " particles |>");
@@ -372,9 +356,7 @@ bool VisualSIRParticleFilter::set_mobile_average_window(const int16_t window)
 
 bool VisualSIRParticleFilter::quit()
 {
-    port_image_in_.interrupt();
-
-    is_running_ = false;
+    teardown();
 
     return true;
 }

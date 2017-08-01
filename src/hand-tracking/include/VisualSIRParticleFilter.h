@@ -81,9 +81,13 @@ public:
     /* Move assignment operator */
     VisualSIRParticleFilter& operator=(VisualSIRParticleFilter&& vsir_pf) noexcept = delete;
 
-    void runFilter() override;
+    void initialization() override;
+
+    void filteringStep() override;
 
     void getResult() override;
+
+    bool runCondition() override { return true; };
 
 protected:
     std::unique_ptr<bfl::Initialization>           initialization_;
@@ -97,18 +101,14 @@ protected:
 
     cv::Ptr<cv::cuda::HOG>                         cuda_hog_;
 
-    unsigned long int                              filtering_step_ = 0;
-    bool                                           is_running_     = false;
-    bool                                           is_resetting_   = false;
-    bool                                           is_stopping_    = false;
 
     yarp::os::BufferedPort<yarp::sig::Vector>                       port_estimates_out_;
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_;
 
 
-    yarp::os::Port           port_rpc_command_;
-    bool                     attach(yarp::os::Port &source);
-    bool                     setCommandPort();
+    yarp::os::Port port_rpc_command_;
+    bool           attach(yarp::os::Port &source);
+    bool           setCommandPort();
 
 
     bool                     run_filter() override;
@@ -126,11 +126,11 @@ protected:
 
     /* ESTIMATE EXTRACTION METHODS */
     //!!!: decidere come gestire l'etrazione delle stime.
-    bool            set_estimates_extraction_method(const std::string& method) override;
+    bool          set_estimates_extraction_method(const std::string& method) override;
 
-    bool            set_mobile_average_window(const int16_t window) override;
+    bool          set_mobile_average_window(const int16_t window) override;
 
-    HistoryBuffer   hist_buffer_;
+    HistoryBuffer hist_buffer_;
 
     enum class EstimatesExtraction
     {
@@ -157,17 +157,21 @@ protected:
     Eigen::VectorXf emAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
     Eigen::VectorXf em_weights_;
 
-    bool                       init_filter = true;
-    iCub::ctrl::AWLinEstimator lin_est_x_    {10, 0.02};
-    iCub::ctrl::AWLinEstimator lin_est_o_    {10, 0.5};
-    iCub::ctrl::AWLinEstimator lin_est_theta_{10, 3.0 * iCub::ctrl::CTRL_DEG2RAD};
-    std::chrono::milliseconds  t_{0};
+    bool                                  init_filter = true;
+    iCub::ctrl::AWLinEstimator            lin_est_x_    {10, 0.02};
+    iCub::ctrl::AWLinEstimator            lin_est_o_    {10, 0.5};
+    iCub::ctrl::AWLinEstimator            lin_est_theta_{10, 3.0 * iCub::ctrl::CTRL_DEG2RAD};
+    std::chrono::milliseconds             t_{0};
     std::chrono::steady_clock::time_point time_1_;
     std::chrono::steady_clock::time_point time_2_;
     Eigen::VectorXf amAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
     /* *************************** */
 
 private:
+    Eigen::MatrixXf particle_;
+    Eigen::VectorXf weight_;
+
+
     const int          block_size_        = 16;
     const int          img_width_         = 320;
     const int          img_height_        = 240;
