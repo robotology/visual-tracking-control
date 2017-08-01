@@ -40,11 +40,11 @@ VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<V
 
     for (int s = 0; s < num_cuda_stream_; ++s)
     {
-        hand_rendered_.insert   (hand_rendered_.begin(),    Mat(         Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC3));
-        cuda_img_.insert        (cuda_img_.begin(),         cuda::GpuMat(Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC3));
-        cuda_img_alpha_.insert  (cuda_img_alpha_.begin(),   cuda::GpuMat(Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC4));
-        cuda_descriptors_.insert(cuda_descriptors_.begin(), cuda::GpuMat(Size(num_img_stream_, feature_dim),                           CV_32F ));
-        cpu_descriptors_.insert (cpu_descriptors_.begin(),  Mat(         Size(num_img_stream_, feature_dim),                           CV_32F ));
+        hand_rendered_.emplace_back   (Mat(         Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC3));
+        cuda_img_.emplace_back        (cuda::GpuMat(Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC3));
+        cuda_img_alpha_.emplace_back  (cuda::GpuMat(Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC4));
+        cuda_descriptors_.emplace_back(cuda::GpuMat(Size(num_img_stream_, feature_dim),                           CV_32F ));
+        cpu_descriptors_.emplace_back (Mat(         Size(num_img_stream_, feature_dim),                           CV_32F ));
     }
 }
 
