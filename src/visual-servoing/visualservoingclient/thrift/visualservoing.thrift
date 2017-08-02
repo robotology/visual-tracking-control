@@ -28,7 +28,7 @@ service VisualServoingIDL
      *
      * @return true/false on success/failure.
      */
-    bool init_visual_servoing(1: bool use_direct_kin);
+    bool init_facilities(1: bool use_direct_kin);
 
     /**
      * Reset support modules and connections to perform the current initialized
@@ -41,7 +41,7 @@ service VisualServoingIDL
      *
      * @return true/false on success/failure.
      */
-    bool reset_visual_servoing();
+    bool reset_facilities();
 
     /**
      * Stop and disconnect support modules and connections used for visual
@@ -55,7 +55,7 @@ service VisualServoingIDL
      *
      * @return true/false on success/failure.
      */
-    bool teardown_visual_servoing();
+    bool stop_facilities();
 
     /**
      * Set the goal points on both left and right camera image plane and start

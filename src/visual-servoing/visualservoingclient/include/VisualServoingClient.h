@@ -33,11 +33,11 @@ public:
 
 
     /* IVisualServoing overrides */
-    bool init(const bool use_direct_kin) override;
+    bool initFacilities(const bool use_direct_kin) override;
 
-    bool reset() override;
+    bool resetFacilities() override;
 
-    bool teardown() override;
+    bool stopFacilities() override;
 
     bool goToGoal(const yarp::sig::Vector& vec_x, const yarp::sig::Vector& vec_o) override;
 

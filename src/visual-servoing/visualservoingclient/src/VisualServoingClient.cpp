@@ -108,21 +108,21 @@ bool VisualServoingClient::close()
 
 
 /* IVisualServoing overrides */
-bool VisualServoingClient::init(const bool use_direct_kin)
+bool VisualServoingClient::initFacilities(const bool use_direct_kin)
 {
-    return false;
+    return visualservoing_control.init_facilities(use_direct_kin);
 }
 
 
-bool VisualServoingClient::reset()
+bool VisualServoingClient::resetFacilities()
 {
-    return false;
+    return visualservoing_control.reset_facilities();
 }
 
 
-bool VisualServoingClient::teardown()
+bool VisualServoingClient::stopFacilities()
 {
-    return false;
+    return visualservoing_control.stop_facilities();
 }
 
 
