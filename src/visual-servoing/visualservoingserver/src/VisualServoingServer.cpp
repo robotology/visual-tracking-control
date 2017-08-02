@@ -303,6 +303,8 @@ bool VisualServoingServer::resetFacilities()
             return false;
 
         yInfoVerbose("Right camera external pose tracker reset.");
+
+        return true;
     }
     else
         return false;
@@ -336,6 +338,8 @@ bool VisualServoingServer::stopFacilities()
             return false;
 
         yInfoVerbose("Right camera external pose tracker stopped.");
+
+        return true;
     }
     else
         return false;
