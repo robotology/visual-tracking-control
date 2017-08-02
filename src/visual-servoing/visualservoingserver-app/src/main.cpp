@@ -44,6 +44,9 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
+    /* Initialize facilities */
+    visual_servoing->initFacilities(false);
+
     /* Stored set-up */
     visual_servoing->storedInit("t170427");
     visual_servoing->storedGoToGoal("t170427");
@@ -86,6 +89,9 @@ int main(int argc, char **argv)
 
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
+
+    /* Close facilities */
+    visual_servoing->stopFacilities();
 
     return EXIT_SUCCESS;
 }
