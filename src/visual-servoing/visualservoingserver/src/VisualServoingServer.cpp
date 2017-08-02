@@ -161,6 +161,7 @@ bool VisualServoingServer::open(Searchable &config)
         return false;
     }
 
+
     yInfoVerbose("*** VisualServoingServer configured! ***");
 
     return true;
@@ -215,33 +216,129 @@ bool VisualServoingServer::close()
 
 
 /* IVisualServoing overrides */
-bool VisualServoingServer::init(const bool use_direct_kin)
+bool VisualServoingServer::initFacilities(const bool use_direct_kin)
 {
-    bool status = true;
-
     if (use_direct_kin)
     {
-        status &= Network::connect("/" + robot_name_ + "/cartesianController/right_arm/state:o", "/visual-servoing/pose/left:i");
-        status &= Network::connect("/" + robot_name_ + "/cartesianController/right_arm/state:o", "/visual-servoing/pose/right:i");
+        yInfoVerbose("Connecting to Cartesian controller right arm output state.");
+
+
+        if (!Network::connect("/" + robot_name_ + "/cartesianController/right_arm/state:o", port_pose_left_in_.getName(), "tcp", !verbosity_))
+            return false;
+
+        if (!Network::connect("/" + robot_name_ + "/cartesianController/right_arm/state:o", port_pose_right_in_.getName(), "tcp", !verbosity_))
+            return false;
+
+
+        yInfoVerbose("Using direct kinematics information for visual servoing.");
     }
     else
     {
+        yInfoVerbose("Connecting to external pose trackers output ports.");
 
+
+        if (!Network::connect(port_rpc_tracker_left_.getName(),  "/hand-tracking/left/cmd:i", "tcp", !verbosity_))
+            return false;
+
+        if (!Network::connect(port_rpc_tracker_right_.getName(), "/hand-tracking/right/cmd:i", "tcp", !verbosity_))
+            return false;
+
+
+        yInfoVerbose("Sending commands to external pose trackers.");
+
+        Bottle cmd;
+        cmd.addString("run_filter");
+
+        Bottle response_left;
+        if (!port_rpc_tracker_left_.write(cmd, response_left))
+            return false;
+
+        if (!response_left.get(0).asBool())
+            return false;
+
+        yInfoVerbose("Left camera external pose tracker running.");
+
+
+        Bottle response_right;
+        if (!port_rpc_tracker_right_.write(cmd, response_right))
+            return false;
+
+        if (!response_right.get(0).asBool())
+            return false;
+
+        yInfoVerbose("Right camera external pose tracker running.");
+
+
+        yInfoVerbose("Using external pose trackers information for visual servoing.");
     }
 
-    return status;
+    return true;
 }
 
 
-bool VisualServoingServer::reset()
+bool VisualServoingServer::resetFacilities()
 {
+    if (port_rpc_tracker_left_.getOutputCount() > 0 && port_rpc_tracker_right_.getOutputCount() > 0)
+    {
+        yInfoVerbose("Sending commands to external pose trackers.");
 
+        Bottle cmd;
+        cmd.addString("rest_filter");
+
+        Bottle response_left;
+        if (!port_rpc_tracker_left_.write(cmd, response_left))
+            return false;
+
+        if (!response_left.get(0).asBool())
+            return false;
+
+        yInfoVerbose("Left camera external pose tracker reset.");
+
+
+        Bottle response_right;
+        if (!port_rpc_tracker_right_.write(cmd, response_right))
+            return false;
+
+        if (!response_right.get(0).asBool())
+            return false;
+
+        yInfoVerbose("Right camera external pose tracker reset.");
+    }
+    else
+        return false;
 }
 
 
-bool VisualServoingServer::teardown()
+bool VisualServoingServer::stopFacilities()
 {
+    if (port_rpc_tracker_left_.getOutputCount() > 0 && port_rpc_tracker_right_.getOutputCount() > 0)
+    {
+        yInfoVerbose("Sending commands to external pose trackers.");
 
+        Bottle cmd;
+        cmd.addString("stop_filter");
+
+        Bottle response_left;
+        if (!port_rpc_tracker_left_.write(cmd, response_left))
+            return false;
+
+        if (!response_left.get(0).asBool())
+            return false;
+
+        yInfoVerbose("Left camera external pose tracker stopped.");
+
+
+        Bottle response_right;
+        if (!port_rpc_tracker_right_.write(cmd, response_right))
+            return false;
+
+        if (!response_right.get(0).asBool())
+            return false;
+
+        yInfoVerbose("Right camera external pose tracker stopped.");
+    }
+    else
+        return false;
 }
 
 
@@ -1096,6 +1193,24 @@ bool VisualServoingServer::quit()
 }
 
 
+bool VisualServoingServer::init_facilities(const bool use_direct_kin)
+{
+    return initFacilities(use_direct_kin);
+}
+
+
+bool VisualServoingServer::reset_facilities()
+{
+    return resetFacilities();
+}
+
+
+bool VisualServoingServer::stop_facilities()
+{
+    return stopFacilities();
+}
+
+
 bool VisualServoingServer::go_to_px_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r)
 {
     if (vec_px_l.size() != 4 || vec_px_l.size() != 4)
@@ -1386,11 +1501,24 @@ bool VisualServoingServer::setCommandPort()
         yErrorVerbose("Cannot open the RPC server command port!");
         return false;
     }
-    if (!this->yarp().attachAsServer(port_rpc_command_))
+    if (!yarp().attachAsServer(port_rpc_command_))
     {
         yErrorVerbose("Cannot attach the RPC server command port!");
         return false;
     }
+
+
+    if (!port_rpc_tracker_left_.open("/visual-servoing/toTracker/left/cmd:o"))
+    {
+        yErrorVerbose("Cannot open the RPC command port to left camera tracker!");
+        return false;
+    }
+    if (!port_rpc_tracker_right_.open("/visual-servoing/toTracker/right/cmd:o"))
+    {
+        yErrorVerbose("Cannot open the RPC command port to right camera tracker!");
+        return false;
+    }
+
 
     yInfoVerbose("RPC command port opened and attached. Ready to recieve commands.");
 

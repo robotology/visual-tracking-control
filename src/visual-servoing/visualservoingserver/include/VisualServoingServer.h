@@ -20,6 +20,7 @@
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Port.h>
+#include <yarp/os/RpcClient.h>
 #include <yarp/os/Thread.h>
 #include <yarp/os/Searchable.h>
 #include <yarp/sig/Image.h>
@@ -46,11 +47,11 @@ public:
 
 
     /* IVisualServoing overrides */
-    bool init(const bool use_direct_kin) override;
+    bool initFacilities(const bool use_direct_kin) override;
 
-    bool reset() override;
+    bool resetFacilities() override;
 
-    bool teardown() override;
+    bool stopFacilities() override;
 
     bool goToGoal(const yarp::sig::Vector& vec_x, const yarp::sig::Vector& vec_o) override;
 
@@ -107,6 +108,12 @@ protected:
 
     /* VisualServoingIDL overrides */
     /* FROM INTERFACE */
+    bool init_facilities(const bool use_direct_kin) override;
+
+    bool reset_facilities() override;
+
+    bool stop_facilities() override;
+
     bool go_to_px_goal(const std::vector<std::vector<double>>& vec_px_l, const std::vector<std::vector<double>>& vec_px_r) override;
 
     bool go_to_pose_goal(const std::vector<double>& vec_x, const std::vector<double>& vec_o) override;
@@ -211,6 +218,8 @@ private:
     yarp::os::BufferedPort<yarp::os::Bottle>                        port_click_right_;
 
     yarp::os::Port                                                  port_rpc_command_;
+    yarp::os::RpcClient                                             port_rpc_tracker_left_;
+    yarp::os::RpcClient                                             port_rpc_tracker_right_;
 
     /* Private class methods */
     bool setRightArmCartesianController();
