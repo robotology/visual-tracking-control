@@ -246,12 +246,12 @@ bool VisualServoingClient::setOrientationGainSwitchTolerance(const double K_o_to
 }
 
 
-std::vector<Vector> VisualServoingClient::get3DPositionGoalFrom3DPose(const Vector& x, const Vector& o)
+std::vector<Vector> VisualServoingClient::get3DGoalPositionsFrom3DPose(const Vector& x, const Vector& o)
 {
     std::vector<double> std_x(x.data(), x.data() + x.size());
     std::vector<double> std_o(o.data(), o.data() + o.size());
 
-    std::vector<std::vector<double>> std_vec_goal_points = visualservoing_control.get_3D_position_goal_from_3D_pose(std_x, std_o);
+    std::vector<std::vector<double>> std_vec_goal_points = visualservoing_control.get_3D_goal_positions_from_3D_pose(std_x, std_o);
 
     size_t num_points = std_vec_goal_points.size();
     std::vector<Vector> vec_goal_points(num_points);
@@ -262,12 +262,12 @@ std::vector<Vector> VisualServoingClient::get3DPositionGoalFrom3DPose(const Vect
 }
 
 
-std::vector<Vector> VisualServoingClient::getPixelPositionGoalFrom3DPose(const Vector& x, const Vector& o, const CamSel& cam)
+std::vector<Vector> VisualServoingClient::getGoalPixelsFrom3DPose(const Vector& x, const Vector& o, const CamSel& cam)
 {
     std::vector<double> std_x(x.data(), x.data() + x.size());
     std::vector<double> std_o(o.data(), o.data() + o.size());
 
-    std::vector<std::vector<double>> std_vec_goal_points = visualservoing_control.get_pixel_position_goal_from_3D_pose(std_x, std_o, (cam == CamSel::left ? "left" : "right"));
+    std::vector<std::vector<double>> std_vec_goal_points = visualservoing_control.get_goal_pixels_from_3D_pose(std_x, std_o, (cam == CamSel::left ? "left" : "right"));
 
     size_t num_points = std_vec_goal_points.size();
     std::vector<Vector> vec_goal_points(num_points);

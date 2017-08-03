@@ -254,7 +254,7 @@ service VisualServoingIDL
      * @return a collection of four Cartesian points (position only) extracted
      *         by the plane defined by x and o.
      */
-    list<list<double>> get_3D_position_goal_from_3D_pose(1: list<double> x, 2: list<double> o);
+    list<list<double>> get_3D_goal_positions_from_3D_pose(1: list<double> x, 2: list<double> o);
 
     /**
      * Helper function: extract four 2D pixel points lying on the plane defined
@@ -268,7 +268,7 @@ service VisualServoingIDL
      * @return a collection of three Cartesian points (position only) extracted
      *         by the plane defined by x and o.
      */
-    list<list<double>> get_pixel_position_goal_from_3D_pose(1: list<double> x, 2: list<double> o, 3: string cam);
+    list<list<double>> get_goal_pixels_from_3D_pose(1: list<double> x, 2: list<double> o, 3: string cam);
 
     /**
      * Gently close the visual servoing device, deallocating resources.

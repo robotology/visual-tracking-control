@@ -84,9 +84,9 @@ public:
 
     bool setOrientationGainSwitchTolerance(const double K_o_tol = 30.0) override;
 
-    std::vector<yarp::sig::Vector> get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o) override;
+    std::vector<yarp::sig::Vector> get3DGoalPositionsFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o) override;
 
-    std::vector<yarp::sig::Vector> getPixelPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o, const CamSel& cam) override;
+    std::vector<yarp::sig::Vector> getGoalPixelsFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o, const CamSel& cam) override;
 
 
     /* TO BE DEPRECATED */
@@ -149,9 +149,9 @@ protected:
 
     bool set_orientation_gain_switch_tolerance(const double K_o_tol) override;
 
-    std::vector<std::vector<double>> get_3D_position_goal_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o) override;
+    std::vector<std::vector<double>> get_3D_goal_positions_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o) override;
 
-    std::vector<std::vector<double>> get_pixel_position_goal_from_3D_pose(const std::vector<double> & x, const std::vector<double> & o, const std::string& cam) override;
+    std::vector<std::vector<double>> get_goal_pixels_from_3D_pose(const std::vector<double> & x, const std::vector<double> & o, const std::string& cam) override;
 
     bool quit() override;
 

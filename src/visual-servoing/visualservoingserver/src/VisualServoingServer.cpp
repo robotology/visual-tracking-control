@@ -353,8 +353,8 @@ bool VisualServoingServer::goToGoal(const Vector& vec_x, const Vector& vec_o)
 {
     yInfoVerbose("*** VisualServoingServer::goToGoal with pose goal invoked ***");
 
-    std::vector<Vector> vec_px_l = getPixelPositionGoalFrom3DPose(vec_x, vec_o, CamSel::left);
-    std::vector<Vector> vec_px_r = getPixelPositionGoalFrom3DPose(vec_x, vec_o, CamSel::right);
+    std::vector<Vector> vec_px_l = getGoalPixelsFrom3DPose(vec_x, vec_o, CamSel::left);
+    std::vector<Vector> vec_px_r = getGoalPixelsFrom3DPose(vec_x, vec_o, CamSel::right);
 
     setPoseGoal(vec_x, vec_o);
     setPixelGoal(vec_px_l, vec_px_r);
@@ -369,7 +369,7 @@ bool VisualServoingServer::goToGoal(const std::vector<Vector>& vec_px_l, const s
 
     yWarningVerbose("<!-- If you did not invoke either one of:");
     yWarningVerbose("<!--  1. get3DPositionGoalFrom3DPose()");
-    yWarningVerbose("<!--  2. getPixelPositionGoalFrom3DPose");
+    yWarningVerbose("<!--  2. getGoalPixelsFrom3DPose");
     yWarningVerbose("<!-- visual servoing will just not work, and the server may also close.");
     yWarningVerbose("<!-- To the current implementation, this behaviour is intentional.");
     yWarningVerbose("<!-- Upcoming releases will change the behaviour of this method.");
@@ -505,7 +505,7 @@ bool VisualServoingServer::setOrientationGainSwitchTolerance(const double K_o_to
 }
 
 
-std::vector<Vector> VisualServoingServer::get3DPositionGoalFrom3DPose(const Vector& x, const Vector& o)
+std::vector<Vector> VisualServoingServer::get3DGoalPositionsFrom3DPose(const Vector& x, const Vector& o)
 {
     yAssert(x.length() == 3);
     yAssert(o.length() == 4);
@@ -526,7 +526,7 @@ std::vector<Vector> VisualServoingServer::get3DPositionGoalFrom3DPose(const Vect
 }
 
 
-std::vector<Vector> VisualServoingServer::getPixelPositionGoalFrom3DPose(const Vector& x, const Vector& o, const CamSel& cam)
+std::vector<Vector> VisualServoingServer::getGoalPixelsFrom3DPose(const Vector& x, const Vector& o, const CamSel& cam)
 {
     yAssert(x.length() == 3);
     yAssert(o.length() == 4);
@@ -1394,7 +1394,7 @@ bool VisualServoingServer::set_orientation_gain_switch_tolerance(const double K_
 }
 
 
-std::vector<std::vector<double>> VisualServoingServer::get_3D_position_goal_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o)
+std::vector<std::vector<double>> VisualServoingServer::get_3D_goal_positions_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o)
 {
     yAssert(x.size() == 3);
     yAssert(o.size() == 4);
@@ -1402,7 +1402,7 @@ std::vector<std::vector<double>> VisualServoingServer::get_3D_position_goal_from
 
     Vector yx(x.size(), x.data());
     Vector yo(o.size(), o.data());
-    std::vector<Vector> yvec_3d_goal_points = get3DPositionGoalFrom3DPose(yx, yo);
+    std::vector<Vector> yvec_3d_goal_points = get3DGoalPositionsFrom3DPose(yx, yo);
 
     std::vector<std::vector<double>> vec_3d_goal_points;
     for (const Vector& yvec_3d_goal : yvec_3d_goal_points)
@@ -1412,7 +1412,7 @@ std::vector<std::vector<double>> VisualServoingServer::get_3D_position_goal_from
 }
 
 
-std::vector<std::vector<double>> VisualServoingServer::get_pixel_position_goal_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o, const std::string& cam)
+std::vector<std::vector<double>> VisualServoingServer::get_goal_pixels_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o, const std::string& cam)
 {
     yAssert(x.size() == 3);
     yAssert(o.size() == 4);
@@ -1422,7 +1422,7 @@ std::vector<std::vector<double>> VisualServoingServer::get_pixel_position_goal_f
     Vector yx(x.size(), x.data());
     Vector yo(o.size(), o.data());
     CamSel e_cam = cam == "left" ? CamSel::left : CamSel::right;
-    std::vector<Vector> yvec_px_goal_points = getPixelPositionGoalFrom3DPose(yx, yo, e_cam);
+    std::vector<Vector> yvec_px_goal_points = getGoalPixelsFrom3DPose(yx, yo, e_cam);
 
     std::vector<std::vector<double>> vec_px_goal_points;
     for (const Vector& yvec_px_goal : yvec_px_goal_points)
@@ -1920,8 +1920,8 @@ void VisualServoingServer::backproc_UpdateVisualServoingParamters()
         Vector vec_o = goal_pose_.subVector(3, 5) / ang;
         vec_o.push_back(ang);
 
-        std::vector<Vector> vec_px_l = getPixelPositionGoalFrom3DPose(vec_x, vec_o, CamSel::left);
-        std::vector<Vector> vec_px_r = getPixelPositionGoalFrom3DPose(vec_x, vec_o, CamSel::right);
+        std::vector<Vector> vec_px_l = getGoalPixelsFrom3DPose(vec_x, vec_o, CamSel::left);
+        std::vector<Vector> vec_px_r = getGoalPixelsFrom3DPose(vec_x, vec_o, CamSel::right);
 
         setPoseGoal(vec_x, vec_o);
 
