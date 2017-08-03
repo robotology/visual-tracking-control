@@ -7,7 +7,6 @@
 #include <yarp/math/SVD.h>
 #include <yarp/os/Network.h>
 #include <yarp/os/Property.h>
-#include <yarp/os/RpcClient.h>
 #include <yarp/os/Time.h>
 
 using namespace yarp::dev;
