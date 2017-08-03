@@ -72,15 +72,15 @@ public:
 
     bool stopController() override;
 
-    bool setTranslationGain(const float K_x_1 = 1.0, const float K_x_2 = 0.25) override;
+    bool setTranslationGain(const double K_x_1 = 1.0, const double K_x_2 = 0.25) override;
 
-    bool setMaxTranslationVelocity(const float max_x_dot) override;
+    bool setMaxTranslationVelocity(const double max_x_dot) override;
 
     bool setTranslationGainSwitchTolerance(const double K_x_tol = 30.0) override;
 
-    bool setOrientationGain(const float K_x_1 = 1.5, const float K_x_2 = 0.375) override;
+    bool setOrientationGain(const double K_x_1 = 1.5, const double K_x_2 = 0.375) override;
 
-    bool setMaxOrientationVelocity(const float max_o_dot) override;
+    bool setMaxOrientationVelocity(const double max_o_dot) override;
 
     bool setOrientationGainSwitchTolerance(const double K_o_tol = 30.0) override;
 
