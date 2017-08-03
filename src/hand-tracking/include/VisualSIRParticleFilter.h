@@ -29,8 +29,8 @@
 #include <yarp/sig/Vector.h>
 
 
-//!!!: Should be templated
-//!!!: Implement rule of 5
+// !!!: Should be templated
+// !!!: Implement rule of 5
 class HistoryBuffer
 {
 public:
@@ -125,7 +125,7 @@ protected:
 
 
     /* ESTIMATE EXTRACTION METHODS */
-    //!!!: decidere come gestire l'etrazione delle stime.
+    // !!!: decidere come gestire l'etrazione delle stime.
     bool          set_estimates_extraction_method(const std::string& method) override;
 
     bool          set_mobile_average_window(const int16_t window) override;

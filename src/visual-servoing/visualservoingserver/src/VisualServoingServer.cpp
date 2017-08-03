@@ -551,7 +551,7 @@ std::vector<Vector> VisualServoingServer::getGoalPixelsFrom3DPose(const Vector& 
 
 
 /* VisualServoingServerIDL overrides */
-//!!!: hard-coded poses need to be deleted and parsed from an external file.
+// !!!: hard-coded poses need to be deleted and parsed from an external file.
 bool VisualServoingServer::storedInit(const std::string& label)
 {
     itf_rightarm_cart_->restoreContext(ctx_local_cart_);
@@ -664,7 +664,7 @@ bool VisualServoingServer::storedInit(const std::string& label)
 
 
 /* Set a fixed goal in pixel coordinates */
-//!!!: hard-coded poses need to be deleted and parsed from an external file.
+// !!!: hard-coded poses need to be deleted and parsed from an external file.
 bool VisualServoingServer::storedGoToGoal(const std::string& label)
 {
     if (label == "t170427")
@@ -728,7 +728,7 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
 
 
 /* Get 3D point from Structure From Motion clicking on the left camera image */
-//!!!: this method may be deleted in a future relese
+// !!!: this method may be deleted in a future relese
 bool VisualServoingServer::goToSFMGoal()
 {
     Bottle cmd;
@@ -1322,7 +1322,7 @@ bool VisualServoingServer::set_control_point(const std::string& point)
 
 std::vector<std::string> VisualServoingServer::get_visual_servoing_info()
 {
-    //???: Come si fa a mettere una Bottle acon Thrift?
+    // ???: Come si fa a mettere una Bottle acon Thrift?
 
     Bottle info;
     getVisualServoingInfo(info);
