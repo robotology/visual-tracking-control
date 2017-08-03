@@ -455,9 +455,10 @@ bool VisualServoingServer::stopController()
 }
 
 
-bool VisualServoingServer::setTranslationGain(const float K_x)
+bool VisualServoingServer::setTranslationGain(const float K_x_1, const float K_x_2)
 {
-    K_x_ = K_x;
+    K_x_[0] = K_x_1;
+    K_x_[1] = K_x_2;
 
     return true;
 }
@@ -471,9 +472,18 @@ bool VisualServoingServer::setMaxTranslationVelocity(const float max_x_dot)
 }
 
 
-bool VisualServoingServer::setOrientationGain(const float K_o)
+bool VisualServoingServer::setTranslationGainSwitchTolerance(const double K_x_tol)
 {
-    K_o_ = K_o;
+    K_x_tol_ = K_x_tol;
+
+    return true;
+}
+
+
+bool VisualServoingServer::setOrientationGain(const float K_o_1, const float K_o_2)
+{
+    K_o_[0] = K_o_1;
+    K_o_[1] = K_o_2;
 
     return true;
 }
@@ -482,6 +492,14 @@ bool VisualServoingServer::setOrientationGain(const float K_o)
 bool VisualServoingServer::setMaxOrientationVelocity(const float max_o_dot)
 {
     max_o_dot_ = max_o_dot;
+
+    return true;
+}
+
+
+bool VisualServoingServer::setOrientationGainSwitchTolerance(const double K_o_tol)
+{
+    K_o_tol_ = K_o_tol;
 
     return true;
 }
@@ -964,8 +982,15 @@ void VisualServoingServer::run()
 
 
         /* VISUAL CONTROL LAW */
-        vel_x    *= K_x_;
-        vel_o(3) *= K_o_;
+        if (checkVisualServoingStatus(px_ee_cur_position, K_x_tol_))
+            vel_x *= K_x_[0];
+        else
+            vel_x *= K_x_[1];
+
+        if (checkVisualServoingStatus(px_ee_cur_orientation, K_o_tol_))
+            vel_o(3) *= K_o_[0];
+        else
+            vel_o(3) *= K_o_[1];
 
 
         if (!sim_)
@@ -1029,17 +1054,11 @@ void VisualServoingServer::run()
         /* CHECK FOR GOAL */
         mtx_px_des_.lock();
 
-        bool is_pos_done = ((std::abs(px_des_(0) - px_ee_cur_position(0)) < px_tol_) && (std::abs(px_des_(1)  - px_ee_cur_position(1))  < px_tol_) && (std::abs(px_des_(2)  - px_ee_cur_position(2))  < px_tol_) &&
-                            (std::abs(px_des_(3) - px_ee_cur_position(3)) < px_tol_) && (std::abs(px_des_(4)  - px_ee_cur_position(4))  < px_tol_) && (std::abs(px_des_(5)  - px_ee_cur_position(5))  < px_tol_) &&
-                            (std::abs(px_des_(6) - px_ee_cur_position(6)) < px_tol_) && (std::abs(px_des_(7)  - px_ee_cur_position(7))  < px_tol_) && (std::abs(px_des_(8)  - px_ee_cur_position(8))  < px_tol_) &&
-                            (std::abs(px_des_(9) - px_ee_cur_position(9)) < px_tol_) && (std::abs(px_des_(10) - px_ee_cur_position(10)) < px_tol_) && (std::abs(px_des_(11) - px_ee_cur_position(11)) < px_tol_));
-
-        bool is_orient_done = ((std::abs(px_des_(0) - px_ee_cur_orientation(0)) < px_tol_) && (std::abs(px_des_(1)  - px_ee_cur_orientation(1))  < px_tol_) && (std::abs(px_des_(2)  - px_ee_cur_orientation(2))  < px_tol_) &&
-                               (std::abs(px_des_(3) - px_ee_cur_orientation(3)) < px_tol_) && (std::abs(px_des_(4)  - px_ee_cur_orientation(4))  < px_tol_) && (std::abs(px_des_(5)  - px_ee_cur_orientation(5))  < px_tol_) &&
-                               (std::abs(px_des_(6) - px_ee_cur_orientation(6)) < px_tol_) && (std::abs(px_des_(7)  - px_ee_cur_orientation(7))  < px_tol_) && (std::abs(px_des_(8)  - px_ee_cur_orientation(8))  < px_tol_) &&
-                               (std::abs(px_des_(9) - px_ee_cur_orientation(9)) < px_tol_) && (std::abs(px_des_(10) - px_ee_cur_orientation(10)) < px_tol_) && (std::abs(px_des_(11) - px_ee_cur_orientation(11)) < px_tol_));
+        bool is_pos_done    = checkVisualServoingStatus(px_ee_cur_position,    px_tol_);
+        bool is_orient_done = checkVisualServoingStatus(px_ee_cur_orientation, px_tol_);
 
         mtx_px_des_.unlock();
+
 
         if (op_mode_ == OperatingMode::position)
             vs_goal_reached_ = is_pos_done;
@@ -1307,9 +1326,9 @@ bool VisualServoingServer::stop_controller()
 }
 
 
-bool VisualServoingServer::set_translation_gain(const double K_x)
+bool VisualServoingServer::set_translation_gain(const double K_x_1, const double K_x_2)
 {
-    return setTranslationGain(K_x);
+    return setTranslationGain(K_x_1, K_x_2);
 }
 
 
@@ -1319,15 +1338,27 @@ bool VisualServoingServer::set_max_translation_velocity(const double max_x_dot)
 }
 
 
-bool VisualServoingServer::set_orientation_gain(const double K_o)
+bool VisualServoingServer::set_translation_gain_switch_tolerance(const double K_x_tol)
 {
-    return setOrientationGain(K_o);
+    return setTranslationGainSwitchTolerance(K_x_tol);
+}
+
+
+bool VisualServoingServer::set_orientation_gain(const double K_o_1, const double K_o_2)
+{
+    return setOrientationGain(K_o_1, K_o_2);
 }
 
 
 bool VisualServoingServer::set_max_orientation_velocity(const double max_o_dot)
 {
     return setMaxOrientationVelocity(max_o_dot);
+}
+
+
+bool VisualServoingServer::set_orientation_gain_switch_tolerance(const double K_o_tol)
+{
+    return setOrientationGainSwitchTolerance(K_o_tol);
 }
 
 
@@ -1866,4 +1897,16 @@ void VisualServoingServer::backproc_UpdateVisualServoingParamters()
     }
 
     yInfoVerbose("*** Stopped background process UpdateVisualServoingParamters ***");
+}
+
+
+bool VisualServoingServer::checkVisualServoingStatus(const Vector& px_cur, const double tol)
+{
+    yAssert(px_cur.size() == 12);
+    yAssert(tol > 0);
+
+    return ((std::abs(px_des_(0) - px_cur(0)) < tol) && (std::abs(px_des_(1)  - px_cur(1))  < tol) && (std::abs(px_des_(2)  - px_cur(2))  < tol) &&
+            (std::abs(px_des_(3) - px_cur(3)) < tol) && (std::abs(px_des_(4)  - px_cur(4))  < tol) && (std::abs(px_des_(5)  - px_cur(5))  < tol) &&
+            (std::abs(px_des_(6) - px_cur(6)) < tol) && (std::abs(px_des_(7)  - px_cur(7))  < tol) && (std::abs(px_des_(8)  - px_cur(8))  < tol) &&
+            (std::abs(px_des_(9) - px_cur(9)) < tol) && (std::abs(px_des_(10) - px_cur(10)) < tol) && (std::abs(px_des_(11) - px_cur(11)) < tol));
 }

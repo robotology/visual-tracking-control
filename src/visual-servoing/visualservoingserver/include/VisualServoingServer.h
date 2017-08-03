@@ -3,6 +3,7 @@
 
 #include "thrift/VisualServoingIDL.h"
 
+#include <array>
 #include <cmath>
 #include <mutex>
 #include <thread>
@@ -63,7 +64,7 @@ public:
 
     bool getVisualServoingInfo(yarp::os::Bottle& info) override;
 
-    bool setGoToGoalTolerance(const double tol = 10.0) override;
+    bool setGoToGoalTolerance(const double tol = 15.0) override;
 
     bool checkVisualServoingController() override;
 
@@ -71,13 +72,17 @@ public:
 
     bool stopController() override;
 
-    bool setTranslationGain(const float K_x = 0.5) override;
+    bool setTranslationGain(const float K_x_1 = 1.0, const float K_x_2 = 0.25) override;
 
     bool setMaxTranslationVelocity(const float max_x_dot) override;
 
-    bool setOrientationGain(const float K_o = 0.5) override;
+    bool setTranslationGainSwitchTolerance(const double K_x_tol = 30.0) override;
+
+    bool setOrientationGain(const float K_x_1 = 1.5, const float K_x_2 = 0.375) override;
 
     bool setMaxOrientationVelocity(const float max_o_dot) override;
+
+    bool setOrientationGainSwitchTolerance(const double K_o_tol = 30.0) override;
 
     std::vector<yarp::sig::Vector> get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o) override;
 
@@ -132,13 +137,17 @@ protected:
 
     bool stop_controller() override;
 
-    bool set_translation_gain(const double K_x) override;
+    bool set_translation_gain(const double K_x_1, const double K_x_2) override;
 
     bool set_max_translation_velocity(const double max_x_dot) override;
 
-    bool set_orientation_gain(const double K_o) override;
+    bool set_translation_gain_switch_tolerance(const double K_x_tol) override;
+
+    bool set_orientation_gain(const double K_o_1, const double K_o_2) override;
 
     bool set_max_orientation_velocity(const double max_o_dot) override;
+
+    bool set_orientation_gain_switch_tolerance(const double K_o_tol) override;
 
     std::vector<std::vector<double>> get_3D_position_goal_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o) override;
 
@@ -176,12 +185,14 @@ private:
     bool                           vs_control_running_ = false;
     bool                           vs_goal_reached_    = false;
     const double                   Ts_                 = 0.1; /* [s] */
-    double                         K_x_                = 0.75;
-    double                         K_o_                = 1.5;
+    std::array<double, 2>          K_x_                = {{1.0, 0.25}};
+    std::array<double, 2>          K_o_                = {{1.5, 0.375}};
     double                         max_x_dot_          = 0.025; /* [m/s] */
     double                         max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
-    double                         px_tol_             = 10.0;
-    double                         traj_time_          = 3.0;
+    double                         K_x_tol_            = 30.0; /* [pixel] */
+    double                         K_o_tol_            = 30.0; /* [pixel] */
+    double                         px_tol_             = 15.0; /* [pixel] */
+    double                         traj_time_          = 3.0; /* [s] */
 
     yarp::sig::Matrix              l_proj_;
     yarp::sig::Matrix              r_proj_;
@@ -260,6 +271,8 @@ private:
 
     void backproc_UpdateVisualServoingParamters();
     bool is_stopping_backproc_update_vs_params = true;
+
+    bool checkVisualServoingStatus(const yarp::sig::Vector& px_cur, const double tol);
 
     void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo()    << str; };
     void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning() << str; };
