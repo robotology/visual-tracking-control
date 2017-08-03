@@ -982,12 +982,12 @@ void VisualServoingServer::run()
 
 
         /* VISUAL CONTROL LAW */
-        if (checkVisualServoingStatus(px_ee_cur_position, K_x_tol_))
+        if (!checkVisualServoingStatus(px_ee_cur_position, K_x_tol_))
             vel_x *= K_x_[0];
         else
             vel_x *= K_x_[1];
 
-        if (checkVisualServoingStatus(px_ee_cur_orientation, K_o_tol_))
+        if (!checkVisualServoingStatus(px_ee_cur_orientation, K_o_tol_))
             vel_o(3) *= K_o_[0];
         else
             vel_o(3) *= K_o_[1];
