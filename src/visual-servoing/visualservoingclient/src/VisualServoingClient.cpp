@@ -210,9 +210,9 @@ bool VisualServoingClient::stopController()
 }
 
 
-bool VisualServoingClient::setTranslationGain(const float K_x)
+bool VisualServoingClient::setTranslationGain(const float K_x_1, const float K_x_2)
 {
-    return visualservoing_control.set_translation_gain(K_x);
+    return visualservoing_control.set_translation_gain(K_x_1, K_x_2);
 }
 
 
@@ -222,15 +222,27 @@ bool VisualServoingClient::setMaxTranslationVelocity(const float max_x_dot)
 }
 
 
-bool VisualServoingClient::setOrientationGain(const float K_o)
+bool VisualServoingClient::setTranslationGainSwitchTolerance(const double K_x_tol)
 {
-    return visualservoing_control.set_orientation_gain(K_o);
+    return visualservoing_control.set_translation_gain_switch_tolerance(K_x_tol);
+}
+
+
+bool VisualServoingClient::setOrientationGain(const float K_o_1, const float K_o_2)
+{
+    return visualservoing_control.set_orientation_gain(K_o_1, K_o_2);
 }
 
 
 bool VisualServoingClient::setMaxOrientationVelocity(const float max_o_dot)
 {
     return visualservoing_control.set_max_orientation_velocity(max_o_dot);
+}
+
+
+bool VisualServoingClient::setOrientationGainSwitchTolerance(const double K_o_tol)
+{
+    return visualservoing_control.set_orientation_gain_switch_tolerance(K_o_tol);
 }
 
 

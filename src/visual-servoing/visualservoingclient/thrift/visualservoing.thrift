@@ -1,7 +1,7 @@
 # Copyright: (C) 2017 iCub Facility - Istituto Italiano di Tecnologia
 # Authors: Claudio Fantacci
 #
-# visualservoingclient.thrift
+# visualservoing.thrift
 
 /**
  * VisualServoingIDL
@@ -128,7 +128,9 @@ service VisualServoingIDL
      *
      * @param tol the tolerance in pixel.
      *
-     * @note Default value: 10 [pixel].
+     * @return true/false on success/failure.
+     *
+     * @note Default value: 15.0 [pixel].
      */
     bool set_go_to_goal_tolerance(1: double tol);
 
@@ -169,16 +171,18 @@ service VisualServoingIDL
     bool stop_controller();
 
     /**
-     * Set the translation gain of the visual servoing control algorithm.
+     * Set the translation gains of the visual servoing control algorithm. The
+     * two values are used, respectively, when the end-effector is far away from
+     * and close to the goal.
      *
      * @return true/false on success/failure.
      *
      * @note Warning: higher values of the gain corresponds to higher
-     *       translatinal velocities.
+     *       translation velocities and oscillation about the goal.
      *
-     * @note Default value: k_x = 0.5.
+     * @note Default values: K_x_1 = 1.0, K_x_2 = 0.25.
      */
-    bool set_translation_gain(1: double K_x);
+    bool set_translation_gain(1: double K_x_1, 2: double K_x_2);
 
     /**
      * Set the maximum translation velocity of the visual servoing control
@@ -194,16 +198,28 @@ service VisualServoingIDL
     bool set_max_translation_velocity(1: double max_x_dot);
 
     /**
-     * Set the orientation gain of the visual servoing control algorithm.
+     * Set the tolerance, in pixels, at which the translation control law
+     * swithces its gain value.
+     *
+     * @return true/false on success/failure.
+     *
+     * @note Default value: K_x_tol = 30.0 [pixel].
+     */
+    bool set_translation_gain_switch_tolerance(1: double K_x_tol);
+
+    /**
+     * Set the orientation gains of the visual servoing control algorithm. The
+     * two values are used, respectively, when the end-effector is far away from
+     * and close to the goal.
      *
      * @return true/false on success/failure.
      *
      * @note Warning: higher values of the gain corresponds to higher
-     *       translatinal velocities.
+     *       orientation velocities and oscillation about the goal.
      *
-     * @note Default value: 0.5.
+     * @note Default values: K_o_1 = 1.5, K_o_2 = 0.375.
      */
-    bool set_orientation_gain(1: double K_o);
+    bool set_orientation_gain(1: double K_o_1, 2: double K_o_2);
 
     /**
      * Set the maximum angular velocity of the axis-angle velocity vector of the
@@ -216,6 +232,16 @@ service VisualServoingIDL
      * @note Default value: 5 * (PI / 180.0) [rad/s].
      */
     bool set_max_orientation_velocity(1: double max_o_dot);
+
+    /**
+     * Set the tolerance, in pixels, at which the orientation control law
+     * swithces its gain value.
+     *
+     * @return true/false on success/failure.
+     *
+     * @note Default value: K_o_tol = 30.0 [pixel].
+     */
+    bool set_orientation_gain_switch_tolerance(1: double K_o_tol);
 
     /**
      * Helper function: extract four Cartesian points lying on the plane defined
@@ -245,7 +271,7 @@ service VisualServoingIDL
     list<list<double>> get_pixel_position_goal_from_3D_pose(1: list<double> x, 2: list<double> o, 3: string cam);
 
     /**
-     * Gently close the visual servoing client, deallocating resources.
+     * Gently close the visual servoing device, deallocating resources.
      */
     bool quit();
 

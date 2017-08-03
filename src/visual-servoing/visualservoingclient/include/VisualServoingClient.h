@@ -49,7 +49,7 @@ public:
 
     bool getVisualServoingInfo(yarp::os::Bottle& info) override;
 
-    bool setGoToGoalTolerance(const double tol = 10.0) override;
+    bool setGoToGoalTolerance(const double tol = 15.0) override;
 
     bool checkVisualServoingController() override;
 
@@ -57,13 +57,17 @@ public:
 
     bool stopController() override;
 
-    bool setTranslationGain(const float K_x = 0.5) override;
+    bool setTranslationGain(const float K_x_1 = 1.0, const float K_x_2 = 0.25) override;
 
     bool setMaxTranslationVelocity(const float max_x_dot) override;
 
-    bool setOrientationGain(const float K_o = 0.5) override;
+    bool setTranslationGainSwitchTolerance(const double K_x_tol = 30.0) override;
+
+    bool setOrientationGain(const float K_o_1 = 1.5, const float K_o_2 = 0.375) override;
 
     bool setMaxOrientationVelocity(const float max_o_dot) override;
+
+    bool setOrientationGainSwitchTolerance(const double K_o_tol = 30.0) override;
 
     std::vector<yarp::sig::Vector> get3DPositionGoalFrom3DPose(const yarp::sig::Vector& x, const yarp::sig::Vector& o) override;
 
