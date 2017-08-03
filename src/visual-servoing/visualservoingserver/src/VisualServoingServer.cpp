@@ -268,8 +268,12 @@ bool VisualServoingServer::initFacilities(const bool use_direct_kin)
 
         yInfoVerbose("Right camera external pose tracker running.");
 
-
         yInfoVerbose("Using external pose trackers information for visual servoing.");
+
+
+        yInfoVerbose("Waiting for the filter to provide good estimates...");
+        yarp::os::Time::delay(10);
+        yInfoVerbose("...done!");
     }
 
     return true;
