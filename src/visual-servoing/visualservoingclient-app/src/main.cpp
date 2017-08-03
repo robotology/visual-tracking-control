@@ -69,8 +69,8 @@ int main(int argc, char **argv)
     x[0] = -0.282; x[1] = 0.061; x[2] = 0.068;
     o[0] = 0.213; o[1] = -0.94; o[2] = 0.265; o[3] = 2.911;
 
-    std::vector<Vector> px_l = visual_servoing->getPixelPositionGoalFrom3DPose(x, o, IVisualServoing::CamSel::left);
-    std::vector<Vector> px_r = visual_servoing->getPixelPositionGoalFrom3DPose(x, o, IVisualServoing::CamSel::right);
+    std::vector<Vector> px_l = visual_servoing->getGoalPixelsFrom3DPose(x, o, IVisualServoing::CamSel::left);
+    std::vector<Vector> px_r = visual_servoing->getGoalPixelsFrom3DPose(x, o, IVisualServoing::CamSel::right);
     visual_servoing->goToGoal(px_l, px_r);
 
     visual_servoing->checkVisualServoingController();
