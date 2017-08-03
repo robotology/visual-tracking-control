@@ -22,7 +22,6 @@ iCubFwdKinMotion::iCubFwdKinMotion(std::unique_ptr<StateModel> state_model, cons
     robot_(robot), laterality_(laterality), port_prefix_(port_prefix),
     delta_hand_pose_(VectorXd::Zero(6)), delta_angle_(0.0)
 {
-    // !!!: Questa parte potremmo trasformarla in uno Strategy per essere poi utilizzata anche da altre classi, tipo GatePoseParticle.
     Property opt_arm_enc;
     opt_arm_enc.put("device", "remote_controlboard");
     opt_arm_enc.put("local",  "/hand-tracking/" + ID_ + "/" + port_prefix + "/control_" + laterality_ + "_arm");

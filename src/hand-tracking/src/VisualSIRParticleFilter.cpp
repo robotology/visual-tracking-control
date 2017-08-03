@@ -81,7 +81,6 @@ void VisualSIRParticleFilter::filteringStep()
         VectorXf temp_parent(num_particles_, 1);
 
         /* PROCESS CURRENT MEASUREMENT */
-        // ???: Measurement process may be a class
         Mat measurement;
 
         measurement = cvarrToMat(img_in->getIplImage());
@@ -91,7 +90,6 @@ void VisualSIRParticleFilter::filteringStep()
         descriptors_cam_cuda.download(descriptors_cam_left);
 
         /* PREDICTION */
-        // !!!: The prediction class shall run over all particles internally, not here
         VectorXf sorted_pred = weight_;
         std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
         float threshold = sorted_pred.tail(6)(0);

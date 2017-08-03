@@ -170,7 +170,6 @@ protected:
 
 private:
     bool                           verbosity_  = false;
-    // !!!: rimuovere o gestire meglio la simulazione
     bool                           sim_        = false;
     yarp::os::ConstString          robot_name_ = "icub";
 
@@ -245,7 +244,6 @@ private:
 
     bool unsetTorsoDOF();
 
-    // !!!: questa funzione non dovrebbe esistere vista la presenza di getGoalPixelsFrom3DPose()
     std::vector<yarp::sig::Vector> getPixelsFromPose(const yarp::sig::Vector& pose, const CamSel& cam);
 
     std::vector<yarp::sig::Vector> getControlPixelsFromPose(const yarp::sig::Vector& pose, const CamSel& cam, const PixelControlMode& mode);
