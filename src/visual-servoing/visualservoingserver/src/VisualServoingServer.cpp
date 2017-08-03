@@ -113,10 +113,10 @@ bool VisualServoingServer::open(Searchable &config)
     Bottle* cam_left_info = btl_cam_info.findGroup("camera_intrinsics_left").get(1).asList();
     Bottle* cam_right_info = btl_cam_info.findGroup("camera_intrinsics_right").get(1).asList();
 
-    float left_fx = static_cast<float>(cam_left_info->get(0).asDouble());
-    float left_cx = static_cast<float>(cam_left_info->get(2).asDouble());
-    float left_fy = static_cast<float>(cam_left_info->get(5).asDouble());
-    float left_cy = static_cast<float>(cam_left_info->get(6).asDouble());
+    double left_fx = cam_left_info->get(0).asDouble();
+    double left_cx = cam_left_info->get(2).asDouble();
+    double left_fy = cam_left_info->get(5).asDouble();
+    double left_cy = cam_left_info->get(6).asDouble();
 
     yInfoVerbose("[CAM] Left camera:");
     yInfoVerbose("[CAM]  - fx: " + std::to_string(left_fx));
@@ -133,10 +133,10 @@ bool VisualServoingServer::open(Searchable &config)
 
     yInfoVerbose("l_proj_ = [\n" + l_proj_.toString() + "]");
 
-    float right_fx = static_cast<float>(cam_right_info->get(0).asDouble());
-    float right_cx = static_cast<float>(cam_right_info->get(2).asDouble());
-    float right_fy = static_cast<float>(cam_right_info->get(5).asDouble());
-    float right_cy = static_cast<float>(cam_right_info->get(6).asDouble());
+    double right_fx = cam_right_info->get(0).asDouble();
+    double right_cx = cam_right_info->get(2).asDouble();
+    double right_fy = cam_right_info->get(5).asDouble();
+    double right_cy = cam_right_info->get(6).asDouble();
 
     yInfoVerbose("[CAM] Right camera:");
     yInfoVerbose("[CAM]  - fx: " + std::to_string(right_fx));
@@ -853,7 +853,7 @@ void VisualServoingServer::run()
             if (estimates->length() == 7)
             {
                 est_copy_left = estimates->subVector(0, 5);
-                float ang     = (*estimates)[6];
+                double ang    = (*estimates)[6];
 
                 est_copy_left[3] *= ang;
                 est_copy_left[4] *= ang;
@@ -868,7 +868,7 @@ void VisualServoingServer::run()
             if (estimates->length() == 7)
             {
                 est_copy_right = estimates->subVector(0, 5);
-                float ang      = (*estimates)[6];
+                double ang     = (*estimates)[6];
 
                 est_copy_right[3] *= ang;
                 est_copy_right[4] *= ang;
