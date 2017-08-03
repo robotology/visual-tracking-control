@@ -191,6 +191,8 @@ private:
     double                         max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
     double                         K_x_tol_            = 30.0; /* [pixel] */
     double                         K_o_tol_            = 30.0; /* [pixel] */
+    bool                           K_x_hysteresis_     = false;
+    bool                           K_o_hysteresis_     = false;
     double                         px_tol_             = 15.0; /* [pixel] */
     double                         traj_time_          = 3.0; /* [s] */
 

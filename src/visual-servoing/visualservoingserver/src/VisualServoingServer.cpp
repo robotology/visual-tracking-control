@@ -983,14 +983,46 @@ void VisualServoingServer::run()
 
         /* VISUAL CONTROL LAW */
         if (!checkVisualServoingStatus(px_ee_cur_position, K_x_tol_))
+        {
             vel_x *= K_x_[0];
+            if (K_x_hysteresis_)
+            {
+                K_x_hysteresis_ = false;
+
+                K_x_tol_ -= 5.0;
+            }
+        }
         else
+        {
             vel_x *= K_x_[1];
+            if (!K_x_hysteresis_)
+            {
+                K_x_hysteresis_ = true;
+
+                K_x_tol_ += 5.0;
+            }
+        }
 
         if (!checkVisualServoingStatus(px_ee_cur_orientation, K_o_tol_))
+        {
             vel_o(3) *= K_o_[0];
+            if (K_o_hysteresis_)
+            {
+                K_o_hysteresis_ = false;
+
+                K_o_tol_ -= 5.0;
+            }
+        }
         else
+        {
             vel_o(3) *= K_o_[1];
+            if (!K_o_hysteresis_)
+            {
+                K_o_hysteresis_ = true;
+
+                K_o_tol_ += 5.0;
+            }
+        }
 
 
         if (!sim_)
