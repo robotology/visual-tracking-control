@@ -45,7 +45,7 @@ void CartesianAxisAnglePrediction::predict(const Ref<const VectorXf>& prev_state
     motionDisturbance(sample);
 
     VectorXf rotated_vec(VectorXf::Zero(3, 1));
-    addAxisangleDisturbance(pred_state.tail<3>(), sample(6), sample.middleRows<3>(3), rotated_vec);
+    addAxisangleDisturbance(pred_state.tail<3>(), sample.middleRows<4>(3), rotated_vec);
 
     pred_state.head<3>() += sample.head<3>();
     pred_state.tail<3>() =  rotated_vec;
@@ -57,9 +57,11 @@ bool CartesianAxisAnglePrediction::setStateModelProperty(const std::string& prop
 }
 
 
-void CartesianAxisAnglePrediction::addAxisangleDisturbance(const Ref<const Vector3f>& current_vec, float disturbance_angle, const Ref<const Vector3f>& disturbance_vec, Ref<Vector3f> rotated_vec)
+void CartesianAxisAnglePrediction::addAxisangleDisturbance(const Ref<const Vector3f>& current_vec, const Ref<const Vector3f>& disturbance_vec,
+                                                           Ref<Vector3f> rotated_vec)
 {
-    float ang = current_vec.tail<3>().norm() + disturbance_angle;
+    float disturbance_angle = disturbance_vec(3);
+    float ang               = current_vec.tail<3>().norm() + disturbance_angle;
 
     if      (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
     else if (ang <=        0.0) ang += 2.0 * M_PI;
