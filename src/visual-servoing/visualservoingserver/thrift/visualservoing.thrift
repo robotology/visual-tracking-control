@@ -251,8 +251,12 @@ service VisualServoingIDL
      * @param o a 4D vector which is filled with the actual orientation using
      *          axis-angle representation xa, ya, za, theta [rad].
      *
-     * @return a collection of four Cartesian points (position only) extracted
-     *         by the plane defined by x and o.
+     * @return on success: a collection of four Cartesian points (position only)
+     *         extracted from the plane defined by x and o;
+     *         on failure: an empty list.
+     *
+     * @note It is always suggested to check whether the returned list is empty
+     *       or not and to take proper counter actions.
      */
     list<list<double>> get_3D_goal_positions_from_3D_pose(1: list<double> x, 2: list<double> o);
 
@@ -265,8 +269,12 @@ service VisualServoingIDL
      *          axis-angle representation xa, ya, za, theta [m]/[rad].
      * @param cam either "left" or "right" to select left or right camera.
      *
-     * @return a collection of three Cartesian points (position only) extracted
-     *         by the plane defined by x and o.
+     * @return on success: a collection of three (u, v) pixel points
+     *         extracted from the plane defined by x and o;
+     *         on failure: an empty list.
+     *
+     * @note It is always suggested to check whether the returned list is empty
+     *       or not and to take proper counter actions.
      */
     list<list<double>> get_goal_pixels_from_3D_pose(1: list<double> x, 2: list<double> o, 3: string cam);
 
