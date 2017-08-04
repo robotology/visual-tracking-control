@@ -8,7 +8,7 @@ using namespace Eigen;
 
 
 BrownianMotion::BrownianMotion(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept :
-    F_(MatrixXf::Identity(6, 6)),
+    F_(MatrixXf::Identity(7, 7)),
     q_xy_(q_xy),
     q_z_(q_z),
     theta_(theta * (M_PI/180.0)),
