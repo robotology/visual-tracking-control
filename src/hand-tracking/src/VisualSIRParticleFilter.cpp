@@ -375,7 +375,7 @@ VectorXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, con
         c_ang += weights(i) * std::cos(particles(6, i));
     }
 
-    out_particle(6) = std::atan2(s_ang, c_ang) + M_PI;
+    out_particle(6) = std::atan2(s_ang, c_ang);
 
     return out_particle;
 }
