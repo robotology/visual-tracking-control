@@ -15,6 +15,7 @@
 #include <BayesFilters/Resampling.h>
 #include <Eigen/Dense>
 #include <iCub/ctrl/adaptWinPolyEstimator.h>
+#include <iCub/ctrl/filters.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/cudaobjdetect.hpp>
 #include <thrift/VisualSIRParticleFilterIDL.h>
@@ -45,7 +46,7 @@ public:
 private:
     unsigned int                window_     = 5;
 
-    const unsigned int          max_window_ = 90;
+    const unsigned int          max_window_ = 30;
 
     std::deque<Eigen::VectorXf> hist_buffer_;
 };
@@ -154,13 +155,21 @@ protected:
     Eigen::VectorXf emAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
     Eigen::VectorXf em_weights_;
 
-    bool                                  init_filter = true;
-    iCub::ctrl::AWLinEstimator            lin_est_x_    {10, 0.02};
-    iCub::ctrl::AWLinEstimator            lin_est_o_    {10, 0.5};
-    iCub::ctrl::AWLinEstimator            lin_est_theta_{10, 3.0 * iCub::ctrl::CTRL_DEG2RAD};
-    std::chrono::milliseconds             t_{0};
-    std::chrono::steady_clock::time_point time_1_;
-    std::chrono::steady_clock::time_point time_2_;
+    bool                       init_filter_ = true;
+    int                        filter_min_win_    = 1;
+    int                        filter_max_win_    = 30;
+    int                        filter_x_win_      = 5;
+    int                        filter_o_win_      = 5;
+    int                        filter_theta_win_  = 5;
+    iCub::ctrl::MedianFilter   filter_x_          {5, yarp::sig::Vector(3, 0.0)};
+    iCub::ctrl::MedianFilter   filter_o_          {5, yarp::sig::Vector(3, 0.0)};
+    iCub::ctrl::MedianFilter   filter_theta_      {5, yarp::sig::Vector(1, 0.0)};
+    double                     lin_est_x_thr_     = 0.03;
+    double                     lin_est_o_thr_     = 0.2;
+    double                     lin_est_theta_thr_ = 2.0 * iCub::ctrl::CTRL_DEG2RAD;
+    iCub::ctrl::AWLinEstimator lin_est_x_         {10, 0.1};
+    iCub::ctrl::AWLinEstimator lin_est_o_         {10, 0.6};
+    iCub::ctrl::AWLinEstimator lin_est_theta_     {10, 6.0 * iCub::ctrl::CTRL_DEG2RAD};
     Eigen::VectorXf amAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
     /* *************************** */
 

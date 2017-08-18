@@ -11,8 +11,9 @@
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/cudaimgproc.hpp>
-#include <yarp/math/Math.h>
 #include <yarp/eigen/Eigen.h>
+#include <yarp/math/Math.h>
+#include <yarp/os/Time.h>
 
 using namespace bfl;
 using namespace cv;
@@ -332,7 +333,7 @@ bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string&
     }
     else if (method == "am_average")
     {
-        init_filter = true;
+        init_filter_ = true;
 
         ext_mode = EstimatesExtraction::am_average;
 
@@ -449,45 +450,63 @@ VectorXf VisualSIRParticleFilter::amAverage(const Ref<const MatrixXf>& particles
 {
     VectorXf cur_estimates = mean(particles, weights);
 
-    if (!init_filter)
+    if (init_filter_)
     {
-        time_2_ =  std::chrono::steady_clock::now();
-        t_      += std::chrono::duration_cast<std::chrono::milliseconds>(time_2_ - time_1_);
-        time_1_ =  time_2_;
-    }
-    else
-    {
-        t_      = std::chrono::milliseconds(0);
-        time_1_ = std::chrono::steady_clock::now();
+        filter_x_.init(Vector(3, 0.0));
+        filter_o_.init(Vector(3, 0.0));
+        filter_theta_.init(Vector(1, 0.0));
+
         lin_est_x_.reset();
         lin_est_o_.reset();
         lin_est_theta_.reset();
 
-        init_filter = false;
+        init_filter_ = false;
     }
+
+    Vector est_out(7);
+    double time_now = Time::now();
 
     Vector x(3);
     toEigen(x) = cur_estimates.head<3>().cast<double>();
-    AWPolyElement element_x;
-    element_x.data = x;
-    element_x.time = t_.count();
+    AWPolyElement element_x(x, time_now);
+
+    Vector dot_x = lin_est_x_.estimate(element_x);
+    if (norm(dot_x) >= lin_est_x_thr_ && filter_x_win_ < filter_max_win_)
+        ++filter_x_win_;
+    else if (norm(dot_x) <= lin_est_x_thr_ && filter_x_win_ > 1)
+        --filter_x_win_;
+    filter_x_.setOrder(filter_x_win_);
+
+    est_out.setSubvector(0, filter_x_.filt(x));
+
 
     Vector o(3);
     toEigen(o) = cur_estimates.middleRows<3>(3).cast<double>();
-    AWPolyElement element_o;
-    element_o.data = o;
-    element_o.time = t_.count();
+    AWPolyElement element_o(o, time_now);
 
-    Vector tetha(1);
-    tetha(0) = cur_estimates(6);
-    AWPolyElement element_theta;
-    element_theta.data = tetha;
-    element_theta.time = t_.count();
+    Vector dot_o = lin_est_o_.estimate(element_o);
+    if (norm(dot_o) >= lin_est_o_thr_ && filter_o_win_ < filter_max_win_)
+        ++filter_o_win_;
+    else if (norm(dot_o) <= lin_est_o_thr_ && filter_o_win_ > 1)
+        --filter_o_win_;
+    filter_o_.setOrder(filter_o_win_);
 
-    Vector est_out(7);
-    est_out.setSubvector(0, lin_est_x_.estimate(element_x));
-    est_out.setSubvector(3, lin_est_o_.estimate(element_o));
-    est_out(6) = lin_est_theta_.estimate(element_theta)(0);
+    est_out.setSubvector(3, filter_o_.filt(o));
+
+
+    Vector theta(1);
+    theta(0) = cur_estimates(6);
+    AWPolyElement element_theta(theta, time_now);
+
+    Vector dot_theta = lin_est_theta_.estimate(element_theta);
+    if (std::abs(dot_theta(0)) >= lin_est_theta_thr_ && filter_theta_win_ < filter_max_win_)
+        ++filter_theta_win_;
+    else if (std::abs(dot_theta(0))  <= lin_est_theta_thr_ && filter_theta_win_ > 1)
+        --filter_theta_win_;
+    filter_theta_.setOrder(filter_theta_win_);
+
+    est_out.setSubvector(6, filter_theta_.filt(theta));
+
 
     return toEigen(est_out).cast<float>();
 }
