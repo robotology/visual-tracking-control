@@ -55,7 +55,7 @@ bool CartesianAxisAnglePrediction::setStateModelProperty(const std::string& prop
 }
 
 
-void CartesianAxisAnglePrediction::addAxisangleDisturbance(Ref<Vector3f> current_vec, const Ref<const Vector3f>& disturbance_vec)
+void CartesianAxisAnglePrediction::addAxisangleDisturbance(Ref<Vector4f> current_vec, const Ref<const Vector4f>& disturbance_vec)
 {
     float ang = current_vec(3) + disturbance_vec(3);
 
