@@ -43,7 +43,7 @@ PlayGatePose::PlayGatePose(std::unique_ptr<VisualCorrection> visual_correction,
 
 PlayGatePose::PlayGatePose(std::unique_ptr<VisualCorrection> visual_correction,
                            const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
-PlayGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30, robot, laterality, port_prefix) { }
+    PlayGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30, robot, laterality, port_prefix) { }
 
 
 PlayGatePose::~PlayGatePose() noexcept { }
@@ -53,8 +53,6 @@ Vector PlayGatePose::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
     if (!b) return Vector(3, 0.0);
-
-    yAssert(b->size() == 3);
 
     Vector torso_enc(3);
     torso_enc(0) = b->get(2).asDouble();
@@ -69,8 +67,6 @@ Vector PlayGatePose::readRootToEE()
 {
     Bottle* b = port_arm_enc_.read();
     if (!b) return Vector(10, 0.0);
-
-    yAssert(b->size() == 16);
 
     Vector root_ee_enc(10);
     root_ee_enc.setSubvector(0, readTorso());
