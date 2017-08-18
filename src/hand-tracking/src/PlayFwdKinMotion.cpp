@@ -112,8 +112,6 @@ Vector PlayFwdKinMotion::readTorso()
     Bottle* b = port_torso_enc_.read();
     if (!b) return Vector(3, 0.0);
 
-    yAssert(b->size() == 3);
-
     Vector torso_enc(3);
     torso_enc(0) = b->get(2).asDouble();
     torso_enc(1) = b->get(1).asDouble();
@@ -128,14 +126,10 @@ Vector PlayFwdKinMotion::readRootToEE()
     Bottle* b = port_arm_enc_.read();
     if (!b) return Vector(10, 0.0);
 
-    yAssert(b->size() == 16);
-
     Vector root_ee_enc(10);
     root_ee_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 7; ++i)
-    {
-        root_ee_enc(i+3) = b->get(i).asDouble();
-    }
+        root_ee_enc(i + 3) = b->get(i).asDouble();
 
     return root_ee_enc;
 }
