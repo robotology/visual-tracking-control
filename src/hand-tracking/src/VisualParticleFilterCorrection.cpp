@@ -66,7 +66,7 @@ void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_
 {
     for (int s = 0; s < num_cuda_stream_; ++s)
     {
-        measurement_model_->observe(pred_state.block(0, s * num_img_stream_, 6, num_img_stream_), hand_rendered_[s]);
+        measurement_model_->observe(pred_state.block(0, s * num_img_stream_, 7, num_img_stream_), hand_rendered_[s]);
     }
 
     for (int s = 0; s < num_cuda_stream_; ++s)
