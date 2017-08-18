@@ -307,7 +307,7 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
     cam_cy_     = std::move(proprio.cam_cy_);
 
     cad_obj_ = std::move(proprio.cad_obj_);
-    si_cad_   = std::move(proprio.si_cad_);
+    si_cad_  = std::move(proprio.si_cad_);
 
     proprio.cam_x_[0] = 0.0;
     proprio.cam_x_[1] = 0.0;
@@ -330,18 +330,17 @@ void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_state, st
         Superimpose::ModelPose          pose;
         Vector                          ee_t(4);
         Vector                          ee_o(4);
-        float                           ang;
 
 
         ee_t(0) = cur_state(0, j);
         ee_t(1) = cur_state(1, j);
         ee_t(2) = cur_state(2, j);
         ee_t(3) =             1.0;
-        ang     = cur_state.col(j).tail(3).norm();
-        ee_o(0) = cur_state(3, j) / ang;
-        ee_o(1) = cur_state(4, j) / ang;
-        ee_o(2) = cur_state(5, j) / ang;
-        ee_o(3) = ang;
+
+        ee_o(0) = cur_state(3, j);
+        ee_o(1) = cur_state(4, j);
+        ee_o(2) = cur_state(5, j);
+        ee_o(3) = cur_state(6, j);
 
         pose.assign(ee_t.data(), ee_t.data()+3);
         pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
@@ -427,8 +426,14 @@ bool VisualProprioception::setiCubParams()
 {
     Vector left_eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * readRootToEye(cam_sel_));
 
-    cam_x_[0] = left_eye_pose(0); cam_x_[1] = left_eye_pose(1); cam_x_[2] = left_eye_pose(2);
-    cam_o_[0] = left_eye_pose(3); cam_o_[1] = left_eye_pose(4); cam_o_[2] = left_eye_pose(5); cam_o_[3] = left_eye_pose(6);
+    cam_x_[0] = left_eye_pose(0);
+    cam_x_[1] = left_eye_pose(1);
+    cam_x_[2] = left_eye_pose(2);
+
+    cam_o_[0] = left_eye_pose(3);
+    cam_o_[1] = left_eye_pose(4);
+    cam_o_[2] = left_eye_pose(5);
+    cam_o_[3] = left_eye_pose(6);
 
 
     Vector q = readRootToFingers();
@@ -608,6 +613,7 @@ bool VisualProprioception::openGazeController()
         if (!itf_gaze_)
         {
             yError() << log_ID_ << "Cannot get head gazecontrollerclient interface!";
+
             drv_gaze_.close();
             return false;
         }
@@ -615,6 +621,7 @@ bool VisualProprioception::openGazeController()
     else
     {
         yError() << log_ID_ << "Cannot open head gazecontrollerclient!";
+
         return false;
     }
 
@@ -637,6 +644,7 @@ bool VisualProprioception::openAnalogs()
             if (!itf_right_hand_analog_)
             {
                 yError() << log_ID_ << "Cannot get right hand analogsensorclient interface!";
+
                 drv_right_hand_analog_.close();
                 return false;
             }
@@ -644,6 +652,7 @@ bool VisualProprioception::openAnalogs()
         else
         {
             yError() << log_ID_ << "Cannot open right hand analogsensorclient!";
+
             return false;
         }
 
@@ -674,8 +683,6 @@ Vector VisualProprioception::readTorso()
     Bottle* b = port_torso_enc_.read();
     if (!b) return Vector(3, 0.0);
 
-    yAssert(b->size() == 3);
-
     Vector torso_enc(3);
     torso_enc(0) = b->get(2).asDouble();
     torso_enc(1) = b->get(1).asDouble();
@@ -690,14 +697,10 @@ Vector VisualProprioception::readRootToFingers()
     Bottle* b = port_arm_enc_.read();
     if (!b) return Vector(19, 0.0);
 
-    yAssert(b->size() == 16);
-
     Vector root_fingers_enc(19);
     root_fingers_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 16; ++i)
-    {
-        root_fingers_enc(3+i) = b->get(i).asDouble();
-    }
+        root_fingers_enc(3 + i) = b->get(i).asDouble();
 
     return root_fingers_enc;
 }
@@ -708,14 +711,11 @@ Vector VisualProprioception::readRootToEye(const ConstString cam_sel)
     Bottle* b = port_head_enc_.read();
     if (!b) return Vector(8, 0.0);
 
-    yAssert(b->size() == 6);
-
     Vector root_eye_enc(8);
     root_eye_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 4; ++i)
-    {
-        root_eye_enc(3+i) = b->get(i).asDouble();
-    }
+        root_eye_enc(3 + i) = b->get(i).asDouble();
+
     if (cam_sel == "left")  root_eye_enc(7) = b->get(4).asDouble() + b->get(5).asDouble()/2.0;
     if (cam_sel == "right") root_eye_enc(7) = b->get(4).asDouble() - b->get(5).asDouble()/2.0;
 

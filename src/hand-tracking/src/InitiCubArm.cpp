@@ -42,8 +42,7 @@ void InitiCubArm::initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref<Eigen
 {
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
 
-    Map<VectorXd> init_hand_pose(ee_pose.data(), 6, 1);
-    init_hand_pose.tail(3) *= ee_pose(6);
+    Map<VectorXd> init_hand_pose(ee_pose.data(), 7, 1);
 
     for (int i = 0; i < state.cols(); ++i)
         state.col(i) = init_hand_pose.cast<float>();
@@ -56,8 +55,6 @@ Vector InitiCubArm::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
     if (!b) return Vector(3, 0.0);
-
-    yAssert(b->size() == 3);
 
     Vector torso_enc(3);
     torso_enc(0) = b->get(2).asDouble();
@@ -73,14 +70,12 @@ Vector InitiCubArm::readRootToEE()
     Bottle* b = port_arm_enc_.read();
     if (!b) return Vector(10, 0.0);
 
-    yAssert(b->size() == 16);
-
     Vector root_ee_enc(10);
 
     root_ee_enc.setSubvector(0, readTorso());
 
     for (size_t i = 0; i < 7; ++i)
-        root_ee_enc(i+3) = b->get(i).asDouble();
+        root_ee_enc(i + 3) = b->get(i).asDouble();
 
     return root_ee_enc;
 }

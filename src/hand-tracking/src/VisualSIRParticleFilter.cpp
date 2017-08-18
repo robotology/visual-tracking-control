@@ -57,7 +57,7 @@ VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
 
 void VisualSIRParticleFilter::initialization()
 {
-    particle_ = MatrixXf(6, num_particles_);
+    particle_ = MatrixXf(7, num_particles_);
     weight_   = VectorXf(num_particles_, 1);
 
     initialization_->initialize(particle_, weight_);
@@ -76,7 +76,7 @@ void VisualSIRParticleFilter::filteringStep()
     ImageOf<PixelRgb>* img_in = port_image_in_.read(true);
     if (img_in != YARP_NULLPTR)
     {
-        MatrixXf temp_particle(6, num_particles_);
+        MatrixXf temp_particle(7, num_particles_);
         VectorXf temp_weight(num_particles_, 1);
         VectorXf temp_parent(num_particles_, 1);
 
@@ -110,7 +110,7 @@ void VisualSIRParticleFilter::filteringStep()
 
 
         /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
-        VectorXf out_particle(6);
+        VectorXf out_particle(7);
         switch (ext_mode)
         {
             case EstimatesExtraction::mean :
@@ -207,7 +207,7 @@ void VisualSIRParticleFilter::filteringStep()
 
         /* PALM */
         Vector& estimates_out = port_estimates_out_.prepare();
-        estimates_out.resize(6);
+        estimates_out.resize(7);
         toEigen(estimates_out) = out_particle.cast<double>();
         port_estimates_out_.write();
         /* ********** */
@@ -362,30 +362,20 @@ bool VisualSIRParticleFilter::quit()
 
 VectorXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
 {
-    VectorXf out_particle = VectorXf::Zero(6);
+    VectorXf out_particle = VectorXf::Zero(7);
     float    s_ang        = 0;
     float    c_ang        = 0;
 
     for (int i = 0; i < particles.cols(); ++i)
     {
-        out_particle.head<3>() += weights(i) * particles.col(i).head<3>();
-        out_particle.tail<3>() += weights(i) * particles.col(i).tail<3>().normalized();
+        out_particle.head<3>()        += weights(i) * particles.col(i).head<3>();
+        out_particle.middleRows<3>(3) += weights(i) * particles.col(i).middleRows<3>(3);
 
-        float ang = particles.col(i).tail<3>().norm();
-
-        if      (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
-        else if (ang <=        0.0) ang += 2.0 * M_PI;
-
-        s_ang += weights(i) * std::sin(ang);
-        c_ang += weights(i) * std::cos(ang);
+        s_ang += weights(i) * std::sin(particles(6, i));
+        c_ang += weights(i) * std::cos(particles(6, i));
     }
 
-    float ang = std::atan2(s_ang, c_ang) + M_PI;
-
-    if      (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
-    else if (ang <=        0.0) ang += 2.0 * M_PI;
-
-    out_particle.tail<3>() = out_particle.tail<3>().normalized() * std::atan2(s_ang, c_ang);
+    out_particle(6) = std::atan2(s_ang, c_ang);
 
     return out_particle;
 }
@@ -396,6 +386,7 @@ VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, con
     MatrixXf::Index maxRow;
     MatrixXf::Index maxCol;
     weights.maxCoeff(&maxRow, &maxCol);
+
     return particles.col(maxRow);
 }
 
@@ -482,21 +473,21 @@ VectorXf VisualSIRParticleFilter::amAverage(const Ref<const MatrixXf>& particles
     element_x.time = t_.count();
 
     Vector o(3);
-    toEigen(o) = cur_estimates.tail<3>().normalized().cast<double>();
+    toEigen(o) = cur_estimates.middleRows<3>(3).cast<double>();
     AWPolyElement element_o;
     element_o.data = o;
     element_o.time = t_.count();
 
     Vector tetha(1);
-    tetha(0) = cur_estimates.tail<3>().norm();
+    tetha(0) = cur_estimates(6);
     AWPolyElement element_theta;
     element_theta.data = tetha;
     element_theta.time = t_.count();
 
-    Vector est_out(6);
+    Vector est_out(7);
     est_out.setSubvector(0, lin_est_x_.estimate(element_x));
     est_out.setSubvector(3, lin_est_o_.estimate(element_o));
-    tetha = lin_est_theta_.estimate(element_theta);
+    est_out(6) = lin_est_theta_.estimate(element_theta)(0);
 
     return toEigen(est_out).cast<float>();
 }
@@ -513,7 +504,7 @@ void HistoryBuffer::addElement(const Ref<const VectorXf>& element)
 
 MatrixXf HistoryBuffer::getHistoryBuffer()
 {
-    MatrixXf hist_out(6, hist_buffer_.size());
+    MatrixXf hist_out(7, hist_buffer_.size());
 
     unsigned int i = 0;
     for (const Ref<const VectorXf>& element : hist_buffer_)

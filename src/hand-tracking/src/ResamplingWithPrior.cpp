@@ -22,7 +22,7 @@ ResamplingWithPrior::ResamplingWithPrior(const ConstString& cam_sel, const Const
 ResamplingWithPrior::~ResamplingWithPrior() noexcept { }
 
 
-std::vector<unsigned int> sort_indexes(const Ref<const VectorXf>& vector)
+std::vector<unsigned int> sort_indices(const Ref<const VectorXf>& vector)
 {
     std::vector<unsigned int> idx(vector.size());
     iota(idx.begin(), idx.end(), 0);
@@ -44,7 +44,7 @@ void ResamplingWithPrior::resample(const Ref<const MatrixXf>& pred_particles, co
     VectorXf tmp_weights(num_resample_particles);
 
     int j = 0;
-    for (int i: sort_indexes(cor_weights))
+    for (int i: sort_indices(cor_weights))
     {
         if (j < num_init_particles)
         {

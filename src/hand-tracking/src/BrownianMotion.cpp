@@ -8,12 +8,21 @@ using namespace Eigen;
 
 
 BrownianMotion::BrownianMotion(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept :
-    F_(MatrixXf::Identity(6, 6)), q_xy_(q_xy), q_z_(q_z), theta_(theta * (M_PI/180.0)), cone_angle_(cone_angle * (M_PI/180.0)), cone_dir_(Vector4f(0.0, 0.0, 1.0, 0.0)),
+    F_(MatrixXf::Identity(7, 7)),
+    q_xy_(q_xy),
+    q_z_(q_z),
+    theta_(theta * (M_PI/180.0)),
+    cone_angle_(cone_angle * (M_PI/180.0)),
+    cone_dir_(Vector4f(0.0, 0.0, 1.0, 0.0)),
     generator_(std::mt19937_64(seed)),
-    distribution_pos_xy_(std::normal_distribution<float>(0.0, q_xy)), distribution_pos_z_(std::normal_distribution<float>(0.0, q_z)),
-    distribution_theta_(std::normal_distribution<float>(0.0, theta_)), distribution_cone_(std::uniform_real_distribution<float>(0.0, 1.0)),
-    gaussian_random_pos_xy_([&] { return (distribution_pos_xy_)(generator_); }), gaussian_random_pos_z_([&] { return (distribution_pos_z_)(generator_); }),
-    gaussian_random_theta_([&] { return (distribution_theta_)(generator_); }), gaussian_random_cone_([&] { return (distribution_cone_)(generator_); }) { }
+    distribution_pos_xy_(std::normal_distribution<float>(0.0, q_xy)),
+    distribution_pos_z_(std::normal_distribution<float>(0.0, q_z)),
+    distribution_theta_(std::normal_distribution<float>(0.0, theta_)),
+    distribution_cone_(std::uniform_real_distribution<float>(0.0, 1.0)),
+    gaussian_random_pos_xy_([&] { return (distribution_pos_xy_)(generator_); }),
+    gaussian_random_pos_z_([&] { return (distribution_pos_z_)(generator_); }),
+    gaussian_random_theta_([&] { return (distribution_theta_)(generator_); }),
+    gaussian_random_cone_([&] { return (distribution_cone_)(generator_); }) { }
 
 
 BrownianMotion::BrownianMotion(const float q_xy, const float q_z, const float theta, const float cone_angle) noexcept :
@@ -28,13 +37,38 @@ BrownianMotion::~BrownianMotion() noexcept { }
 
 
 BrownianMotion::BrownianMotion(const BrownianMotion& brown) :
-    F_(brown.F_), q_xy_(brown.q_xy_), q_z_(brown.q_z_), theta_(brown.theta_), cone_angle_(brown.cone_angle_),  cone_dir_(brown.cone_dir_),
-    generator_(brown.generator_), distribution_pos_xy_(brown.distribution_pos_xy_), distribution_pos_z_(brown.distribution_pos_z_), distribution_theta_(brown.distribution_theta_), distribution_cone_(brown.distribution_cone_), gaussian_random_pos_xy_(brown.gaussian_random_pos_xy_), gaussian_random_pos_z_(brown.gaussian_random_pos_z_), gaussian_random_theta_(brown.gaussian_random_theta_), gaussian_random_cone_(brown.gaussian_random_cone_) { }
+    F_(brown.F_),
+    q_xy_(brown.q_xy_),
+    q_z_(brown.q_z_),
+    theta_(brown.theta_),
+    cone_angle_(brown.cone_angle_),
+    cone_dir_(brown.cone_dir_),
+    generator_(brown.generator_),
+    distribution_pos_xy_(brown.distribution_pos_xy_),
+    distribution_pos_z_(brown.distribution_pos_z_),
+    distribution_theta_(brown.distribution_theta_),
+    distribution_cone_(brown.distribution_cone_),
+    gaussian_random_pos_xy_(brown.gaussian_random_pos_xy_),
+    gaussian_random_pos_z_(brown.gaussian_random_pos_z_),
+    gaussian_random_theta_(brown.gaussian_random_theta_),
+    gaussian_random_cone_(brown.gaussian_random_cone_) { }
 
 
 BrownianMotion::BrownianMotion(BrownianMotion&& brown) noexcept :
-F_(std::move(brown.F_)), q_xy_(brown.q_xy_), theta_(brown.theta_), cone_angle_(brown.cone_angle_), cone_dir_(std::move(brown.cone_dir_)),
-    generator_(std::move(brown.generator_)), distribution_pos_xy_(std::move(brown.distribution_pos_xy_)), distribution_pos_z_(std::move(brown.distribution_pos_z_)), distribution_theta_(std::move(brown.distribution_theta_)), distribution_cone_(std::move(brown.distribution_cone_)), gaussian_random_pos_xy_(std::move(brown.gaussian_random_pos_xy_)), gaussian_random_pos_z_(std::move(brown.gaussian_random_pos_z_)), gaussian_random_theta_(std::move(brown.gaussian_random_theta_)), gaussian_random_cone_(std::move(brown.gaussian_random_cone_))
+    F_(std::move(brown.F_)),
+    q_xy_(brown.q_xy_),
+    theta_(brown.theta_),
+    cone_angle_(brown.cone_angle_),
+    cone_dir_(std::move(brown.cone_dir_)),
+    generator_(std::move(brown.generator_)),
+    distribution_pos_xy_(std::move(brown.distribution_pos_xy_)),
+    distribution_pos_z_(std::move(brown.distribution_pos_z_)),
+    distribution_theta_(std::move(brown.distribution_theta_)),
+    distribution_cone_(std::move(brown.distribution_cone_)),
+    gaussian_random_pos_xy_(std::move(brown.gaussian_random_pos_xy_)),
+    gaussian_random_pos_z_(std::move(brown.gaussian_random_pos_z_)),
+    gaussian_random_theta_(std::move(brown.gaussian_random_theta_)),
+    gaussian_random_cone_(std::move(brown.gaussian_random_cone_))
 {
     brown.q_xy_       = 0.0;
     brown.q_z_        = 0.0;
