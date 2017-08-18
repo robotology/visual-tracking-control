@@ -59,8 +59,8 @@ void CartesianAxisAnglePrediction::addAxisangleDisturbance(Ref<Vector4f> current
 {
     float ang = current_vec(3) + disturbance_vec(3);
 
-    if      (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
-    else if (ang <=        0.0) ang += 2.0 * M_PI;
+    if      (ang >   M_PI) ang -= 2.0 * M_PI;
+    else if (ang <= -M_PI) ang += 2.0 * M_PI;
 
 
     /* Find the rotation axis 'u' and rotation angle 'rot' [1] */

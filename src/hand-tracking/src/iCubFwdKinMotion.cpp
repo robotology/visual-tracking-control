@@ -123,8 +123,8 @@ void iCubFwdKinMotion::propagate(const Ref<const VectorXf>& cur_state, Ref<Vecto
     prop_state.middleRows<3>(3) = (cur_state.middleRows<3>(3) + delta_hand_pose_.middleRows<3>(3).cast<float>()).normalized();
 
     float   ang = cur_state(6) + static_cast<float>(delta_angle_);
-    if      (ang >  2.0 * M_PI) ang -= 2.0 * M_PI;
-    else if (ang <=        0.0) ang += 2.0 * M_PI;
+    if      (ang >   M_PI) ang -= 2.0 * M_PI;
+    else if (ang <= -M_PI) ang += 2.0 * M_PI;
 
     prop_state(6) = ang;
 
@@ -190,8 +190,8 @@ bool iCubFwdKinMotion::setDeltaMotion()
     delta_hand_pose_.middleRows<3>(3) = cur_ee_pose.middleRows<3>(3) - prev_ee_pose_.middleRows<3>(3);
 
     delta_angle_ = cur_ee_pose(6) - prev_ee_pose_(6);
-    if      (delta_angle_ >  2.0 * M_PI) delta_angle_ -= 2.0 * M_PI;
-    else if (delta_angle_ <=        0.0) delta_angle_ += 2.0 * M_PI;
+    if      (delta_angle_ >   M_PI) delta_angle_ -= 2.0 * M_PI;
+    else if (delta_angle_ <= -M_PI) delta_angle_ += 2.0 * M_PI;
 
     prev_ee_pose_ = cur_ee_pose;
 
