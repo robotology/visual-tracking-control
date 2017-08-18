@@ -16,7 +16,7 @@ GatePose::GatePose(std::unique_ptr<VisualCorrection> visual_correction,
     gate_aperture_((M_PI / 180.0) * gate_aperture),
     gate_rotation_((M_PI / 180.0) * gate_rotation)
 {
-    ee_pose_ = VectorXd::Zero(6);
+    ee_pose_ = VectorXd::Zero(7);
 }
 
 
@@ -35,9 +35,9 @@ void GatePose::correct(const Ref<const MatrixXf>& pred_state, InputArray measure
 
     for (int i = 0; i < pred_state.cols(); ++i)
     {
-        if (!isInsideEllipsoid(pred_state.block<3, 1>(0, i))              ||
-            !isWithinRotation (pred_state.block<3, 1>(3, i).norm())       ||
-            !isInsideCone     (pred_state.block<3, 1>(3, i).normalized())   )
+        if (!isInsideEllipsoid(pred_state.col(i).head<3>())        ||
+            !isInsideCone     (pred_state.col(i).middleRows<3>(3)) ||
+            !isWithinRotation (pred_state(6, i))                     )
             cor_state(i, 0) = std::numeric_limits<float>::min();
     }
 }
