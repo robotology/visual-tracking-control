@@ -152,7 +152,7 @@ bool PlayFwdKinMotion::setDeltaMotion()
 
     delta_hand_pose_.head<3>() = cur_ee_pose.head<3>() - prev_ee_pose_.head<3>();
 
-    delta_hand_pose_.middleRows<3>(3) = (cur_ee_pose.middleRows<3>(3) - prev_ee_pose_.middleRows<3>(3)).normalized();
+    delta_hand_pose_.middleRows<3>(3) = cur_ee_pose.middleRows<3>(3) - prev_ee_pose_.middleRows<3>(3);
 
     delta_angle_ = cur_ee_pose(6) - prev_ee_pose_(6);
     if      (delta_angle_ >  2.0 * M_PI) delta_angle_ -= 2.0 * M_PI;
