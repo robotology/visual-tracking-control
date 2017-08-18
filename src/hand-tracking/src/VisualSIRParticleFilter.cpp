@@ -386,6 +386,7 @@ VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, con
     MatrixXf::Index maxRow;
     MatrixXf::Index maxCol;
     weights.maxCoeff(&maxRow, &maxCol);
+
     return particles.col(maxRow);
 }
 
