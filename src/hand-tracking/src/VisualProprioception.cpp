@@ -330,18 +330,17 @@ void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_state, st
         Superimpose::ModelPose          pose;
         Vector                          ee_t(4);
         Vector                          ee_o(4);
-        float                           ang;
 
 
         ee_t(0) = cur_state(0, j);
         ee_t(1) = cur_state(1, j);
         ee_t(2) = cur_state(2, j);
         ee_t(3) =             1.0;
-        ang     = cur_state.col(j).tail(3).norm();
-        ee_o(0) = cur_state(3, j) / ang;
-        ee_o(1) = cur_state(4, j) / ang;
-        ee_o(2) = cur_state(5, j) / ang;
-        ee_o(3) = ang;
+
+        ee_o(0) = cur_state(3, j);
+        ee_o(1) = cur_state(4, j);
+        ee_o(2) = cur_state(5, j);
+        ee_o(3) = cur_state(6, j);
 
         pose.assign(ee_t.data(), ee_t.data()+3);
         pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
