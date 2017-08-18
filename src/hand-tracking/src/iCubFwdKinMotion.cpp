@@ -28,23 +28,28 @@ iCubFwdKinMotion::iCubFwdKinMotion(std::unique_ptr<StateModel> state_model, cons
     opt_arm_enc.put("remote", "/" + robot_ + "/right_arm");
 
     yInfo() << log_ID_ << "Opening " + laterality_ + " arm remote_controlboard driver...";
+
     if (drv_arm_enc_.open(opt_arm_enc))
     {
         yInfo() << log_ID_ << "Succesfully opened " + laterality_ + " arm remote_controlboard interface.";
 
         yInfo() << log_ID_ << "Getting " + laterality_ + " arm encoder interface...";
+
         drv_arm_enc_.view(itf_arm_enc_);
         if (!itf_arm_enc_)
         {
             yError() << log_ID_ << "Cannot get " + laterality_ + " arm encoder interface!";
+
             drv_arm_enc_.close();
             throw std::runtime_error("ERROR::" + ID_ + "::CTOR::INTERFACE\nERROR: cannot get " + laterality_ + " arm encoder interface!");
         }
+
         yInfo() << log_ID_ << "Succesfully got " + laterality_ + " arm encoder interface.";
     }
     else
     {
         yError() << log_ID_ << "Cannot open " + laterality_ + " arm remote_controlboard!";
+
         throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open " + laterality_ + " arm remote_controlboard!");
     }
 
@@ -59,23 +64,28 @@ iCubFwdKinMotion::iCubFwdKinMotion(std::unique_ptr<StateModel> state_model, cons
     opt_torso_enc.put("remote", "/" + robot_ + "/torso");
 
     yInfo() << log_ID_ << "Opening torso remote_controlboard driver...";
+
     if (drv_torso_enc_.open(opt_torso_enc))
     {
         yInfo() << log_ID_ << "Succesfully opened torso remote_controlboard driver.";
 
         yInfo() << log_ID_ << "Getting torso encoder interface...";
+
         drv_torso_enc_.view(itf_torso_enc_);
         if (!itf_torso_enc_)
         {
             yError() << log_ID_ << "Cannot get torso encoder interface!";
+
             drv_torso_enc_.close();
             throw std::runtime_error("ERROR::" + ID_ + "::CTOR::INTERFACE\nERROR: cannot get torso encoder interface!");
         }
+
         yInfo() << log_ID_ << "Succesfully got torso encoder interface.";
     }
     else
     {
         yError() << log_ID_ << "Cannot open torso remote_controlboard!";
+
         throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open torso remote_controlboard!");
     }
 
@@ -164,7 +174,7 @@ Vector iCubFwdKinMotion::readRootToEE()
 
     while (!itf_arm_enc_->getEncoders(enc_arm.data()));
     for (size_t i = 0; i < 7; ++i)
-        root_ee_enc(i+3) = enc_arm(i);
+        root_ee_enc(i + 3) = enc_arm(i);
 
     return root_ee_enc;
 }
