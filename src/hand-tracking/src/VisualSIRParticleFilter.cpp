@@ -288,11 +288,10 @@ std::vector<std::string> VisualSIRParticleFilter::get_info()
     info.push_back("<| Current window size: " + std::to_string(hist_buffer_.getHistorySize()) + " |>");
     info.push_back("<| Available estimate extraction methods:" +
                    std::string(ext_mode == EstimatesExtraction::mean       ? "1) mean <-- In use; "       : "1) mean; ") +
-                   std::string(ext_mode == EstimatesExtraction::mode       ? "2) mode <-- In use; "       : "2) mode") +
-                   std::string(ext_mode == EstimatesExtraction::sm_average ? "3) sm_average <-- In use; " : "3) sm_average") +
-                   std::string(ext_mode == EstimatesExtraction::wm_average ? "4) wm_average <-- In use; " : "4) wm_average") +
-                   std::string(ext_mode == EstimatesExtraction::em_average ? "5) em_average <-- In use; " : "5) em_average") +
-                   std::string(ext_mode == EstimatesExtraction::am_average ? "6) am_average <-- In use; " : "6) am_average") + " |>");
+                   std::string(ext_mode == EstimatesExtraction::mode       ? "2) mode <-- In use; "       : "2) mode; ") +
+                   std::string(ext_mode == EstimatesExtraction::sm_average ? "3) sm_average <-- In use; " : "3) sm_average; ") +
+                   std::string(ext_mode == EstimatesExtraction::wm_average ? "4) wm_average <-- In use; " : "4) wm_average; ") +
+                   std::string(ext_mode == EstimatesExtraction::em_average ? "5) em_average <-- In use; " : "5) em_average") + " |>");
 
     return info;
 }
