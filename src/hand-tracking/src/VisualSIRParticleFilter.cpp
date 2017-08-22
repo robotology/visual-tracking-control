@@ -11,8 +11,9 @@
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/cudaimgproc.hpp>
-#include <yarp/math/Math.h>
 #include <yarp/eigen/Eigen.h>
+#include <yarp/math/Math.h>
+#include <yarp/os/Time.h>
 
 using namespace bfl;
 using namespace cv;
@@ -131,10 +132,6 @@ void VisualSIRParticleFilter::filteringStep()
 
             case EstimatesExtraction::em_average :
                 out_particle = emAverage(particle_, weight_);
-                break;
-
-            case EstimatesExtraction::am_average :
-                out_particle = amAverage(particle_, weight_);
                 break;
 
             default:
@@ -286,13 +283,15 @@ std::vector<std::string> VisualSIRParticleFilter::get_info()
     info.push_back("<| Using " + cam_sel_ + " camera images |>");
     info.push_back("<| Using encoders from " + laterality_ + " iCub arm |>");
     info.push_back("<| Using " + std::to_string(num_particles_) + " particles |>");
+    info.push_back("<| Adaptive window: " +
+                   std::string(hist_buffer_.getAdaptiveWindowStatus() ? "enabled" : "disabled") + " |>");
+    info.push_back("<| Current window size: " + std::to_string(hist_buffer_.getHistorySize()) + " |>");
     info.push_back("<| Available estimate extraction methods:" +
                    std::string(ext_mode == EstimatesExtraction::mean       ? "1) mean <-- In use; "       : "1) mean; ") +
-                   std::string(ext_mode == EstimatesExtraction::mode       ? "2) mode <-- In use; "       : "2) mode") +
-                   std::string(ext_mode == EstimatesExtraction::sm_average ? "3) sm_average <-- In use; " : "3) sm_average") +
-                   std::string(ext_mode == EstimatesExtraction::wm_average ? "4) wm_average <-- In use; " : "4) wm_average") +
-                   std::string(ext_mode == EstimatesExtraction::em_average ? "5) em_average <-- In use; " : "5) em_average") +
-                   std::string(ext_mode == EstimatesExtraction::am_average ? "6) am_average <-- In use; " : "6) am_average") + " |>");
+                   std::string(ext_mode == EstimatesExtraction::mode       ? "2) mode <-- In use; "       : "2) mode; ") +
+                   std::string(ext_mode == EstimatesExtraction::sm_average ? "3) sm_average <-- In use; " : "3) sm_average; ") +
+                   std::string(ext_mode == EstimatesExtraction::wm_average ? "4) wm_average <-- In use; " : "4) wm_average; ") +
+                   std::string(ext_mode == EstimatesExtraction::em_average ? "5) em_average <-- In use; " : "5) em_average") + " |>");
 
     return info;
 }
@@ -330,14 +329,6 @@ bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string&
 
         return true;
     }
-    else if (method == "am_average")
-    {
-        init_filter = true;
-
-        ext_mode = EstimatesExtraction::am_average;
-
-        return true;
-    }
 
     return false;
 }
@@ -349,6 +340,12 @@ bool VisualSIRParticleFilter::set_mobile_average_window(const int16_t window)
         return hist_buffer_.setHistorySize(window);
     else
         return false;
+}
+
+
+bool VisualSIRParticleFilter::enable_adaptive_window(const bool status)
+{
+    return hist_buffer_.enableAdaptiveWindow(status);
 }
 
 
@@ -374,6 +371,12 @@ VectorXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, con
         s_ang += weights(i) * std::sin(particles(6, i));
         c_ang += weights(i) * std::cos(particles(6, i));
     }
+
+    float versor_norm = out_particle.middleRows<3>(3).norm();
+    if ( versor_norm >= 0.99)
+        out_particle.middleRows<3>(3) /= versor_norm;
+    else
+        out_particle.middleRows<3>(3) = mode(particles, weights).middleRows<3>(3);
 
     out_particle(6) = std::atan2(s_ang, c_ang);
 
@@ -445,56 +448,19 @@ VectorXf VisualSIRParticleFilter::emAverage(const Ref<const MatrixXf>& particles
 }
 
 
-VectorXf VisualSIRParticleFilter::amAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
+HistoryBuffer::HistoryBuffer() noexcept
 {
-    VectorXf cur_estimates = mean(particles, weights);
-
-    if (!init_filter)
-    {
-        time_2_ =  std::chrono::steady_clock::now();
-        t_      += std::chrono::duration_cast<std::chrono::milliseconds>(time_2_ - time_1_);
-        time_1_ =  time_2_;
-    }
-    else
-    {
-        t_      = std::chrono::milliseconds(0);
-        time_1_ = std::chrono::steady_clock::now();
-        lin_est_x_.reset();
-        lin_est_o_.reset();
-        lin_est_theta_.reset();
-
-        init_filter = false;
-    }
-
-    Vector x(3);
-    toEigen(x) = cur_estimates.head<3>().cast<double>();
-    AWPolyElement element_x;
-    element_x.data = x;
-    element_x.time = t_.count();
-
-    Vector o(3);
-    toEigen(o) = cur_estimates.middleRows<3>(3).cast<double>();
-    AWPolyElement element_o;
-    element_o.data = o;
-    element_o.time = t_.count();
-
-    Vector tetha(1);
-    tetha(0) = cur_estimates(6);
-    AWPolyElement element_theta;
-    element_theta.data = tetha;
-    element_theta.time = t_.count();
-
-    Vector est_out(7);
-    est_out.setSubvector(0, lin_est_x_.estimate(element_x));
-    est_out.setSubvector(3, lin_est_o_.estimate(element_o));
-    est_out(6) = lin_est_theta_.estimate(element_theta)(0);
-
-    return toEigen(est_out).cast<float>();
+    lin_est_x_.reset();
+    lin_est_o_.reset();
+    lin_est_theta_.reset();
 }
 
 
 void HistoryBuffer::addElement(const Ref<const VectorXf>& element)
 {
+    if (adaptive_window_)
+        adaptWindow(element);
+
     hist_buffer_.push_front(element);
 
     if (hist_buffer_.size() > window_)
@@ -531,4 +497,64 @@ bool HistoryBuffer::setHistorySize(const unsigned int window)
     window_ = tmp;
 
     return true;
+}
+
+
+bool HistoryBuffer::decreaseHistorySize()
+{
+    return setHistorySize(window_ - 1);
+}
+
+
+bool HistoryBuffer::increaseHistorySize()
+{
+    return setHistorySize(window_ + 1);
+}
+
+
+bool HistoryBuffer::enableAdaptiveWindow(const bool status)
+{
+    if (status)
+        mem_window_ = window_;
+    else
+    {
+        window_ = mem_window_;
+        setHistorySize(window_);
+    }
+
+    adaptive_window_ = status;
+
+    return true;
+}
+
+
+void HistoryBuffer::adaptWindow(const Ref<const VectorXf>& element)
+{
+    double time_now = Time::now();
+
+    Vector x(3);
+    toEigen(x) = element.head<3>().cast<double>();
+    AWPolyElement element_x(x, time_now);
+
+    Vector dot_x = lin_est_x_.estimate(element_x);
+
+
+    Vector o(3);
+    toEigen(o) = element.middleRows<3>(3).cast<double>();
+    AWPolyElement element_o(o, time_now);
+
+    Vector dot_o = lin_est_o_.estimate(element_o);
+
+
+    Vector theta(1);
+    theta(0) = element(6);
+    AWPolyElement element_theta(theta, time_now);
+
+    Vector dot_theta = lin_est_theta_.estimate(element_theta);
+
+
+    if (norm(dot_x) <= lin_est_x_thr_ || norm(dot_o) <= lin_est_o_thr_ || std::abs(dot_theta(0)) <= lin_est_theta_thr_)
+        increaseHistorySize();
+    else if (norm(dot_x) > lin_est_x_thr_ || norm(dot_o) > lin_est_o_thr_ || std::abs(dot_theta(0)) > lin_est_theta_thr_)
+        decreaseHistorySize();
 }

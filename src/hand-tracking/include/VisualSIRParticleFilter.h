@@ -15,6 +15,7 @@
 #include <BayesFilters/Resampling.h>
 #include <Eigen/Dense>
 #include <iCub/ctrl/adaptWinPolyEstimator.h>
+#include <iCub/ctrl/filters.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/cudaobjdetect.hpp>
 #include <thrift/VisualSIRParticleFilterIDL.h>
@@ -32,7 +33,7 @@
 class HistoryBuffer
 {
 public:
-    HistoryBuffer() noexcept { };
+    HistoryBuffer() noexcept;
 
     ~HistoryBuffer() noexcept { };
 
@@ -42,12 +43,36 @@ public:
 
     bool            setHistorySize(const unsigned int window);
 
+    unsigned int    getHistorySize() { return window_; };
+
+    bool            decreaseHistorySize();
+
+    bool            increaseHistorySize();
+
+    bool            enableAdaptiveWindow(const bool status);
+
+    bool            getAdaptiveWindowStatus() { return adaptive_window_; };
+
 private:
     unsigned int                window_     = 5;
 
-    const unsigned int          max_window_ = 90;
+    const unsigned int          max_window_ = 30;
+
+    unsigned int                mem_window_ = 5;
 
     std::deque<Eigen::VectorXf> hist_buffer_;
+
+    bool                        adaptive_window_ = false;
+
+    double                      lin_est_x_thr_     = 0.03;
+    double                      lin_est_o_thr_     = 0.5;
+    double                      lin_est_theta_thr_ = 3.0 * iCub::ctrl::CTRL_DEG2RAD;
+
+    iCub::ctrl::AWLinEstimator  lin_est_x_         {4, 0.1};
+    iCub::ctrl::AWLinEstimator  lin_est_o_         {4, 0.6};
+    iCub::ctrl::AWLinEstimator  lin_est_theta_     {4, 6.0 * iCub::ctrl::CTRL_DEG2RAD};
+
+    void                        adaptWindow(const Eigen::Ref<const Eigen::VectorXf>& element);
 };
 
 
@@ -127,6 +152,8 @@ protected:
 
     bool set_mobile_average_window(const int16_t window) override;
 
+    bool enable_adaptive_window(const bool status) override;
+
     HistoryBuffer hist_buffer_;
 
     enum class EstimatesExtraction
@@ -135,8 +162,7 @@ protected:
         mode,
         sm_average,
         wm_average,
-        em_average,
-        am_average
+        em_average
     };
 
     EstimatesExtraction ext_mode = EstimatesExtraction::em_average;
@@ -153,15 +179,6 @@ protected:
 
     Eigen::VectorXf emAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
     Eigen::VectorXf em_weights_;
-
-    bool                                  init_filter = true;
-    iCub::ctrl::AWLinEstimator            lin_est_x_    {10, 0.02};
-    iCub::ctrl::AWLinEstimator            lin_est_o_    {10, 0.5};
-    iCub::ctrl::AWLinEstimator            lin_est_theta_{10, 3.0 * iCub::ctrl::CTRL_DEG2RAD};
-    std::chrono::milliseconds             t_{0};
-    std::chrono::steady_clock::time_point time_1_;
-    std::chrono::steady_clock::time_point time_2_;
-    Eigen::VectorXf amAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
     /* *************************** */
 
 private:
