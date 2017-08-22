@@ -532,7 +532,7 @@ std::vector<Vector> VisualServoingServer::get3DGoalPositionsFrom3DPose(const Vec
 
 std::vector<Vector> VisualServoingServer::getGoalPixelsFrom3DPose(const Vector& x, const Vector& o, const CamSel& cam)
 {
-    if (x.length() != 3 || o.length() != 4 && (cam != CamSel::left || cam != CamSel::right))
+    if (x.length() != 3 || o.length() != 4)
         return std::vector<Vector>();
 
 
@@ -1389,7 +1389,7 @@ std::vector<std::vector<double>> VisualServoingServer::get_3D_goal_positions_fro
 
 std::vector<std::vector<double>> VisualServoingServer::get_goal_pixels_from_3D_pose(const std::vector<double>& x, const std::vector<double>& o, const std::string& cam)
 {
-    if (x.size() != 3 || o.size() != 4 && (cam != "left" || cam != "right"))
+    if (x.size() != 3 || o.size() != 4 || (cam != "left" && cam != "right"))
         return std::vector<std::vector<double>>();
 
 
