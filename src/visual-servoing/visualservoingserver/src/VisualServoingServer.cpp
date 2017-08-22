@@ -575,6 +575,7 @@ bool VisualServoingServer::storedInit(const std::string& label)
         od[2] =  0.026;
         od[3] =  2.693;
 
+        /* -6.706 1.394 -3.618 */
         gaze_loc[0] = -6.706;
         gaze_loc[1] =  1.394;
         gaze_loc[2] = -3.618;
@@ -591,10 +592,10 @@ bool VisualServoingServer::storedInit(const std::string& label)
         od[2] = -0.473;
         od[3] =  2.896;
 
-        /* -0.681 0.112 -0.240 */
-        gaze_loc[0] = -0.681;
-        gaze_loc[1] =  0.112;
-        gaze_loc[2] = -0.240;
+        /* -5.938 1.385 -4.724 */
+        gaze_loc[0] = -5.938;
+        gaze_loc[1] =  1.385;
+        gaze_loc[2] = -4.724;
     }
     else if (label == "t170713")
     {
@@ -608,10 +609,10 @@ bool VisualServoingServer::storedInit(const std::string& label)
         od[2] =  0.86;
         od[3] =  2.962;
 
-        /* -0.627 0.164 -0.283 */
-        gaze_loc[0] = -0.627;
-        gaze_loc[1] =  0.164;
-        gaze_loc[2] = -0.283;
+        /* -5.938 1.385 -4.724 */
+        gaze_loc[0] = -5.938;
+        gaze_loc[1] =  1.385;
+        gaze_loc[2] = -4.724;
     }
     else if (label == "sfm300517")
     {

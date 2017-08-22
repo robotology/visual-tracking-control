@@ -45,7 +45,7 @@ int main(int argc, char **argv)
     }
 
     /* Initialize facilities */
-    visual_servoing->initFacilities(false);
+    visual_servoing->initFacilities(true);
 
     /* Stored set-up */
     visual_servoing->storedInit("t170427");
