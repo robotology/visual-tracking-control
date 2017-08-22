@@ -68,15 +68,27 @@ service VisualSIRParticleFilterIDL
     bool set_estimates_extraction_method(1:string method);
 
     /**
-     * Cheange the window width of mobile averages for estimates extraction.
+     * Cheange the window size of mobile averages for estimates extraction.
      *
-     * @param window specifies the mobile window width.
+     * @param window specifies the mobile window size.
      *
-     * @return true window width changed successfully, false otherwise.
+     * @return true window size changed successfully, false otherwise.
      *
      * @note The default value is 20. Minimum value is 2. Maximum value is 90.
      */
     bool set_mobile_average_window(1:i16 window = 20);
+
+    /**
+     * Enable/Disable adaptive window size of mobile averages for estimates
+     * extraction.
+     *
+     * @param status true/false to enable/disable adaptive window size.
+     *
+     * @return true/false if adaptive window window size is enabled/disabled.
+     *
+     * @note By default adaptive window is disabled.
+     */
+    bool enable_adaptive_window(1:bool status);
 
     /**
      * Gently close the application, deallocating resources.

@@ -33,7 +33,7 @@
 class HistoryBuffer
 {
 public:
-    HistoryBuffer() noexcept { };
+    HistoryBuffer() noexcept;
 
     ~HistoryBuffer() noexcept { };
 
@@ -43,12 +43,36 @@ public:
 
     bool            setHistorySize(const unsigned int window);
 
+    unsigned int    getHistorySize() { return window_; };
+
+    bool            decreaseHistorySize();
+
+    bool            increaseHistorySize();
+
+    bool            enableAdaptiveWindow(const bool status);
+
+    bool            getAdaptiveWindowStatus() { return adaptive_window_; };
+
 private:
     unsigned int                window_     = 5;
 
     const unsigned int          max_window_ = 30;
 
+    unsigned int                mem_window_ = 5;
+
     std::deque<Eigen::VectorXf> hist_buffer_;
+
+    bool                        adaptive_window_ = false;
+
+    double                      lin_est_x_thr_     = 0.03;
+    double                      lin_est_o_thr_     = 0.5;
+    double                      lin_est_theta_thr_ = 3.0 * iCub::ctrl::CTRL_DEG2RAD;
+
+    iCub::ctrl::AWLinEstimator  lin_est_x_         {4, 0.1};
+    iCub::ctrl::AWLinEstimator  lin_est_o_         {4, 0.6};
+    iCub::ctrl::AWLinEstimator  lin_est_theta_     {4, 6.0 * iCub::ctrl::CTRL_DEG2RAD};
+
+    void                        adaptWindow(const Eigen::Ref<const Eigen::VectorXf>& element);
 };
 
 
@@ -128,6 +152,8 @@ protected:
 
     bool set_mobile_average_window(const int16_t window) override;
 
+    bool enable_adaptive_window(const bool status) override;
+
     HistoryBuffer hist_buffer_;
 
     enum class EstimatesExtraction
@@ -136,8 +162,7 @@ protected:
         mode,
         sm_average,
         wm_average,
-        em_average,
-        am_average
+        em_average
     };
 
     EstimatesExtraction ext_mode = EstimatesExtraction::em_average;
@@ -154,23 +179,6 @@ protected:
 
     Eigen::VectorXf emAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
     Eigen::VectorXf em_weights_;
-
-    bool                       init_filter_ = true;
-    int                        filter_min_win_    = 1;
-    int                        filter_max_win_    = 30;
-    int                        filter_x_win_      = 5;
-    int                        filter_o_win_      = 5;
-    int                        filter_theta_win_  = 5;
-    iCub::ctrl::MedianFilter   filter_x_          {5, yarp::sig::Vector(3, 0.0)};
-    iCub::ctrl::MedianFilter   filter_o_          {5, yarp::sig::Vector(3, 0.0)};
-    iCub::ctrl::MedianFilter   filter_theta_      {5, yarp::sig::Vector(1, 0.0)};
-    double                     lin_est_x_thr_     = 0.03;
-    double                     lin_est_o_thr_     = 0.2;
-    double                     lin_est_theta_thr_ = 2.0 * iCub::ctrl::CTRL_DEG2RAD;
-    iCub::ctrl::AWLinEstimator lin_est_x_         {10, 0.1};
-    iCub::ctrl::AWLinEstimator lin_est_o_         {10, 0.6};
-    iCub::ctrl::AWLinEstimator lin_est_theta_     {10, 6.0 * iCub::ctrl::CTRL_DEG2RAD};
-    Eigen::VectorXf amAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
     /* *************************** */
 
 private:
