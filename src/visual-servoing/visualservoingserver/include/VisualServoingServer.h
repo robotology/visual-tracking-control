@@ -184,8 +184,8 @@ private:
     bool                           vs_control_running_ = false;
     bool                           vs_goal_reached_    = false;
     const double                   Ts_                 = 0.1; /* [s] */
-    std::array<double, 2>          K_x_                = {{1.0, 0.25}};
-    std::array<double, 2>          K_o_                = {{1.5, 0.375}};
+    std::array<double, 2>          K_x_                = {{1.0, 0.5}};
+    std::array<double, 2>          K_o_                = {{1.5, 0.75}};
     double                         max_x_dot_          = 0.025; /* [m/s] */
     double                         max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
     double                         K_x_tol_            = 20.0; /* [pixel] */
