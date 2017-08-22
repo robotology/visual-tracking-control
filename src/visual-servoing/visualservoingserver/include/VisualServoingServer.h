@@ -198,7 +198,7 @@ private:
     yarp::sig::Matrix              l_proj_;
     yarp::sig::Matrix              r_proj_;
 
-    yarp::sig::Vector              goal_pose_    = yarp::math::zeros(6);
+    yarp::sig::Vector              goal_pose_    = yarp::math::zeros(7);
     yarp::sig::Vector              px_des_       = yarp::math::zeros(12);
     yarp::sig::Matrix              l_H_eye_to_r_ = yarp::math::zeros(4, 4);
     yarp::sig::Matrix              r_H_eye_to_r_ = yarp::math::zeros(4, 4);
@@ -260,8 +260,6 @@ private:
     yarp::sig::Vector getJacobianU(const CamSel& cam, const yarp::sig::Vector& px);
 
     yarp::sig::Vector getJacobianV(const CamSel& cam, const yarp::sig::Vector& px);
-    
-    yarp::sig::Vector getAxisAngle(const yarp::sig::Vector& v);
 
     bool setCameraTransformations();
 

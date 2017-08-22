@@ -516,10 +516,9 @@ std::vector<Vector> VisualServoingServer::get3DGoalPositionsFrom3DPose(const Vec
         return std::vector<Vector>();
 
 
-    Vector pose(6);
+    Vector pose(7);
     pose.setSubvector(0, x);
-    pose.setSubvector(3, o.subVector(0, 2));
-    pose.setSubvector(3, pose.subVector(3, 5) * o[3]);
+    pose.setSubvector(3, o);
 
     yWarningVerbose("<!-- Invoking setPoseGoal() to set the goal pose for visual servoing.");
     yWarningVerbose("<!-- Be warned that this specific invokation will be removed in upcoming releases.");
@@ -537,10 +536,9 @@ std::vector<Vector> VisualServoingServer::getGoalPixelsFrom3DPose(const Vector& 
         return std::vector<Vector>();
 
 
-    Vector pose(6);
+    Vector pose(7);
     pose.setSubvector(0, x);
-    pose.setSubvector(3, o.subVector(0, 2));
-    pose.setSubvector(3, pose.subVector(3, 5) * o[3]);
+    pose.setSubvector(3, o);
 
     yWarningVerbose("<!-- Invoking setPoseGoal() to set the goal pose for visual servoing.");
     yWarningVerbose("<!-- Be warned that this specific invokation will be removed in upcoming releases.");
@@ -676,9 +674,10 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
         goal_pose_[1] =  0.018;
         goal_pose_[2] =  0.121;
 
-        goal_pose_[3] =  0.310 * 3.008;
-        goal_pose_[4] = -0.873 * 3.008;
-        goal_pose_[5] =  0.374 * 3.008;
+        goal_pose_[3] =  0.310;
+        goal_pose_[4] = -0.873;
+        goal_pose_[5] =  0.374;
+        goal_pose_[6] =  3.008;
     }
     else if (label == "t170517")
     {
@@ -687,9 +686,10 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
         goal_pose_[1] =  0.013;
         goal_pose_[2] =  0.104;
 
-        goal_pose_[3] = -0.370 * 2.781;
-        goal_pose_[4] =  0.799 * 2.781;
-        goal_pose_[5] = -0.471 * 2.781;
+        goal_pose_[3] = -0.370;
+        goal_pose_[4] =  0.799;
+        goal_pose_[5] = -0.471;
+        goal_pose_[6] =  2.781;
     }
     else if (label == "t170711")
     {
@@ -698,9 +698,10 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
         goal_pose_[1] =  0.024;
         goal_pose_[2] = -0.053;
 
-        goal_pose_[3] =  0.057 * 2.525;
-        goal_pose_[4] =  0.980 * 2.525;
-        goal_pose_[5] = -0.189 * 2.525;
+        goal_pose_[3] =  0.057;
+        goal_pose_[4] =  0.980;
+        goal_pose_[5] = -0.189;
+        goal_pose_[6] =  2.525;
     }
     else if (label == "t170713")
     {
@@ -709,9 +710,10 @@ bool VisualServoingServer::storedGoToGoal(const std::string& label)
         goal_pose_[1] =  0.061;
         goal_pose_[2] =  0.068;
 
-        goal_pose_[3] =  0.213 * 2.911;
-        goal_pose_[4] = -0.94  * 2.911;
-        goal_pose_[5] =  0.265 * 2.911;
+        goal_pose_[3] =  0.213;
+        goal_pose_[4] = -0.94 ;
+        goal_pose_[5] =  0.265;
+        goal_pose_[6] =  2.911;
     }
     else
         return false;
@@ -768,7 +770,7 @@ bool VisualServoingServer::goToSFMGoal()
 
         Vector p = zeros(7);
         p.setSubvector(0, sfm_pos.subVector(0, 2));
-        p.setSubvector(3, ee_o.subVector(0, 2) * ee_o(3));
+        p.setSubvector(3, ee_o.subVector(0, 3));
 
         goal_pose_ = p;
         yInfoVerbose("6D goal: " + goal_pose_.toString());
@@ -828,8 +830,8 @@ bool VisualServoingServer::threadInit()
 
 void VisualServoingServer::run()
 {
-    Vector  est_copy_left(6);
-    Vector  est_copy_right(6);
+    Vector  est_copy_left(7);
+    Vector  est_copy_right(7);
     Vector* estimates;
 
     std::vector<Vector> l_px_position;
@@ -851,32 +853,12 @@ void VisualServoingServer::run()
             /* GET THE END-EFFECTOR POSE ESTIMATES FOR THE LEFT EYE */
             estimates = port_pose_left_in_.read(true);
             yInfoVerbose("Got [" + estimates->toString() + "] from left eye particle filter.");
-            if (estimates->length() == 7)
-            {
-                est_copy_left = estimates->subVector(0, 5);
-                double ang    = (*estimates)[6];
-
-                est_copy_left[3] *= ang;
-                est_copy_left[4] *= ang;
-                est_copy_left[5] *= ang;
-            }
-            else
-                est_copy_left = *estimates;
+            est_copy_left = *estimates;
 
             /* GET THE END-EFFECTOR POSE ESTIMATES FOR THE RIGHT EYE */
             estimates = port_pose_right_in_.read(true);
             yInfoVerbose("Got [" + estimates->toString() + "] from right eye particle filter.");
-            if (estimates->length() == 7)
-            {
-                est_copy_right = estimates->subVector(0, 5);
-                double ang     = (*estimates)[6];
-
-                est_copy_right[3] *= ang;
-                est_copy_right[4] *= ang;
-                est_copy_right[5] *= ang;
-            }
-            else
-                est_copy_right = *estimates;
+            est_copy_right = *estimates;
         }
         if (sim_) do_once = true;
 
@@ -1040,24 +1022,18 @@ void VisualServoingServer::run()
         /* *********************** SIM ************************ */
         if (sim_)
         {
-            Vector l_o = getAxisAngle(est_copy_left.subVector(3, 5));
-            Matrix l_R = axis2dcm(l_o);
-            Vector r_o = getAxisAngle(est_copy_right.subVector(3, 5));
-            Matrix r_R = axis2dcm(r_o);
+            Matrix l_R = axis2dcm(est_copy_left.subVector(3, 6));
+            Matrix r_R = axis2dcm(est_copy_right.subVector(3, 6));
+
 
             vel_o[3] *= Ts_;
             l_R = axis2dcm(vel_o) * l_R;
             r_R = axis2dcm(vel_o) * r_R;
 
-            Vector l_new_o = dcm2axis(l_R);
-            double l_ang = l_new_o(3);
-            l_new_o.pop_back();
-            l_new_o *= l_ang;
 
+            Vector l_new_o = dcm2axis(l_R);
             Vector r_new_o = dcm2axis(r_R);
-            double r_ang = r_new_o(3);
-            r_new_o.pop_back();
-            r_new_o *= r_ang;
+
 
             if (op_mode_ == OperatingMode::position)
             {
@@ -1071,10 +1047,10 @@ void VisualServoingServer::run()
             }
             else if (op_mode_ == OperatingMode::pose)
             {
-                est_copy_left.setSubvector(3, l_new_o);
-                est_copy_right.setSubvector(3, r_new_o);
                 est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
                 est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
+                est_copy_left.setSubvector(3, l_new_o);
+                est_copy_right.setSubvector(3, r_new_o);
             }
         }
         /* **************************************************** */
@@ -1639,7 +1615,7 @@ bool VisualServoingServer::unsetTorsoDOF()
 
 std::vector<Vector> VisualServoingServer::getPixelsFromPose(const Vector& pose, const CamSel& cam)
 {
-    yAssert(pose.length() == 6);
+    yAssert(pose.length() == 7);
     yAssert(cam == CamSel::left || cam == CamSel::right);
 
 
@@ -1661,7 +1637,7 @@ std::vector<Vector> VisualServoingServer::getControlPixelsFromPose(const Vector&
 
     Vector control_pose = pose;
     if (mode == PixelControlMode::x)
-        control_pose.setSubvector(3, goal_pose_.subVector(3, 5));
+        control_pose.setSubvector(3, goal_pose_.subVector(3, 6));
     else if (mode == PixelControlMode::o)
         control_pose.setSubvector(0, goal_pose_.subVector(0, 2));
 
@@ -1679,9 +1655,9 @@ std::vector<Vector> VisualServoingServer::getControlPointsFromPose(const Vector&
 {
     Vector ee_x = pose.subVector(0, 2);
     ee_x.push_back(1.0);
-    double ang  = norm(pose.subVector(3, 5));
-    Vector ee_o = pose.subVector(3, 5) / ang;
-    ee_o.push_back(ang);
+
+    Vector ee_o = pose.subVector(3, 6);
+
 
     Matrix H_ee_to_root = axis2dcm(ee_o);
     H_ee_to_root.setCol(3, ee_x);
@@ -1831,16 +1807,6 @@ Vector VisualServoingServer::getJacobianV(const CamSel& cam, const Vector& px)
 }
 
 
-Vector VisualServoingServer::getAxisAngle(const Vector& v)
-{
-    double ang  = norm(v);
-    Vector aa   = v / ang;
-    aa.push_back(ang);
-
-    return aa;
-}
-
-
 bool VisualServoingServer::setCameraTransformations()
 {
     std::lock_guard<std::mutex> lock(mtx_H_eye_cam_);
@@ -1879,7 +1845,7 @@ bool VisualServoingServer::setCameraTransformations()
 bool VisualServoingServer::setPoseGoal(const yarp::sig::Vector& goal_x, const yarp::sig::Vector& goal_o)
 {
     goal_pose_.setSubvector(0, goal_x);
-    goal_pose_.setSubvector(3, goal_o.subVector(0, 2) * goal_o[3]);
+    goal_pose_.setSubvector(3, goal_o);
 
     return true;
 }
@@ -1916,10 +1882,7 @@ void VisualServoingServer::backproc_UpdateVisualServoingParamters()
     while (!is_stopping_backproc_update_vs_params)
     {
         Vector vec_x = goal_pose_.subVector(0, 2);
-
-        double ang   = norm(goal_pose_.subVector(3, 5));
-        Vector vec_o = goal_pose_.subVector(3, 5) / ang;
-        vec_o.push_back(ang);
+        Vector vec_o = goal_pose_.subVector(3, 6);
 
         std::vector<Vector> vec_px_l = getGoalPixelsFrom3DPose(vec_x, vec_o, CamSel::left);
         std::vector<Vector> vec_px_r = getGoalPixelsFrom3DPose(vec_x, vec_o, CamSel::right);
