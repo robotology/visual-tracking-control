@@ -188,8 +188,8 @@ private:
     std::array<double, 2>          K_o_                = {{1.5, 0.375}};
     double                         max_x_dot_          = 0.025; /* [m/s] */
     double                         max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
-    double                         K_x_tol_            = 30.0; /* [pixel] */
-    double                         K_o_tol_            = 30.0; /* [pixel] */
+    double                         K_x_tol_            = 20.0; /* [pixel] */
+    double                         K_o_tol_            = 20.0; /* [pixel] */
     bool                           K_x_hysteresis_     = false;
     bool                           K_o_hysteresis_     = false;
     double                         px_tol_             = 15.0; /* [pixel] */
