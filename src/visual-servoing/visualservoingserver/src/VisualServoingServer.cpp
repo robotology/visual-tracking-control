@@ -831,9 +831,10 @@ bool VisualServoingServer::threadInit()
 
 void VisualServoingServer::run()
 {
-    Vector  est_copy_left(7);
-    Vector  est_copy_right(7);
-    Vector* estimates;
+    /* VARIABLE DEFINITIONS */
+    Vector* endeffector_pose;
+    Vector  eepose_copy_left(7);
+    Vector  eepose_copy_right(7);
 
     std::vector<Vector> l_px_position;
     std::vector<Vector> l_px_orientation;
@@ -846,33 +847,27 @@ void VisualServoingServer::run()
     Vector px_ee_cur_orientation = zeros(12);
     Matrix jacobian_orientation  = zeros(12, 6);
 
-    bool do_once = false;
+
+    /* GET THE INITIAL END-EFFECTOR POSE FOR THE LEFT EYE */
+    endeffector_pose = port_pose_left_in_.read(true);
+    eepose_copy_left = *endeffector_pose;
+
+    yInfoVerbose("Got [" + eepose_copy_left.toString() + "] for the left eye.");
+
+    /* GET THE INITIAL END-EFFECTOR POSE FOR THE RIGHT EYE */
+    endeffector_pose = port_pose_right_in_.read(true);
+    eepose_copy_right = *endeffector_pose;
+
+    yInfoVerbose("Got [" + eepose_copy_right.toString() + "] for the right eye.");
+
     while (!isStopping() && !vs_goal_reached_)
     {
-        if (!do_once)
-        {
-            /* GET THE END-EFFECTOR POSE ESTIMATES FOR THE LEFT EYE */
-            estimates = port_pose_left_in_.read(true);
-            yInfoVerbose("Got [" + estimates->toString() + "] from left eye particle filter.");
-            est_copy_left = *estimates;
-
-            /* GET THE END-EFFECTOR POSE ESTIMATES FOR THE RIGHT EYE */
-            estimates = port_pose_right_in_.read(true);
-            yInfoVerbose("Got [" + estimates->toString() + "] from right eye particle filter.");
-            est_copy_right = *estimates;
-        }
-        if (sim_) do_once = true;
-
-        yInfoVerbose("EE estimates left  = [" + est_copy_left.toString()  + "]");
-        yInfoVerbose("EE estimates right = [" + est_copy_right.toString() + "]");
-
-
         /* EVALUATING CONTROL POINTS */
-        l_px_position    = getControlPixelsFromPose(est_copy_left, CamSel::left, PixelControlMode::x);
-        l_px_orientation = getControlPixelsFromPose(est_copy_left, CamSel::left, PixelControlMode::o);
+        l_px_position    = getControlPixelsFromPose(eepose_copy_left, CamSel::left, PixelControlMode::x);
+        l_px_orientation = getControlPixelsFromPose(eepose_copy_left, CamSel::left, PixelControlMode::o);
 
-        r_px_position    = getControlPixelsFromPose(est_copy_right, CamSel::right, PixelControlMode::x);
-        r_px_orientation = getControlPixelsFromPose(est_copy_right, CamSel::right, PixelControlMode::o);
+        r_px_position    = getControlPixelsFromPose(eepose_copy_right, CamSel::right, PixelControlMode::x);
+        r_px_orientation = getControlPixelsFromPose(eepose_copy_right, CamSel::right, PixelControlMode::o);
 
 
         yInfoVerbose("px_des_ = [" + px_des_.toString() + "]");
@@ -892,202 +887,6 @@ void VisualServoingServer::run()
         yInfoVerbose("px_ee_cur_orientation = [" + px_ee_cur_orientation.toString() + "]");
         yInfoVerbose("jacobian_orientation  = [\n" + jacobian_orientation.toString() + "]");
 
-
-        /* EVALUATING ERRORS */
-        mtx_px_des_.lock();
-
-        Vector e_position               = px_des_ - px_ee_cur_position;
-        Matrix inv_jacobian_position    = pinv(jacobian_position);
-
-        Vector e_orientation            = px_des_ - px_ee_cur_orientation;
-        Matrix inv_jacobian_orientation = pinv(jacobian_orientation);
-
-        yInfoVerbose("e_position = [" + e_position.toString() + "]");
-        yInfoVerbose("e_orientation = [" + e_orientation.toString() + "]");
-
-        mtx_px_des_.unlock();
-
-
-        /* EVALUATING CONTROL VELOCITIES */
-        mtx_H_eye_cam_.lock();
-
-        Vector vel_x = zeros(3);
-        Vector vel_o = zeros(3);
-        for (int i = 0; i < inv_jacobian_position.cols(); ++i)
-        {
-            Vector delta_vel_position    = inv_jacobian_position.getCol(i)    * e_position(i);
-            Vector delta_vel_orientation = inv_jacobian_orientation.getCol(i) * e_orientation(i);
-
-            if (i == 1 || i == 4 || i == 7 || i == 10)
-            {
-                vel_x += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_position.subVector(0, 2);
-                vel_o += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_orientation.subVector(3, 5);
-            }
-            else
-            {
-                vel_x += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_position.subVector(0, 2);
-                vel_o += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_orientation.subVector(3, 5);
-            }
-        }
-
-        mtx_H_eye_cam_.unlock();
-
-        double ang = norm(vel_o);
-        vel_o /= ang;
-        vel_o.push_back(ang);
-
-        yInfoVerbose("vel_x = [" + vel_x.toString() + "]");
-        yInfoVerbose("vel_o = [" + vel_o.toString()  + "]");
-
-
-        /* ENFORCE TRANSLATIONAL VELOCITY BOUNDS */
-        for (size_t i = 0; i < vel_x.length(); ++i)
-        {
-            if (!std::isnan(vel_x[i]) && !std::isinf(vel_x[i]))
-                vel_x[i] = sign(vel_x[i]) * std::min(max_x_dot_, std::fabs(vel_x[i]));
-            else
-            {
-                vel_x = Vector(3, 0.0);
-                break;
-            }
-        }
-        yInfoVerbose("bounded vel_x = [" + vel_x.toString() + "]");
-
-
-        /* ENFORCE ROTATIONAL VELOCITY BOUNDS */
-        if (!std::isnan(vel_o[0]) && !std::isinf(vel_x[0]) &&
-            !std::isnan(vel_o[1]) && !std::isinf(vel_x[1]) &&
-            !std::isnan(vel_o[2]) && !std::isinf(vel_x[2]) &&
-            !std::isnan(vel_o[3]) && !std::isinf(vel_x[3]))
-            vel_o[3] = sign(vel_o[3]) * std::min(max_o_dot_, std::fabs(vel_o[3]));
-        else
-            vel_o = Vector(4, 0.0);
-        yInfoVerbose("bounded vel_o = [" + vel_o.toString() + "]");
-
-
-        /* VISUAL CONTROL LAW */
-        if (!checkVisualServoingStatus(px_ee_cur_position, K_x_tol_))
-        {
-            vel_x *= K_x_[0];
-            if (K_x_hysteresis_)
-            {
-                K_x_hysteresis_ = false;
-
-                K_x_tol_ -= 5.0;
-            }
-        }
-        else
-        {
-            vel_x *= K_x_[1];
-            if (!K_x_hysteresis_)
-            {
-                K_x_hysteresis_ = true;
-
-                K_x_tol_ += 5.0;
-            }
-        }
-
-        if (!checkVisualServoingStatus(px_ee_cur_orientation, K_o_tol_))
-        {
-            vel_o(3) *= K_o_[0];
-            if (K_o_hysteresis_)
-            {
-                K_o_hysteresis_ = false;
-
-                K_o_tol_ -= 5.0;
-            }
-        }
-        else
-        {
-            vel_o(3) *= K_o_[1];
-            if (!K_o_hysteresis_)
-            {
-                K_o_hysteresis_ = true;
-
-                K_o_tol_ += 5.0;
-            }
-        }
-
-
-        if (!sim_)
-        {
-            if (op_mode_ == OperatingMode::position)
-                itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
-            else if (op_mode_ == OperatingMode::orientation)
-                itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
-            else if (op_mode_ == OperatingMode::pose)
-                itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
-        }
-
-
-        /* *********************** SIM ************************ */
-        if (sim_)
-        {
-            Matrix l_R = axis2dcm(est_copy_left.subVector(3, 6));
-            Matrix r_R = axis2dcm(est_copy_right.subVector(3, 6));
-
-
-            vel_o[3] *= Ts_;
-            l_R = axis2dcm(vel_o) * l_R;
-            r_R = axis2dcm(vel_o) * r_R;
-
-
-            Vector l_new_o = dcm2axis(l_R);
-            Vector r_new_o = dcm2axis(r_R);
-
-
-            if (op_mode_ == OperatingMode::position)
-            {
-                est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
-                est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
-            }
-            else if (op_mode_ == OperatingMode::orientation)
-            {
-                est_copy_left.setSubvector(3, l_new_o);
-                est_copy_right.setSubvector(3, r_new_o);
-            }
-            else if (op_mode_ == OperatingMode::pose)
-            {
-                est_copy_left.setSubvector(0, est_copy_left.subVector(0, 2)  + vel_x * Ts_);
-                est_copy_right.setSubvector(0, est_copy_right.subVector(0, 2)  + vel_x * Ts_);
-                est_copy_left.setSubvector(3, l_new_o);
-                est_copy_right.setSubvector(3, r_new_o);
-            }
-        }
-        /* **************************************************** */
-
-
-        /* WAIT FOR SOME MOTION */
-        Time::delay(Ts_);
-
-
-        /* CHECK FOR GOAL */
-        mtx_px_des_.lock();
-
-        bool is_pos_done    = checkVisualServoingStatus(px_ee_cur_position,    px_tol_);
-        bool is_orient_done = checkVisualServoingStatus(px_ee_cur_orientation, px_tol_);
-
-        mtx_px_des_.unlock();
-
-
-        if (op_mode_ == OperatingMode::position)
-            vs_goal_reached_ = is_pos_done;
-        else if (op_mode_ == OperatingMode::orientation)
-            vs_goal_reached_ = is_orient_done;
-        else if (op_mode_ == OperatingMode::pose)
-            vs_goal_reached_ = is_pos_done && is_orient_done;
-
-
-        if (vs_goal_reached_)
-        {
-            yInfoVerbose("");
-            yInfoVerbose("*** Goal reached! ***");
-            yInfoVerbose("px_des = "                + px_des_.toString());
-            yInfoVerbose("px_ee_cur_position = "    + px_ee_cur_position.toString());
-            yInfoVerbose("px_ee_cur_orientation = " + px_ee_cur_orientation.toString());
-            yInfoVerbose("*** ------------- ***");
-            yInfoVerbose("");
-        }
 
         /* *** *** *** DEBUG OUTPUT - TO BE DELETED *** *** *** */
         std::vector<cv::Scalar> color;
@@ -1129,6 +928,211 @@ void VisualServoingServer::run()
         port_image_left_out_.write();
         port_image_right_out_.write();
         /* *** *** ***  *** *** *** *** *** *** *** *** *** *** */
+
+
+        /* CHECK FOR GOAL */
+        mtx_px_des_.lock();
+
+        bool is_pos_done    = checkVisualServoingStatus(px_ee_cur_position,    px_tol_);
+        bool is_orient_done = checkVisualServoingStatus(px_ee_cur_orientation, px_tol_);
+
+        mtx_px_des_.unlock();
+
+
+        if (op_mode_ == OperatingMode::position)
+            vs_goal_reached_ = is_pos_done;
+        else if (op_mode_ == OperatingMode::orientation)
+            vs_goal_reached_ = is_orient_done;
+        else if (op_mode_ == OperatingMode::pose)
+            vs_goal_reached_ = is_pos_done && is_orient_done;
+
+
+        if (vs_goal_reached_)
+        {
+            yInfoVerbose("");
+            yInfoVerbose("*** Goal reached! ***");
+            yInfoVerbose("px_des = "                + px_des_.toString());
+            yInfoVerbose("px_ee_cur_position = "    + px_ee_cur_position.toString());
+            yInfoVerbose("px_ee_cur_orientation = " + px_ee_cur_orientation.toString());
+            yInfoVerbose("*** ------------- ***");
+            yInfoVerbose("");
+        }
+        else
+        {
+            /* EVALUATING ERRORS */
+            mtx_px_des_.lock();
+
+            Vector e_position               = px_des_ - px_ee_cur_position;
+            Matrix inv_jacobian_position    = pinv(jacobian_position);
+
+            Vector e_orientation            = px_des_ - px_ee_cur_orientation;
+            Matrix inv_jacobian_orientation = pinv(jacobian_orientation);
+
+            yInfoVerbose("e_position = [" + e_position.toString() + "]");
+            yInfoVerbose("e_orientation = [" + e_orientation.toString() + "]");
+
+            mtx_px_des_.unlock();
+
+
+            /* EVALUATING CONTROL VELOCITIES */
+            mtx_H_eye_cam_.lock();
+
+            Vector vel_x = zeros(3);
+            Vector vel_o = zeros(3);
+            for (int i = 0; i < inv_jacobian_position.cols(); ++i)
+            {
+                Vector delta_vel_position    = inv_jacobian_position.getCol(i)    * e_position(i);
+                Vector delta_vel_orientation = inv_jacobian_orientation.getCol(i) * e_orientation(i);
+
+                if (i == 1 || i == 4 || i == 7 || i == 10)
+                {
+                    vel_x += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_position.subVector(0, 2);
+                    vel_o += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_orientation.subVector(3, 5);
+                }
+                else
+                {
+                    vel_x += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_position.subVector(0, 2);
+                    vel_o += l_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_orientation.subVector(3, 5);
+                }
+            }
+
+            mtx_H_eye_cam_.unlock();
+
+            double ang = norm(vel_o);
+            vel_o /= ang;
+            vel_o.push_back(ang);
+
+            yInfoVerbose("vel_x = [" + vel_x.toString() + "]");
+            yInfoVerbose("vel_o = [" + vel_o.toString()  + "]");
+
+
+            /* ENFORCE TRANSLATIONAL VELOCITY BOUNDS */
+            for (size_t i = 0; i < vel_x.length(); ++i)
+            {
+                if (!std::isnan(vel_x[i]) && !std::isinf(vel_x[i]))
+                    vel_x[i] = sign(vel_x[i]) * std::min(max_x_dot_, std::fabs(vel_x[i]));
+                else
+                {
+                    vel_x = Vector(3, 0.0);
+                    break;
+                }
+            }
+            yInfoVerbose("bounded vel_x = [" + vel_x.toString() + "]");
+
+
+            /* ENFORCE ROTATIONAL VELOCITY BOUNDS */
+            if (!std::isnan(vel_o[0]) && !std::isinf(vel_x[0]) &&
+                !std::isnan(vel_o[1]) && !std::isinf(vel_x[1]) &&
+                !std::isnan(vel_o[2]) && !std::isinf(vel_x[2]) &&
+                !std::isnan(vel_o[3]) && !std::isinf(vel_x[3]))
+                vel_o[3] = sign(vel_o[3]) * std::min(max_o_dot_, std::fabs(vel_o[3]));
+            else
+                vel_o = Vector(4, 0.0);
+            yInfoVerbose("bounded vel_o = [" + vel_o.toString() + "]");
+
+
+            /* VISUAL CONTROL LAW */
+            if (!checkVisualServoingStatus(px_ee_cur_position, K_x_tol_))
+            {
+                vel_x *= K_x_[0];
+                if (K_x_hysteresis_)
+                {
+                    K_x_hysteresis_ = false;
+
+                    K_x_tol_ -= 5.0;
+                }
+            }
+            else
+            {
+                vel_x *= K_x_[1];
+                if (!K_x_hysteresis_)
+                {
+                    K_x_hysteresis_ = true;
+
+                    K_x_tol_ += 5.0;
+                }
+            }
+
+            if (!checkVisualServoingStatus(px_ee_cur_orientation, K_o_tol_))
+            {
+                vel_o(3) *= K_o_[0];
+                if (K_o_hysteresis_)
+                {
+                    K_o_hysteresis_ = false;
+
+                    K_o_tol_ -= 5.0;
+                }
+            }
+            else
+            {
+                vel_o(3) *= K_o_[1];
+                if (!K_o_hysteresis_)
+                {
+                    K_o_hysteresis_ = true;
+
+                    K_o_tol_ += 5.0;
+                }
+            }
+
+
+            if (!sim_)
+            {
+                /* COMMAND END-EFFECTOR WITH THE CARTESIAN CONTROLLER */
+                if (op_mode_ == OperatingMode::position)
+                    itf_rightarm_cart_->setTaskVelocities(vel_x, Vector(4, 0.0));
+                else if (op_mode_ == OperatingMode::orientation)
+                    itf_rightarm_cart_->setTaskVelocities(Vector(3, 0.0), vel_o);
+                else if (op_mode_ == OperatingMode::pose)
+                    itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+
+
+                /* WAIT FOR SOME MOTION */
+                Time::delay(Ts_);
+
+
+                /* UPDATE END-EFFECTOR POSE FOR THE LEFT EYE */
+                endeffector_pose = port_pose_left_in_.read(true);
+                eepose_copy_left = *endeffector_pose;
+
+                /* UPDATE END-EFFECTOR POSE FOR THE RIGHT EYE */
+                endeffector_pose = port_pose_right_in_.read(true);
+                eepose_copy_right = *endeffector_pose;
+            }
+            else
+            {
+                Matrix l_R = axis2dcm(eepose_copy_left.subVector(3, 6));
+                Matrix r_R = axis2dcm(eepose_copy_right.subVector(3, 6));
+
+
+                vel_o[3] *= Ts_;
+                l_R = axis2dcm(vel_o) * l_R;
+                r_R = axis2dcm(vel_o) * r_R;
+
+
+                Vector l_new_o = dcm2axis(l_R);
+                Vector r_new_o = dcm2axis(r_R);
+
+
+                /* SIMULATE END-EFFECTOR COMMAND AND UPDATE ITS POSE */
+                if (op_mode_ == OperatingMode::position)
+                {
+                    eepose_copy_left.setSubvector(0, eepose_copy_left.subVector(0, 2)  + vel_x * Ts_);
+                    eepose_copy_right.setSubvector(0, eepose_copy_right.subVector(0, 2)  + vel_x * Ts_);
+                }
+                else if (op_mode_ == OperatingMode::orientation)
+                {
+                    eepose_copy_left.setSubvector(3, l_new_o);
+                    eepose_copy_right.setSubvector(3, r_new_o);
+                }
+                else if (op_mode_ == OperatingMode::pose)
+                {
+                    eepose_copy_left.setSubvector(0, eepose_copy_left.subVector(0, 2)  + vel_x * Ts_);
+                    eepose_copy_right.setSubvector(0, eepose_copy_right.subVector(0, 2)  + vel_x * Ts_);
+                    eepose_copy_left.setSubvector(3, l_new_o);
+                    eepose_copy_right.setSubvector(3, r_new_o);
+                }
+            }
+        }
     }
 }
 
