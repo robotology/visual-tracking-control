@@ -20,15 +20,15 @@ using namespace iCub::ctrl;
 /* Ctors and Dtors */
 VisualServoingClient::VisualServoingClient()
 {
-    yInfo("*** Invoked VisualServoingClient ctor ***");
-    yInfo("*** VisualServoingClient constructed ***");
+    yInfo() << "*** Invoked VisualServoingClient ctor ***";
+    yInfo() << "*** VisualServoingClient constructed ***";
 }
 
 
 VisualServoingClient::~VisualServoingClient()
 {
-    yInfo("*** Invoked VisualServoingClient dtor ***");
-    yInfo("*** VisualServoingClient destructed ***");
+    yInfo() << "*** Invoked VisualServoingClient dtor ***";
+    yInfo() << "*** VisualServoingClient destructed ***";
 }
 
 
@@ -36,7 +36,7 @@ VisualServoingClient::~VisualServoingClient()
 bool VisualServoingClient::open(Searchable &config)
 {
     verbosity_ = config.check("verbosity", Value(false)).asBool();
-    yInfo("|> Verbosity: " + ConstString(verbosity_? "ON" : "OFF"));
+    yInfo() << "|> Verbosity: " + ConstString(verbosity_? "ON" : "OFF");
 
 
     yInfoVerbose("*** Configuring VisualServoingClient ***");
