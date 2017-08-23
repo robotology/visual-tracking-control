@@ -112,7 +112,6 @@ protected:
 
 
     /* VisualServoingIDL overrides */
-    /* FROM INTERFACE */
     bool init_facilities(const bool use_direct_kin) override;
 
     bool reset_facilities() override;
