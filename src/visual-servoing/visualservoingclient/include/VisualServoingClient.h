@@ -45,6 +45,8 @@ public:
 
     bool setModality(const std::string& mode) override;
 
+    bool setVisualServoControl(const std::string& control) override;
+
     bool setControlPoint(const yarp::os::ConstString& point) override;
 
     bool getVisualServoingInfo(yarp::os::Bottle& info) override;

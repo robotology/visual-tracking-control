@@ -104,6 +104,28 @@ service VisualServoingIDL
     bool set_modality(1:string mode);
 
     /**
+     *  Set visual servo control law between:
+     *  1. 'decoupled': image-based visual servoing with decoupled position and
+     *                  orientation control law, the control law was proposed
+     *                  in [1];
+     *  2. 'robust': image-based visual servoing with averaged image Jacobians,
+     *               the control law was proposed in [2];
+     *
+     * @param mode a label referring to one of the three visual servo controls,
+     *             i.e. 'position', 'orientation' or 'pose'.
+     *
+     * @note [1] C. Fantacci, G. Vezzani, U. Pattacini, V. Tikhanoff and L.
+     *       Natale, "Precise markerless visual servoing on unknown objects for
+     *       humanoid robot platforms", to appear.
+     *       [2] E. Malis, “Improving vision-based control using efficient
+     *       second-order minimization techniques”, IEEE ICRA, vol. 2, p.
+     *       1843–1848, 2004.
+     *
+     * @return true/false on success/failure.
+     */
+    bool set_visual_servo_control(1:string control);
+
+    /**
      * Set the point controlled during visual servoing.
      *
      * @param point label of the point to control.

@@ -170,6 +170,12 @@ bool VisualServoingClient::setModality(const std::string& mode)
 }
 
 
+bool VisualServoingClient::setVisualServoControl(const std::string& control)
+{
+    return visualservoing_control.set_visual_servo_control(control);
+}
+
+
 bool VisualServoingClient::setControlPoint(const yarp::os::ConstString& point)
 {
     yWarningVerbose("*** Service setControlPoint is unimplemented. ***");
