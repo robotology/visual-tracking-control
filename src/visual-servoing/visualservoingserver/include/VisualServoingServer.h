@@ -221,8 +221,6 @@ private:
 
     int                            ctx_local_cart_;
     int                            ctx_remote_cart_;
-//    int                            ctx_local_gaze_;
-//    int                            ctx_remote_gaze_;
 
     yarp::os::BufferedPort<yarp::sig::Vector>                       port_pose_left_in_;
     yarp::os::BufferedPort<yarp::sig::Vector>                       port_pose_right_in_;

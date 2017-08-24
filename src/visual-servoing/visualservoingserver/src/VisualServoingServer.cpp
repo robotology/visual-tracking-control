@@ -569,7 +569,6 @@ std::vector<Vector> VisualServoingServer::getGoalPixelsFrom3DPose(const Vector& 
 bool VisualServoingServer::storedInit(const std::string& label)
 {
     itf_rightarm_cart_->restoreContext(ctx_local_cart_);
-//    itf_gaze_->restoreContext(ctx_local_gaze_);
 
 
     Vector xd       = zeros(3);
@@ -672,7 +671,6 @@ bool VisualServoingServer::storedInit(const std::string& label)
 
 
     itf_rightarm_cart_->restoreContext(ctx_remote_cart_);
-//    itf_gaze_->restoreContext(ctx_remote_gaze_);
 
     return true;
 }
@@ -825,7 +823,6 @@ bool VisualServoingServer::threadInit()
 
     /* RESTORING CARTESIAN AND GAZE CONTEXT */
     itf_rightarm_cart_->restoreContext(ctx_local_cart_);
-//    itf_gaze_->restoreContext(ctx_local_gaze_);
 
 
     /* SETTING BACKGROUND THREAD */
@@ -895,7 +892,6 @@ void VisualServoingServer::threadRelease()
 
     /* RESTORING REMOTE CARTESIAN AND GAZE CONTEXTS */
     itf_rightarm_cart_->restoreContext(ctx_remote_cart_);
-//    itf_gaze_->restoreContext(ctx_remote_gaze_);
 
 
     vs_control_running_ = false;
@@ -1812,31 +1808,6 @@ bool VisualServoingServer::setGazeController()
         return false;
     }
 
-
-//    if (!itf_gaze_->storeContext(&ctx_remote_gaze_))
-//    {
-//        yErrorVerbose("Error storing remote IGazeControl contex!");
-//        return false;
-//    }
-//    yInfoVerbose("Remote IGazeControl context stored.");
-//
-//
-//    if (!itf_gaze_->storeContext(&ctx_local_gaze_))
-//    {
-//        yErrorVerbose("Error storing local IGazeControl context!");
-//        return false;
-//    }
-//    yInfoVerbose("Local IGazeControl context stored.");
-//
-//
-//    if (!itf_gaze_->restoreContext(ctx_remote_gaze_))
-//    {
-//        yErrorVerbose("Error restoring remote IGazeControl context!");
-//        return false;
-//    }
-//    yInfoVerbose("Remote IGazeControl context restored.");
-
-
     return true;
 }
 
@@ -1882,6 +1853,7 @@ bool VisualServoingServer::setTorsoDOF()
     yInfoVerbose("Old DOF: [" + curDOF.toString(0) + "].");
 
     yInfoVerbose("Setting iCub to use torso DOF.");
+
     Vector newDOF(curDOF);
     newDOF[0] = 1;
     newDOF[1] = 0;
@@ -1889,7 +1861,9 @@ bool VisualServoingServer::setTorsoDOF()
     if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
         return false;
 
-    yInfoVerbose("New DOF: [" + curDOF.toString(0) + "]");
+    yInfoVerbose("New DOF: Yaw " + ConstString(curDOF[0] == 0 ? "blocked, " : "actuated, ") +
+                 "Roll "         + ConstString(curDOF[1] == 0 ? "blocked, " : "actuated, ") +
+                 "Pitch "        + ConstString(curDOF[2] == 0 ? "blocked."  : "actuated." ));
 
     return true;
 }
@@ -1902,6 +1876,7 @@ bool VisualServoingServer::unsetTorsoDOF()
     yInfoVerbose("Old DOF: [" + curDOF.toString(0) + "].");
 
     yInfoVerbose("Setting iCub to block torso DOF.");
+
     Vector newDOF(curDOF);
     newDOF[0] = 0;
     newDOF[1] = 0;
@@ -1909,7 +1884,9 @@ bool VisualServoingServer::unsetTorsoDOF()
     if (!itf_rightarm_cart_->setDOF(newDOF, curDOF))
         return false;
 
-    yInfoVerbose("New DOF: [" + curDOF.toString(0) + "]");
+    yInfoVerbose("New DOF: Yaw " + ConstString(curDOF[0] == 0 ? "blocked, " : "actuated, ") +
+                 "Roll "         + ConstString(curDOF[1] == 0 ? "blocked, " : "actuated, ") +
+                 "Pitch "        + ConstString(curDOF[2] == 0 ? "blocked."  : "actuated." ));
 
     return true;
 }
