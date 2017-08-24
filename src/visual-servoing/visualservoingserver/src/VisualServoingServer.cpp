@@ -1196,39 +1196,71 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
         color.emplace_back(cv::Scalar(255,   0,   0));
         color.emplace_back(cv::Scalar(  0, 255,   0));
         color.emplace_back(cv::Scalar(  0,   0, 255));
-        color.emplace_back(cv::Scalar(255, 255,   0));
+        color.emplace_back(cv::Scalar(255, 127,  51));
 
-        /* Left eye end-effector superimposition image */
+
+        /* Left eye end-effector superimposition */
         ImageOf<PixelRgb>* l_imgin  = port_image_left_in_.read(true);
         ImageOf<PixelRgb>& l_imgout = port_image_left_out_.prepare();
         l_imgout = *l_imgin;
         cv::Mat l_img = cv::cvarrToMat(l_imgout.getIplImage());
 
-        /* Right eye end-effector superimposition image */
+        /* Right eye end-effector superimposition */
         ImageOf<PixelRgb>* r_imgin  = port_image_right_in_.read(true);
         ImageOf<PixelRgb>& r_imgout = port_image_right_out_.prepare();
         r_imgout = *r_imgin;
         cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
 
 
-        for (unsigned int i = 0; i < l_px_position.size(); ++i)
+        /* Plot points and lines */
+        std::vector<Vector> l_px_pose = getPixelsFromPose(eepose_copy_left,  CamSel::left);
+        std::vector<Vector> r_px_pose = getPixelsFromPose(eepose_copy_right, CamSel::right);
+
+        for (int i = 0; i < l_px_pose.size(); ++i)
         {
-            const Vector& l_px_p = l_px_position[i];
-            const Vector& l_px_o = l_px_orientation[i];
-            const Vector& r_px_p = r_px_position[i];
-            const Vector& r_px_o = r_px_orientation[i];
-            const Vector& l_px_g = l_px_goal_[i];
-            const Vector& r_px_g = r_px_goal_[i];
+            const Vector& l_cur_px_p = l_px_pose[i];
+            const Vector& l_pre_px_p = l_px_pose[(3 + i) % 4];
 
-            cv::circle(l_img, cv::Point(l_px_p[0], l_px_p[1]), 4, color[i], 4);
-            cv::circle(l_img, cv::Point(l_px_o[0], l_px_o[1]), 4, color[i], 4);
-            cv::circle(l_img, cv::Point(l_px_g[0], l_px_g[1]), 4, color[i], 4);
+            const Vector& r_cur_px_p = r_px_pose[i];
+            const Vector& r_pre_px_p = r_px_pose[(3 + i) % 4];
 
-            cv::circle(r_img, cv::Point(r_px_p[0], r_px_p[1]), 4, color[i], 4);
-            cv::circle(r_img, cv::Point(r_px_o[0], r_px_o[1]), 4, color[i], 4);
-            cv::circle(r_img, cv::Point(r_px_g[0], r_px_g[1]), 4, color[i], 4);
+            const Vector& l_cur_px_g = l_px_goal_[i];
+            const Vector& l_pre_px_g = l_px_goal_[(3 + i) % 4];
+
+            const Vector& r_cur_px_g = r_px_goal_[i];
+            const Vector& r_pre_px_g = r_px_goal_[(3 + i) % 4];
+
+
+            cv::line(l_img, cv::Point(l_pre_px_p[0], l_pre_px_p[1]), cv::Point(l_cur_px_p[0], l_cur_px_p[1]), color[3], 4, cv::LineTypes::LINE_AA);
+            cv::line(r_img, cv::Point(r_pre_px_p[0], r_pre_px_p[1]), cv::Point(r_cur_px_p[0], r_cur_px_p[1]), color[3], 4, cv::LineTypes::LINE_AA);
+
+            cv::line(l_img, cv::Point(l_pre_px_g[0], l_pre_px_g[1]), cv::Point(l_cur_px_g[0], l_cur_px_g[1]), color[3], 4, cv::LineTypes::LINE_AA);
+            cv::line(r_img, cv::Point(r_pre_px_g[0], r_pre_px_g[1]), cv::Point(r_cur_px_g[0], r_cur_px_g[1]), color[3], 4, cv::LineTypes::LINE_AA);
+
+            if (i == 2 || i == 3)
+            {
+                cv::circle(l_img, cv::Point(l_cur_px_p[0], l_cur_px_p[1]), 4, color[i - 1], 4);
+                cv::circle(r_img, cv::Point(r_cur_px_p[0], r_cur_px_p[1]), 4, color[i - 1], 4);
+
+                cv::circle(l_img, cv::Point(l_cur_px_g[0], l_cur_px_g[1]), 4, color[i - 1], 4);
+                cv::circle(r_img, cv::Point(r_cur_px_g[0], r_cur_px_g[1]), 4, color[i - 1], 4);
+            }
         }
 
+
+        Vector l_cur_px_ee = getPixelFromPoint(CamSel::left,  cat(eepose_copy_left.subVector(0, 2), 1.0));
+        Vector r_cur_px_ee = getPixelFromPoint(CamSel::right, cat(eepose_copy_right.subVector(0, 2), 1.0));
+
+        cv::circle(l_img, cv::Point(l_cur_px_ee[0], l_cur_px_ee[1]), 4, color[0], 4);
+        cv::circle(r_img, cv::Point(r_cur_px_ee[0], r_cur_px_ee[1]), 4, color[0], 4);
+
+
+        Vector l_cur_px_g = getPixelFromPoint(CamSel::left,  cat(goal_pose_.subVector(0, 2), 1.0));
+        Vector r_cur_px_g = getPixelFromPoint(CamSel::right, cat(goal_pose_.subVector(0, 2), 1.0));
+
+        cv::circle(l_img, cv::Point(l_cur_px_g[0], l_cur_px_g[1]), 4, color[0], 4);
+        cv::circle(r_img, cv::Point(r_cur_px_g[0], r_cur_px_g[1]), 4, color[0], 4);
+        
         port_image_left_out_.write();
         port_image_right_out_.write();
         /* *** *** ***  *** *** *** *** *** *** *** *** *** *** */
@@ -1500,7 +1532,8 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
         color.emplace_back(cv::Scalar(255,   0,   0));
         color.emplace_back(cv::Scalar(  0, 255,   0));
         color.emplace_back(cv::Scalar(  0,   0, 255));
-        color.emplace_back(cv::Scalar(255, 255,   0));
+        color.emplace_back(cv::Scalar(255, 127,  51));
+
 
         /* Left eye end-effector superimposition */
         ImageOf<PixelRgb>* l_imgin  = port_image_left_in_.read(true);
@@ -1514,19 +1547,52 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
         r_imgout = *r_imgin;
         cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
 
-        for (unsigned int i = 0; i < l_px_pose.size(); ++i)
+
+        /* Plot points and lines */
+        for (int i = 0; i < l_px_pose.size(); ++i)
         {
-            const Vector& l_px_p = l_px_pose[i];
-            const Vector& r_px_p = r_px_pose[i];
-            const Vector& l_px_g = l_px_goal_[i];
-            const Vector& r_px_g = r_px_goal_[i];
+            const Vector& l_cur_px_p = l_px_pose[i];
+            const Vector& l_pre_px_p = l_px_pose[(3 + i) % 4];
 
-            cv::circle(l_img, cv::Point(l_px_p[0], l_px_p[1]), 4, color[i], 4);
-            cv::circle(l_img, cv::Point(l_px_g[0], l_px_g[1]), 4, color[i], 4);
+            const Vector& r_cur_px_p = r_px_pose[i];
+            const Vector& r_pre_px_p = r_px_pose[(3 + i) % 4];
 
-            cv::circle(r_img, cv::Point(r_px_p[0], r_px_p[1]), 4, color[i], 4);
-            cv::circle(r_img, cv::Point(r_px_g[0], r_px_g[1]), 4, color[i], 4);
+            const Vector& l_cur_px_g = l_px_goal_[i];
+            const Vector& l_pre_px_g = l_px_goal_[(3 + i) % 4];
+
+            const Vector& r_cur_px_g = r_px_goal_[i];
+            const Vector& r_pre_px_g = r_px_goal_[(3 + i) % 4];
+
+
+            cv::line(l_img, cv::Point(l_pre_px_p[0], l_pre_px_p[1]), cv::Point(l_cur_px_p[0], l_cur_px_p[1]), color[3], 4, cv::LineTypes::LINE_AA);
+            cv::line(r_img, cv::Point(r_pre_px_p[0], r_pre_px_p[1]), cv::Point(r_cur_px_p[0], r_cur_px_p[1]), color[3], 4, cv::LineTypes::LINE_AA);
+
+            cv::line(l_img, cv::Point(l_pre_px_g[0], l_pre_px_g[1]), cv::Point(l_cur_px_g[0], l_cur_px_g[1]), color[3], 4, cv::LineTypes::LINE_AA);
+            cv::line(r_img, cv::Point(r_pre_px_g[0], r_pre_px_g[1]), cv::Point(r_cur_px_g[0], r_cur_px_g[1]), color[3], 4, cv::LineTypes::LINE_AA);
+
+            if (i == 2 || i == 3)
+            {
+                cv::circle(l_img, cv::Point(l_cur_px_p[0], l_cur_px_p[1]), 4, color[i - 1], 4);
+                cv::circle(r_img, cv::Point(r_cur_px_p[0], r_cur_px_p[1]), 4, color[i - 1], 4);
+
+                cv::circle(l_img, cv::Point(l_cur_px_g[0], l_cur_px_g[1]), 4, color[i - 1], 4);
+                cv::circle(r_img, cv::Point(r_cur_px_g[0], r_cur_px_g[1]), 4, color[i - 1], 4);
+            }
         }
+
+
+        Vector l_cur_px_ee = getPixelFromPoint(CamSel::left,  cat(eepose_copy_left.subVector(0, 2), 1.0));
+        Vector r_cur_px_ee = getPixelFromPoint(CamSel::right, cat(eepose_copy_right.subVector(0, 2), 1.0));
+
+        cv::circle(l_img, cv::Point(l_cur_px_ee[0], l_cur_px_ee[1]), 4, color[0], 4);
+        cv::circle(r_img, cv::Point(r_cur_px_ee[0], r_cur_px_ee[1]), 4, color[0], 4);
+
+
+        Vector l_cur_px_g = getPixelFromPoint(CamSel::left,  cat(goal_pose_.subVector(0, 2), 1.0));
+        Vector r_cur_px_g = getPixelFromPoint(CamSel::right, cat(goal_pose_.subVector(0, 2), 1.0));
+
+        cv::circle(l_img, cv::Point(l_cur_px_g[0], l_cur_px_g[1]), 4, color[0], 4);
+        cv::circle(r_img, cv::Point(r_cur_px_g[0], r_cur_px_g[1]), 4, color[0], 4);
 
         port_image_left_out_.write();
         port_image_right_out_.write();
@@ -1910,6 +1976,7 @@ std::vector<Vector> VisualServoingServer::getPixelsFromPose(const Vector& pose, 
 
 std::vector<Vector> VisualServoingServer::getControlPixelsFromPose(const Vector& pose, const CamSel& cam, const PixelControlMode& mode)
 {
+    yAssert(pose.length() == 7);
     yAssert(cam == CamSel::left || cam == CamSel::right);
     yAssert(mode == PixelControlMode::all || mode == PixelControlMode::x || mode == PixelControlMode::o);
 
