@@ -118,7 +118,7 @@ bool VisualServoingServer::open(Searchable &config)
     double left_fy = cam_left_info->get(5).asDouble();
     double left_cy = cam_left_info->get(6).asDouble();
 
-    yInfoVerbose("[CAM] Left camera:");
+    yInfoVerbose("[CAM] Left camera intrinsic parameters:");
     yInfoVerbose("[CAM]  - fx: " + std::to_string(left_fx));
     yInfoVerbose("[CAM]  - fy: " + std::to_string(left_fy));
     yInfoVerbose("[CAM]  - cx: " + std::to_string(left_cx));
@@ -131,14 +131,14 @@ bool VisualServoingServer::open(Searchable &config)
     l_proj_(1, 2) = left_cy;
     l_proj_(2, 2) = 1.0;
 
-    yInfoVerbose("l_proj_ = [\n" + l_proj_.toString() + "]");
+    yInfoVerbose("Left projection matrix = [\n" + l_proj_.toString() + "\n]");
 
     double right_fx = cam_right_info->get(0).asDouble();
     double right_cx = cam_right_info->get(2).asDouble();
     double right_fy = cam_right_info->get(5).asDouble();
     double right_cy = cam_right_info->get(6).asDouble();
 
-    yInfoVerbose("[CAM] Right camera:");
+    yInfoVerbose("[CAM] Right camera intrinsic paramenter:");
     yInfoVerbose("[CAM]  - fx: " + std::to_string(right_fx));
     yInfoVerbose("[CAM]  - fy: " + std::to_string(right_fy));
     yInfoVerbose("[CAM]  - cx: " + std::to_string(right_cx));
@@ -151,7 +151,7 @@ bool VisualServoingServer::open(Searchable &config)
     r_proj_(1, 2) = right_cy;
     r_proj_(2, 2) = 1.0;
 
-    yInfoVerbose("r_proj_ = [\n" + r_proj_.toString() + "]");
+    yInfoVerbose("Right projection matrix = [\n" + r_proj_.toString() + "\n]");
 
 
     if (!setCommandPort())
@@ -1154,13 +1154,13 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
     endeffector_pose = port_pose_left_in_.read(true);
     eepose_copy_left = *endeffector_pose;
 
-    yInfoVerbose("Got [" + eepose_copy_left.toString() + "] for the left eye.");
+    yInfoVerbose("Got [" + eepose_copy_left.toString() + "] end-effector pose for the left eye.");
 
     /* GET THE INITIAL END-EFFECTOR POSE FOR THE RIGHT EYE */
     endeffector_pose = port_pose_right_in_.read(true);
     eepose_copy_right = *endeffector_pose;
 
-    yInfoVerbose("Got [" + eepose_copy_right.toString() + "] for the right eye.");
+    yInfoVerbose("Got [" + eepose_copy_right.toString() + "] end-effector pose for the right eye.");
 
     while (!isStopping() && !vs_goal_reached_)
     {
@@ -1287,9 +1287,9 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
         {
             yInfoVerbose("");
             yInfoVerbose("*** Goal reached! ***");
-            yInfoVerbose("px_des = "                + px_des_.toString());
-            yInfoVerbose("px_ee_cur_position = "    + px_ee_cur_position.toString());
-            yInfoVerbose("px_ee_cur_orientation = " + px_ee_cur_orientation.toString());
+            yInfoVerbose("Desired goal pixels = "                   + px_des_.toString());
+            yInfoVerbose("Current position controlled pixels = "    + px_ee_cur_position.toString());
+            yInfoVerbose("Current orientation controlled pixels = " + px_ee_cur_orientation.toString());
             yInfoVerbose("*** ------------- ***");
             yInfoVerbose("");
         }
@@ -1304,8 +1304,8 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
             Vector e_orientation            = px_des_ - px_ee_cur_orientation;
             Matrix inv_jacobian_orientation = pinv(jacobian_orientation);
 
-            yInfoVerbose("e_position = [" + e_position.toString() + "]");
-            yInfoVerbose("e_orientation = [" + e_orientation.toString() + "]");
+            yInfoVerbose("Position error in pixels    = [" + e_position.toString()    + "]");
+            yInfoVerbose("Orientation error in pixels = [" + e_orientation.toString() + "]");
 
             mtx_px_des_.unlock();
 
@@ -1338,8 +1338,8 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
             vel_o /= ang;
             vel_o.push_back(ang);
 
-            yInfoVerbose("vel_x = [" + vel_x.toString() + "]");
-            yInfoVerbose("vel_o = [" + vel_o.toString() + "]");
+            yInfoVerbose("Translational velocity = [" + vel_x.toString() + "]");
+            yInfoVerbose("Orientation velocity   = [" + vel_o.toString() + "]");
 
 
             /* ENFORCE TRANSLATIONAL VELOCITY BOUNDS */
@@ -1353,7 +1353,7 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
                     break;
                 }
             }
-            yInfoVerbose("bounded vel_x = [" + vel_x.toString() + "]");
+            yInfoVerbose("Bounded translational velocity = [" + vel_x.toString() + "]");
 
 
             /* ENFORCE ROTATIONAL VELOCITY BOUNDS */
@@ -1364,7 +1364,7 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
                 vel_o[3] = sign(vel_o[3]) * std::min(max_o_dot_, std::fabs(vel_o[3]));
             else
                 vel_o = Vector(4, 0.0);
-            yInfoVerbose("bounded vel_o = [" + vel_o.toString() + "]");
+            yInfoVerbose("Bounded orientation velocity = [" + vel_o.toString() + "]");
 
 
             /* VISUAL CONTROL LAW */
@@ -1493,13 +1493,13 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
     endeffector_pose = port_pose_left_in_.read(true);
     eepose_copy_left = *endeffector_pose;
 
-    yInfoVerbose("Got [" + eepose_copy_left.toString() + "] for the left eye.");
+    yInfoVerbose("Got [" + eepose_copy_left.toString() + "] end-effector pose for the left eye.");
 
     /* GET THE INITIAL END-EFFECTOR POSE FOR THE RIGHT EYE */
     endeffector_pose = port_pose_right_in_.read(true);
     eepose_copy_right = *endeffector_pose;
 
-    yInfoVerbose("Got [" + eepose_copy_right.toString() + "] for the right eye.");
+    yInfoVerbose("Got [" + eepose_copy_right.toString() + "] end-effector pose for the right eye.");
 
     while (!isStopping() && !vs_goal_reached_)
     {
@@ -1611,9 +1611,8 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
         {
             yInfoVerbose("");
             yInfoVerbose("*** Goal reached! ***");
-            yInfoVerbose("px_des = "         + px_des_.toString());
-            yInfoVerbose("px_ee_cur_pose = " + px_ee_cur_pose.toString());
-            yInfoVerbose("px_ee_cur_goal = " + px_ee_cur_goal.toString());
+            yInfoVerbose("Desired goal pixels = "                + px_des_.toString());
+            yInfoVerbose("Current position controlled pixels = " + px_ee_cur_pose.toString());
             yInfoVerbose("*** ------------- ***");
             yInfoVerbose("");
         }
@@ -1625,7 +1624,7 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
             Vector e            = px_des_ - px_ee_cur_pose;
             Matrix inv_jacobian = pinv(0.5 * (jacobian_pose + jacobian_goal));
 
-            yInfoVerbose("e_position = [" + e.toString() + "]");
+            yInfoVerbose("Position error in pixels = [" + e.toString() + "]");
 
             mtx_px_des_.unlock();
 
@@ -1657,8 +1656,8 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
             vel_o /= ang;
             vel_o.push_back(ang);
 
-            yInfoVerbose("vel_x = [" + vel_x.toString() + "]");
-            yInfoVerbose("vel_o = [" + vel_o.toString() + "]");
+            yInfoVerbose("Translational velocity = [" + vel_x.toString() + "]");
+            yInfoVerbose("Orientation velocity = [" + vel_o.toString() + "]");
 
 
             /* ENFORCE TRANSLATIONAL VELOCITY BOUNDS */
@@ -1672,7 +1671,7 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
                     break;
                 }
             }
-            yInfoVerbose("bounded vel_x = [" + vel_x.toString() + "]");
+            yInfoVerbose("Bounded translational velocity = [" + vel_x.toString() + "]");
 
 
             /* ENFORCE ROTATIONAL VELOCITY BOUNDS */
@@ -1683,7 +1682,7 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
                 vel_o[3] = sign(vel_o[3]) * std::min(max_o_dot_, std::fabs(vel_o[3]));
             else
                 vel_o = Vector(4, 0.0);
-            yInfoVerbose("bounded vel_o = [" + vel_o.toString() + "]");
+            yInfoVerbose("Bounded orientation velocity = [" + vel_o.toString() + "]");
 
 
             /* VISUAL CONTROL LAW */
@@ -2208,15 +2207,15 @@ bool VisualServoingServer::setPixelGoal(const std::vector<Vector>& l_px_goal, co
 
     for (unsigned int i = 0; i < l_px_goal_.size(); ++i)
     {
-        yInfoVerbose("l_px_goal_" + std::to_string(i) + " = [" + l_px_goal_[i].toString() + "]");
-        yInfoVerbose("r_px_goal_" + std::to_string(i) + " = [" + r_px_goal_[i].toString() + "]");
+        yInfoVerbose("Left goal pixels #"  + std::to_string(i) + " = [" + l_px_goal_[i].toString() + "]");
+        yInfoVerbose("Right goal pixels #" + std::to_string(i) + " = [" + r_px_goal_[i].toString() + "]");
 
         px_des_[3 * i]     = l_px_goal_[i][0];   /* l_u_xi */
         px_des_[3 * i + 1] = r_px_goal_[i][0];   /* r_u_xi */
         px_des_[3 * i + 2] = l_px_goal_[i][1];   /* l_v_xi */
     }
 
-    yInfoVerbose("px_des_ = ["  + px_des_.toString() + "]");
+    yInfoVerbose("Desired goal pixels = ["  + px_des_.toString() + "]");
 
     return true;
 }
