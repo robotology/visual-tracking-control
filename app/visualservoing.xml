@@ -3,9 +3,9 @@
 <application>
 
     <!-- GENERIC INFORMATION -->
-    <name>visual-servoing</name>
+    <name>visualservoing</name>
     <description>This app allows the iCub to perform visual servoing tasks. Must be used with the hand-tracking app.</description>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -58,18 +58,6 @@
 
     <!-- REQUIRED CONNECTIONS -->
     <connection>
-        <from>/hand-tracking/left/result/estimates:o</from>
-        <to>/visual-servoing/pose/left:i</to>
-        <protocol>tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/hand-tracking/right/result/estimates:o</from>
-        <to>/visual-servoing/pose/right:i</to>
-        <protocol>tcp</protocol>
-    </connection>
-
-    <connection>
         <from>/icub/camcalib/left/out</from>
         <to>/view/cam_left</to>
         <protocol>tcp</protocol>
@@ -77,25 +65,25 @@
 
     <connection>
         <from>/icub/camcalib/left/out</from>
-        <to>/visual-servoing/cam_left/img:i</to>
+        <to>/visualservoing/cam_left/img:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/visual-servoing/cam_left/img:o</from>
+        <from>/visualservoing/cam_left/img:o</from>
         <to>/view/cam_left/ee</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/view/cam_left/click:o</from>
-        <to>/visual-servoing/cam_left/click:i</to>
+        <to>/visualservoing/cam_left/click:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/view/cam_right/click:o</from>
-        <to>/visual-servoing/cam_right/click:i</to>
+        <to>/visualservoing/cam_right/click:i</to>
         <protocol>tcp</protocol>
     </connection>
 
@@ -107,24 +95,24 @@
 
     <connection>
         <from>/icub/camcalib/right/out</from>
-        <to>/visual-servoing/cam_right/img:i</to>
+        <to>/visualservoing/cam_right/img:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/visual-servoing/cam_right/img:o</from>
+        <from>/visualservoing/cam_right/img:o</from>
         <to>/view/cam_right/ee</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/visual-servoing/cam_left/x:o</from>
+        <from>/visualservoing/cam_left/x:o</from>
         <to>/datadumper/cam_left/x</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/visual-servoing/cam_right/x:o</from>
+        <from>/visualservoing/cam_right/x:o</from>
         <to>/datadumper/cam_right/x</to>
         <protocol>tcp</protocol>
     </connection>

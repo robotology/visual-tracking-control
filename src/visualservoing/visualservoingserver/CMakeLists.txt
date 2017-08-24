@@ -1,9 +1,12 @@
-set(PLUGIN_TARGET_NAME visualservoingclient)
+set(PLUGIN_TARGET_NAME visualservoingserver)
 string(TOUPPER ${PLUGIN_NAME} UC_PLUGIN_NAME)
 
 yarp_prepare_plugin(${PLUGIN_TARGET_NAME} CATEGORY device
-                                          TYPE VisualServoingClient
-                                          INCLUDE VisualServoingClient.h)
+                                          TYPE VisualServoingServer
+                                          INCLUDE VisualServoingServer.h
+                                          DEFAULT ON
+                                          ADVANCED
+                                          INTERNAL)
 
 find_package(ICUB   REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -16,13 +19,13 @@ include(YarpInstallationHelpers)
 # Plugin source and header files
 set(${PLUGIN_TARGET_NAME}_HDR
         ../visualservoingcommon/VisualServoingCommon.h
-        include/VisualServoingClient.h)
+        include/VisualServoingServer.h)
 
 set(${PLUGIN_TARGET_NAME}_SRC
-        src/VisualServoingClient.cpp)
+        src/VisualServoingServer.cpp)
 
 set(${PLUGIN_TARGET_NAME}_CONF
-        conf/visualservoingclient.ini)
+        conf/visualservoingserver.ini)
 
 set(${PLUGIN_TARGET_NAME}_THRIFT_HDR
         thrift/visualservoing.thrift)

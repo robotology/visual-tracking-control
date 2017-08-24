@@ -8,4 +8,4 @@ if(BUILD_REACHING)
     add_subdirectory(reaching)
 endif()
 
-add_subdirectory(visual-servoing)
+add_subdirectory(visualservoing)

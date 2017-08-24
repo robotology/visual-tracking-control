@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     prop_client_vs.put("device",    "visualservoingclient");
     prop_client_vs.put("verbosity", true);
     prop_client_vs.put("local",     "/VisualServoingClientTest");
-    prop_client_vs.put("remote",    "/visual-servoing");
+    prop_client_vs.put("remote",    "/visualservoing");
 
     PolyDriver drv_client_vs(prop_client_vs);
     if (!drv_client_vs.isValid())

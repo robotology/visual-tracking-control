@@ -54,50 +54,50 @@ bool VisualServoingServer::open(Searchable &config)
         yInfoVerbose("|> Robot name: " + robot_name_);
 
 
-    if (!port_pose_left_in_.open("/visual-servoing/pose/left:i"))
+    if (!port_pose_left_in_.open("/visualservoing/pose/left:i"))
     {
-        yErrorVerbose("Could not open /visual-servoing/pose/left:i port!");
+        yErrorVerbose("Could not open /visualservoing/pose/left:i port!");
         return false;
     }
-    if (!port_pose_right_in_.open("/visual-servoing/pose/right:i"))
+    if (!port_pose_right_in_.open("/visualservoing/pose/right:i"))
     {
-        yErrorVerbose("Could not open /visual-servoing/pose/right:i port!");
-        return false;
-    }
-
-
-    if (!port_image_left_in_.open("/visual-servoing/cam_left/img:i"))
-    {
-        yErrorVerbose("Could not open /visual-servoing/cam_left/img:i port!");
-        return false;
-    }
-    if (!port_image_left_out_.open("/visual-servoing/cam_left/img:o"))
-    {
-        yErrorVerbose("Could not open /visual-servoing/cam_left/img:o port!");
+        yErrorVerbose("Could not open /visualservoing/pose/right:i port!");
         return false;
     }
 
 
-    if (!port_image_right_in_.open("/visual-servoing/cam_right/img:i"))
+    if (!port_image_left_in_.open("/visualservoing/cam_left/img:i"))
     {
-        yErrorVerbose("Could not open /visual-servoing/cam_right/img:i port!");
+        yErrorVerbose("Could not open /visualservoing/cam_left/img:i port!");
         return false;
     }
-    if (!port_image_right_out_.open("/visual-servoing/cam_right/img:o"))
+    if (!port_image_left_out_.open("/visualservoing/cam_left/img:o"))
     {
-        yErrorVerbose("Could not open /visual-servoing/cam_right/img:o port!");
+        yErrorVerbose("Could not open /visualservoing/cam_left/img:o port!");
         return false;
     }
 
 
-    if (!port_click_left_.open("/visual-servoing/cam_left/click:i"))
+    if (!port_image_right_in_.open("/visualservoing/cam_right/img:i"))
     {
-        yErrorVerbose("Could not open /visual-servoing/cam_left/click:in port!");
+        yErrorVerbose("Could not open /visualservoing/cam_right/img:i port!");
         return false;
     }
-    if (!port_click_right_.open("/visual-servoing/cam_right/click:i"))
+    if (!port_image_right_out_.open("/visualservoing/cam_right/img:o"))
     {
-        yErrorVerbose("Could not open /visual-servoing/cam_right/click:i port!");
+        yErrorVerbose("Could not open /visualservoing/cam_right/img:o port!");
+        return false;
+    }
+
+
+    if (!port_click_left_.open("/visualservoing/cam_left/click:i"))
+    {
+        yErrorVerbose("Could not open /visualservoing/cam_left/click:in port!");
+        return false;
+    }
+    if (!port_click_right_.open("/visualservoing/cam_right/click:i"))
+    {
+        yErrorVerbose("Could not open /visualservoing/cam_right/click:i port!");
         return false;
     }
 
@@ -156,7 +156,7 @@ bool VisualServoingServer::open(Searchable &config)
 
     if (!setCommandPort())
     {
-        yErrorVerbose("Could not open /visual-servoing/cmd:i port!");
+        yErrorVerbose("Could not open /visualservoing/cmd:i port!");
         return false;
     }
 
@@ -755,8 +755,8 @@ bool VisualServoingServer::goToSFMGoal()
     l_click[1] = click_left->get(1).asDouble();
 
     RpcClient port_sfm;
-    port_sfm.open("/visual-servoing/tosfm");
-    Network::connect("/visual-servoing/tosfm", "/SFM/rpc");
+    port_sfm.open("/visualservoing/tosfm");
+    Network::connect("/visualservoing/tosfm", "/SFM/rpc");
 
     cmd.clear();
 
@@ -797,7 +797,7 @@ bool VisualServoingServer::goToSFMGoal()
     else
         return false;
 
-    Network::disconnect("/visual-servoing/tosfm", "/SFM/rpc");
+    Network::disconnect("/visualservoing/tosfm", "/SFM/rpc");
     port_sfm.close();
 
     return start();
@@ -832,7 +832,7 @@ bool VisualServoingServer::threadInit()
 
 
     yInfoVerbose("");
-    yInfoVerbose("*** Running visual-servoing! ***");
+    yInfoVerbose("*** Running visual servoing! ***");
     yInfoVerbose("");
 
     return true;
@@ -1777,7 +1777,7 @@ bool VisualServoingServer::setRightArmCartesianController()
 {
     Property rightarm_cartesian_options;
     rightarm_cartesian_options.put("device", "cartesiancontrollerclient");
-    rightarm_cartesian_options.put("local",  "/visual-servoing/cart_right_arm");
+    rightarm_cartesian_options.put("local",  "/visualservoing/cart_right_arm");
     rightarm_cartesian_options.put("remote", "/" + robot_name_ + "/cartesianController/right_arm");
 
     rightarm_cartesian_driver_.open(rightarm_cartesian_options);
@@ -1854,7 +1854,7 @@ bool VisualServoingServer::setGazeController()
 {
     Property gaze_option;
     gaze_option.put("device", "gazecontrollerclient");
-    gaze_option.put("local",  "/visual-servoing/gaze");
+    gaze_option.put("local",  "/visualservoing/gaze");
     gaze_option.put("remote", "/iKinGazeCtrl");
 
     gaze_driver_.open(gaze_option);
@@ -1881,7 +1881,7 @@ bool VisualServoingServer::setCommandPort()
 {
     yInfoVerbose("Opening RPC command port.");
 
-    if (!port_rpc_command_.open("/visual-servoing/cmd:i"))
+    if (!port_rpc_command_.open("/visualservoing/cmd:i"))
     {
         yErrorVerbose("Cannot open the RPC server command port!");
         return false;
@@ -1893,12 +1893,12 @@ bool VisualServoingServer::setCommandPort()
     }
 
 
-    if (!port_rpc_tracker_left_.open("/visual-servoing/toTracker/left/cmd:o"))
+    if (!port_rpc_tracker_left_.open("/visualservoing/toTracker/left/cmd:o"))
     {
         yErrorVerbose("Cannot open the RPC command port to left camera tracker!");
         return false;
     }
-    if (!port_rpc_tracker_right_.open("/visual-servoing/toTracker/right/cmd:o"))
+    if (!port_rpc_tracker_right_.open("/visualservoing/toTracker/right/cmd:o"))
     {
         yErrorVerbose("Cannot open the RPC command port to right camera tracker!");
         return false;
