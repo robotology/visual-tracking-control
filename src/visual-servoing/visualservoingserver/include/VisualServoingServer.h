@@ -60,6 +60,8 @@ public:
 
     bool setModality(const std::string& mode) override;
 
+    bool setVisualServoControl(const std::string& control) override;
+
     bool setControlPoint(const yarp::os::ConstString& point) override;
 
     bool getVisualServoingInfo(yarp::os::Bottle& info) override;
@@ -124,6 +126,8 @@ protected:
 
     bool set_modality(const std::string& mode) override;
 
+    bool set_visual_servo_control(const std::string& control) override;
+
     bool set_control_point(const std::string& point) override;
 
     std::vector<std::string> get_visual_servoing_info() override;
@@ -163,6 +167,8 @@ protected:
 
 
     /* Enum helpers */
+    enum class VisualServoControl { decoupled, robust };
+
     enum class PixelControlMode { all, x, o };
 
     enum class OperatingMode { position, orientation, pose };
@@ -172,6 +178,7 @@ private:
     bool                           sim_        = false;
     yarp::os::ConstString          robot_name_ = "icub";
 
+    VisualServoControl             vs_control_ = VisualServoControl::decoupled;
     OperatingMode                  op_mode_ = OperatingMode::pose;
 
     yarp::dev::PolyDriver          rightarm_cartesian_driver_;
@@ -233,6 +240,10 @@ private:
     yarp::os::RpcClient                                             port_rpc_tracker_right_;
 
     /* Private class methods */
+    void decoupledImageBasedVisualServoControl();
+
+    void robustImageBasedVisualServoControl();
+
     bool setRightArmCartesianController();
 
     bool setGazeController();
