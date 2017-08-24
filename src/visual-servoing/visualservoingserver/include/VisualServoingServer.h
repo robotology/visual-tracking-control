@@ -191,14 +191,14 @@ private:
     bool                           vs_goal_reached_    = false;
     const double                   Ts_                 = 0.1; /* [s] */
     std::array<double, 2>          K_x_                = {{1.0, 0.5}};
-    std::array<double, 2>          K_o_                = {{1.5, 0.75}};
+    std::array<double, 2>          K_o_                = {{3.0, 1.0}};
     double                         max_x_dot_          = 0.025; /* [m/s] */
     double                         max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
-    double                         K_x_tol_            = 20.0; /* [pixel] */
-    double                         K_o_tol_            = 20.0; /* [pixel] */
+    double                         K_x_tol_            = 10.0; /* [pixel] */
+    double                         K_o_tol_            = 10.0; /* [pixel] */
     bool                           K_x_hysteresis_     = false;
     bool                           K_o_hysteresis_     = false;
-    double                         px_tol_             = 15.0; /* [pixel] */
+    double                         px_tol_             = 5.0; /* [pixel] */
     double                         traj_time_          = 3.0; /* [s] */
 
     yarp::sig::Matrix              l_proj_;
