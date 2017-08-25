@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     ResourceFinder rf;
     rf.setVerbose();
     rf.setDefaultContext("hand-tracking");
-    rf.setDefaultConfigFile("parameters.ini");
+    rf.setDefaultConfigFile("config.ini");
     rf.configure(argc, argv);
 
     ConstString robot_name       = rf.check("robot",      Value("icub")).asString();
