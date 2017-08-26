@@ -252,7 +252,7 @@ bool VisualSIRParticleFilter::reset_filter()
 {
     reset();
 
-    return false;
+    return true;
 }
 
 
@@ -260,7 +260,7 @@ bool VisualSIRParticleFilter::stop_filter()
 {
     reboot();
 
-    return false;
+    return true;
 }
 
 
