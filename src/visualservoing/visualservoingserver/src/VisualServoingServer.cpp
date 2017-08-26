@@ -221,20 +221,17 @@ bool VisualServoingServer::initFacilities(const bool use_direct_kin)
     {
         yInfoVerbose("Connecting to Cartesian controller right arm output state.");
 
-
         if (!Network::connect("/" + robot_name_ + "/cartesianController/right_arm/state:o", port_pose_left_in_.getName(), "tcp", !verbosity_))
             return false;
 
         if (!Network::connect("/" + robot_name_ + "/cartesianController/right_arm/state:o", port_pose_right_in_.getName(), "tcp", !verbosity_))
             return false;
 
-
         yInfoVerbose("Using direct kinematics information for visual servoing.");
     }
     else
     {
-        yInfoVerbose("Connecting to external pose trackers output ports.");
-
+        yInfoVerbose("Connecting to external pose trackers command ports.");
 
         if (!Network::connect(port_rpc_tracker_left_.getName(),  "/hand-tracking/left/cmd:i", "tcp", !verbosity_))
             return false;
@@ -273,6 +270,17 @@ bool VisualServoingServer::initFacilities(const bool use_direct_kin)
         yInfoVerbose("Waiting for the filter to provide good estimates...");
         yarp::os::Time::delay(10);
         yInfoVerbose("...done!");
+
+
+        yInfoVerbose("Connecting to external pose trackers output ports.");
+
+        if (!Network::connect("/hand-tracking/left/result/estimates:o",   port_pose_left_in_.getName(),  "tcp", !verbosity_))
+            return false;
+
+        if (!Network::connect("/hand-tracking/right/result/estimates:o ", port_pose_right_in_.getName(), "tcp", !verbosity_))
+            return false;
+
+        yInfoVerbose("Receiving end-effector pose from external trackers.");
     }
 
     return true;
@@ -332,6 +340,9 @@ bool VisualServoingServer::stopFacilities()
 
         yInfoVerbose("Left camera external pose tracker stopped.");
 
+        if (!Network::disconnect(port_rpc_tracker_left_.getName(),  "/hand-tracking/left/cmd:i", !verbosity_))
+            return false;
+
 
         Bottle response_right;
         if (!port_rpc_tracker_right_.write(cmd, response_right))
@@ -341,6 +352,21 @@ bool VisualServoingServer::stopFacilities()
             return false;
 
         yInfoVerbose("Right camera external pose tracker stopped.");
+
+        if (!Network::disconnect(port_rpc_tracker_right_.getName(), "/hand-tracking/right/cmd:i", !verbosity_))
+            return false;
+
+
+        yInfoVerbose("Disconnecting from external pose trackers output ports.");
+
+        if (!Network::disconnect("/hand-tracking/left/result/estimates:o",   port_pose_left_in_.getName(), !verbosity_))
+            return false;
+
+        if (!Network::disconnect("/hand-tracking/right/result/estimates:o ", port_pose_right_in_.getName(), !verbosity_))
+            return false;
+
+        yInfoVerbose("Disconnected from external trackers.");
+
 
         return true;
     }
