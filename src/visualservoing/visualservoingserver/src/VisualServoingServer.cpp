@@ -1170,10 +1170,10 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
     std::vector<Vector> r_px_position;
     std::vector<Vector> r_px_orientation;
 
-    Vector px_ee_cur_position    = zeros(12);
-    Matrix jacobian_position     = zeros(12, 6);
-    Vector px_ee_cur_orientation = zeros(12);
-    Matrix jacobian_orientation  = zeros(12, 6);
+    Vector px_ee_cur_position    = zeros(16);
+    Matrix jacobian_position     = zeros(16, 6);
+    Vector px_ee_cur_orientation = zeros(16);
+    Matrix jacobian_orientation  = zeros(16, 6);
 
 
     /* GET THE INITIAL END-EFFECTOR POSE FOR THE LEFT EYE */
@@ -1346,7 +1346,7 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
                 Vector delta_vel_position    = inv_jacobian_position.getCol(i)    * e_position(i);
                 Vector delta_vel_orientation = inv_jacobian_orientation.getCol(i) * e_orientation(i);
 
-                if (i == 1 || i == 4 || i == 7 || i == 10)
+                if (i == 1 || i == 3 || i == 5 || i == 7 || i == 9 || i == 11 || i == 13 || i == 15)
                 {
                     vel_x += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_position.subVector(0, 2);
                     vel_o += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel_orientation.subVector(3, 5);
@@ -1509,10 +1509,10 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
     std::vector<Vector> l_px_pose;
     std::vector<Vector> r_px_pose;
 
-    Vector px_ee_cur_pose = zeros(12);
-    Matrix jacobian_pose  = zeros(12, 6);
-    Vector px_ee_cur_goal = zeros(12);
-    Matrix jacobian_goal  = zeros(12, 6);
+    Vector px_ee_cur_pose = zeros(16);
+    Matrix jacobian_pose  = zeros(16, 6);
+    Vector px_ee_cur_goal = zeros(16);
+    Matrix jacobian_goal  = zeros(16, 6);
 
 
     /* GET THE INITIAL END-EFFECTOR POSE FOR THE LEFT EYE */
@@ -1664,7 +1664,7 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
             {
                 Vector delta_vel = inv_jacobian.getCol(i) * e(i);
 
-                if (i == 1 || i == 4 || i == 7 || i == 10)
+                if (i == 1 || i == 3 || i == 5 || i == 7 || i == 9 || i == 11 || i == 13 || i == 15)
                 {
                     vel_x += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(0, 2);
                     vel_o += r_H_eye_to_r_.submatrix(0, 2, 0, 2) * delta_vel.subVector(3, 5);
@@ -2097,11 +2097,11 @@ void VisualServoingServer::getCurrentStereoFeaturesAndJacobian(const std::vector
 {
     yAssert(left_px.size() == right_px.size());
 
-    if (features.length() != 12)
-        features.resize(12);
+    if (features.length() != 16)
+        features.resize(16);
 
-    if (jacobian.rows() != 12 || jacobian.cols() != 6)
-        jacobian.resize(12, 6);
+    if (jacobian.rows() != 16 || jacobian.cols() != 6)
+        jacobian.resize(16, 6);
 
 
     auto iter_left_px   = left_px.cbegin();
@@ -2113,14 +2113,16 @@ void VisualServoingServer::getCurrentStereoFeaturesAndJacobian(const std::vector
         const Vector& r_v = (*iter_right_px);
 
         /* FEATURES */
-        features[3 * offset]     = l_v[0];  /* l_u_xi */
+        features[3 * offset    ] = l_v[0];  /* l_u_xi */
         features[3 * offset + 1] = r_v[0];  /* r_u_xi */
         features[3 * offset + 2] = l_v[1];  /* l_v_xi */
+        features[3 * offset + 3] = r_v[1];  /* r_v_xi */
 
         /* JACOBIAN */
         jacobian.setRow(3 * offset,      getJacobianU(CamSel::left,  l_v));
         jacobian.setRow(3 * offset + 1,  getJacobianU(CamSel::right, r_v));
         jacobian.setRow(3 * offset + 2,  getJacobianV(CamSel::left,  l_v));
+        jacobian.setRow(3 * offset + 3,  getJacobianV(CamSel::right, r_v));
 
         ++iter_left_px;
         ++iter_right_px;
@@ -2236,9 +2238,10 @@ bool VisualServoingServer::setPixelGoal(const std::vector<Vector>& l_px_goal, co
         yInfoVerbose("Left goal pixels #"  + std::to_string(i) + " = [" + l_px_goal_[i].toString() + "]");
         yInfoVerbose("Right goal pixels #" + std::to_string(i) + " = [" + r_px_goal_[i].toString() + "]");
 
-        px_des_[3 * i]     = l_px_goal_[i][0];   /* l_u_xi */
+        px_des_[3 * i    ] = l_px_goal_[i][0];   /* l_u_xi */
         px_des_[3 * i + 1] = r_px_goal_[i][0];   /* r_u_xi */
         px_des_[3 * i + 2] = l_px_goal_[i][1];   /* l_v_xi */
+        px_des_[3 * i + 3] = r_px_goal_[i][1];   /* r_v_xi */
     }
 
     yInfoVerbose("Desired goal pixels = ["  + px_des_.toString() + "]");
@@ -2271,11 +2274,11 @@ void VisualServoingServer::backproc_UpdateVisualServoingParamters()
 
 bool VisualServoingServer::checkVisualServoingStatus(const Vector& px_cur, const double tol)
 {
-    yAssert(px_cur.size() == 12);
+    yAssert(px_cur.size() == 16);
     yAssert(tol > 0);
 
-    return ((std::abs(px_des_(0) - px_cur(0)) < tol) && (std::abs(px_des_(1)  - px_cur(1))  < tol) && (std::abs(px_des_(2)  - px_cur(2))  < tol) &&
-            (std::abs(px_des_(3) - px_cur(3)) < tol) && (std::abs(px_des_(4)  - px_cur(4))  < tol) && (std::abs(px_des_(5)  - px_cur(5))  < tol) &&
-            (std::abs(px_des_(6) - px_cur(6)) < tol) && (std::abs(px_des_(7)  - px_cur(7))  < tol) && (std::abs(px_des_(8)  - px_cur(8))  < tol) &&
-            (std::abs(px_des_(9) - px_cur(9)) < tol) && (std::abs(px_des_(10) - px_cur(10)) < tol) && (std::abs(px_des_(11) - px_cur(11)) < tol));
+    return ((std::abs(px_des_(0)  - px_cur(0))  < tol) && (std::abs(px_des_(1)  - px_cur(1))  < tol) && (std::abs(px_des_(2)  - px_cur(2))  < tol) && (std::abs(px_des_(3)  - px_cur(3))  < tol) &&
+            (std::abs(px_des_(4)  - px_cur(4))  < tol) && (std::abs(px_des_(5)  - px_cur(5))  < tol) && (std::abs(px_des_(6)  - px_cur(6))  < tol) && (std::abs(px_des_(7)  - px_cur(7))  < tol) &&
+            (std::abs(px_des_(8)  - px_cur(8))  < tol) && (std::abs(px_des_(9)  - px_cur(9))  < tol) && (std::abs(px_des_(10) - px_cur(10)) < tol) && (std::abs(px_des_(11) - px_cur(11)) < tol) &&
+            (std::abs(px_des_(12) - px_cur(12)) < tol) && (std::abs(px_des_(13) - px_cur(13)) < tol) && (std::abs(px_des_(14) - px_cur(14)) < tol) && (std::abs(px_des_(15) - px_cur(15)) < tol));
 }

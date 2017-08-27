@@ -205,7 +205,7 @@ private:
     yarp::sig::Matrix              r_proj_;
 
     yarp::sig::Vector              goal_pose_    = yarp::math::zeros(7);
-    yarp::sig::Vector              px_des_       = yarp::math::zeros(12);
+    yarp::sig::Vector              px_des_       = yarp::math::zeros(16);
     yarp::sig::Matrix              l_H_eye_to_r_ = yarp::math::zeros(4, 4);
     yarp::sig::Matrix              r_H_eye_to_r_ = yarp::math::zeros(4, 4);
     yarp::sig::Matrix              l_H_r_to_cam_ = yarp::math::zeros(4, 4);
