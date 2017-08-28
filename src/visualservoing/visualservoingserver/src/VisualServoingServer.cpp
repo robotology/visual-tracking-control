@@ -1165,6 +1165,7 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
     Vector* endeffector_pose;
     Vector  eepose_copy_left(7);
     Vector  eepose_copy_right(7);
+    Vector  eepose_averaged(7);
 
     std::vector<Vector> l_px_position;
     std::vector<Vector> l_px_orientation;
@@ -1187,6 +1188,11 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
     /* GET THE INITIAL END-EFFECTOR POSE FOR THE RIGHT EYE */
     endeffector_pose = port_pose_right_in_.read(true);
     eepose_copy_right = *endeffector_pose;
+
+    /* GET THE INITIAL END-EFFECTOR POSE AVERAGE TO BE CONTROLLED BY THE VISUAL SERVO CONTROL */
+    eepose_averaged = averagePose(eepose_copy_left, eepose_copy_right);
+    eepose_copy_left  = eepose_averaged;
+    eepose_copy_right = eepose_averaged;
 
     yInfoVerbose("Got [" + eepose_copy_right.toString() + "] end-effector pose for the right eye.");
 
@@ -1461,6 +1467,11 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
                 /* UPDATE END-EFFECTOR POSE FOR THE RIGHT EYE */
                 endeffector_pose = port_pose_right_in_.read(true);
                 eepose_copy_right = *endeffector_pose;
+
+                /* UPDATE END-EFFECTOR POSE AVERAGE TO BE CONTROLLED BY THE VISUAL SERVO CONTROL */
+                eepose_averaged = averagePose(eepose_copy_left, eepose_copy_right);
+                eepose_copy_left  = eepose_averaged;
+                eepose_copy_right = eepose_averaged;
             }
             else
             {
@@ -1507,6 +1518,7 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
     Vector* endeffector_pose;
     Vector  eepose_copy_left(7);
     Vector  eepose_copy_right(7);
+    Vector  eepose_averaged(7);
 
     std::vector<Vector> l_px_pose;
     std::vector<Vector> r_px_pose;
@@ -1526,6 +1538,11 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
     /* GET THE INITIAL END-EFFECTOR POSE FOR THE RIGHT EYE */
     endeffector_pose = port_pose_right_in_.read(true);
     eepose_copy_right = *endeffector_pose;
+
+    /* GET THE INITIAL END-EFFECTOR POSE AVERAGE TO BE CONTROLLED BY THE VISUAL SERVO CONTROL */
+    eepose_averaged = averagePose(eepose_copy_left, eepose_copy_right);
+    eepose_copy_left  = eepose_averaged;
+    eepose_copy_right = eepose_averaged;
 
     yInfoVerbose("Got [" + eepose_copy_right.toString() + "] end-effector pose for the right eye.");
 
@@ -1774,6 +1791,11 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
                 /* UPDATE END-EFFECTOR POSE FOR THE RIGHT EYE */
                 endeffector_pose = port_pose_right_in_.read(true);
                 eepose_copy_right = *endeffector_pose;
+
+                /* UPDATE END-EFFECTOR POSE AVERAGE TO BE CONTROLLED BY THE VISUAL SERVO CONTROL */
+                eepose_averaged = averagePose(eepose_copy_left, eepose_copy_right);
+                eepose_copy_left  = eepose_averaged;
+                eepose_copy_right = eepose_averaged;
             }
             else
             {
@@ -2283,4 +2305,21 @@ bool VisualServoingServer::checkVisualServoingStatus(const Vector& px_cur, const
             (std::abs(px_des_(4)  - px_cur(4))  < tol) && (std::abs(px_des_(5)  - px_cur(5))  < tol) && (std::abs(px_des_(6)  - px_cur(6))  < tol) && (std::abs(px_des_(7)  - px_cur(7))  < tol) &&
             (std::abs(px_des_(8)  - px_cur(8))  < tol) && (std::abs(px_des_(9)  - px_cur(9))  < tol) && (std::abs(px_des_(10) - px_cur(10)) < tol) && (std::abs(px_des_(11) - px_cur(11)) < tol) &&
             (std::abs(px_des_(12) - px_cur(12)) < tol) && (std::abs(px_des_(13) - px_cur(13)) < tol) && (std::abs(px_des_(14) - px_cur(14)) < tol) && (std::abs(px_des_(15) - px_cur(15)) < tol));
+}
+
+
+Vector VisualServoingServer::averagePose(const Vector& l_pose, const Vector& r_pose) const
+{
+    Vector pose_out = zeros(7);
+
+    pose_out.setSubvector(0, 0.5 * l_pose.subVector(0, 2) + 0.5 * r_pose.subVector(0, 2));
+
+    pose_out.setSubvector(3, 0.5 * l_pose.subVector(3, 5) + 0.5 * r_pose.subVector(3, 5));
+    pose_out.setSubvector(3, pose_out.subVector(3, 5) / norm(pose_out.subVector(3, 5)));
+
+    float s_ang = 0.5 * std::sin(l_pose(6)) + 0.5 * std::sin(r_pose(6));
+    float c_ang = 0.5 * std::cos(l_pose(6)) + 0.5 * std::cos(r_pose(6));
+    pose_out(6) = std::atan2(s_ang, c_ang);
+
+    return pose_out;
 }

@@ -283,6 +283,9 @@ private:
     void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo()    << str; };
     void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning() << str; };
     void yErrorVerbose  (const yarp::os::ConstString& str) const { if(verbosity_) yError()   << str; };
+
+    /* EXPERIMENTAL */
+    yarp::sig::Vector averagePose(const yarp::sig::Vector& l_pose, const yarp::sig::Vector& r_pose) const;
 };
 
 #endif /* VISUALSERVOINGSERVER_H */
