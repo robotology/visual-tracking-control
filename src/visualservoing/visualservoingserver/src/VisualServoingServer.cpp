@@ -594,6 +594,7 @@ std::vector<Vector> VisualServoingServer::getGoalPixelsFrom3DPose(const Vector& 
 /* VisualServoingServerIDL overrides */
 bool VisualServoingServer::storedInit(const std::string& label)
 {
+    itf_rightarm_cart_->storeContext(&ctx_remote_cart_);
     itf_rightarm_cart_->restoreContext(ctx_local_cart_);
 
 
@@ -848,6 +849,7 @@ bool VisualServoingServer::threadInit()
 
 
     /* RESTORING CARTESIAN AND GAZE CONTEXT */
+    itf_rightarm_cart_->storeContext(&ctx_remote_cart_);
     itf_rightarm_cart_->restoreContext(ctx_local_cart_);
 
 

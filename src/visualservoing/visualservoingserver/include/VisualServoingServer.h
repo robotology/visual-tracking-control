@@ -198,8 +198,8 @@ private:
     double                         K_o_tol_            = 20.0; /* [pixel] */
     bool                           K_x_hysteresis_     = false;
     bool                           K_o_hysteresis_     = false;
-    double                         px_tol_             = 3.0; /* [pixel] */
-    double                         traj_time_          = 3.0; /* [s] */
+    double                         px_tol_             = 5.0; /* [pixel] */
+    double                         traj_time_          = 1.0; /* [s] */
 
     yarp::sig::Matrix              l_proj_;
     yarp::sig::Matrix              r_proj_;
