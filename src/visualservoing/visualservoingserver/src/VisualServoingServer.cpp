@@ -1948,7 +1948,7 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
         /* CHECK FOR GOAL */
         mtx_px_des_.lock();
 
-        vs_goal_reached_ = checkVisualServoingStatus(eepose_averaged, tol_position_, tol_angle_);
+        vs_goal_reached_ = checkVisualServoingStatus(eepose_averaged, tol_position_, tol_orientation_, tol_angle_);
 
         mtx_px_des_.unlock();
 
@@ -1967,27 +1967,18 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
             /* EVALUATING ERRORS */
             mtx_px_des_.lock();
 
-            Vector e_pos   = goal_pose_.subVector(0, 2) - eepose_averaged.subVector(0, 2);
-            Vector e_u     = cross(goal_pose_.subVector(3, 5), eepose_averaged.subVector(3, 5));
-            double e_theta = std::acos(dot(goal_pose_.subVector(3, 5), eepose_averaged.subVector(3, 5)));
+            Vector e_pos         = goal_pose_.subVector(0, 2) - eepose_averaged.subVector(0, 2);
+            Vector e_orientation = dcm2axis(axis2dcm(goal_pose_.subVector(3, 6)) * axis2dcm(eepose_averaged.subVector(3, 6)).transposed());
 
-            yInfoVerbose("Position error = [" + e_pos.toString() + "]");
+            yInfoVerbose("Position error    = [" + e_pos.toString()         + "]");
+            yInfoVerbose("Orientation error = [" + e_orientation.toString() + "]");
 
             mtx_px_des_.unlock();
 
 
             /* EVALUATING CONTROL VELOCITIES */
-            Vector vel_o = cat(e_u, e_theta / Ts_);
-
-            Matrix skew = zeros(3, 3);
-            skew(0, 1) = -eepose_averaged(2);
-            skew(0, 2) =  eepose_averaged(1);
-            skew(1, 0) =  eepose_averaged(2);
-            skew(1, 2) = -eepose_averaged(0);
-            skew(2, 0) = -eepose_averaged(1);
-            skew(2, 1) =  eepose_averaged(0);
-
-            Vector vel_x = e_pos + skew * vel_o(3) * vel_o.subVector(0, 2);
+            Vector vel_o = cat(e_orientation.subVector(0, 2), e_orientation(3));
+            Vector vel_x = e_pos;
 
             yInfoVerbose("Translational velocity = [" + vel_x.toString() + "]");
             yInfoVerbose("Orientation velocity = [" + vel_o.toString() + "]");
@@ -2019,10 +2010,10 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
 
 
             /* VISUAL CONTROL LAW */
-            if (!checkVisualServoingStatus(eepose_averaged, K_position_tol_, K_orientation_tol_))
+            if (!checkVisualServoingStatus(eepose_averaged, K_position_tol_, K_orientation_tol_, K_angle_tol_))
             {
-                vel_x    *= K_x_[0] * 10;
-                vel_o(3) *= K_o_[0] * 10;
+                vel_x    *= K_x_[0];
+                vel_o(3) *= K_o_[0];
                 if (K_pose_hysteresis_)
                 {
                     K_pose_hysteresis_ = false;
@@ -2598,13 +2589,13 @@ Vector VisualServoingServer::averagePose(const Vector& l_pose, const Vector& r_p
 }
 
 
-bool VisualServoingServer::checkVisualServoingStatus(const Vector& pose_cur, const double tol_position, const double tol_angle)
+bool VisualServoingServer::checkVisualServoingStatus(const Vector& pose_cur, const double tol_position, const double tol_orientation, const double tol_angle)
 {
     bool reached_position = (norm(pose_cur.subVector(0, 2) - goal_pose_.subVector(0, 2)) < tol_position);
 
-    bool reached_axis = std::abs(std::acos(dot(pose_cur.subVector(3, 5), goal_pose_.subVector(3, 5)))) < tol_angle;
+    bool reached_axis = std::abs(std::acos(dot(pose_cur.subVector(3, 5), goal_pose_.subVector(3, 5)))) < tol_orientation;
 
-    double ang = pose_cur(6) - goal_pose_(6);
+    double  ang = pose_cur(6) - goal_pose_(6);
     if      (ang >   M_PI) ang -= 2.0 * M_PI;
     else if (ang <= -M_PI) ang += 2.0 * M_PI;
 
