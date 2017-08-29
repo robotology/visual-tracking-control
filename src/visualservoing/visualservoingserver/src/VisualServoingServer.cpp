@@ -2084,6 +2084,11 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
                 eepose_copy_right.setSubvector(0, eepose_copy_right.subVector(0, 2)  + vel_x * Ts_);
                 eepose_copy_left.setSubvector(3, l_new_o);
                 eepose_copy_right.setSubvector(3, r_new_o);
+
+                /* SIMULARE END-EFFECTOR POSE AVERAGE TO BE CONTROLLED BY THE VISUAL SERVO CONTROL */
+                eepose_averaged = averagePose(eepose_copy_left, eepose_copy_right);
+                eepose_copy_left  = eepose_averaged;
+                eepose_copy_right = eepose_averaged;
             }
         }
     }
