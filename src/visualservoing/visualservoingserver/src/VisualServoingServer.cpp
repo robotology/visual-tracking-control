@@ -1967,7 +1967,18 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
             /* EVALUATING ERRORS */
             mtx_px_des_.lock();
 
-            Vector e    = goal_pose_.subVector(0, 2) - eepose_averaged.subVector(0, 2);
+            Vector e_pos   = goal_pose_.subVector(0, 2) - eepose_averaged.subVector(0, 2);
+            Vector e_u     = cross(goal_pose_.subVector(3, 5), eepose_averaged.subVector(3, 5));
+            double e_theta = std::acos(dot(goal_pose_.subVector(3, 5), eepose_averaged.subVector(3, 5)));
+
+            yInfoVerbose("Position error = [" + e_pos.toString() + "]");
+
+            mtx_px_des_.unlock();
+
+
+            /* EVALUATING CONTROL VELOCITIES */
+            Vector vel_o = cat(e_u, e_theta / Ts_);
+
             Matrix skew = zeros(3, 3);
             skew(0, 1) = -eepose_averaged(2);
             skew(0, 2) =  eepose_averaged(1);
@@ -1976,14 +1987,7 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
             skew(2, 0) = -eepose_averaged(1);
             skew(2, 1) =  eepose_averaged(0);
 
-            yInfoVerbose("Translation error = [" + e.toString() + "]");
-
-            mtx_px_des_.unlock();
-
-
-            /* EVALUATING CONTROL VELOCITIES */
-            Vector vel_x = e + skew * eepose_averaged(6) * eepose_averaged.subVector(3, 5);
-            Vector vel_o = cat(eepose_averaged.subVector(3, 5), eepose_averaged(6));
+            Vector vel_x = e_pos + skew * vel_o(3) * vel_o.subVector(0, 2);
 
             yInfoVerbose("Translational velocity = [" + vel_x.toString() + "]");
             yInfoVerbose("Orientation velocity = [" + vel_o.toString() + "]");
@@ -2017,8 +2021,8 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
             /* VISUAL CONTROL LAW */
             if (!checkVisualServoingStatus(eepose_averaged, K_position_tol_, K_orientation_tol_))
             {
-                vel_x    *= -K_x_[0];
-                vel_o(3) *= -K_o_[0];
+                vel_x    *= K_x_[0] * 10;
+                vel_o(3) *= K_o_[0] * 10;
                 if (K_pose_hysteresis_)
                 {
                     K_pose_hysteresis_ = false;
@@ -2029,8 +2033,8 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
             }
             else
             {
-                vel_x    *= -K_x_[1];
-                vel_o(3) *= -K_o_[1];
+                vel_x    *= K_x_[1];
+                vel_o(3) *= K_o_[1];
                 if (!K_pose_hysteresis_)
                 {
                     K_pose_hysteresis_ = true;
