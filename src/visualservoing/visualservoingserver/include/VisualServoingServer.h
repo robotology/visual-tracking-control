@@ -178,7 +178,7 @@ private:
     bool                           sim_        = false;
     yarp::os::ConstString          robot_name_ = "icub";
 
-    VisualServoControl             vs_control_ = VisualServoControl::decoupled;
+    VisualServoControl             vs_control_ = VisualServoControl::cartesian;
     OperatingMode                  op_mode_ = OperatingMode::pose;
 
     yarp::dev::PolyDriver          rightarm_cartesian_driver_;

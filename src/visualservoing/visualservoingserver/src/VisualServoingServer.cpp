@@ -1882,23 +1882,52 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
 
 
         /* Plot points and lines */
-        Vector l_position_g = getPixelFromPoint(CamSel::left,  goal_pose_.subVector(0, 2));
-        Vector r_position_g = getPixelFromPoint(CamSel::right, goal_pose_.subVector(0, 2));
+        Vector l_position_ee = getPixelFromPoint(CamSel::left,  cat(eepose_averaged.subVector(0, 2), 1.0));
+        Vector r_position_ee = getPixelFromPoint(CamSel::right, cat(eepose_averaged.subVector(0, 2), 1.0));
+
+        Matrix H_ee_to_root = axis2dcm(eepose_averaged.subVector(3, 6));
+        H_ee_to_root.setCol(3, cat(eepose_averaged.subVector(0, 2), 1.0));
+
+        Vector versor_x_ee = H_ee_to_root * cat(0.03,    0,    0, 1.0);
+        Vector versor_y_ee = H_ee_to_root * cat(   0, 0.03,    0, 1.0);
+        Vector versor_z_ee = H_ee_to_root * cat(   0,    0, 0.03, 1.0);
+
+        Vector l_versor_x_ee = getPixelFromPoint(CamSel::left,  versor_x_ee);
+        Vector l_versor_y_ee = getPixelFromPoint(CamSel::left,  versor_y_ee);
+        Vector l_versor_z_ee = getPixelFromPoint(CamSel::left,  versor_z_ee);
+
+        Vector r_versor_x_ee = getPixelFromPoint(CamSel::right, versor_x_ee);
+        Vector r_versor_y_ee = getPixelFromPoint(CamSel::right, versor_y_ee);
+        Vector r_versor_z_ee = getPixelFromPoint(CamSel::right, versor_z_ee);
+
+        cv::circle(l_img, cv::Point(l_position_ee[0], l_position_ee[1]), 4, color[3], 4);
+        cv::line  (l_img, cv::Point(l_position_ee[0], l_position_ee[1]), cv::Point(l_versor_x_ee[0], l_versor_x_ee[1]), color[0], 4, cv::LineTypes::LINE_AA);
+        cv::line  (l_img, cv::Point(l_position_ee[0], l_position_ee[1]), cv::Point(l_versor_y_ee[0], l_versor_y_ee[1]), color[1], 4, cv::LineTypes::LINE_AA);
+        cv::line  (l_img, cv::Point(l_position_ee[0], l_position_ee[1]), cv::Point(l_versor_z_ee[0], l_versor_z_ee[1]), color[2], 4, cv::LineTypes::LINE_AA);
+
+        cv::circle(r_img, cv::Point(r_position_ee[0], r_position_ee[1]), 4, color[3], 4);
+        cv::line  (r_img, cv::Point(r_position_ee[0], r_position_ee[1]), cv::Point(r_versor_x_ee[0], r_versor_x_ee[1]), color[0], 4, cv::LineTypes::LINE_AA);
+        cv::line  (r_img, cv::Point(r_position_ee[0], r_position_ee[1]), cv::Point(r_versor_y_ee[0], r_versor_y_ee[1]), color[1], 4, cv::LineTypes::LINE_AA);
+        cv::line  (r_img, cv::Point(r_position_ee[0], r_position_ee[1]), cv::Point(r_versor_z_ee[0], r_versor_z_ee[1]), color[2], 4, cv::LineTypes::LINE_AA);
+
+
+        Vector l_position_g = getPixelFromPoint(CamSel::left,  cat(goal_pose_.subVector(0, 2), 1.0));
+        Vector r_position_g = getPixelFromPoint(CamSel::right, cat(goal_pose_.subVector(0, 2), 1.0));
 
         Matrix H_goal_to_root = axis2dcm(goal_pose_.subVector(3, 6));
         H_goal_to_root.setCol(3, cat(goal_pose_.subVector(0, 2), 1.0));
 
-        Vector versor_x_g = H_goal_to_root * cat(0.03,    0,    0);
-        Vector versor_y_g = H_goal_to_root * cat(   0, 0.03,    0);
-        Vector versor_z_g = H_goal_to_root * cat(   0,    0, 0.03);
+        Vector versor_x_g = H_goal_to_root * cat(0.03,    0,    0, 1.0);
+        Vector versor_y_g = H_goal_to_root * cat(   0, 0.03,    0, 1.0);
+        Vector versor_z_g = H_goal_to_root * cat(   0,    0, 0.03, 1.0);
 
-        Vector l_versor_x_g = l_H_r_to_cam_ * versor_x_g;
-        Vector l_versor_y_g = l_H_r_to_cam_ * versor_y_g;
-        Vector l_versor_z_g = l_H_r_to_cam_ * versor_z_g;
+        Vector l_versor_x_g = getPixelFromPoint(CamSel::left,  versor_x_g);
+        Vector l_versor_y_g = getPixelFromPoint(CamSel::left,  versor_y_g);
+        Vector l_versor_z_g = getPixelFromPoint(CamSel::left,  versor_z_g);
 
-        Vector r_versor_x_g = r_H_r_to_cam_ * versor_x_g;
-        Vector r_versor_y_g = r_H_r_to_cam_ * versor_y_g;
-        Vector r_versor_z_g = r_H_r_to_cam_ * versor_z_g;
+        Vector r_versor_x_g = getPixelFromPoint(CamSel::right, versor_x_g);
+        Vector r_versor_y_g = getPixelFromPoint(CamSel::right, versor_y_g);
+        Vector r_versor_z_g = getPixelFromPoint(CamSel::right, versor_z_g);
 
         cv::circle(l_img, cv::Point(l_position_g[0], l_position_g[1]), 4, color[3], 4);
         cv::line  (l_img, cv::Point(l_position_g[0], l_position_g[1]), cv::Point(l_versor_x_g[0], l_versor_x_g[1]), color[0], 4, cv::LineTypes::LINE_AA);
@@ -1909,6 +1938,7 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
         cv::line  (r_img, cv::Point(r_position_g[0], r_position_g[1]), cv::Point(r_versor_x_g[0], r_versor_x_g[1]), color[0], 4, cv::LineTypes::LINE_AA);
         cv::line  (r_img, cv::Point(r_position_g[0], r_position_g[1]), cv::Point(r_versor_y_g[0], r_versor_y_g[1]), color[1], 4, cv::LineTypes::LINE_AA);
         cv::line  (r_img, cv::Point(r_position_g[0], r_position_g[1]), cv::Point(r_versor_z_g[0], r_versor_z_g[1]), color[2], 4, cv::LineTypes::LINE_AA);
+
 
         port_image_left_out_.write();
         port_image_right_out_.write();
