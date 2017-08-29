@@ -167,7 +167,7 @@ protected:
 
 
     /* Enum helpers */
-    enum class VisualServoControl { decoupled, robust };
+    enum class VisualServoControl { decoupled, robust, cartesian };
 
     enum class PixelControlMode { all, x, o };
 
@@ -193,12 +193,17 @@ private:
     std::array<double, 2>          K_x_                = {{0.5, 0.25}};
     std::array<double, 2>          K_o_                = {{0.5, 0.25}};
     double                         max_x_dot_          = 0.025; /* [m/s] */
-    double                         max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
+    double                         max_o_dot_          = 5.0 * M_PI / 180.0; /* [rad/s] */
     double                         K_x_tol_            = 20.0; /* [pixel] */
     double                         K_o_tol_            = 20.0; /* [pixel] */
+    double                         K_position_tol_     = 0.03; /* [m] */
+    double                         K_orientation_tol_  = 5.0 * M_PI / 180.0; /* [rad] */
     bool                           K_x_hysteresis_     = false;
     bool                           K_o_hysteresis_     = false;
-    double                         px_tol_             = 5.0; /* [pixel] */
+    bool                           K_pose_hysteresis_  = false;
+    double                         tol_px_             = 5.0; /* [pixel] */
+    double                         tol_position_       = 0.01; /* [m] */
+    double                         tol_angle_          = 1.0 * M_PI / 180.0; /* [rad] */
     double                         traj_time_          = 1.0; /* [s] */
 
     yarp::sig::Matrix              l_proj_;
@@ -241,6 +246,8 @@ private:
     void decoupledImageBasedVisualServoControl();
 
     void robustImageBasedVisualServoControl();
+
+    void cartesianPositionBasedVisualServoControl();
 
     bool setRightArmCartesianController();
 
@@ -286,6 +293,8 @@ private:
 
     /* EXPERIMENTAL */
     yarp::sig::Vector averagePose(const yarp::sig::Vector& l_pose, const yarp::sig::Vector& r_pose) const;
+
+    bool checkVisualServoingStatus(const yarp::sig::Vector& pose_cur, const double tol_position, const double tol_angle);
 };
 
 #endif /* VISUALSERVOINGSERVER_H */
