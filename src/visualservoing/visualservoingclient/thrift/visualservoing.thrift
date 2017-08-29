@@ -61,9 +61,9 @@ service VisualServoingIDL
      * Set the goal points on both left and right camera image plane and start
      * visual servoing.
      *
-     * @param vec_px_l a collection of four 2D vectors which contains the (u,v)
+     * @param vec_px_l a collection of four 2D vectors which contains the (u, v)
      *                 coordinates of the pixels within the left image plane.
-     * @param vec_px_r a collection of four 2D vectors which contains the (u,v)
+     * @param vec_px_r a collection of four 2D vectors which contains the (u, v)
      *                 coordinates of the pixels within the right image plane.
      *
      * @note By invoking this method, the visual servoing goal will be reached in
@@ -91,6 +91,19 @@ service VisualServoingIDL
     bool go_to_pose_goal(1: list<double> vec_x, 2: list<double> vec_o);
 
     /**
+     *  Set visual servoing operating mode between:
+     *  1. 'position': position-only visual servo control;
+     *  2. 'orientation': orientation-only visual servo control;
+     *  3. 'pose': position + orientation visual servo control.
+     *
+     * @param mode a label referring to one of the three operating mode, i.e.
+     *             'position', 'orientation' or 'pose'.
+     *
+     * @return true/false on success/failure.
+     */
+    bool set_modality(1:string mode);
+
+    /**
      *  Set visual servo control law between:
      *  1. 'decoupled': image-based visual servoing with decoupled position and
      *                  orientation control law, the control law was proposed
@@ -111,19 +124,6 @@ service VisualServoingIDL
      * @return true/false on success/failure.
      */
     bool set_visual_servo_control(1:string control);
-
-    /**
-     *  Set visual servoing operating mode between:
-     *  1. 'position': position-only visual servo control;
-     *  2. 'orientation': orientation-only visual servo control;
-     *  3. 'pose': position + orientation visual servo control.
-     *
-     * @param mode a label referring to one of the three operating mode, i.e.
-     *             'position', 'orientation' or 'pose'.
-     *
-     * @return true/false on success/failure.
-     */
-    bool set_modality(1:string mode);
 
     /**
      * Set the point controlled during visual servoing.
@@ -269,9 +269,9 @@ service VisualServoingIDL
      * Helper function: extract four Cartesian points lying on the plane defined
      * by the frame o in the position x relative to the robot base frame.
      *
-     * @param x a 3D vector which is filled with the actual position x,y,z [m].
+     * @param x a 3D vector which is filled with the actual position (x, y, z) [m].
      * @param o a 4D vector which is filled with the actual orientation using
-     *          axis-angle representation xa, ya, za, theta [rad].
+     *          axis-angle representation (xa, ya, za) and (theta) [rad].
      *
      * @return on success: a collection of four Cartesian points (position only)
      *         extracted from the plane defined by x and o;
@@ -286,9 +286,9 @@ service VisualServoingIDL
      * Helper function: extract four 2D pixel points lying on the plane defined
      * by the frame o in the position x relative to the robot base frame.
      *
-     * @param x a 3D vector which is filled with the actual position x,y,z [m].
+     * @param x a 3D vector which is filled with the actual position (x, y, z) [m].
      * @param o a 4D vector which is filled with the actual orientation using
-     *          axis-angle representation xa, ya, za, theta [m]/[rad].
+     *          axis-angle representation (xa, ya, za) and (theta) [m]/[rad].
      * @param cam either "left" or "right" to select left or right camera.
      *
      * @return on success: a collection of three (u, v) pixel points
