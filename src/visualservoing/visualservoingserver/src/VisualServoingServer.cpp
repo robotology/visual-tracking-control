@@ -446,6 +446,8 @@ bool VisualServoingServer::setVisualServoControl(const std::string& control)
         vs_control_ = VisualServoControl::decoupled;
     else if (control == "robust")
         vs_control_ = VisualServoControl::robust;
+    else if (control == "cartesian")
+        vs_control_ = VisualServoControl::cartesian;
     else
         return false;
 
@@ -471,7 +473,7 @@ bool VisualServoingServer::getVisualServoingInfo(yarp::os::Bottle& info)
 
 bool VisualServoingServer::setGoToGoalTolerance(const double tol)
 {
-    px_tol_ = tol;
+    tol_px_ = tol;
 
     return true;
 }
@@ -887,6 +889,8 @@ void VisualServoingServer::run()
         decoupledImageBasedVisualServoControl();
     else if (vs_control_ == VisualServoControl::robust)
         robustImageBasedVisualServoControl();
+    else if (vs_control_ == VisualServoControl::cartesian)
+        cartesianPositionBasedVisualServoControl();
 }
 
 
@@ -1358,8 +1362,8 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
         /* CHECK FOR GOAL */
         mtx_px_des_.lock();
 
-        bool is_pos_done    = checkVisualServoingStatus(px_ee_cur_position,    px_tol_);
-        bool is_orient_done = checkVisualServoingStatus(px_ee_cur_orientation, px_tol_);
+        bool is_pos_done    = checkVisualServoingStatus(px_ee_cur_position,    tol_px_);
+        bool is_orient_done = checkVisualServoingStatus(px_ee_cur_orientation, tol_px_);
 
         mtx_px_des_.unlock();
 
@@ -1702,7 +1706,7 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
         /* CHECK FOR GOAL */
         mtx_px_des_.lock();
 
-        vs_goal_reached_ = checkVisualServoingStatus(px_ee_cur_pose, px_tol_);
+        vs_goal_reached_ = checkVisualServoingStatus(px_ee_cur_pose, tol_px_);
 
         mtx_px_des_.unlock();
 
@@ -1872,6 +1876,269 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
                 eepose_copy_right.setSubvector(0, eepose_copy_right.subVector(0, 2)  + vel_x * Ts_);
                 eepose_copy_left.setSubvector(3, l_new_o);
                 eepose_copy_right.setSubvector(3, r_new_o);
+            }
+        }
+    }
+}
+
+
+void VisualServoingServer::cartesianPositionBasedVisualServoControl()
+{
+    /* VARIABLE DEFINITIONS */
+    Vector* endeffector_pose;
+    Vector  eepose_copy_left(7);
+    Vector  eepose_copy_right(7);
+    Vector  eepose_averaged(7);
+
+    /* GET THE INITIAL END-EFFECTOR POSE FOR THE LEFT EYE */
+    endeffector_pose = port_pose_left_in_.read(true);
+    eepose_copy_left = *endeffector_pose;
+
+    yInfoVerbose("Got [" + eepose_copy_left.toString() + "] end-effector pose for the left eye.");
+
+    /* GET THE INITIAL END-EFFECTOR POSE FOR THE RIGHT EYE */
+    endeffector_pose = port_pose_right_in_.read(true);
+    eepose_copy_right = *endeffector_pose;
+
+    yInfoVerbose("Got [" + eepose_copy_right.toString() + "] end-effector pose for the right eye.");
+
+    /* GET THE INITIAL END-EFFECTOR POSE AVERAGE TO BE CONTROLLED BY THE VISUAL SERVO CONTROL */
+    eepose_averaged = averagePose(eepose_copy_left, eepose_copy_right);
+    eepose_copy_left  = eepose_averaged;
+    eepose_copy_right = eepose_averaged;
+
+    yInfoVerbose("Averaged end-effector pose: [" + eepose_averaged.toString() + "].");
+
+
+    while (!isStopping() && !vs_goal_reached_)
+    {
+        yInfoVerbose("Desired goal pose = [" + goal_pose_.toString() + "]");
+
+
+        /* *** *** *** DEBUG OUTPUT - TO BE DELETED *** *** *** */
+        std::vector<cv::Scalar> color;
+        color.emplace_back(cv::Scalar(255,   0,   0));
+        color.emplace_back(cv::Scalar(  0, 255,   0));
+        color.emplace_back(cv::Scalar(  0,   0, 255));
+        color.emplace_back(cv::Scalar(255, 127,  51));
+
+
+        /* Left eye end-effector superimposition */
+        ImageOf<PixelRgb>* l_imgin  = port_image_left_in_.read(true);
+        ImageOf<PixelRgb>& l_imgout = port_image_left_out_.prepare();
+        l_imgout = *l_imgin;
+        cv::Mat l_img = cv::cvarrToMat(l_imgout.getIplImage());
+
+        /* Right eye end-effector superimposition */
+        ImageOf<PixelRgb>* r_imgin  = port_image_right_in_.read(true);
+        ImageOf<PixelRgb>& r_imgout = port_image_right_out_.prepare();
+        r_imgout = *r_imgin;
+        cv::Mat r_img = cv::cvarrToMat(r_imgout.getIplImage());
+
+
+        /* Plot points and lines */
+        Vector l_position_ee = getPixelFromPoint(CamSel::left,  cat(eepose_averaged.subVector(0, 2), 1.0));
+        Vector r_position_ee = getPixelFromPoint(CamSel::right, cat(eepose_averaged.subVector(0, 2), 1.0));
+
+        Matrix H_ee_to_root = axis2dcm(eepose_averaged.subVector(3, 6));
+        H_ee_to_root.setCol(3, cat(eepose_averaged.subVector(0, 2), 1.0));
+
+        Vector versor_x_ee = H_ee_to_root * cat(0.03,    0,    0, 1.0);
+        Vector versor_y_ee = H_ee_to_root * cat(   0, 0.03,    0, 1.0);
+        Vector versor_z_ee = H_ee_to_root * cat(   0,    0, 0.03, 1.0);
+
+        Vector l_versor_x_ee = getPixelFromPoint(CamSel::left,  versor_x_ee);
+        Vector l_versor_y_ee = getPixelFromPoint(CamSel::left,  versor_y_ee);
+        Vector l_versor_z_ee = getPixelFromPoint(CamSel::left,  versor_z_ee);
+
+        Vector r_versor_x_ee = getPixelFromPoint(CamSel::right, versor_x_ee);
+        Vector r_versor_y_ee = getPixelFromPoint(CamSel::right, versor_y_ee);
+        Vector r_versor_z_ee = getPixelFromPoint(CamSel::right, versor_z_ee);
+
+        cv::circle(l_img, cv::Point(l_position_ee[0], l_position_ee[1]), 4, color[3], 4);
+        cv::line  (l_img, cv::Point(l_position_ee[0], l_position_ee[1]), cv::Point(l_versor_x_ee[0], l_versor_x_ee[1]), color[0], 4, cv::LineTypes::LINE_AA);
+        cv::line  (l_img, cv::Point(l_position_ee[0], l_position_ee[1]), cv::Point(l_versor_y_ee[0], l_versor_y_ee[1]), color[1], 4, cv::LineTypes::LINE_AA);
+        cv::line  (l_img, cv::Point(l_position_ee[0], l_position_ee[1]), cv::Point(l_versor_z_ee[0], l_versor_z_ee[1]), color[2], 4, cv::LineTypes::LINE_AA);
+
+        cv::circle(r_img, cv::Point(r_position_ee[0], r_position_ee[1]), 4, color[3], 4);
+        cv::line  (r_img, cv::Point(r_position_ee[0], r_position_ee[1]), cv::Point(r_versor_x_ee[0], r_versor_x_ee[1]), color[0], 4, cv::LineTypes::LINE_AA);
+        cv::line  (r_img, cv::Point(r_position_ee[0], r_position_ee[1]), cv::Point(r_versor_y_ee[0], r_versor_y_ee[1]), color[1], 4, cv::LineTypes::LINE_AA);
+        cv::line  (r_img, cv::Point(r_position_ee[0], r_position_ee[1]), cv::Point(r_versor_z_ee[0], r_versor_z_ee[1]), color[2], 4, cv::LineTypes::LINE_AA);
+
+
+        Vector l_position_g = getPixelFromPoint(CamSel::left,  cat(goal_pose_.subVector(0, 2), 1.0));
+        Vector r_position_g = getPixelFromPoint(CamSel::right, cat(goal_pose_.subVector(0, 2), 1.0));
+
+        Matrix H_goal_to_root = axis2dcm(goal_pose_.subVector(3, 6));
+        H_goal_to_root.setCol(3, cat(goal_pose_.subVector(0, 2), 1.0));
+
+        Vector versor_x_g = H_goal_to_root * cat(0.03,    0,    0, 1.0);
+        Vector versor_y_g = H_goal_to_root * cat(   0, 0.03,    0, 1.0);
+        Vector versor_z_g = H_goal_to_root * cat(   0,    0, 0.03, 1.0);
+
+        Vector l_versor_x_g = getPixelFromPoint(CamSel::left,  versor_x_g);
+        Vector l_versor_y_g = getPixelFromPoint(CamSel::left,  versor_y_g);
+        Vector l_versor_z_g = getPixelFromPoint(CamSel::left,  versor_z_g);
+
+        Vector r_versor_x_g = getPixelFromPoint(CamSel::right, versor_x_g);
+        Vector r_versor_y_g = getPixelFromPoint(CamSel::right, versor_y_g);
+        Vector r_versor_z_g = getPixelFromPoint(CamSel::right, versor_z_g);
+
+        cv::circle(l_img, cv::Point(l_position_g[0], l_position_g[1]), 4, color[3], 4);
+        cv::line  (l_img, cv::Point(l_position_g[0], l_position_g[1]), cv::Point(l_versor_x_g[0], l_versor_x_g[1]), color[0], 4, cv::LineTypes::LINE_AA);
+        cv::line  (l_img, cv::Point(l_position_g[0], l_position_g[1]), cv::Point(l_versor_y_g[0], l_versor_y_g[1]), color[1], 4, cv::LineTypes::LINE_AA);
+        cv::line  (l_img, cv::Point(l_position_g[0], l_position_g[1]), cv::Point(l_versor_z_g[0], l_versor_z_g[1]), color[2], 4, cv::LineTypes::LINE_AA);
+
+        cv::circle(r_img, cv::Point(r_position_g[0], r_position_g[1]), 4, color[3], 4);
+        cv::line  (r_img, cv::Point(r_position_g[0], r_position_g[1]), cv::Point(r_versor_x_g[0], r_versor_x_g[1]), color[0], 4, cv::LineTypes::LINE_AA);
+        cv::line  (r_img, cv::Point(r_position_g[0], r_position_g[1]), cv::Point(r_versor_y_g[0], r_versor_y_g[1]), color[1], 4, cv::LineTypes::LINE_AA);
+        cv::line  (r_img, cv::Point(r_position_g[0], r_position_g[1]), cv::Point(r_versor_z_g[0], r_versor_z_g[1]), color[2], 4, cv::LineTypes::LINE_AA);
+
+
+        port_image_left_out_.write();
+        port_image_right_out_.write();
+        /* *** *** ***  *** *** *** *** *** *** *** *** *** *** */
+
+
+        /* CHECK FOR GOAL */
+        mtx_px_des_.lock();
+
+        vs_goal_reached_ = checkVisualServoingStatus(eepose_averaged, tol_position_, tol_orientation_, tol_angle_);
+
+        mtx_px_des_.unlock();
+
+
+        if (vs_goal_reached_)
+        {
+            yInfoVerbose("");
+            yInfoVerbose("*** Goal reached! ***");
+            yInfoVerbose("Desired goal pose = " + goal_pose_.toString());
+            yInfoVerbose("Reached pose      = " + eepose_averaged.toString());
+            yInfoVerbose("*** ------------- ***");
+            yInfoVerbose("");
+        }
+        else
+        {
+            /* EVALUATING ERRORS */
+            mtx_px_des_.lock();
+
+            Vector e_pos         = goal_pose_.subVector(0, 2) - eepose_averaged.subVector(0, 2);
+            Vector e_orientation = dcm2axis(axis2dcm(goal_pose_.subVector(3, 6)) * axis2dcm(eepose_averaged.subVector(3, 6)).transposed());
+
+            yInfoVerbose("Position error    = [" + e_pos.toString()         + "]");
+            yInfoVerbose("Orientation error = [" + e_orientation.toString() + "]");
+
+            mtx_px_des_.unlock();
+
+
+            /* EVALUATING CONTROL VELOCITIES */
+            Vector vel_o = cat(e_orientation.subVector(0, 2), e_orientation(3));
+            Vector vel_x = e_pos;
+
+            yInfoVerbose("Translational velocity = [" + vel_x.toString() + "]");
+            yInfoVerbose("Orientation velocity = [" + vel_o.toString() + "]");
+
+
+            /* ENFORCE TRANSLATIONAL VELOCITY BOUNDS */
+            for (size_t i = 0; i < vel_x.length(); ++i)
+            {
+                if (!std::isnan(vel_x[i]) && !std::isinf(vel_x[i]))
+                    vel_x[i] = sign(vel_x[i]) * std::min(max_x_dot_, std::fabs(vel_x[i]));
+                else
+                {
+                    vel_x = Vector(3, 0.0);
+                    break;
+                }
+            }
+            yInfoVerbose("Bounded translational velocity = [" + vel_x.toString() + "]");
+
+
+            /* ENFORCE ROTATIONAL VELOCITY BOUNDS */
+            if (!std::isnan(vel_o[0]) && !std::isinf(vel_x[0]) &&
+                !std::isnan(vel_o[1]) && !std::isinf(vel_x[1]) &&
+                !std::isnan(vel_o[2]) && !std::isinf(vel_x[2]) &&
+                !std::isnan(vel_o[3]) && !std::isinf(vel_x[3]))
+                vel_o[3] = sign(vel_o[3]) * std::min(max_o_dot_, std::fabs(vel_o[3]));
+            else
+                vel_o = Vector(4, 0.0);
+            yInfoVerbose("Bounded orientation velocity = [" + vel_o.toString() + "]");
+
+
+            /* VISUAL CONTROL LAW */
+            if (!checkVisualServoingStatus(eepose_averaged, K_position_tol_, K_orientation_tol_, K_angle_tol_))
+            {
+                vel_x    *= K_x_[0];
+                vel_o(3) *= K_o_[0];
+                if (K_pose_hysteresis_)
+                {
+                    K_pose_hysteresis_ = false;
+
+                    K_position_tol_    -= 0.02;
+                    K_orientation_tol_ -= (2.0 * M_PI / 180.0);
+                }
+            }
+            else
+            {
+                vel_x    *= K_x_[1];
+                vel_o(3) *= K_o_[1];
+                if (!K_pose_hysteresis_)
+                {
+                    K_pose_hysteresis_ = true;
+
+                    K_position_tol_    += 0.02;
+                    K_orientation_tol_ += (2.0 * M_PI / 180.0);
+                }
+            }
+
+
+            if (!sim_)
+            {
+                /* COMMAND END-EFFECTOR WITH THE CARTESIAN CONTROLLER */
+                itf_rightarm_cart_->setTaskVelocities(vel_x, vel_o);
+
+
+                /* WAIT FOR SOME MOTION */
+                Time::delay(Ts_);
+
+
+                /* UPDATE END-EFFECTOR POSE FOR THE LEFT EYE */
+                endeffector_pose = port_pose_left_in_.read(true);
+                eepose_copy_left = *endeffector_pose;
+
+                /* UPDATE END-EFFECTOR POSE FOR THE RIGHT EYE */
+                endeffector_pose = port_pose_right_in_.read(true);
+                eepose_copy_right = *endeffector_pose;
+
+                /* UPDATE END-EFFECTOR POSE AVERAGE TO BE CONTROLLED BY THE VISUAL SERVO CONTROL */
+                eepose_averaged = averagePose(eepose_copy_left, eepose_copy_right);
+                eepose_copy_left  = eepose_averaged;
+                eepose_copy_right = eepose_averaged;
+            }
+            else
+            {
+                Matrix l_R = axis2dcm(eepose_copy_left.subVector(3, 6));
+                Matrix r_R = axis2dcm(eepose_copy_right.subVector(3, 6));
+
+
+                vel_o[3] *= Ts_;
+                l_R = axis2dcm(vel_o) * l_R;
+                r_R = axis2dcm(vel_o) * r_R;
+
+
+                Vector l_new_o = dcm2axis(l_R);
+                Vector r_new_o = dcm2axis(r_R);
+
+
+                /* SIMULATE END-EFFECTOR COMMAND AND UPDATE ITS POSE */
+                eepose_copy_left.setSubvector(0, eepose_copy_left.subVector(0, 2)  + vel_x * Ts_);
+                eepose_copy_right.setSubvector(0, eepose_copy_right.subVector(0, 2)  + vel_x * Ts_);
+                eepose_copy_left.setSubvector(3, l_new_o);
+                eepose_copy_right.setSubvector(3, r_new_o);
+
+                /* SIMULARE END-EFFECTOR POSE AVERAGE TO BE CONTROLLED BY THE VISUAL SERVO CONTROL */
+                eepose_averaged = averagePose(eepose_copy_left, eepose_copy_right);
+                eepose_copy_left  = eepose_averaged;
+                eepose_copy_right = eepose_averaged;
             }
         }
     }
@@ -2391,4 +2658,37 @@ Vector stdVectorOfVectorsToVector(const std::vector<Vector>& vectors)
     }
 
     return v;
+}
+
+
+Vector VisualServoingServer::averagePose(const Vector& l_pose, const Vector& r_pose) const
+{
+    Vector pose_out = zeros(7);
+
+    pose_out.setSubvector(0, 0.5 * l_pose.subVector(0, 2) + 0.5 * r_pose.subVector(0, 2));
+
+    pose_out.setSubvector(3, 0.5 * l_pose.subVector(3, 5) + 0.5 * r_pose.subVector(3, 5));
+    pose_out.setSubvector(3, pose_out.subVector(3, 5) / norm(pose_out.subVector(3, 5)));
+
+    float s_ang = 0.5 * std::sin(l_pose(6)) + 0.5 * std::sin(r_pose(6));
+    float c_ang = 0.5 * std::cos(l_pose(6)) + 0.5 * std::cos(r_pose(6));
+    pose_out(6) = std::atan2(s_ang, c_ang);
+
+    return pose_out;
+}
+
+
+bool VisualServoingServer::checkVisualServoingStatus(const Vector& pose_cur, const double tol_position, const double tol_orientation, const double tol_angle)
+{
+    bool reached_position = (norm(pose_cur.subVector(0, 2) - goal_pose_.subVector(0, 2)) < tol_position);
+
+    bool reached_axis = std::abs(std::acos(dot(pose_cur.subVector(3, 5), goal_pose_.subVector(3, 5)))) < tol_orientation;
+
+    double  ang = pose_cur(6) - goal_pose_(6);
+    if      (ang >   M_PI) ang -= 2.0 * M_PI;
+    else if (ang <= -M_PI) ang += 2.0 * M_PI;
+
+    bool reached_angle = std::abs(ang) < tol_angle;
+
+    return reached_position && reached_axis && reached_angle;
 }
