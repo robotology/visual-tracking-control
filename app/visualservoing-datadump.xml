@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+<application>
+
+    <!-- GENERIC INFORMATION -->
+    <name>visualservoing</name>
+    <description>This app allows the iCub to perform visual servoing tasks. Must be used with the hand-tracking app.</description>
+    <version>0.5.0</version>
+
+    <authors>
+        <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
+    </authors>
+
+
+    <!-- REQUIRED MODULES -->
+    <module>
+        <name>yarpdev</name>
+        <parameters>--device visualservoingserver --verbosity true --robot icub</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/cam_left --out /view/cam_left/click:o --x 20 --y 370 --RefreshTime 30</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/cam_right --out /view/cam_right/click:o --x 340 --y 370 --RefreshTime 30</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/cam_left/ee --x 20 --y 740 --RefreshTime 30</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/cam_right/ee --x 340 --y 740 --RefreshTime 30</parameters>
+        <node>localhost</node>
+    </module>
+
+
+    <!-- DATADUMPER -->
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/cam_left/ctrl_px --txTime --rxTime --type bottle</parameters>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/cam_right/ctrl_px --txTime --rxTime --type bottle</parameters>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/cam_left/kin_px --txTime --rxTime --type bottle</parameters>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/cam_right/kin_px --txTime --rxTime --type bottle</parameters>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/cam_left/goal_px --txTime --rxTime --type bottle</parameters>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/cam_right/goal_px --txTime --rxTime --type bottle</parameters>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/pose/ctrl --txTime --rxTime --type bottle</parameters>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/pose/goal --txTime --rxTime --type bottle</parameters>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <node>localhost</node>
+        <parameters>--name /datadumper/pose/kin --txTime --rxTime --type bottle</parameters>
+    </module>
+
+
+    <!-- REQUIRED CONNECTIONS -->
+    <connection>
+        <from>/icub/camcalib/left/out</from>
+        <to>/view/cam_left</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/camcalib/left/out</from>
+        <to>/visualservoing/cam_left/img:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/cam_left/img:o</from>
+        <to>/view/cam_left/ee</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/view/cam_left/click:o</from>
+        <to>/visualservoing/cam_left/click:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/view/cam_right/click:o</from>
+        <to>/visualservoing/cam_right/click:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/camcalib/right/out</from>
+        <to>/view/cam_right</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/camcalib/right/out</from>
+        <to>/visualservoing/cam_right/img:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/cam_right/img:o</from>
+        <to>/view/cam_right/ee</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+
+    <!-- DATADUMP CONNECTIONS -->
+    <connection>
+        <from>/visualservoing/cam_left/ctrl_px:o</from>
+        <to>/datadumper/cam_left/ctrl_px</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/cam_right/ctrl_px:o</from>
+        <to>/datadumper/cam_right/ctrl_px</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/cam_left/kin_px:o</from>
+        <to>/datadumper/cam_left/kin_px</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/cam_right/kin_px:o</from>
+        <to>/datadumper/cam_right/kin_px</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/cam_left/goal_px:o</from>
+        <to>/datadumper/cam_left/goal_px</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/cam_right/goal_px:o</from>
+        <to>/datadumper/cam_right/goal_px</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/pose/ctrl:o</from>
+        <to>/datadumper/pose/ctrl</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/pose/goal:o</from>
+        <to>/datadumper/pose/goal</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/cartesianController/right_arm/state:o</from>
+        <to>/datadumper/pose/kin</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+</application>

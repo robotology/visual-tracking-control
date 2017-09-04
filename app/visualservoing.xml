@@ -43,18 +43,6 @@
         <node>localhost</node>
     </module>
 
-    <module>
-        <name>yarpdatadumper</name>
-        <node>localhost</node>
-        <parameters>--name /datadumper/cam_left/x --txTime --rxTime --type bottle</parameters>
-    </module>
-
-    <module>
-        <name>yarpdatadumper</name>
-        <node>localhost</node>
-        <parameters>--name /datadumper/cam_right/x --txTime --rxTime --type bottle</parameters>
-    </module>
-
 
     <!-- REQUIRED CONNECTIONS -->
     <connection>
@@ -102,18 +90,6 @@
     <connection>
         <from>/visualservoing/cam_right/img:o</from>
         <to>/view/cam_right/ee</to>
-        <protocol>tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/visualservoing/cam_left/x:o</from>
-        <to>/datadumper/cam_left/x</to>
-        <protocol>tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/visualservoing/cam_right/x:o</from>
-        <to>/datadumper/cam_right/x</to>
         <protocol>tcp</protocol>
     </connection>
 

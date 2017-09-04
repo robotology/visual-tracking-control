@@ -154,6 +154,20 @@ bool VisualServoingServer::open(Searchable &config)
     yInfoVerbose("Right projection matrix = [\n" + r_proj_.toString() + "\n]");
 
 
+
+    port_pose_px_l_.open("/visualservoing/cam_left/ctrl_px:o");
+    port_pose_px_r_.open("/visualservoing/cam_right/ctrl_px:o");
+
+    port_kin_px_l_.open("/visualservoing/cam_left/kin_px:o");
+    port_kin_px_r_.open("/visualservoing/cam_right/kin_px:o");
+
+    port_goal_px_l_.open("/visualservoing/cam_left/goal_px:o");
+    port_goal_px_r_.open("/visualservoing/cam_right/goal_px:o");
+
+    port_pose_avg_.open("/visualservoing/pose/ctrl:o");
+    port_pose_goal_.open("/visualservoing/pose/goal:o");
+
+
     if (!setCommandPort())
     {
         yErrorVerbose("Could not open /visualservoing/cmd:i port!");
@@ -1300,6 +1314,47 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
         /* *** *** ***  *** *** *** *** *** *** *** *** *** *** */
 
 
+        /* *** *** *** LOG - TO BE DELETED *** *** *** */
+
+        Vector& pose_px_l = port_pose_px_l_.prepare();
+        pose_px_l = stdVectorOfVectorsToVector(getControlPixelsFromPose(eepose_averaged, CamSel::left, PixelControlMode::all));
+        port_pose_px_l_.write();
+
+        Vector& pose_px_r = port_pose_px_r_.prepare();
+        pose_px_r = stdVectorOfVectorsToVector(getControlPixelsFromPose(eepose_averaged, CamSel::right, PixelControlMode::all));
+        port_pose_px_r_.write();
+
+        Vector kin_x;
+        Vector kin_o;
+        itf_rightarm_cart_->getPose(kin_x, kin_o);
+
+        Vector& pose_kin_px_l = port_kin_px_l_.prepare();
+        pose_kin_px_l = stdVectorOfVectorsToVector(getControlPixelsFromPose(cat(kin_x, kin_o), CamSel::left, PixelControlMode::all));
+        port_kin_px_l_.write();
+
+        Vector& pose_kin_px_r = port_kin_px_r_.prepare();
+        pose_kin_px_r = stdVectorOfVectorsToVector(getControlPixelsFromPose(cat(kin_x, kin_o), CamSel::right, PixelControlMode::all));
+        port_kin_px_r_.write();
+
+        Vector& goal_px_l_ = port_goal_px_l_.prepare();
+        goal_px_l_ = stdVectorOfVectorsToVector(l_px_goal_);
+        port_goal_px_l_.write();
+
+        Vector& goal_px_r_ = port_goal_px_r_.prepare();
+        goal_px_r_ = stdVectorOfVectorsToVector(r_px_goal_);
+        port_goal_px_r_.write();
+
+        Vector& pose_avg_ = port_pose_avg_.prepare();
+        pose_avg_ = eepose_averaged;
+        port_pose_avg_.write();
+
+        Vector& pose_goal_ = port_pose_goal_.prepare();
+        pose_goal_ = goal_pose_;
+        port_pose_goal_.write();
+
+        /* *** *** *** *** *** *** *** *** *** *** *** */
+
+
         /* CHECK FOR GOAL */
         mtx_px_des_.lock();
 
@@ -2322,4 +2377,18 @@ Vector VisualServoingServer::averagePose(const Vector& l_pose, const Vector& r_p
     pose_out(6) = std::atan2(s_ang, c_ang);
 
     return pose_out;
+}
+
+
+Vector stdVectorOfVectorsToVector(const std::vector<Vector>& vectors)
+{
+    Vector v;
+
+    for (const Vector& yv : vectors)
+    {
+        v.push_back(yv[0]);
+        v.push_back(yv[1]);
+    }
+
+    return v;
 }

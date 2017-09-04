@@ -286,6 +286,21 @@ private:
 
     /* EXPERIMENTAL */
     yarp::sig::Vector averagePose(const yarp::sig::Vector& l_pose, const yarp::sig::Vector& r_pose) const;
+
+    /* LOG */
+    yarp::sig::Vector stdVectorOfVectorsToVector(const std::vector<yarp::sig::Vector>& vectors);
+
+    yarp::os::BufferedPort<yarp::sig::Vector> port_pose_px_l_;
+    yarp::os::BufferedPort<yarp::sig::Vector> port_pose_px_r_;
+
+    yarp::os::BufferedPort<yarp::sig::Vector> port_kin_px_l_;
+    yarp::os::BufferedPort<yarp::sig::Vector> port_kin_px_r_;
+
+    yarp::os::BufferedPort<yarp::sig::Vector> port_goal_px_l_;
+    yarp::os::BufferedPort<yarp::sig::Vector> port_goal_px_r_;
+
+    yarp::os::BufferedPort<yarp::sig::Vector> port_pose_avg_;
+    yarp::os::BufferedPort<yarp::sig::Vector> port_pose_goal_;
 };
 
 #endif /* VISUALSERVOINGSERVER_H */
