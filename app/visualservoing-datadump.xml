@@ -3,9 +3,9 @@
 <application>
 
     <!-- GENERIC INFORMATION -->
-    <name>visualservoing</name>
-    <description>This app allows the iCub to perform visual servoing tasks. Must be used with the hand-tracking app.</description>
-    <version>0.5.0</version>
+    <name>visualservoing-datadump</name>
+    <description>This app allows the iCub to perform visual servoing tasks and save data.</description>
+    <version>0.1.0</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
