@@ -1207,12 +1207,15 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
     endeffector_pose = port_pose_right_in_.read(true);
     eepose_copy_right = *endeffector_pose;
 
+    yInfoVerbose("Got [" + eepose_copy_right.toString() + "] end-effector pose for the right eye.");
+
     /* GET THE INITIAL END-EFFECTOR POSE AVERAGE TO BE CONTROLLED BY THE VISUAL SERVO CONTROL */
     eepose_averaged = averagePose(eepose_copy_left, eepose_copy_right);
     eepose_copy_left  = eepose_averaged;
     eepose_copy_right = eepose_averaged;
 
-    yInfoVerbose("Got [" + eepose_copy_right.toString() + "] end-effector pose for the right eye.");
+    yInfoVerbose("Got [" + eepose_averaged.toString() + "] averaged end-effector pose.");
+
 
     while (!isStopping() && !vs_goal_reached_)
     {
@@ -1999,6 +2002,17 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
         port_image_right_out_.write();
         /* *** *** ***  *** *** *** *** *** *** *** *** *** *** */
 
+        /* *** *** *** LOG - TO BE DELETED *** *** *** */
+
+        Vector& pose_avg_ = port_pose_avg_.prepare();
+        pose_avg_ = eepose_averaged;
+        port_pose_avg_.write();
+
+        Vector& pose_goal_ = port_pose_goal_.prepare();
+        pose_goal_ = goal_pose_;
+        port_pose_goal_.write();
+        
+        /* *** *** *** *** *** *** *** *** *** *** *** */
 
         /* CHECK FOR GOAL */
         mtx_px_des_.lock();
@@ -2647,37 +2661,6 @@ Vector VisualServoingServer::averagePose(const Vector& l_pose, const Vector& r_p
 }
 
 
-Vector stdVectorOfVectorsToVector(const std::vector<Vector>& vectors)
-{
-    Vector v;
-
-    for (const Vector& yv : vectors)
-    {
-        v.push_back(yv[0]);
-        v.push_back(yv[1]);
-    }
-
-    return v;
-}
-
-
-Vector VisualServoingServer::averagePose(const Vector& l_pose, const Vector& r_pose) const
-{
-    Vector pose_out = zeros(7);
-
-    pose_out.setSubvector(0, 0.5 * l_pose.subVector(0, 2) + 0.5 * r_pose.subVector(0, 2));
-
-    pose_out.setSubvector(3, 0.5 * l_pose.subVector(3, 5) + 0.5 * r_pose.subVector(3, 5));
-    pose_out.setSubvector(3, pose_out.subVector(3, 5) / norm(pose_out.subVector(3, 5)));
-
-    float s_ang = 0.5 * std::sin(l_pose(6)) + 0.5 * std::sin(r_pose(6));
-    float c_ang = 0.5 * std::cos(l_pose(6)) + 0.5 * std::cos(r_pose(6));
-    pose_out(6) = std::atan2(s_ang, c_ang);
-
-    return pose_out;
-}
-
-
 bool VisualServoingServer::checkVisualServoingStatus(const Vector& pose_cur, const double tol_position, const double tol_orientation, const double tol_angle)
 {
     bool reached_position = (norm(pose_cur.subVector(0, 2) - goal_pose_.subVector(0, 2)) < tol_position);
@@ -2691,4 +2674,18 @@ bool VisualServoingServer::checkVisualServoingStatus(const Vector& pose_cur, con
     bool reached_angle = std::abs(ang) < tol_angle;
 
     return reached_position && reached_axis && reached_angle;
+}
+
+
+Vector VisualServoingServer::stdVectorOfVectorsToVector(const std::vector<Vector>& vectors)
+{
+    Vector v;
+
+    for (const Vector& yv : vectors)
+    {
+        v.push_back(yv[0]);
+        v.push_back(yv[1]);
+    }
+
+    return v;
 }
