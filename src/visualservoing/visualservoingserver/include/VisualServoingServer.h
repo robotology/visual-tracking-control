@@ -311,6 +311,7 @@ private:
     yarp::os::BufferedPort<yarp::sig::Vector> port_goal_px_r_;
 
     yarp::os::BufferedPort<yarp::sig::Vector> port_pose_avg_;
+    yarp::os::BufferedPort<yarp::sig::Vector> port_pose_kin_;
     yarp::os::BufferedPort<yarp::sig::Vector> port_pose_goal_;
 };
 

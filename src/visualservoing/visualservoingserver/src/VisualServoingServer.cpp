@@ -155,16 +155,17 @@ bool VisualServoingServer::open(Searchable &config)
 
 
 
-    port_pose_px_l_.open("/visualservoing/cam_left/ctrl_px:o");
-    port_pose_px_r_.open("/visualservoing/cam_right/ctrl_px:o");
+    port_pose_px_l_.open("/visualservoing/cam_left/ctrl:o");
+    port_pose_px_r_.open("/visualservoing/cam_right/ctrl:o");
 
-    port_kin_px_l_.open("/visualservoing/cam_left/kin_px:o");
-    port_kin_px_r_.open("/visualservoing/cam_right/kin_px:o");
+    port_kin_px_l_.open("/visualservoing/cam_left/kin:o");
+    port_kin_px_r_.open("/visualservoing/cam_right/kin:o");
 
-    port_goal_px_l_.open("/visualservoing/cam_left/goal_px:o");
-    port_goal_px_r_.open("/visualservoing/cam_right/goal_px:o");
+    port_goal_px_l_.open("/visualservoing/cam_left/goal:o");
+    port_goal_px_r_.open("/visualservoing/cam_right/goal:o");
 
     port_pose_avg_.open("/visualservoing/pose/ctrl:o");
+    port_pose_kin_.open("/visualservoing/pose/kin:o");
     port_pose_goal_.open("/visualservoing/pose/goal:o");
 
 
@@ -199,6 +200,16 @@ bool VisualServoingServer::close()
     port_image_right_out_.interrupt();
     port_click_right_.interrupt();
 
+    port_pose_px_l_.interrupt();
+    port_pose_px_r_.interrupt();
+    port_kin_px_l_.interrupt();
+    port_kin_px_r_.interrupt();
+    port_goal_px_l_.interrupt();
+    port_goal_px_r_.interrupt();
+    port_pose_avg_.interrupt();
+    port_pose_kin_.interrupt();
+    port_pose_goal_.interrupt();
+
     yInfoVerbose("*** Interrupting VisualServoingServer done! ***");
 
 
@@ -213,6 +224,16 @@ bool VisualServoingServer::close()
     port_image_right_in_.close();
     port_image_right_out_.close();
     port_click_right_.close();
+
+    port_pose_px_l_.close();
+    port_pose_px_r_.close();
+    port_kin_px_l_.close();
+    port_kin_px_r_.close();
+    port_goal_px_l_.close();
+    port_goal_px_r_.close();
+    port_pose_avg_.close();
+    port_pose_kin_.close();
+    port_pose_goal_.close();
 
     yInfoVerbose("...removing frames...");
     itf_rightarm_cart_->removeTipFrame();
@@ -612,7 +633,6 @@ bool VisualServoingServer::storedInit(const std::string& label)
 {
     itf_rightarm_cart_->storeContext(&ctx_remote_cart_);
     itf_rightarm_cart_->restoreContext(ctx_local_cart_);
-
 
     Vector xd       = zeros(3);
     Vector od       = zeros(4);
@@ -1355,6 +1375,10 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
         pose_avg_ = eepose_averaged;
         port_pose_avg_.write();
 
+        Vector& pose_kin_ = port_pose_kin_.prepare();
+        pose_kin_ = cat(kin_x, kin_o);
+        port_pose_kin_.write();
+
         Vector& pose_goal_ = port_pose_goal_.prepare();
         pose_goal_ = goal_pose_;
         port_pose_goal_.write();
@@ -2007,6 +2031,14 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
         Vector& pose_avg_ = port_pose_avg_.prepare();
         pose_avg_ = eepose_averaged;
         port_pose_avg_.write();
+
+        Vector kin_x;
+        Vector kin_o;
+        itf_rightarm_cart_->getPose(kin_x, kin_o);
+
+        Vector& pose_kin_ = port_pose_kin_.prepare();
+        pose_kin_ = cat(kin_x, kin_o);
+        port_pose_kin_.write();
 
         Vector& pose_goal_ = port_pose_goal_.prepare();
         pose_goal_ = goal_pose_;

@@ -48,37 +48,37 @@
     <module>
         <name>yarpdatadumper</name>
         <node>localhost</node>
-        <parameters>--name /datadumper/cam_left/ctrl_px --txTime --rxTime --type bottle</parameters>
+        <parameters>--name /datadumper/cam_left/ctrl --txTime --rxTime --type bottle</parameters>
     </module>
 
     <module>
         <name>yarpdatadumper</name>
         <node>localhost</node>
-        <parameters>--name /datadumper/cam_right/ctrl_px --txTime --rxTime --type bottle</parameters>
+        <parameters>--name /datadumper/cam_right/ctrl --txTime --rxTime --type bottle</parameters>
     </module>
 
     <module>
         <name>yarpdatadumper</name>
         <node>localhost</node>
-        <parameters>--name /datadumper/cam_left/kin_px --txTime --rxTime --type bottle</parameters>
+        <parameters>--name /datadumper/cam_left/kin --txTime --rxTime --type bottle</parameters>
     </module>
 
     <module>
         <name>yarpdatadumper</name>
         <node>localhost</node>
-        <parameters>--name /datadumper/cam_right/kin_px --txTime --rxTime --type bottle</parameters>
+        <parameters>--name /datadumper/cam_right/kin --txTime --rxTime --type bottle</parameters>
     </module>
 
     <module>
         <name>yarpdatadumper</name>
         <node>localhost</node>
-        <parameters>--name /datadumper/cam_left/goal_px --txTime --rxTime --type bottle</parameters>
+        <parameters>--name /datadumper/cam_left/goal --txTime --rxTime --type bottle</parameters>
     </module>
 
     <module>
         <name>yarpdatadumper</name>
         <node>localhost</node>
-        <parameters>--name /datadumper/cam_right/goal_px --txTime --rxTime --type bottle</parameters>
+        <parameters>--name /datadumper/cam_right/goal --txTime --rxTime --type bottle</parameters>
     </module>
 
     <module>
@@ -152,38 +152,38 @@
 
     <!-- DATADUMP CONNECTIONS -->
     <connection>
-        <from>/visualservoing/cam_left/ctrl_px:o</from>
-        <to>/datadumper/cam_left/ctrl_px</to>
+        <from>/visualservoing/cam_left/ctrl:o</from>
+        <to>/datadumper/cam_left/ctrl</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/visualservoing/cam_right/ctrl_px:o</from>
-        <to>/datadumper/cam_right/ctrl_px</to>
+        <from>/visualservoing/cam_right/ctrl:o</from>
+        <to>/datadumper/cam_right/ctrl</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/visualservoing/cam_left/kin_px:o</from>
-        <to>/datadumper/cam_left/kin_px</to>
+        <from>/visualservoing/cam_left/kin:o</from>
+        <to>/datadumper/cam_left/kin</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/visualservoing/cam_right/kin_px:o</from>
-        <to>/datadumper/cam_right/kin_px</to>
+        <from>/visualservoing/cam_right/kin:o</from>
+        <to>/datadumper/cam_right/kin</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/visualservoing/cam_left/goal_px:o</from>
-        <to>/datadumper/cam_left/goal_px</to>
+        <from>/visualservoing/cam_left/goal:o</from>
+        <to>/datadumper/cam_left/goal</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/visualservoing/cam_right/goal_px:o</from>
-        <to>/datadumper/cam_right/goal_px</to>
+        <from>/visualservoing/cam_right/goal:o</from>
+        <to>/datadumper/cam_right/goal</to>
         <protocol>tcp</protocol>
     </connection>
 
@@ -194,14 +194,14 @@
     </connection>
 
     <connection>
-        <from>/visualservoing/pose/goal:o</from>
-        <to>/datadumper/pose/goal</to>
+        <from>/visualservoing/pose/kin:o</from>
+        <to>/datadumper/pose/kin</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/icub/cartesianController/right_arm/state:o</from>
-        <to>/datadumper/pose/kin</to>
+        <from>/visualservoing/pose/goal:o</from>
+        <to>/datadumper/pose/goal</to>
         <protocol>tcp</protocol>
     </connection>
 
