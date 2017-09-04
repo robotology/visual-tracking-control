@@ -28,6 +28,7 @@ int main(int argc, char **argv)
     prop_client_vs.put("verbosity", true);
     prop_client_vs.put("local",     "/VisualServoingClientTest");
     prop_client_vs.put("remote",    "/visualservoing");
+    bool use_fwd_kin = false;
 
     PolyDriver drv_client_vs(prop_client_vs);
     if (!drv_client_vs.isValid())
@@ -44,22 +45,38 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    /* Initialize facilities */
-    visual_servoing->initFacilities(true);
-    
     /* Stored set-up */
     visual_servoing->storedInit("t170427");
+
+    visual_servoing->initFacilities(use_fwd_kin);
     visual_servoing->storedGoToGoal("t170427");
 
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
 
+    visual_servoing->stopFacilities();
+
     /* Stored set-up */
     visual_servoing->storedInit("t170713");
+
+    visual_servoing->initFacilities(use_fwd_kin);
     visual_servoing->storedGoToGoal("t170713");
 
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
+
+    visual_servoing->stopFacilities();
+
+    /* Stored set-up */
+    visual_servoing->storedInit("t170904");
+
+    visual_servoing->initFacilities(use_fwd_kin);
+    visual_servoing->storedGoToGoal("t170904");
+
+    visual_servoing->checkVisualServoingController();
+    visual_servoing->waitVisualServoingDone();
+
+    visual_servoing->stopFacilities();
 
     /* Pixel go to goal */
     visual_servoing->storedInit("t170713");
@@ -71,26 +88,35 @@ int main(int argc, char **argv)
 
     std::vector<Vector> px_l = visual_servoing->getGoalPixelsFrom3DPose(x, o, IVisualServoing::CamSel::left);
     std::vector<Vector> px_r = visual_servoing->getGoalPixelsFrom3DPose(x, o, IVisualServoing::CamSel::right);
+
+    visual_servoing->initFacilities(use_fwd_kin);
     visual_servoing->goToGoal(px_l, px_r);
 
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
 
+    visual_servoing->stopFacilities();
+
     /* Pose go to goal */
     visual_servoing->storedInit("t170713");
+
+    visual_servoing->initFacilities(use_fwd_kin);
     visual_servoing->goToGoal(x, o);
 
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
 
+    visual_servoing->stopFacilities();
+
     /* Pose go to goal */
     visual_servoing->storedInit("t170713");
+
+    visual_servoing->initFacilities(use_fwd_kin);
     visual_servoing->storedGoToGoal("t170711");
 
     visual_servoing->checkVisualServoingController();
     visual_servoing->waitVisualServoingDone();
 
-    /* Close facilities */
     visual_servoing->stopFacilities();
 
     return EXIT_SUCCESS;
