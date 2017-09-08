@@ -45,29 +45,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    /* Stored set-up */
-    visual_servoing->storedInit("t170427");
-
-    visual_servoing->initFacilities(use_fwd_kin);
-    visual_servoing->storedGoToGoal("t170427");
-
-    visual_servoing->checkVisualServoingController();
-    visual_servoing->waitVisualServoingDone();
-
-    visual_servoing->stopFacilities();
-
-    /* Stored set-up */
-    visual_servoing->storedInit("t170713");
-
-    visual_servoing->initFacilities(use_fwd_kin);
-    visual_servoing->storedGoToGoal("t170713");
-
-    visual_servoing->checkVisualServoingController();
-    visual_servoing->waitVisualServoingDone();
-
-    visual_servoing->stopFacilities();
-
-    /* Stored set-up */
+    /* Stored set-up: t170904 */
     visual_servoing->storedInit("t170904");
 
     visual_servoing->initFacilities(use_fwd_kin);
@@ -78,7 +56,29 @@ int main(int argc, char **argv)
 
     visual_servoing->stopFacilities();
 
-    /* Pixel go to goal */
+    /* Stored set-up: t170427 */
+    visual_servoing->storedInit("t170427");
+
+    visual_servoing->initFacilities(use_fwd_kin);
+    visual_servoing->storedGoToGoal("t170427");
+
+    visual_servoing->checkVisualServoingController();
+    visual_servoing->waitVisualServoingDone();
+
+    visual_servoing->stopFacilities();
+
+    /* Stored set-up: t170713 */
+    visual_servoing->storedInit("t170713");
+
+    visual_servoing->initFacilities(use_fwd_kin);
+    visual_servoing->storedGoToGoal("t170713");
+
+    visual_servoing->checkVisualServoingController();
+    visual_servoing->waitVisualServoingDone();
+
+    visual_servoing->stopFacilities();
+
+    /* Pixel go to goal: t170713 */
     visual_servoing->storedInit("t170713");
 
     Vector x(3);
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 
     visual_servoing->stopFacilities();
 
-    /* Pose go to goal */
+    /* Pose go to goal: t170713 */
     visual_servoing->storedInit("t170713");
 
     visual_servoing->initFacilities(use_fwd_kin);
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
 
     visual_servoing->stopFacilities();
 
-    /* Pose go to goal */
+    /* Pose go to goal: t170713 */
     visual_servoing->storedInit("t170713");
 
     visual_servoing->initFacilities(use_fwd_kin);
