@@ -1373,11 +1373,11 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
         /* *** *** *** LOG - TO BE DELETED *** *** *** */
 
         Vector& pose_px_l = port_pose_px_l_.prepare();
-        pose_px_l = stdVectorOfVectorsToVector(getControlPixelsFromPose(eepose_averaged, CamSel::left, PixelControlMode::all));
+        pose_px_l = stdVectorOfVectorsToVector(getControlPixelsFromPose(eepose_copy_left, CamSel::left, PixelControlMode::all));
         port_pose_px_l_.write();
 
         Vector& pose_px_r = port_pose_px_r_.prepare();
-        pose_px_r = stdVectorOfVectorsToVector(getControlPixelsFromPose(eepose_averaged, CamSel::right, PixelControlMode::all));
+        pose_px_r = stdVectorOfVectorsToVector(getControlPixelsFromPose(eepose_copy_right, CamSel::right, PixelControlMode::all));
         port_pose_px_r_.write();
 
         Vector kin_x;
