@@ -2660,9 +2660,6 @@ bool VisualServoingServer::setCameraTransformations()
     if (!itf_gaze_->getRightEyePose(right_eye_x, right_eye_o))
         return false;
 
-    yInfoVerbose("left_eye_o = ["  + left_eye_o.toString()  + "]");
-    yInfoVerbose("right_eye_o = [" + right_eye_o.toString() + "]");
-
 
     l_H_eye_to_r_ = axis2dcm(left_eye_o);
     left_eye_x.push_back(1.0);
@@ -2700,16 +2697,11 @@ bool VisualServoingServer::setPixelGoal(const std::vector<Vector>& l_px_goal, co
 
     for (unsigned int i = 0; i < l_px_goal_.size(); ++i)
     {
-        yInfoVerbose("Left goal pixels #"  + std::to_string(i) + " = [" + l_px_goal_[i].toString() + "]");
-        yInfoVerbose("Right goal pixels #" + std::to_string(i) + " = [" + r_px_goal_[i].toString() + "]");
-
         px_des_[3 * i    ] = l_px_goal_[i][0];   /* l_u_xi */
         px_des_[3 * i + 1] = r_px_goal_[i][0];   /* r_u_xi */
         px_des_[3 * i + 2] = l_px_goal_[i][1];   /* l_v_xi */
         px_des_[3 * i + 3] = r_px_goal_[i][1];   /* r_v_xi */
     }
-
-    yInfoVerbose("Desired goal pixels = ["  + px_des_.toString() + "]");
 
     return true;
 }
