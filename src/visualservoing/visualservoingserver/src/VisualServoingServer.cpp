@@ -1758,6 +1758,50 @@ void VisualServoingServer::robustImageBasedVisualServoControl()
         port_image_right_out_.write();
         /* *** *** ***  *** *** *** *** *** *** *** *** *** *** */
 
+        /* *** *** *** LOG - TO BE DELETED *** *** *** */
+
+        Vector& pose_px_l = port_pose_px_l_.prepare();
+        pose_px_l = stdVectorOfVectorsToVector(getControlPixelsFromPose(eepose_copy_left, CamSel::left, PixelControlMode::all));
+        port_pose_px_l_.write();
+
+        Vector& pose_px_r = port_pose_px_r_.prepare();
+        pose_px_r = stdVectorOfVectorsToVector(getControlPixelsFromPose(eepose_copy_right, CamSel::right, PixelControlMode::all));
+        port_pose_px_r_.write();
+
+        Vector kin_x;
+        Vector kin_o;
+        itf_rightarm_cart_->getPose(kin_x, kin_o);
+
+        Vector& pose_kin_px_l = port_kin_px_l_.prepare();
+        pose_kin_px_l = stdVectorOfVectorsToVector(getControlPixelsFromPose(cat(kin_x, kin_o), CamSel::left, PixelControlMode::all));
+        port_kin_px_l_.write();
+
+        Vector& pose_kin_px_r = port_kin_px_r_.prepare();
+        pose_kin_px_r = stdVectorOfVectorsToVector(getControlPixelsFromPose(cat(kin_x, kin_o), CamSel::right, PixelControlMode::all));
+        port_kin_px_r_.write();
+
+        Vector& goal_px_l_ = port_goal_px_l_.prepare();
+        goal_px_l_ = stdVectorOfVectorsToVector(l_px_goal_);
+        port_goal_px_l_.write();
+
+        Vector& goal_px_r_ = port_goal_px_r_.prepare();
+        goal_px_r_ = stdVectorOfVectorsToVector(r_px_goal_);
+        port_goal_px_r_.write();
+
+        Vector& pose_avg_ = port_pose_avg_.prepare();
+        pose_avg_ = eepose_averaged;
+        port_pose_avg_.write();
+
+        Vector& pose_kin_ = port_pose_kin_.prepare();
+        pose_kin_ = cat(kin_x, kin_o);
+        port_pose_kin_.write();
+
+        Vector& pose_goal_ = port_pose_goal_.prepare();
+        pose_goal_ = goal_pose_;
+        port_pose_goal_.write();
+
+        /* *** *** *** *** *** *** *** *** *** *** *** */
+
 
         /* CHECK FOR GOAL */
         mtx_px_des_.lock();
