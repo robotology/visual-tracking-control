@@ -45,6 +45,9 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
+    /* Set visual servoing control*/
+    visual_servoing->setVisualServoControl("decoupled");
+
     /* Stored set-up: t170904 */
     visual_servoing->storedInit("t170904");
 
