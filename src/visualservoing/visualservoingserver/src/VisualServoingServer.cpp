@@ -2578,16 +2578,16 @@ void VisualServoingServer::getCurrentStereoFeaturesAndJacobian(const std::vector
         const Vector& r_v = (*iter_right_px);
 
         /* FEATURES */
-        features[3 * offset    ] = l_v[0];  /* l_u_xi */
-        features[3 * offset + 1] = r_v[0];  /* r_u_xi */
-        features[3 * offset + 2] = l_v[1];  /* l_v_xi */
-        features[3 * offset + 3] = r_v[1];  /* r_v_xi */
+        features[4 * offset    ] = l_v[0];  /* l_u_xi */
+        features[4 * offset + 1] = r_v[0];  /* r_u_xi */
+        features[4 * offset + 2] = l_v[1];  /* l_v_xi */
+        features[4 * offset + 3] = r_v[1];  /* r_v_xi */
 
         /* JACOBIAN */
-        jacobian.setRow(3 * offset,      getJacobianU(CamSel::left,  l_v));
-        jacobian.setRow(3 * offset + 1,  getJacobianU(CamSel::right, r_v));
-        jacobian.setRow(3 * offset + 2,  getJacobianV(CamSel::left,  l_v));
-        jacobian.setRow(3 * offset + 3,  getJacobianV(CamSel::right, r_v));
+        jacobian.setRow(4 * offset,      getJacobianU(CamSel::left,  l_v));
+        jacobian.setRow(4 * offset + 1,  getJacobianU(CamSel::right, r_v));
+        jacobian.setRow(4 * offset + 2,  getJacobianV(CamSel::left,  l_v));
+        jacobian.setRow(4 * offset + 3,  getJacobianV(CamSel::right, r_v));
 
         ++iter_left_px;
         ++iter_right_px;
@@ -2697,10 +2697,10 @@ bool VisualServoingServer::setPixelGoal(const std::vector<Vector>& l_px_goal, co
 
     for (unsigned int i = 0; i < l_px_goal_.size(); ++i)
     {
-        px_des_[3 * i    ] = l_px_goal_[i][0];   /* l_u_xi */
-        px_des_[3 * i + 1] = r_px_goal_[i][0];   /* r_u_xi */
-        px_des_[3 * i + 2] = l_px_goal_[i][1];   /* l_v_xi */
-        px_des_[3 * i + 3] = r_px_goal_[i][1];   /* r_v_xi */
+        px_des_[4 * i    ] = l_px_goal_[i][0];   /* l_u_xi */
+        px_des_[4 * i + 1] = r_px_goal_[i][0];   /* r_u_xi */
+        px_des_[4 * i + 2] = l_px_goal_[i][1];   /* l_v_xi */
+        px_des_[4 * i + 3] = r_px_goal_[i][1];   /* r_v_xi */
     }
 
     return true;
