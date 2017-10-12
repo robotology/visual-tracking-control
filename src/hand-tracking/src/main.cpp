@@ -13,7 +13,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/cuda.hpp>
 
-#include "BrownianMotion.h"
+#include "CartesianAxisAngleBrownianMotion.h"
 #include "CartesianAxisAnglePrediction.h"
 #include "iCubGatePose.h"
 #include "iCubFwdKinMotion.h"
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
 
     /* MOTION MODEL */
-    std::unique_ptr<StateModel> brown(new BrownianMotion(0.005, 0.005, 3.0, 2.5, 1));
+    std::unique_ptr<StateModel> brown(new CartesianAxisAngleBrownianMotion(0.005, 0.005, 3.0, 2.5, 1));
     std::unique_ptr<StateModel> icub_motion;
     if (!play)
     {

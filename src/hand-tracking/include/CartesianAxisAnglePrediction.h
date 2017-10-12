@@ -4,7 +4,7 @@
 #include <memory>
 #include <random>
 
-#include <BayesFilters/ParticleFilterPrediction.h>
+#include <BayesFilters/PFPrediction.h>
 #include <BayesFilters/StateModel.h>
 
 namespace bfl {
@@ -12,36 +12,23 @@ namespace bfl {
 }
 
 
-class bfl::CartesianAxisAnglePrediction : public bfl::ParticleFilterPrediction
+class bfl::CartesianAxisAnglePrediction : public bfl::PFPrediction
 {
 public:
-    /* Default constructor, disabled */
-    CartesianAxisAnglePrediction() = delete;
+    CartesianAxisAnglePrediction(std::unique_ptr<StateModel> state_model_) noexcept;
 
-    /* PF prediction constructor */
-    CartesianAxisAnglePrediction(std::unique_ptr<StateModel> transition_model) noexcept;
-
-    /* Destructor */
-    ~CartesianAxisAnglePrediction() noexcept override;
-
-    /* Move constructor */
     CartesianAxisAnglePrediction(CartesianAxisAnglePrediction&& pf_prediction) noexcept;
 
-    /* Move assignment operator */
+    ~CartesianAxisAnglePrediction() noexcept;
+
     CartesianAxisAnglePrediction& operator=(CartesianAxisAnglePrediction&& pf_prediction) noexcept;
 
-    void predict(const Eigen::Ref<const Eigen::VectorXf>& prev_state, Eigen::Ref<Eigen::VectorXf> pred_state) override;
+    void predict(const Eigen::Ref<const Eigen::MatrixXf>& prev_state, Eigen::Ref<Eigen::MatrixXf> pred_state) override;
 
-    void motion(const Eigen::Ref<const Eigen::VectorXf>& cur_state, Eigen::Ref<Eigen::VectorXf> prop_state) override;
-
-    void motionDisturbance(Eigen::Ref<Eigen::VectorXf> sample) override;
-
-    bool setStateModelProperty(const std::string& property) override;
+    StateModel& getStateModel() override;
 
 protected:
     std::unique_ptr<StateModel> state_model_;
-
-    void addAxisangleDisturbance(Eigen::Ref<Eigen::Vector4f> current_vec, const Eigen::Ref<const Eigen::Vector4f>& disturbance_vec);
 };
 
 #endif /* DRAWPOSE_H */
