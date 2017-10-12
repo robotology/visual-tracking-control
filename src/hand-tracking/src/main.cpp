@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
     /* CORRECTION */
     std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_count));
 
-    std::unique_ptr<VisualCorrection> vpf_correction_gated;
+    std::unique_ptr<PFVisualCorrection> vpf_correction_gated;
     if (!play)
     {
         std::unique_ptr<iCubGatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_correction),

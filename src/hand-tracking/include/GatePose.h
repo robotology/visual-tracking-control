@@ -3,40 +3,30 @@
 
 #include <string>
 
-#include <BayesFilters/VisualCorrectionDecorator.h>
+#include <BayesFilters/PFVisualCorrectionDecorator.h>
 #include <BayesFilters/StateModel.h>
 
 
-class GatePose : public bfl::VisualCorrectionDecorator
+class GatePose : public bfl::PFVisualCorrectionDecorator
 {
 public:
-    /* Constructor */
-    GatePose(std::unique_ptr<VisualCorrection> visual_correction,
+    GatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
              const double gate_x, const double gate_y, const double gate_z,
              const double gate_rotation,
              const double gate_aperture) noexcept;
 
-    GatePose(std::unique_ptr<VisualCorrection> visual_correction) noexcept;
+    GatePose(std::unique_ptr<PFVisualCorrection> visual_correction) noexcept;
 
-    /* Default constructor, disabled */
-    GatePose() = delete;
+    ~GatePose() noexcept;
 
-    /* Destructor */
-    ~GatePose() noexcept override;
+    void correct(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, const Eigen::Ref<const Eigen::VectorXf>& pred_weights, cv::InputArray measurements,
+                 Eigen::Ref<Eigen::MatrixXf> cor_states, Eigen::Ref<Eigen::VectorXf> cor_weights) override;
 
-    /* Move constructor, disabled */
-    GatePose(GatePose&& visual_correction) = delete;
+    void innovation(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> innovations) override;
 
-    /* Move assignment operator, disabled */
-    GatePose& operator=(GatePose&& visual_correction) = delete;
+    double likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovations) override;
 
-    void correct(const Eigen::Ref<const Eigen::MatrixXf>& pred_state, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> cor_state) override;
-
-    void innovation(const Eigen::Ref<const Eigen::MatrixXf>& pred_state, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> innovation) override;
-
-    void likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovation, Eigen::Ref<Eigen::MatrixXf> cor_state) override;
-
-    bool setObservationModelProperty(const std::string& property) override;
+    bfl::VisualObservationModel& getVisualObservationModel() override;
 
 protected:
     virtual Eigen::VectorXd readPose() = 0;

@@ -13,17 +13,15 @@
 class iCubGatePose : public GatePose
 {
 public:
-    /* Constructor */
-    iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+    iCubGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
                  const double gate_x, const double gate_y, const double gate_z,
                  const double gate_aperture,
                  const double gate_rotation,
                  const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
-    iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+    iCubGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
                  const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
-    /* Destructor */
     ~iCubGatePose() noexcept override;
 
 protected:
