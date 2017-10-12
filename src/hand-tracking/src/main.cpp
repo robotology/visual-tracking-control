@@ -16,9 +16,9 @@
 #include "CartesianAxisAngleBrownianMotion.h"
 #include "CartesianAxisAnglePrediction.h"
 #include "iCubGatePose.h"
-#include "iCubFwdKinMotion.h"
+#include "iCubFwdKinModel.h"
 #include "InitiCubArm.h"
-#include "PlayFwdKinMotion.h"
+#include "PlayFwdKinModel.h"
 #include "PlayGatePose.h"
 #include "ResamplingWithPrior.h"
 #include "VisualProprioception.h"
@@ -88,12 +88,12 @@ int main(int argc, char *argv[])
     std::unique_ptr<StateModel> icub_motion;
     if (!play)
     {
-        std::unique_ptr<iCubFwdKinMotion> icub_fwdkin(new iCubFwdKinMotion(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
+        std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
         icub_motion = std::move(icub_fwdkin);
     }
     else
     {
-        std::unique_ptr<PlayFwdKinMotion> play_fwdkin(new PlayFwdKinMotion(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
+        std::unique_ptr<PlayFwdKinModel> play_fwdkin(new PlayFwdKinModel(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
         icub_motion = std::move(play_fwdkin);
     }
 

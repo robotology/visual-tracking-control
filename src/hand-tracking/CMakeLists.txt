@@ -27,10 +27,10 @@ set(${EXE_TARGET_NAME}_HDR
         include/CartesianAxisAngleBrownianMotion.h
         include/CartesianAxisAnglePrediction.h
         include/GatePose.h
-        include/iCubFwdKinMotion.h
+        include/iCubFwdKinModel.h
         include/iCubGatePose.h
         include/InitiCubArm.h
-        include/PlayFwdKinMotion.h
+        include/PlayFwdKinModel.h
         include/PlayGatePose.h
         include/ResamplingWithPrior.h
         include/VisualProprioception.h
@@ -42,10 +42,10 @@ set(${EXE_TARGET_NAME}_SRC
         src/CartesianAxisAngleBrownianMotion.cpp
         src/CartesianAxisAnglePrediction.cpp
         src/GatePose.cpp
-        src/iCubFwdKinMotion.cpp
+        src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
         src/InitiCubArm.cpp
-        src/PlayFwdKinMotion.cpp
+        src/PlayFwdKinModel.cpp
         src/PlayGatePose.cpp
         src/ResamplingWithPrior.cpp
         src/VisualProprioception.cpp

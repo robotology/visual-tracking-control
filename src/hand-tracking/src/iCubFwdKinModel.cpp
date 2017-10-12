@@ -1,4 +1,4 @@
-#include "iCubFwdKinMotion.h"
+#include "iCubFwdKinModel.h"
 
 #include <exception>
 #include <functional>
@@ -8,6 +8,7 @@
 #include <yarp/os/Property.h>
 #include <yarp/os/LogStream.h>
 
+using namespace bfl;
 using namespace Eigen;
 using namespace iCub::ctrl;
 using namespace iCub::iKin;
@@ -16,8 +17,8 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-iCubFwdKinMotion::iCubFwdKinMotion(std::unique_ptr<StateModel> state_model, const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
-    bfl::StateModelDecorator(std::move(state_model)),
+iCubFwdKinModel::iCubFwdKinModel(std::unique_ptr<StateModel> state_model, const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
+    StateModelDecorator(std::move(state_model)),
     icub_kin_arm_(iCubArm(laterality+"_v2")),
     robot_(robot), laterality_(laterality), port_prefix_(port_prefix),
     delta_hand_pose_(VectorXd::Zero(7)), delta_angle_(0.0)
@@ -97,50 +98,46 @@ iCubFwdKinMotion::iCubFwdKinMotion(std::unique_ptr<StateModel> state_model, cons
 }
 
 
-iCubFwdKinMotion::~iCubFwdKinMotion() noexcept
+iCubFwdKinModel::~iCubFwdKinModel() noexcept
 {
     drv_arm_enc_.close();
     drv_torso_enc_.close();
 }
 
 
-iCubFwdKinMotion::iCubFwdKinMotion(iCubFwdKinMotion&& state_model) noexcept :
-    bfl::StateModelDecorator(std::move(state_model)) { }
-
-
-iCubFwdKinMotion& iCubFwdKinMotion::operator=(iCubFwdKinMotion&& state_model) noexcept
+void iCubFwdKinModel::propagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> prop_state)
 {
-    bfl::StateModelDecorator::operator=(std::move(state_model));
+    MatrixXf temp_state(cur_state.rows(), cur_state.cols());
+    iCubFwdKinPropagate(cur_state, temp_state);
 
-    return *this;
+    StateModelDecorator::propagate(temp_state, prop_state);
 }
 
 
-void iCubFwdKinMotion::propagate(const Ref<const VectorXf>& cur_state, Ref<VectorXf> prop_state)
+void iCubFwdKinModel::motion(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> mot_state)
 {
-    prop_state.head<3>() = cur_state.head<3>() + delta_hand_pose_.head<3>().cast<float>();
+    MatrixXf temp_state(cur_state.rows(), cur_state.cols());
+    iCubFwdKinPropagate(cur_state, temp_state);
 
-    prop_state.middleRows<3>(3) = (cur_state.middleRows<3>(3) + delta_hand_pose_.middleRows<3>(3).cast<float>()).normalized();
-
-    float   ang = cur_state(6) + static_cast<float>(delta_angle_);
-    if      (ang >   M_PI) ang -= 2.0 * M_PI;
-    else if (ang <= -M_PI) ang += 2.0 * M_PI;
-
-    prop_state(6) = ang;
-
-    bfl::StateModelDecorator::propagate(prop_state, prop_state);
+    StateModelDecorator::motion(temp_state, mot_state);
 }
 
 
-void iCubFwdKinMotion::noiseSample(Ref<VectorXf> sample)
+MatrixXf iCubFwdKinModel::getNoiseSample(const int num)
 {
-    bfl::StateModelDecorator::noiseSample(sample);
+    return StateModelDecorator::getNoiseSample(num);
 }
 
 
-bool iCubFwdKinMotion::setProperty(const std::string& property)
+MatrixXf iCubFwdKinModel::getNoiseCovariance()
 {
-    if (!bfl::StateModelDecorator::setProperty(property))
+    return StateModelDecorator::getNoiseCovariance();
+}
+
+
+bool iCubFwdKinModel::setProperty(const std::string& property)
+{
+    if (!StateModelDecorator::setProperty(property))
         if (property == "ICFW_DELTA")
             return setDeltaMotion();
 
@@ -148,7 +145,7 @@ bool iCubFwdKinMotion::setProperty(const std::string& property)
 }
 
 
-Vector iCubFwdKinMotion::readTorso()
+Vector iCubFwdKinModel::readTorso()
 {
     int torso_enc_num;
     itf_torso_enc_->getAxes(&torso_enc_num);
@@ -162,7 +159,7 @@ Vector iCubFwdKinMotion::readTorso()
 }
 
 
-Vector iCubFwdKinMotion::readRootToEE()
+Vector iCubFwdKinModel::readRootToEE()
 {
     int arm_enc_num;
     itf_arm_enc_->getAxes(&arm_enc_num);
@@ -180,7 +177,7 @@ Vector iCubFwdKinMotion::readRootToEE()
 }
 
 
-bool iCubFwdKinMotion::setDeltaMotion()
+bool iCubFwdKinModel::setDeltaMotion()
 {
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     Map<VectorXd> cur_ee_pose(ee_pose.data(), 7, 1);
@@ -196,4 +193,23 @@ bool iCubFwdKinMotion::setDeltaMotion()
     prev_ee_pose_ = cur_ee_pose;
 
     return true;
+}
+
+
+void iCubFwdKinModel::iCubFwdKinPropagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> prop_state)
+{
+    prop_state.topRows<3>() = cur_state.topRows<3>().colwise() + delta_hand_pose_.head<3>().cast<float>();
+
+    prop_state.middleRows<3>(3) = (cur_state.middleRows<3>(3).colwise() + delta_hand_pose_.middleRows<3>(3).cast<float>());
+    prop_state.middleRows<3>(3).colwise().normalize();
+
+    RowVectorXf ang = cur_state.bottomRows<1>().array() + static_cast<float>(delta_angle_);
+
+    for (unsigned int i = 0; i < ang.cols(); ++i)
+    {
+        if      (ang(i) >   M_PI) ang(i) -= 2.0 * M_PI;
+        else if (ang(i) <= -M_PI) ang(i) += 2.0 * M_PI;
+    }
+
+    prop_state.bottomRows<1>() = ang;
 }
