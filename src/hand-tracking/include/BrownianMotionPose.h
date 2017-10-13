@@ -42,7 +42,8 @@ protected:
     float                                 q_z_;         /* Noise standard deviation for x-y 3D position */
     float                                 theta_;       /* Noise standard deviation for axis-angle rotation */
     float                                 cone_angle_;  /* Noise standard deviation for axis-angle axis cone */
-    Eigen::Vector4f                       cone_dir_;    /* Cone direction of rotation */
+
+    Eigen::Vector4f                       cone_dir_;    /* Cone direction of rotation. Fixed, left here for future implementation. */
 
     std::mt19937_64                       generator_;
     std::normal_distribution<float>       distribution_pos_xy_;
