@@ -48,11 +48,11 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     }
     else
     {
-        yWarning() << log_ID_ << "[CAM PARAMS]" << "No intrinisc camera information could be found by the ctor. Looking for fallback values in parameters.ini.";
+        yWarning() << log_ID_ << "[CAM PARAMS]" << "No intrinisc camera information could be found by the ctor. Looking for fallback values in config.ini.";
 
         rf.setVerbose();
         rf.setDefaultContext(context);
-        rf.setDefaultConfigFile("parameters.ini");
+        rf.setDefaultConfigFile("config.ini");
         rf.configure(0, YARP_NULLPTR);
 
         Bottle* fallback_intrinsic = rf.findGroup("FALLBACK").find("intrinsic_" + cam_sel_).asList();
@@ -69,7 +69,7 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
         }
         else
         {
-            yWarning() << log_ID_ << "[CAM PARAMS]" << "No fallback values could be found in parameters.ini by the ctor for the intrinisc camera parameters. Falling (even more) back to iCub_SIM values.";
+            yWarning() << log_ID_ << "[CAM PARAMS]" << "No fallback values could be found in config.ini by the ctor for the intrinisc camera parameters. Falling (even more) back to iCub_SIM values.";
             cam_width_  = 320;
             cam_height_ = 240;
             cam_fx_     = 257.34;
