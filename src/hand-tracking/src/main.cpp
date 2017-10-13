@@ -68,10 +68,10 @@ int main(int argc, char *argv[])
     rf.configure(argc, argv);
 
     FilteringParamtersD paramsd;
-    paramsd["play"]          = rf.findGroup("PF").check("play",          Value(1.0)).asDouble();
     paramsd["num_particles"] = rf.findGroup("PF").check("num_particles", Value(50.0)).asDouble();
     paramsd["gpu_count"]     = rf.findGroup("PF").check("gpu_count",     Value(1.0)).asDouble();
     paramsd["num_images"]    = paramsd["num_particles"] / paramsd["gpu_count"];
+    paramsd["play"]          = rf.findGroup("PF").check("play",          Value(1.0)).asDouble();
 
     paramsd["q_xy"]       = rf.findGroup("BROWNIANMOTION").check("q_xy",       Value(0.005)).asDouble();
     paramsd["q_z"]        = rf.findGroup("BROWNIANMOTION").check("q_z",        Value(0.005)).asDouble();
@@ -97,8 +97,25 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - robot:"         << paramss["robot"];
     yInfo() << log_ID << " - cam_sel:"       << paramss["cam_sel"];
     yInfo() << log_ID << " - laterality:"    << paramss["laterality"];
-    yInfo() << log_ID << " - play:"          << (paramsd["play"] == 1.0 ? "true" : "false");
+
     yInfo() << log_ID << " - num_particles:" << paramsd["num_particles"];
+    yInfo() << log_ID << " - gpu_count:"     << paramsd["gpu_count"];
+    yInfo() << log_ID << " - num_images:"    << paramsd["num_images"];
+    yInfo() << log_ID << " - play:"          << (paramsd["play"] == 1.0 ? "true" : "false");
+
+    yInfo() << log_ID << " - q_xy:"       << paramsd["q_xy"];
+    yInfo() << log_ID << " - q_z:"        << paramsd["q_z"];
+    yInfo() << log_ID << " - theta:"      << paramsd["theta"];
+    yInfo() << log_ID << " - cone_angle:" << paramsd["cone_angle"];
+    yInfo() << log_ID << " - seed:"       << paramsd["seed"];
+
+    yInfo() << log_ID << " - likelihood_gain:" << paramsd["likelihood_gain"];
+
+    yInfo() << log_ID << " - gate_x:"        << paramsd["gate_x"];
+    yInfo() << log_ID << " - gate_y:"        << paramsd["gate_y"];
+    yInfo() << log_ID << " - gate_z:"        << paramsd["gate_z"];
+    yInfo() << log_ID << " - gate_aperture:" << paramsd["gate_aperture"];
+    yInfo() << log_ID << " - gate_rotation:" << paramsd["gate_rotation"];
 
 
     /* INITIALIZATION */
