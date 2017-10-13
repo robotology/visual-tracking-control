@@ -29,7 +29,7 @@ using yarp::sig::PixelRgb;
 
 
 VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<Initialization> initialization,
-                                                 std::unique_ptr<ParticleFilterPrediction> prediction, std::unique_ptr<VisualCorrection> correction,
+                                                 std::unique_ptr<PFPrediction> prediction, std::unique_ptr<PFVisualCorrection> correction,
                                                  std::unique_ptr<Resampling> resampling,
                                                  const ConstString& cam_sel, const ConstString& laterality, const int num_particles) :
     initialization_(std::move(initialization)), prediction_(std::move(prediction)), correction_(std::move(correction)), resampling_(std::move(resampling)),
@@ -49,21 +49,24 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<Initialization>
 }
 
 
+void VisualSIRParticleFilter::initialization()
+{
+    pred_particle_ = MatrixXf(7, num_particles_);
+    pred_weight_   = VectorXf(num_particles_, 1);
+
+    cor_particle_ = MatrixXf(7, num_particles_);
+    cor_weight_   = VectorXf(num_particles_, 1);
+
+    initialization_->initialize(pred_particle_, pred_weight_);
+
+    prediction_->getStateModel().setProperty("ICFW_PLAY_INIT");
+}
+
+
 VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
 {
     port_image_in_.close();
     port_estimates_out_.close();
-}
-
-
-void VisualSIRParticleFilter::initialization()
-{
-    particle_ = MatrixXf(7, num_particles_);
-    weight_   = VectorXf(num_particles_, 1);
-
-    initialization_->initialize(particle_, weight_);
-
-    prediction_->setStateModelProperty("ICFW_PLAY_INIT");
 }
 
 
@@ -77,10 +80,6 @@ void VisualSIRParticleFilter::filteringStep()
     ImageOf<PixelRgb>* img_in = port_image_in_.read(true);
     if (img_in != YARP_NULLPTR)
     {
-        MatrixXf temp_particle(7, num_particles_);
-        VectorXf temp_weight(num_particles_, 1);
-        VectorXf temp_parent(num_particles_, 1);
-
         /* PROCESS CURRENT MEASUREMENT */
         Mat measurement;
 
@@ -91,23 +90,29 @@ void VisualSIRParticleFilter::filteringStep()
         descriptors_cam_cuda.download(descriptors_cam_left);
 
         /* PREDICTION */
-        VectorXf sorted_pred = weight_;
-        std::sort(sorted_pred.data(), sorted_pred.data() + sorted_pred.size());
-        float threshold = sorted_pred.tail(6)(0);
-
-        prediction_->setStateModelProperty("ICFW_DELTA");
-        for (int j = 0; j < num_particles_; ++j)
+        if (getFilteringStep() != 0)
         {
-            if (weight_(j) <= threshold)
-                prediction_->predict(particle_.col(j), particle_.col(j));
-            else
-                prediction_->motion(particle_.col(j), particle_.col(j));
+            VectorXf sorted_cor = cor_weight_;
+            std::sort(sorted_cor.data(), sorted_cor.data() + sorted_cor.size());
+            float threshold = sorted_cor.tail(6)(0);
+
+            prediction_->getStateModel().setProperty("ICFW_DELTA");
+            for (int j = 0; j < num_particles_; ++j)
+            {
+                if (cor_weight_(j) <= threshold)
+                    prediction_->getStateModel().motion(cor_particle_.col(j), pred_particle_.col(j));
+                else
+                    prediction_->getStateModel().propagate(cor_particle_.col(j), pred_particle_.col(j));
+            }
+
+            pred_weight_ = cor_weight_;
         }
 
         /* CORRECTION */
-        correction_->setObservationModelProperty("VP_PARAMS");
-        correction_->correct(particle_, descriptors_cam_left, weight_);
-        weight_ /= weight_.sum();
+        correction_->getVisualObservationModel().setProperty("VP_PARAMS");
+        correction_->correct(pred_particle_, pred_weight_, descriptors_cam_left,
+                             cor_particle_, cor_weight_);
+        cor_weight_ /= cor_weight_.sum();
 
 
         /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
@@ -115,23 +120,23 @@ void VisualSIRParticleFilter::filteringStep()
         switch (ext_mode)
         {
             case EstimatesExtraction::mean :
-                out_particle = mean(particle_, weight_);
+                out_particle = mean(cor_particle_, cor_weight_);
                 break;
 
             case EstimatesExtraction::mode :
-                out_particle = mode(particle_, weight_);
+                out_particle = mode(cor_particle_, cor_weight_);
                 break;
 
             case EstimatesExtraction::sm_average :
-                out_particle = smAverage(particle_, weight_);
+                out_particle = smAverage(cor_particle_, cor_weight_);
                 break;
 
             case EstimatesExtraction::wm_average :
-                out_particle = wmAverage(particle_, weight_);
+                out_particle = wmAverage(cor_particle_, cor_weight_);
                 break;
 
             case EstimatesExtraction::em_average :
-                out_particle = emAverage(particle_, weight_);
+                out_particle = emAverage(cor_particle_, cor_weight_);
                 break;
 
             default:
@@ -142,17 +147,21 @@ void VisualSIRParticleFilter::filteringStep()
 
         /* RESAMPLING */
         std::cout << "Step: " << getFilteringStep() << std::endl;
-        std::cout << "Neff: " << resampling_->neff(weight_) << std::endl;
-        if (resampling_->neff(weight_) < std::round(num_particles_ / 5.f))
+        std::cout << "Neff: " << resampling_->neff(cor_weight_) << std::endl;
+        if (resampling_->neff(cor_weight_) < std::round(num_particles_ / 5.f))
         {
             std::cout << "Resampling!" << std::endl;
 
-            resampling_->resample(particle_, weight_,
-                                  temp_particle, temp_weight,
-                                  temp_parent);
+            MatrixXf res_particle(7, num_particles_);
+            VectorXf res_weight(num_particles_, 1);
+            VectorXf res_parent(num_particles_, 1);
 
-            particle_ = temp_particle;
-            weight_   = temp_weight;
+            resampling_->resample(cor_particle_, cor_weight_,
+                                  res_particle, res_weight,
+                                  res_parent);
+
+            cor_particle_ = res_particle;
+            cor_weight_   = res_weight;
         }
 
         /* STATE ESTIMATE OUTPUT */
@@ -267,9 +276,9 @@ bool VisualSIRParticleFilter::stop_filter()
 bool VisualSIRParticleFilter::use_analogs(const bool status)
 {
     if (status)
-        return correction_->setObservationModelProperty("VP_ANALOGS_ON");
+        return correction_->getVisualObservationModel().setProperty("VP_ANALOGS_ON");
     else
-        return correction_->setObservationModelProperty("VP_ANALOGS_OFF");
+        return correction_->getVisualObservationModel().setProperty("VP_ANALOGS_OFF");
 }
 
 

@@ -20,39 +20,34 @@
 class VisualProprioception : public bfl::VisualObservationModel
 {
 public:
-    /* VisualProprioception constructor */
-    VisualProprioception(const int num_images, const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const yarp::os::ConstString& context);
+    VisualProprioception(const bool use_thumb, const bool use_forearm, const int num_images,
+                         const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const yarp::os::ConstString& context);
 
-    /* Destructor */
-    ~VisualProprioception() noexcept override;
-
-    /* Copy constructor */
     VisualProprioception(const VisualProprioception& proprio);
 
-    /* Move constructor */
     VisualProprioception(VisualProprioception&& proprio) noexcept;
 
-    /* Copy assignment operator */
+    ~VisualProprioception() noexcept;
+
     VisualProprioception& operator=(const VisualProprioception& proprio);
 
-    /* Move assignment operator */
     VisualProprioception& operator=(VisualProprioception&& proprio) noexcept;
 
-    void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, cv::OutputArray observation) override;
+    void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_states, cv::OutputArray observations) override;
 
     bool setProperty(const std::string property) override;
 
-
-    int          getOGLTilesNumber();
-    int          getOGLTilesRows();
-    int          getOGLTilesCols();
+    int getOGLTilesNumber();
+    int getOGLTilesRows();
+    int getOGLTilesCols();
 
     unsigned int getCamWidth();
     unsigned int getCamHeight();
-    float        getCamFx();
-    float        getCamFy();
-    float        getCamCx();
-    float        getCamCy();
+
+    float getCamFx();
+    float getCamFy();
+    float getCamCx();
+    float getCamCy();
 
 protected:
     yarp::os::ConstString    log_ID_ = "[VisualProprioception]";
@@ -85,7 +80,7 @@ protected:
 
     void              setArmJoints(const yarp::sig::Vector& q, const yarp::sig::Vector& analogs, const yarp::sig::Matrix& analog_bounds);
 
-    void              getModelPose(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, std::vector<Superimpose::ModelPoseContainer>& hand_poses);
+    void              getModelPose(const Eigen::Ref<const Eigen::MatrixXf>& cur_states, std::vector<Superimpose::ModelPoseContainer>& hand_poses);
 
     yarp::sig::Vector readArmEncoders();
     yarp::sig::Vector readTorso();
@@ -93,16 +88,18 @@ protected:
     yarp::sig::Vector readRootToEye(const yarp::os::ConstString cam_sel);
     /* **** */
 
-    yarp::os::ConstString     cam_sel_;
-    double                    cam_x_[3];
-    double                    cam_o_[4];
-    unsigned int              cam_width_;
-    unsigned int              cam_height_;
-    float                     cam_fx_;
-    float                     cam_cx_;
-    float                     cam_fy_;
-    float                     cam_cy_;
+    yarp::os::ConstString cam_sel_;
+    double                cam_x_[3];
+    double                cam_o_[4];
+    unsigned int          cam_width_;
+    unsigned int          cam_height_;
+    float                 cam_fx_;
+    float                 cam_cx_;
+    float                 cam_fy_;
+    float                 cam_cy_;
 
+    bool                      use_thumb_;
+    bool                      use_forearm_;
     SICAD::ModelPathContainer cad_obj_;
     SICAD*                    si_cad_;
     int                       ogl_tiles_rows_;

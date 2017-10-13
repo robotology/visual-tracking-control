@@ -24,33 +24,33 @@ include(YarpInstallationHelpers)
 
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
-        include/BrownianMotion.h
-        include/CartesianAxisAnglePrediction.h
+        include/BrownianMotionPose.h
+        include/DrawParticlesPose.h
         include/GatePose.h
-        include/iCubFwdKinMotion.h
+        include/iCubFwdKinModel.h
         include/iCubGatePose.h
         include/InitiCubArm.h
-        include/PlayFwdKinMotion.h
+        include/PlayFwdKinModel.h
         include/PlayGatePose.h
         include/ResamplingWithPrior.h
         include/VisualProprioception.h
-        include/VisualParticleFilterCorrection.h
-        include/VisualSIRParticleFilter.h)
+        include/VisualSIRParticleFilter.h
+        include/VisualUpdateParticles.h)
 
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
-        src/BrownianMotion.cpp
-        src/CartesianAxisAnglePrediction.cpp
+        src/BrownianMotionPose.cpp
+        src/DrawParticlesPose.cpp
         src/GatePose.cpp
-        src/iCubFwdKinMotion.cpp
+        src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
         src/InitiCubArm.cpp
-        src/PlayFwdKinMotion.cpp
+        src/PlayFwdKinModel.cpp
         src/PlayGatePose.cpp
         src/ResamplingWithPrior.cpp
         src/VisualProprioception.cpp
-        src/VisualParticleFilterCorrection.cpp
-        src/VisualSIRParticleFilter.cpp)
+        src/VisualSIRParticleFilter.cpp
+        src/VisualUpdateParticles.cpp)
 
 set(${EXE_TARGET_NAME}_THRIFT_HDR
         thrift/visualsirpf.thrift)

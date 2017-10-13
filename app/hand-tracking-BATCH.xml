@@ -71,28 +71,28 @@
         <protocol>tcp</protocol>
     </connection>
 
-    <!-- PlayFwdKinMotion -->
+    <!-- PlayFwdKinModel -->
     <connection>
         <from>/icub/torso/state:o</from>
-        <to>/hand-tracking/PlayFwdKinMotion/left/torso:i</to>
+        <to>/hand-tracking/PlayFwdKinModel/left/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/icub/torso/state:o</from>
-        <to>/hand-tracking/PlayFwdKinMotion/right/torso:i</to>
+        <to>/hand-tracking/PlayFwdKinModel/right/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/icub/right_arm/state:o</from>
-        <to>/hand-tracking/PlayFwdKinMotion/left/right_arm:i</to>
+        <to>/hand-tracking/PlayFwdKinModel/left/right_arm:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/icub/right_arm/state:o</from>
-        <to>/hand-tracking/PlayFwdKinMotion/right/right_arm:i</to>
+        <to>/hand-tracking/PlayFwdKinModel/right/right_arm:i</to>
         <protocol>tcp</protocol>
     </connection>
 

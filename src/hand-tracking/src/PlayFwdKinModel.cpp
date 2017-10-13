@@ -1,4 +1,4 @@
-#include "PlayFwdKinMotion.h"
+#include "PlayFwdKinModel.h"
 
 #include <exception>
 #include <functional>
@@ -8,6 +8,7 @@
 #include <yarp/os/Property.h>
 #include <yarp/os/LogStream.h>
 
+using namespace bfl;
 using namespace Eigen;
 using namespace iCub::ctrl;
 using namespace iCub::iKin;
@@ -16,8 +17,8 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-PlayFwdKinMotion::PlayFwdKinMotion(std::unique_ptr<StateModel> state_model, const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
-    bfl::StateModelDecorator(std::move(state_model)),
+PlayFwdKinModel::PlayFwdKinModel(std::unique_ptr<StateModel> state_model, const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
+    StateModelDecorator(std::move(state_model)),
     icub_kin_arm_(iCubArm(laterality+"_v2")),
     robot_(robot), laterality_(laterality), port_prefix_(port_prefix),
     delta_hand_pose_(VectorXd::Zero(7)), delta_angle_(0.0)
@@ -34,8 +35,8 @@ PlayFwdKinMotion::PlayFwdKinMotion(std::unique_ptr<StateModel> state_model, cons
 }
 
 
-PlayFwdKinMotion::PlayFwdKinMotion(std::unique_ptr<StateModel> state_model, const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix, bool init_pose) noexcept :
-    PlayFwdKinMotion(std::move(state_model), robot, laterality, port_prefix)
+PlayFwdKinModel::PlayFwdKinModel(std::unique_ptr<StateModel> state_model, const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix, bool init_pose) noexcept :
+    PlayFwdKinModel(std::move(state_model), robot, laterality, port_prefix)
 {
     if (init_pose)
     {
@@ -48,7 +49,11 @@ PlayFwdKinMotion::PlayFwdKinMotion(std::unique_ptr<StateModel> state_model, cons
 }
 
 
-PlayFwdKinMotion::~PlayFwdKinMotion() noexcept
+PlayFwdKinModel::PlayFwdKinModel(PlayFwdKinModel&& state_model) noexcept :
+    StateModelDecorator(std::move(state_model)) { }
+
+
+PlayFwdKinModel::~PlayFwdKinModel() noexcept
 {
     port_torso_enc_.interrupt();
     port_torso_enc_.close();
@@ -58,43 +63,47 @@ PlayFwdKinMotion::~PlayFwdKinMotion() noexcept
 }
 
 
-PlayFwdKinMotion::PlayFwdKinMotion(PlayFwdKinMotion&& state_model) noexcept :
-    bfl::StateModelDecorator(std::move(state_model)) { }
-
-
-PlayFwdKinMotion& PlayFwdKinMotion::operator=(PlayFwdKinMotion&& state_model) noexcept
+PlayFwdKinModel& PlayFwdKinModel::operator=(PlayFwdKinModel&& state_model) noexcept
 {
-    bfl::StateModelDecorator::operator=(std::move(state_model));
+    StateModelDecorator::operator=(std::move(state_model));
 
     return *this;
 }
 
 
-void PlayFwdKinMotion::propagate(const Ref<const VectorXf>& cur_state, Ref<VectorXf> prop_state)
+void PlayFwdKinModel::propagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> prop_state)
 {
-    prop_state.head<3>() = cur_state.head<3>() + delta_hand_pose_.head<3>().cast<float>();
+    MatrixXf temp_state(cur_state.rows(), cur_state.cols());
+    PlayFwdKinPropagate(cur_state, temp_state);
 
-    prop_state.middleRows<3>(3) = (cur_state.middleRows<3>(3) + delta_hand_pose_.middleRows<3>(3).cast<float>()).normalized();
-
-    float   ang = cur_state(6) + static_cast<float>(delta_angle_);
-    if      (ang >   M_PI) ang -= 2.0 * M_PI;
-    else if (ang <= -M_PI) ang += 2.0 * M_PI;
-
-    prop_state(6) = ang;
-
-    bfl::StateModelDecorator::propagate(prop_state, prop_state);
+    StateModelDecorator::propagate(temp_state, prop_state);
 }
 
 
-void PlayFwdKinMotion::noiseSample(Ref<VectorXf> sample)
+void PlayFwdKinModel::motion(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> mot_state)
 {
-    bfl::StateModelDecorator::noiseSample(sample);
+    MatrixXf temp_state(cur_state.rows(), cur_state.cols());
+    PlayFwdKinPropagate(cur_state, temp_state);
+
+    StateModelDecorator::motion(temp_state, mot_state);
 }
 
 
-bool PlayFwdKinMotion::setProperty(const std::string& property)
+MatrixXf PlayFwdKinModel::getNoiseSample(const int num)
 {
-    if (!bfl::StateModelDecorator::setProperty(property))
+    return StateModelDecorator::getNoiseSample(num);
+}
+
+
+MatrixXf PlayFwdKinModel::getNoiseCovariance()
+{
+    return StateModelDecorator::getNoiseCovariance();
+}
+
+
+bool PlayFwdKinModel::setProperty(const std::string& property)
+{
+    if (!StateModelDecorator::setProperty(property))
     {
         if (property == "ICFW_DELTA")
             return setDeltaMotion();
@@ -107,7 +116,7 @@ bool PlayFwdKinMotion::setProperty(const std::string& property)
 }
 
 
-Vector PlayFwdKinMotion::readTorso()
+Vector PlayFwdKinModel::readTorso()
 {
     Bottle* b = port_torso_enc_.read();
     if (!b) return Vector(3, 0.0);
@@ -121,7 +130,7 @@ Vector PlayFwdKinMotion::readTorso()
 }
 
 
-Vector PlayFwdKinMotion::readRootToEE()
+Vector PlayFwdKinModel::readRootToEE()
 {
     Bottle* b = port_arm_enc_.read();
     if (!b) return Vector(10, 0.0);
@@ -135,7 +144,7 @@ Vector PlayFwdKinMotion::readRootToEE()
 }
 
 
-bool PlayFwdKinMotion::setInitialPose()
+bool PlayFwdKinModel::setInitialPose()
 {
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     Map<VectorXd> cur_ee_pose(ee_pose.data(), 7, 1);
@@ -145,7 +154,7 @@ bool PlayFwdKinMotion::setInitialPose()
 }
 
 
-bool PlayFwdKinMotion::setDeltaMotion()
+bool PlayFwdKinModel::setDeltaMotion()
 {
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     Map<VectorXd> cur_ee_pose(ee_pose.data(), 7, 1);
@@ -161,4 +170,23 @@ bool PlayFwdKinMotion::setDeltaMotion()
     prev_ee_pose_ = cur_ee_pose;
 
     return true;
+}
+
+
+void PlayFwdKinModel::PlayFwdKinPropagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> prop_state)
+{
+    prop_state.topRows<3>() = cur_state.topRows<3>().colwise() + delta_hand_pose_.head<3>().cast<float>();
+
+    prop_state.middleRows<3>(3) = (cur_state.middleRows<3>(3).colwise() + delta_hand_pose_.middleRows<3>(3).cast<float>());
+    prop_state.middleRows<3>(3).colwise().normalize();
+
+    RowVectorXf ang = cur_state.bottomRows<1>().array() + static_cast<float>(delta_angle_);
+
+    for (unsigned int i = 0; i < ang.cols(); ++i)
+    {
+        if      (ang(i) >   M_PI) ang(i) -= 2.0 * M_PI;
+        else if (ang(i) <= -M_PI) ang(i) += 2.0 * M_PI;
+    }
+
+    prop_state.bottomRows<1>() = ang;
 }

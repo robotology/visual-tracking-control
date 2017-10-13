@@ -21,9 +21,13 @@ using namespace yarp::math;
 using yarp::sig::Vector;
 
 
-VisualProprioception::VisualProprioception(const int num_images, const ConstString& cam_sel, const ConstString& laterality, const ConstString& context) :
-    laterality_(laterality), icub_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")},
-    cam_sel_(cam_sel)
+VisualProprioception::VisualProprioception(const bool use_thumb, const bool use_forearm, const int num_images,
+                                           const ConstString& cam_sel, const ConstString& laterality, const ConstString& context) :
+    laterality_(laterality),
+    icub_arm_(iCubArm(laterality+"_v2")),
+    icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")},
+    cam_sel_(cam_sel),
+    use_thumb_(use_thumb), use_forearm_(use_forearm)
 {
     ResourceFinder rf;
 
@@ -48,11 +52,11 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     }
     else
     {
-        yWarning() << log_ID_ << "[CAM PARAMS]" << "No intrinisc camera information could be found by the ctor. Looking for fallback values in parameters.ini.";
+        yWarning() << log_ID_ << "[CAM PARAMS]" << "No intrinisc camera information could be found by the ctor. Looking for fallback values in config.ini.";
 
         rf.setVerbose();
         rf.setDefaultContext(context);
-        rf.setDefaultConfigFile("parameters.ini");
+        rf.setDefaultConfigFile("config.ini");
         rf.configure(0, YARP_NULLPTR);
 
         Bottle* fallback_intrinsic = rf.findGroup("FALLBACK").find("intrinsic_" + cam_sel_).asList();
@@ -69,7 +73,7 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
         }
         else
         {
-            yWarning() << log_ID_ << "[CAM PARAMS]" << "No fallback values could be found in parameters.ini by the ctor for the intrinisc camera parameters. Falling (even more) back to iCub_SIM values.";
+            yWarning() << log_ID_ << "[CAM PARAMS]" << "No fallback values could be found in config.ini by the ctor for the intrinisc camera parameters. Falling (even more) back to iCub_SIM values.";
             cam_width_  = 320;
             cam_height_ = 240;
             cam_fx_     = 257.34;
@@ -102,21 +106,24 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     if (!file_found(cad_obj_["palm"]))
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_palm.obj not found!");
 
-//    cad_obj_["thumb1"] = rf.findFileByName("r_tl0.obj");
-//    if (!file_found(cad_obj_["thumb1"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
-//    cad_obj_["thumb2"] = rf.findFileByName("r_tl1.obj");
-//    if (!file_found(cad_obj_["thumb2"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
-//    cad_obj_["thumb3"] = rf.findFileByName("r_tl2.obj");
-//    if (!file_found(cad_obj_["thumb3"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
-//    cad_obj_["thumb4"] = rf.findFileByName("r_tl3.obj");
-//    if (!file_found(cad_obj_["thumb4"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
-//    cad_obj_["thumb5"] = rf.findFileByName("r_tl4.obj");
-//    if (!file_found(cad_obj_["thumb5"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
+    if (use_thumb)
+    {
+        cad_obj_["thumb1"] = rf.findFileByName("r_tl0.obj");
+        if (!file_found(cad_obj_["thumb1"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
+        cad_obj_["thumb2"] = rf.findFileByName("r_tl1.obj");
+        if (!file_found(cad_obj_["thumb2"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
+        cad_obj_["thumb3"] = rf.findFileByName("r_tl2.obj");
+        if (!file_found(cad_obj_["thumb3"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
+        cad_obj_["thumb4"] = rf.findFileByName("r_tl3.obj");
+        if (!file_found(cad_obj_["thumb4"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
+        cad_obj_["thumb5"] = rf.findFileByName("r_tl4.obj");
+        if (!file_found(cad_obj_["thumb5"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
+    }
 
     cad_obj_["index0"] = rf.findFileByName("r_indexbase.obj");
     if (!file_found(cad_obj_["index0"]))
@@ -147,9 +154,12 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     if (!file_found(cad_obj_["medium3"]))
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ml3.obj not found!");
 
-//    cad_obj_["forearm"] = rf.findFileByName("r_forearm.obj");
-//    if (!file_found(cad_obj_["forearm"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_forearm.obj not found!");
+    if (use_forearm)
+    {
+        cad_obj_["forearm"] = rf.findFileByName("r_forearm.obj");
+        if (!file_found(cad_obj_["forearm"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_forearm.obj not found!");
+    }
 
     rf.setDefaultContext(context + "/shader");
     ConstString shader_path = rf.findFileByName("shader_model.vert");
@@ -322,9 +332,9 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 }
 
 
-void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_state, std::vector<Superimpose::ModelPoseContainer>& hand_poses)
+void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_states, std::vector<Superimpose::ModelPoseContainer>& hand_poses)
 {
-    for (int j = 0; j < cur_state.cols(); ++j)
+    for (int j = 0; j < cur_states.cols(); ++j)
     {
         Superimpose::ModelPoseContainer hand_pose;
         Superimpose::ModelPose          pose;
@@ -332,15 +342,15 @@ void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_state, st
         Vector                          ee_o(4);
 
 
-        ee_t(0) = cur_state(0, j);
-        ee_t(1) = cur_state(1, j);
-        ee_t(2) = cur_state(2, j);
-        ee_t(3) =             1.0;
+        ee_t(0) = cur_states(0, j);
+        ee_t(1) = cur_states(1, j);
+        ee_t(2) = cur_states(2, j);
+        ee_t(3) =              1.0;
 
-        ee_o(0) = cur_state(3, j);
-        ee_o(1) = cur_state(4, j);
-        ee_o(2) = cur_state(5, j);
-        ee_o(3) = cur_state(6, j);
+        ee_o(0) = cur_states(3, j);
+        ee_o(1) = cur_states(4, j);
+        ee_o(2) = cur_states(5, j);
+        ee_o(3) = cur_states(6, j);
 
         pose.assign(ee_t.data(), ee_t.data()+3);
         pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
@@ -349,7 +359,7 @@ void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_state, st
         /* Change index to add/remove limbs */
         yarp::sig::Matrix Ha = axis2dcm(ee_o);
         Ha.setCol(3, ee_t);
-        for (size_t fng = 1; fng < 3; ++fng)
+        for (unsigned int fng = (use_thumb_ ? 0 : 1); fng < 3; ++fng)
         {
             std::string finger_s;
             pose.clear();
@@ -380,29 +390,31 @@ void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_state, st
                 hand_pose.emplace(finger_s, pose);
             }
         }
-        /* Comment/Uncomment to add/remove limbs */
-//        yarp::sig::Matrix invH6 = Ha *
-//                                  getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
-//                                  getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
-//        Vector j_x = invH6.getCol(3).subVector(0, 2);
-//        Vector j_o = dcm2axis(invH6);
-//        pose.clear();
-//        pose.assign(j_x.data(), j_x.data()+3);
-//        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-//        hand_pose.emplace("forearm", pose);
+        if (use_forearm_)
+        {
+            yarp::sig::Matrix invH6 = Ha *
+                                      getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
+                                      getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
+            Vector j_x = invH6.getCol(3).subVector(0, 2);
+            Vector j_o = dcm2axis(invH6);
+            pose.clear();
+            pose.assign(j_x.data(), j_x.data()+3);
+            pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+            hand_pose.emplace("forearm", pose);
+        }
 
         hand_poses.push_back(hand_pose);
     }
 }
 
 
-void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputArray observation)
+void VisualProprioception::observe(const Ref<const MatrixXf>& cur_states, OutputArray observations)
 {
     std::vector<Superimpose::ModelPoseContainer> hand_poses;
-    getModelPose(cur_state, hand_poses);
+    getModelPose(cur_states, hand_poses);
 
-    observation.create(cam_height_ * si_cad_->getTilesRows(), cam_width_ * si_cad_->getTilesCols(), CV_8UC3);
-    Mat hand_ogl = observation.getMat();
+    observations.create(cam_height_ * si_cad_->getTilesRows(), cam_width_ * si_cad_->getTilesCols(), CV_8UC3);
+    Mat hand_ogl = observations.getMat();
 
     si_cad_->superimpose(hand_poses, cam_x_, cam_o_, hand_ogl);
 }
