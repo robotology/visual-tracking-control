@@ -322,9 +322,9 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 }
 
 
-void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_state, std::vector<Superimpose::ModelPoseContainer>& hand_poses)
+void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_states, std::vector<Superimpose::ModelPoseContainer>& hand_poses)
 {
-    for (int j = 0; j < cur_state.cols(); ++j)
+    for (int j = 0; j < cur_states.cols(); ++j)
     {
         Superimpose::ModelPoseContainer hand_pose;
         Superimpose::ModelPose          pose;
@@ -332,15 +332,15 @@ void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_state, st
         Vector                          ee_o(4);
 
 
-        ee_t(0) = cur_state(0, j);
-        ee_t(1) = cur_state(1, j);
-        ee_t(2) = cur_state(2, j);
-        ee_t(3) =             1.0;
+        ee_t(0) = cur_states(0, j);
+        ee_t(1) = cur_states(1, j);
+        ee_t(2) = cur_states(2, j);
+        ee_t(3) =              1.0;
 
-        ee_o(0) = cur_state(3, j);
-        ee_o(1) = cur_state(4, j);
-        ee_o(2) = cur_state(5, j);
-        ee_o(3) = cur_state(6, j);
+        ee_o(0) = cur_states(3, j);
+        ee_o(1) = cur_states(4, j);
+        ee_o(2) = cur_states(5, j);
+        ee_o(3) = cur_states(6, j);
 
         pose.assign(ee_t.data(), ee_t.data()+3);
         pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
@@ -396,13 +396,13 @@ void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_state, st
 }
 
 
-void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputArray observation)
+void VisualProprioception::observe(const Ref<const MatrixXf>& cur_states, OutputArray observations)
 {
     std::vector<Superimpose::ModelPoseContainer> hand_poses;
-    getModelPose(cur_state, hand_poses);
+    getModelPose(cur_states, hand_poses);
 
-    observation.create(cam_height_ * si_cad_->getTilesRows(), cam_width_ * si_cad_->getTilesCols(), CV_8UC3);
-    Mat hand_ogl = observation.getMat();
+    observations.create(cam_height_ * si_cad_->getTilesRows(), cam_width_ * si_cad_->getTilesCols(), CV_8UC3);
+    Mat hand_ogl = observations.getMat();
 
     si_cad_->superimpose(hand_poses, cam_x_, cam_o_, hand_ogl);
 }

@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     }
 
     /* PREDICTION */
-    std::unique_ptr<ParticleFilterPrediction> pf_prediction(new CartesianAxisAnglePrediction(std::move(icub_motion)));
+    std::unique_ptr<PFPrediction> pf_prediction(new CartesianAxisAnglePrediction(std::move(icub_motion)));
 
 
     /* SENSOR MODEL */
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     }
 
     /* CORRECTION */
-    std::unique_ptr<VisualParticleFilterCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_count));
+    std::unique_ptr<PFVisualCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_count));
 
     std::unique_ptr<PFVisualCorrection> vpf_correction_gated;
     if (!play)

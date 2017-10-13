@@ -17,20 +17,25 @@ using namespace cv;
 using namespace Eigen;
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> measurement_model) noexcept :
-    VisualParticleFilterCorrection(std::move(measurement_model), 1) { }
+VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model) noexcept :
+    VisualParticleFilterCorrection(std::move(observation_model), 0.001, 1) { }
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> measurement_model, const int num_cuda_stream) noexcept :
-    measurement_model_(std::move(measurement_model)),
-    num_cuda_stream_(num_cuda_stream), num_img_stream_(measurement_model_->getOGLTilesNumber()), cuda_stream_(std::vector<cuda::Stream>(num_cuda_stream))
+VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain) noexcept :
+    VisualParticleFilterCorrection(std::move(observation_model), likelihood_gain, 1) { }
+
+
+VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_cuda_stream) noexcept :
+    observation_model_(std::move(observation_model)),
+    likelihood_gain_(likelihood_gain),
+    num_cuda_stream_(num_cuda_stream), num_img_stream_(observation_model_->getOGLTilesNumber()), cuda_stream_(std::vector<cuda::Stream>(num_cuda_stream))
 {
     int          block_size     = 16;
     int          bin_number     = 9;
-    unsigned int img_width      = measurement_model_->getCamWidth();
-    unsigned int img_height     = measurement_model_->getCamHeight();
-    unsigned int ogl_tiles_cols = measurement_model_->getOGLTilesCols();
-    unsigned int ogl_tiles_rows = measurement_model_->getOGLTilesRows();
+    unsigned int img_width      = observation_model_->getCamWidth();
+    unsigned int img_height     = observation_model_->getCamHeight();
+    unsigned int ogl_tiles_cols = observation_model_->getOGLTilesCols();
+    unsigned int ogl_tiles_rows = observation_model_->getOGLTilesRows();
     unsigned int feature_dim    = (img_width/block_size*2-1) * (img_height/block_size*2-1) * bin_number * 4;
 
     cuda_hog_ = cuda::HOG::create(Size(img_width, img_height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), bin_number);
@@ -52,22 +57,26 @@ VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<V
 VisualParticleFilterCorrection::~VisualParticleFilterCorrection() noexcept { }
 
 
-void VisualParticleFilterCorrection::correct(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> cor_state)
+void VisualParticleFilterCorrection::correct(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
+                                             Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
 {
-    VectorXf innovate(pred_state.cols());
+    VectorXf innovations(pred_states.cols());
+    innovation(pred_states, measurements, innovations);
 
-    innovation(pred_state, measurements, innovate);
+    for (int i = 0; i < innovations.rows(); ++i)
+    {
+        cor_weights(i) *= likelihood(innovations.row(i));
 
-    likelihood(innovate, cor_state);
+        if (cor_weights(i) <= 0)
+            cor_weights(i) = std::numeric_limits<float>::min();
+    }
 }
 
 
-void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_state, InputArray measurements, Ref<MatrixXf> innovation)
+void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_states, cv::InputArray measurements, Ref<MatrixXf> innovations)
 {
     for (int s = 0; s < num_cuda_stream_; ++s)
-    {
-        measurement_model_->observe(pred_state.block(0, s * num_img_stream_, 7, num_img_stream_), hand_rendered_[s]);
-    }
+        observation_model_->observe(pred_states.block(0, s * num_img_stream_, 7, num_img_stream_), hand_rendered_[s]);
 
     for (int s = 0; s < num_cuda_stream_; ++s)
     {
@@ -76,10 +85,10 @@ void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_
         cuda_hog_->compute(cuda_img_alpha_[s], cuda_descriptors_[s], cuda_stream_[s]);
     }
 
-    for (int s = 0; s < num_cuda_stream_; ++s) cuda_stream_[s].waitForCompletion();
-
     for (int s = 0; s < num_cuda_stream_; ++s)
     {
+        cuda_stream_[s].waitForCompletion();
+
         cuda_descriptors_[s].download(cpu_descriptors_[s], cuda_stream_[s]);
 
         for (int i = 0; i < num_img_stream_; ++i)
@@ -98,24 +107,19 @@ void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_
             }
             }
 
-            innovation(s * num_img_stream_ + i, 0) = sum_diff;
+            innovations(s * num_img_stream_ + i, 0) = sum_diff;
         }
     }
 }
 
 
-void VisualParticleFilterCorrection::likelihood(const Ref<const MatrixXf>& innovation, Ref<MatrixXf> cor_state)
+double VisualParticleFilterCorrection::likelihood(const Ref<const MatrixXf>& innovations)
 {
-    for (int i = 0; i < innovation.rows(); ++i)
-    {
-        cor_state(i, 0) *= ( exp(-0.001 * innovation(i, 0)) );
-
-        if (cor_state(i, 0) <= 0) cor_state(i, 0) = std::numeric_limits<float>::min();
-    }
+    return exp(-0.001 * innovations.cast<double>().coeff(0, 0));
 }
 
 
-bool VisualParticleFilterCorrection::setObservationModelProperty(const std::string& property)
+bfl::VisualObservationModel& VisualParticleFilterCorrection::getVisualObservationModel()
 {
-    return measurement_model_->setProperty(property);
+    return *observation_model_;
 }

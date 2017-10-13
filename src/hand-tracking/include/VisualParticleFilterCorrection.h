@@ -7,37 +7,36 @@
 #include <mutex>
 #include <thread>
 
-#include <BayesFilters/VisualCorrection.h>
+#include <BayesFilters/PFVisualCorrection.h>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaobjdetect.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 
 
-class VisualParticleFilterCorrection : public bfl::VisualCorrection
+class VisualParticleFilterCorrection : public bfl::PFVisualCorrection
 {
 public:
-    /* Default constructor, disabled */
-    VisualParticleFilterCorrection() = delete;
-
-    /* VPF correction constructor */
     VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model) noexcept;
 
-    /* Detailed VPF correction constructor */
-    VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model, const int num_cuda_stream) noexcept;
+    VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain) noexcept;
 
-    /* Destructor */
-    ~VisualParticleFilterCorrection() noexcept override;
+    VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_cuda_stream) noexcept;
 
-    void correct(const Eigen::Ref<const Eigen::MatrixXf>& pred_state, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> cor_state) override;
+    ~VisualParticleFilterCorrection() noexcept;
 
-    void innovation(const Eigen::Ref<const Eigen::MatrixXf>& pred_state, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> innovation) override;
+    void correct(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, const Eigen::Ref<const Eigen::VectorXf>& pred_weights, cv::InputArray measurements,
+                 Eigen::Ref<Eigen::MatrixXf> cor_states, Eigen::Ref<Eigen::VectorXf> cor_weights) override;
 
-    void likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovation, Eigen::Ref<Eigen::MatrixXf> cor_state) override;
+    void innovation(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> innovations) override;
 
-    bool setObservationModelProperty(const std::string& property) override;
+    double likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovations) override;
+
+    bfl::VisualObservationModel& getVisualObservationModel() override;
+
 
 protected:
-    std::unique_ptr<VisualProprioception> measurement_model_;
+    std::unique_ptr<VisualProprioception> observation_model_;
+    double                                likelihood_gain_;
 
     cv::Ptr<cv::cuda::HOG>                cuda_hog_;
 
