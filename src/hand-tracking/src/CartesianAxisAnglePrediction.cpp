@@ -25,9 +25,12 @@ CartesianAxisAnglePrediction& CartesianAxisAnglePrediction::operator=(CartesianA
 }
 
 
-void CartesianAxisAnglePrediction::predict(const Eigen::Ref<const Eigen::MatrixXf>& prev_state, Eigen::Ref<Eigen::MatrixXf> pred_state)
+void CartesianAxisAnglePrediction::predict(const Ref<const MatrixXf>& prev_states, const Ref<const VectorXf>& prev_weights,
+                                           Ref<MatrixXf> pred_states, Ref<VectorXf> pred_weights)
 {
-    state_model_->motion(prev_state, pred_state);
+    state_model_->motion(prev_states, pred_states);
+
+    pred_weights = prev_weights;
 }
 
 
