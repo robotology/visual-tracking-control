@@ -63,9 +63,11 @@ void VisualParticleFilterCorrection::correct(const Ref<const MatrixXf>& pred_sta
     VectorXf innovations(pred_states.cols());
     innovation(pred_states, measurements, innovations);
 
+    cor_states = pred_states;
+
     for (int i = 0; i < innovations.rows(); ++i)
     {
-        cor_weights(i) *= likelihood(innovations.row(i));
+        cor_weights(i) = pred_weights(i) * likelihood(innovations.row(i));
 
         if (cor_weights(i) <= 0)
             cor_weights(i) = std::numeric_limits<float>::min();
