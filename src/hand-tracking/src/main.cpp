@@ -79,6 +79,9 @@ int main(int argc, char *argv[])
     paramsd["cone_angle"] = rf.findGroup("BROWNIANMOTION").check("cone_angle", Value(2.5)).asDouble();
     paramsd["seed"]       = rf.findGroup("BROWNIANMOTION").check("seed",       Value(1.0)).asDouble();
 
+    paramsd["use_thumb"]   = rf.findGroup("VISUALPROPRIOCEPTION").check("use_thumb", Value(0.0)).asDouble();
+    paramsd["use_forearm"] = rf.findGroup("VISUALPROPRIOCEPTION").check("use_forearm", Value(0.0)).asDouble();
+
     paramsd["likelihood_gain"] = rf.findGroup("VISUALUPDATEPARTICLES").check("likelihood_gain", Value(0.001)).asDouble();
 
     paramsd["gate_x"]        = rf.findGroup("GATEPOSE").check("gate_x",        Value(0.1)).asDouble();
@@ -108,6 +111,9 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - theta:"      << paramsd["theta"];
     yInfo() << log_ID << " - cone_angle:" << paramsd["cone_angle"];
     yInfo() << log_ID << " - seed:"       << paramsd["seed"];
+
+    yInfo() << log_ID << " - use_thumb:" << paramsd["use_thumb"];
+    yInfo() << log_ID << " - use_forearm:" << paramsd["use_forearm"];
 
     yInfo() << log_ID << " - likelihood_gain:" << paramsd["likelihood_gain"];
 
@@ -144,7 +150,8 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(paramsd["num_images"], paramss["cam_sel"], paramss["laterality"], rf.getContext()));
+        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(paramsd["use_thumb"], paramsd["use_forearm"],
+                                                                          paramsd["num_images"], paramss["cam_sel"], paramss["laterality"], rf.getContext()));
 
         proprio = std::move(vp);
         paramsd["num_particles"] = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * paramsd["gpu_count"];
