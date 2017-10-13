@@ -49,7 +49,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // FIXME: page locked dovrebbe essere più veloce da utilizzate con CUDA, non sembra essere il caso.
+
+    // Page locked dovrebbe essere più veloce da utilizzate con CUDA, non sembra essere il caso.
 //    Mat::setDefaultAllocator(cuda::HostMem::getAllocator(cuda::HostMem::PAGE_LOCKED));
 
     cuda::DeviceInfo gpu_dev;
@@ -59,42 +60,49 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << "[CUDA] Can map host memory:"            << gpu_dev.canMapHostMemory();
     yInfo() << log_ID << "[CUDA] Clock:"                          << gpu_dev.clockRate() << "KHz";
 
+
     ResourceFinder rf;
     rf.setVerbose();
     rf.setDefaultContext("hand-tracking");
     rf.setDefaultConfigFile("config.ini");
     rf.configure(argc, argv);
 
-    ConstString robot_name       = rf.check("robot",      Value("icub")).asString();
-    ConstString robot_cam_sel    = rf.check("cam",        Value("left")).asString();
-    ConstString robot_laterality = rf.check("laterality", Value("right")).asString();
-    bool        play             = ((rf.findGroup("play").size() == 1 ? true : (rf.findGroup("play").size() == 2 ? rf.find("play").asBool() : false)));
-    int         num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
-    int         gpu_count        = 1;
-    double      likelihood_gain  = 0.001;
+    FilteringParamtersD paramsd;
+    paramsd["play"]            = ((rf.findGroup("play").size() == 1 ? 1.0 : (rf.findGroup("play").size() == 2 ? rf.find("play").asBool() : 0.0)));
+    paramsd["num_particles"]   = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
+    paramsd["gpu_count"]       = 1;
+    paramsd["num_images"]      = paramsd["num_particles"] / paramsd["gpu_count"];
+    paramsd["likelihood_gain"] = 0.001;
+
+    FilteringParamtersS paramss;
+    paramss["robot_name"]       = rf.check("robot",      Value("icub")).asString();
+    paramss["robot_cam_sel"]    = rf.check("cam",        Value("left")).asString();
+    paramss["robot_laterality"] = rf.check("laterality", Value("right")).asString();
+
 
     yInfo() << log_ID << "Running with:";
-    yInfo() << log_ID << " - robot name:"          << robot_name;
-    yInfo() << log_ID << " - robot camera:"        << robot_cam_sel;
-    yInfo() << log_ID << " - robot laterality:"    << robot_laterality;
-    yInfo() << log_ID << " - use data from ports:" << (play ? "true" : "false");
-    yInfo() << log_ID << " - number of particles:" << num_particles;
+    yInfo() << log_ID << " - robot name:"          << paramss["robot_name"];
+    yInfo() << log_ID << " - robot camera:"        << paramss["robot_cam_sel"];
+    yInfo() << log_ID << " - robot laterality:"    << paramss["robot_laterality"];
+    yInfo() << log_ID << " - use data from ports:" << (paramsd["play"] == 1.0 ? "true" : "false");
+    yInfo() << log_ID << " - number of particles:" << paramsd["num_particles"];
+
 
     /* INITIALIZATION */
-    std::unique_ptr<InitiCubArm> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", robot_cam_sel, robot_laterality));
+    std::unique_ptr<InitiCubArm> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", paramss["robot_cam_sel"], paramss["robot_laterality"]));
 
 
     /* MOTION MODEL */
     std::unique_ptr<BrownianMotionPose> brown(new BrownianMotionPose(0.005, 0.005, 3.0, 2.5, 1));
     std::unique_ptr<StateModel> icub_motion;
-    if (!play)
+    if (paramsd["play"] != 1.0)
     {
-        std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
+        std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(std::move(brown), paramss["robot_name"], paramss["robot_laterality"], paramss["robot_cam_sel"]));
         icub_motion = std::move(icub_fwdkin);
     }
     else
     {
-        std::unique_ptr<PlayFwdKinModel> play_fwdkin(new PlayFwdKinModel(std::move(brown), robot_name, robot_laterality, robot_cam_sel));
+        std::unique_ptr<PlayFwdKinModel> play_fwdkin(new PlayFwdKinModel(std::move(brown), paramss["robot_name"], paramss["robot_laterality"], paramss["robot_cam_sel"]));
         icub_motion = std::move(play_fwdkin);
     }
 
@@ -106,10 +114,10 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(num_particles / gpu_count, robot_cam_sel, robot_laterality, rf.getContext()));
+        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(paramsd["num_images"], paramss["robot_cam_sel"], paramss["robot_laterality"], rf.getContext()));
 
         proprio = std::move(vp);
-        num_particles = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * gpu_count;
+        paramsd["num_particles"] = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * paramsd["gpu_count"];
     }
     catch (const std::runtime_error& e)
     {
@@ -118,38 +126,40 @@ int main(int argc, char *argv[])
     }
 
     /* CORRECTION */
-    std::unique_ptr<VisualUpdateParticles> vpf_correction(new VisualUpdateParticles(std::move(proprio), likelihood_gain, gpu_count));
+    std::unique_ptr<VisualUpdateParticles> vpf_correction(new VisualUpdateParticles(std::move(proprio), paramsd["likelihood_gain"], paramsd["gpu_count"]));
 
     std::unique_ptr<GatePose> vpf_correction_gated;
-    if (!play)
+    if (paramsd["play"] != 1.0)
     {
         std::unique_ptr<iCubGatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_correction),
                                                                       0.1, 0.1, 0.1, 15, 30,
-                                                                      robot_name, robot_laterality, robot_cam_sel));
+                                                                      paramss["robot_name"], paramss["robot_laterality"], paramss["robot_cam_sel"]));
         vpf_correction_gated = std::move(icub_gate_pose);
     }
     else
     {
         std::unique_ptr<PlayGatePose> icub_gate_pose(new PlayGatePose(std::move(vpf_correction),
                                                                       0.1, 0.1, 0.1, 15, 30,
-                                                                      robot_name, robot_laterality, robot_cam_sel));
+                                                                      paramss["robot_name"], paramss["robot_laterality"], paramss["robot_cam_sel"]));
         vpf_correction_gated = std::move(icub_gate_pose);
     }
 
 
     /* RESAMPLING */
 //    std::unique_ptr<Resampling> resampling(new Resampling());
-    std::unique_ptr<Resampling> resampling(new ResamplingWithPrior("hand-tracking/ResamplingWithPrior", robot_cam_sel, robot_laterality));
+    std::unique_ptr<Resampling> resampling(new ResamplingWithPrior("hand-tracking/ResamplingWithPrior", paramss["robot_cam_sel"], paramss["robot_laterality"]));
 
 
     /* PARTICLE FILTER */
     VisualSIRParticleFilter vsir_pf(std::move(init_arm),
                                     std::move(pf_prediction), std::move(vpf_correction_gated),
                                     std::move(resampling),
-                                    robot_cam_sel, robot_laterality, num_particles);
+                                    paramss["robot_cam_sel"], paramss["robot_laterality"], paramsd["num_particles"]);
+
 
     vsir_pf.prepare();
     vsir_pf.wait();
+
 
     yInfo() << log_ID << "Application closed succesfully.";
     return EXIT_SUCCESS;
