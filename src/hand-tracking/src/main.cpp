@@ -68,41 +68,54 @@ int main(int argc, char *argv[])
     rf.configure(argc, argv);
 
     FilteringParamtersD paramsd;
-    paramsd["play"]            = ((rf.findGroup("play").size() == 1 ? 1.0 : (rf.findGroup("play").size() == 2 ? rf.find("play").asBool() : 0.0)));
-    paramsd["num_particles"]   = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
-    paramsd["gpu_count"]       = 1;
-    paramsd["num_images"]      = paramsd["num_particles"] / paramsd["gpu_count"];
-    paramsd["likelihood_gain"] = 0.001;
+    paramsd["play"]          = rf.findGroup("PF").check("play",          Value(1.0)).asDouble();
+    paramsd["num_particles"] = rf.findGroup("PF").check("num_particles", Value(50.0)).asDouble();
+    paramsd["gpu_count"]     = rf.findGroup("PF").check("gpu_count",     Value(1.0)).asDouble();
+    paramsd["num_images"]    = paramsd["num_particles"] / paramsd["gpu_count"];
+
+    paramsd["q_xy"]       = rf.findGroup("BROWNIANMOTION").check("q_xy",       Value(0.005)).asDouble();
+    paramsd["q_z"]        = rf.findGroup("BROWNIANMOTION").check("q_z",        Value(0.005)).asDouble();
+    paramsd["theta"]      = rf.findGroup("BROWNIANMOTION").check("theta",      Value(3.0)).asDouble();
+    paramsd["cone_angle"] = rf.findGroup("BROWNIANMOTION").check("cone_angle", Value(2.5)).asDouble();
+    paramsd["seed"]       = rf.findGroup("BROWNIANMOTION").check("seed",       Value(1.0)).asDouble();
+
+    paramsd["likelihood_gain"] = rf.findGroup("VISUALUPDATEPARTICLES").check("likelihood_gain", Value(0.001)).asDouble();
+
+    paramsd["gate_x"]        = rf.findGroup("GATEPOSE").check("gate_x",        Value(0.1)).asDouble();
+    paramsd["gate_y"]        = rf.findGroup("GATEPOSE").check("gate_y",        Value(0.1)).asDouble();
+    paramsd["gate_z"]        = rf.findGroup("GATEPOSE").check("gate_z",        Value(0.1)).asDouble();
+    paramsd["gate_aperture"] = rf.findGroup("GATEPOSE").check("gate_aperture", Value(15.0)).asDouble();
+    paramsd["gate_rotation"] = rf.findGroup("GATEPOSE").check("gate_rotation", Value(30.0)).asDouble();
 
     FilteringParamtersS paramss;
-    paramss["robot_name"]       = rf.check("robot",      Value("icub")).asString();
-    paramss["robot_cam_sel"]    = rf.check("cam",        Value("left")).asString();
-    paramss["robot_laterality"] = rf.check("laterality", Value("right")).asString();
+    paramss["robot"]      = rf.findGroup("PF").check("robot",      Value("icub")).asString();
+    paramss["cam_sel"]    = rf.findGroup("PF").check("cam_sel",    Value("left")).asString();
+    paramss["laterality"] = rf.findGroup("PF").check("laterality", Value("right")).asString();
 
 
     yInfo() << log_ID << "Running with:";
-    yInfo() << log_ID << " - robot name:"          << paramss["robot_name"];
-    yInfo() << log_ID << " - robot camera:"        << paramss["robot_cam_sel"];
-    yInfo() << log_ID << " - robot laterality:"    << paramss["robot_laterality"];
-    yInfo() << log_ID << " - use data from ports:" << (paramsd["play"] == 1.0 ? "true" : "false");
-    yInfo() << log_ID << " - number of particles:" << paramsd["num_particles"];
+    yInfo() << log_ID << " - robot:"         << paramss["robot"];
+    yInfo() << log_ID << " - cam_sel:"       << paramss["cam_sel"];
+    yInfo() << log_ID << " - laterality:"    << paramss["laterality"];
+    yInfo() << log_ID << " - play:"          << (paramsd["play"] == 1.0 ? "true" : "false");
+    yInfo() << log_ID << " - num_particles:" << paramsd["num_particles"];
 
 
     /* INITIALIZATION */
-    std::unique_ptr<InitiCubArm> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", paramss["robot_cam_sel"], paramss["robot_laterality"]));
+    std::unique_ptr<InitiCubArm> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", paramss["cam_sel"], paramss["laterality"]));
 
 
     /* MOTION MODEL */
-    std::unique_ptr<BrownianMotionPose> brown(new BrownianMotionPose(0.005, 0.005, 3.0, 2.5, 1));
+    std::unique_ptr<BrownianMotionPose> brown(new BrownianMotionPose(paramsd["q_xy"], paramsd["q_z"], paramsd["theta"], paramsd["cone_angle"], paramsd["seed"]));
     std::unique_ptr<StateModel> icub_motion;
     if (paramsd["play"] != 1.0)
     {
-        std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(std::move(brown), paramss["robot_name"], paramss["robot_laterality"], paramss["robot_cam_sel"]));
+        std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(std::move(brown), paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
         icub_motion = std::move(icub_fwdkin);
     }
     else
     {
-        std::unique_ptr<PlayFwdKinModel> play_fwdkin(new PlayFwdKinModel(std::move(brown), paramss["robot_name"], paramss["robot_laterality"], paramss["robot_cam_sel"]));
+        std::unique_ptr<PlayFwdKinModel> play_fwdkin(new PlayFwdKinModel(std::move(brown), paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
         icub_motion = std::move(play_fwdkin);
     }
 
@@ -114,7 +127,7 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(paramsd["num_images"], paramss["robot_cam_sel"], paramss["robot_laterality"], rf.getContext()));
+        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(paramsd["num_images"], paramss["cam_sel"], paramss["laterality"], rf.getContext()));
 
         proprio = std::move(vp);
         paramsd["num_particles"] = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * paramsd["gpu_count"];
@@ -132,29 +145,31 @@ int main(int argc, char *argv[])
     if (paramsd["play"] != 1.0)
     {
         std::unique_ptr<iCubGatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_correction),
-                                                                      0.1, 0.1, 0.1, 15, 30,
-                                                                      paramss["robot_name"], paramss["robot_laterality"], paramss["robot_cam_sel"]));
+                                                                      paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
+                                                                      paramsd["gate_aperture"], paramsd["gate_rotation"],
+                                                                      paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
         vpf_correction_gated = std::move(icub_gate_pose);
     }
     else
     {
         std::unique_ptr<PlayGatePose> icub_gate_pose(new PlayGatePose(std::move(vpf_correction),
-                                                                      0.1, 0.1, 0.1, 15, 30,
-                                                                      paramss["robot_name"], paramss["robot_laterality"], paramss["robot_cam_sel"]));
+                                                                      paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
+                                                                      paramsd["gate_aperture"], paramsd["gate_rotation"],
+                                                                      paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
         vpf_correction_gated = std::move(icub_gate_pose);
     }
 
 
     /* RESAMPLING */
 //    std::unique_ptr<Resampling> resampling(new Resampling());
-    std::unique_ptr<Resampling> resampling(new ResamplingWithPrior("hand-tracking/ResamplingWithPrior", paramss["robot_cam_sel"], paramss["robot_laterality"]));
+    std::unique_ptr<Resampling> resampling(new ResamplingWithPrior("hand-tracking/ResamplingWithPrior", paramss["cam_sel"], paramss["laterality"]));
 
 
     /* PARTICLE FILTER */
     VisualSIRParticleFilter vsir_pf(std::move(init_arm),
                                     std::move(pf_prediction), std::move(vpf_correction_gated),
                                     std::move(resampling),
-                                    paramss["robot_cam_sel"], paramss["robot_laterality"], paramsd["num_particles"]);
+                                    paramss["cam_sel"], paramss["laterality"], paramsd["num_particles"]);
 
 
     vsir_pf.prepare();
