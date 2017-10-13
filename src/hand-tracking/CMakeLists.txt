@@ -25,7 +25,7 @@ include(YarpInstallationHelpers)
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
-        include/CartesianAxisAnglePrediction.h
+        include/DrawParticlesPose.h
         include/GatePose.h
         include/iCubFwdKinModel.h
         include/iCubGatePose.h
@@ -40,7 +40,7 @@ set(${EXE_TARGET_NAME}_HDR
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
         src/BrownianMotionPose.cpp
-        src/CartesianAxisAnglePrediction.cpp
+        src/DrawParticlesPose.cpp
         src/GatePose.cpp
         src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
