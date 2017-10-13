@@ -100,10 +100,12 @@ void VisualSIRParticleFilter::filteringStep()
             for (int j = 0; j < num_particles_; ++j)
             {
                 if (cor_weight_(j) <= threshold)
-                    prediction_->getStateModel().propagate(cor_particle_.col(j), pred_particle_.col(j));
-                else
                     prediction_->getStateModel().motion(cor_particle_.col(j), pred_particle_.col(j));
+                else
+                    prediction_->getStateModel().propagate(cor_particle_.col(j), pred_particle_.col(j));
             }
+
+            pred_weight_ = cor_weight_;
         }
 
         /* CORRECTION */
