@@ -1,5 +1,5 @@
-#ifndef DRAWPOSE_H
-#define DRAWPOSE_H
+#ifndef DRAWPARTICLESPOSE_H
+#define DRAWPARTICLESPOSE_H
 
 #include <memory>
 #include <random>
@@ -8,20 +8,20 @@
 #include <BayesFilters/StateModel.h>
 
 namespace bfl {
-    class CartesianAxisAnglePrediction;
+    class DrawParticlesPose;
 }
 
 
-class bfl::CartesianAxisAnglePrediction : public bfl::PFPrediction
+class bfl::DrawParticlesPose : public bfl::PFPrediction
 {
 public:
-    CartesianAxisAnglePrediction(std::unique_ptr<StateModel> state_model_) noexcept;
+    DrawParticlesPose(std::unique_ptr<StateModel> state_model_) noexcept;
 
-    CartesianAxisAnglePrediction(CartesianAxisAnglePrediction&& pf_prediction) noexcept;
+    DrawParticlesPose(DrawParticlesPose&& pf_prediction) noexcept;
 
-    ~CartesianAxisAnglePrediction() noexcept;
+    ~DrawParticlesPose() noexcept;
 
-    CartesianAxisAnglePrediction& operator=(CartesianAxisAnglePrediction&& pf_prediction) noexcept;
+    DrawParticlesPose& operator=(DrawParticlesPose&& pf_prediction) noexcept;
 
     void predict(const Eigen::Ref<const Eigen::MatrixXf>& prev_states, const Eigen::Ref<const Eigen::VectorXf>& prev_weights,
                  Eigen::Ref<Eigen::MatrixXf> pred_states, Eigen::Ref<Eigen::VectorXf> pred_weights) override;
@@ -32,4 +32,4 @@ protected:
     std::unique_ptr<StateModel> state_model_;
 };
 
-#endif /* DRAWPOSE_H */
+#endif /* DRAWPARTICLESPOSE_H */

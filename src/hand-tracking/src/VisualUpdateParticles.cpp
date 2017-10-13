@@ -1,4 +1,4 @@
-#include "VisualParticleFilterCorrection.h"
+#include "VisualUpdateParticles.h"
 
 #include <cmath>
 #include <functional>
@@ -17,15 +17,15 @@ using namespace cv;
 using namespace Eigen;
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model) noexcept :
-    VisualParticleFilterCorrection(std::move(observation_model), 0.001, 1) { }
+VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model) noexcept :
+    VisualUpdateParticles(std::move(observation_model), 0.001, 1) { }
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain) noexcept :
-    VisualParticleFilterCorrection(std::move(observation_model), likelihood_gain, 1) { }
+VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain) noexcept :
+    VisualUpdateParticles(std::move(observation_model), likelihood_gain, 1) { }
 
 
-VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_cuda_stream) noexcept :
+VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_cuda_stream) noexcept :
     observation_model_(std::move(observation_model)),
     likelihood_gain_(likelihood_gain),
     num_cuda_stream_(num_cuda_stream), num_img_stream_(observation_model_->getOGLTilesNumber()), cuda_stream_(std::vector<cuda::Stream>(num_cuda_stream))
@@ -54,10 +54,10 @@ VisualParticleFilterCorrection::VisualParticleFilterCorrection(std::unique_ptr<V
 }
 
 
-VisualParticleFilterCorrection::~VisualParticleFilterCorrection() noexcept { }
+VisualUpdateParticles::~VisualUpdateParticles() noexcept { }
 
 
-void VisualParticleFilterCorrection::correct(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
+void VisualUpdateParticles::correct(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
                                              Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
 {
     VectorXf innovations(pred_states.cols());
@@ -75,7 +75,7 @@ void VisualParticleFilterCorrection::correct(const Ref<const MatrixXf>& pred_sta
 }
 
 
-void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_states, cv::InputArray measurements, Ref<MatrixXf> innovations)
+void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, cv::InputArray measurements, Ref<MatrixXf> innovations)
 {
     for (int s = 0; s < num_cuda_stream_; ++s)
         observation_model_->observe(pred_states.block(0, s * num_img_stream_, 7, num_img_stream_), hand_rendered_[s]);
@@ -115,13 +115,13 @@ void VisualParticleFilterCorrection::innovation(const Ref<const MatrixXf>& pred_
 }
 
 
-double VisualParticleFilterCorrection::likelihood(const Ref<const MatrixXf>& innovations)
+double VisualUpdateParticles::likelihood(const Ref<const MatrixXf>& innovations)
 {
-    return exp(-0.001 * innovations.cast<double>().coeff(0, 0));
+    return exp(-likelihood_gain_ * innovations.cast<double>().coeff(0, 0));
 }
 
 
-bfl::VisualObservationModel& VisualParticleFilterCorrection::getVisualObservationModel()
+bfl::VisualObservationModel& VisualUpdateParticles::getVisualObservationModel()
 {
     return *observation_model_;
 }

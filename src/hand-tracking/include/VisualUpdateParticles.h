@@ -1,5 +1,5 @@
-#ifndef VISUALPARTICLEFILTERCORRECTION_H
-#define VISUALPARTICLEFILTERCORRECTION_H
+#ifndef VISUALUPDATEPARTICLES_H
+#define VISUALUPDATEPARTICLES_H
 
 #include "VisualProprioception.h"
 
@@ -13,16 +13,16 @@
 #include <opencv2/objdetect/objdetect.hpp>
 
 
-class VisualParticleFilterCorrection : public bfl::PFVisualCorrection
+class VisualUpdateParticles : public bfl::PFVisualCorrection
 {
 public:
-    VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model) noexcept;
+    VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model) noexcept;
 
-    VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain) noexcept;
+    VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain) noexcept;
 
-    VisualParticleFilterCorrection(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_cuda_stream) noexcept;
+    VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_cuda_stream) noexcept;
 
-    ~VisualParticleFilterCorrection() noexcept;
+    ~VisualUpdateParticles() noexcept;
 
     void correct(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, const Eigen::Ref<const Eigen::VectorXf>& pred_weights, cv::InputArray measurements,
                  Eigen::Ref<Eigen::MatrixXf> cor_states, Eigen::Ref<Eigen::VectorXf> cor_weights) override;
@@ -32,7 +32,6 @@ public:
     double likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovations) override;
 
     bfl::VisualObservationModel& getVisualObservationModel() override;
-
 
 protected:
     std::unique_ptr<VisualProprioception> observation_model_;
@@ -50,4 +49,4 @@ protected:
     std::vector<cv::Mat>                  cpu_descriptors_;
 };
 
-#endif /* VISUALPARTICLEFILTERCORRECTION_H */
+#endif /* VISUALUPDATEPARTICLES_H */

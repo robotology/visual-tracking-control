@@ -1,5 +1,5 @@
-#ifndef CARTESIANAXISANGLEBROWNIANMOTION_H
-#define CARTESIANAXISANGLEBROWNIANMOTION_H
+#ifndef BROWNIANMOTIONPOSE_H
+#define BROWNIANMOTIONPOSE_H
 
 #include <functional>
 #include <random>
@@ -7,24 +7,24 @@
 #include <BayesFilters/StateModel.h>
 
 
-class CartesianAxisAngleBrownianMotion : public bfl::StateModel
+class BrownianMotionPose : public bfl::StateModel
 {
 public:
-    CartesianAxisAngleBrownianMotion(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept;
+    BrownianMotionPose(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept;
 
-    CartesianAxisAngleBrownianMotion(const float q_xy, const float q_z, const float theta, const float cone_angle) noexcept;
+    BrownianMotionPose(const float q_xy, const float q_z, const float theta, const float cone_angle) noexcept;
 
-    CartesianAxisAngleBrownianMotion() noexcept;
+    BrownianMotionPose() noexcept;
 
-    CartesianAxisAngleBrownianMotion(const CartesianAxisAngleBrownianMotion& bm);
+    BrownianMotionPose(const BrownianMotionPose& bm);
 
-    CartesianAxisAngleBrownianMotion(CartesianAxisAngleBrownianMotion&& bm) noexcept;
+    BrownianMotionPose(BrownianMotionPose&& bm) noexcept;
 
-    ~CartesianAxisAngleBrownianMotion() noexcept;
+    ~BrownianMotionPose() noexcept;
 
-    CartesianAxisAngleBrownianMotion& operator=(const CartesianAxisAngleBrownianMotion& bm);
+    BrownianMotionPose& operator=(const BrownianMotionPose& bm);
 
-    CartesianAxisAngleBrownianMotion& operator=(CartesianAxisAngleBrownianMotion&& bm) noexcept;
+    BrownianMotionPose& operator=(BrownianMotionPose&& bm) noexcept;
 
     void propagate(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> prop_state) override;
 
@@ -57,4 +57,4 @@ protected:
     void addAxisangleDisturbance(const Eigen::Ref<const Eigen::MatrixXf>& disturbance_vec, Eigen::Ref<Eigen::MatrixXf> current_vec);
 };
 
-#endif /* CARTESIANAXISANGLEBROWNIANMOTION_H */
+#endif /* BROWNIANMOTIONPOSE_H */

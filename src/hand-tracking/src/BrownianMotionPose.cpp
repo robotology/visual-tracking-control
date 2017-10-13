@@ -1,4 +1,4 @@
-#include "CartesianAxisAngleBrownianMotion.h"
+#include "BrownianMotionPose.h"
 
 #include <cmath>
 #include <iostream>
@@ -7,7 +7,7 @@
 using namespace Eigen;
 
 
-CartesianAxisAngleBrownianMotion::CartesianAxisAngleBrownianMotion(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept :
+BrownianMotionPose::BrownianMotionPose(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept :
     F_(MatrixXf::Identity(7, 7)),
     q_xy_(q_xy),
     q_z_(q_z),
@@ -25,15 +25,15 @@ CartesianAxisAngleBrownianMotion::CartesianAxisAngleBrownianMotion(const float q
     gaussian_random_cone_([&] { return (distribution_cone_)(generator_); }) { }
 
 
-CartesianAxisAngleBrownianMotion::CartesianAxisAngleBrownianMotion(const float q_xy, const float q_z, const float theta, const float cone_angle) noexcept :
-    CartesianAxisAngleBrownianMotion(q_xy, q_z, theta, cone_angle, 1) { }
+BrownianMotionPose::BrownianMotionPose(const float q_xy, const float q_z, const float theta, const float cone_angle) noexcept :
+    BrownianMotionPose(q_xy, q_z, theta, cone_angle, 1) { }
 
 
-CartesianAxisAngleBrownianMotion::CartesianAxisAngleBrownianMotion() noexcept :
-    CartesianAxisAngleBrownianMotion(0.005, 0.005, 3.0, 2.5, 1) { }
+BrownianMotionPose::BrownianMotionPose() noexcept :
+    BrownianMotionPose(0.005, 0.005, 3.0, 2.5, 1) { }
 
 
-CartesianAxisAngleBrownianMotion::CartesianAxisAngleBrownianMotion(const CartesianAxisAngleBrownianMotion& brown) :
+BrownianMotionPose::BrownianMotionPose(const BrownianMotionPose& brown) :
     F_(brown.F_),
     q_xy_(brown.q_xy_),
     q_z_(brown.q_z_),
@@ -51,7 +51,7 @@ CartesianAxisAngleBrownianMotion::CartesianAxisAngleBrownianMotion(const Cartesi
     gaussian_random_cone_(brown.gaussian_random_cone_) { }
 
 
-CartesianAxisAngleBrownianMotion::CartesianAxisAngleBrownianMotion(CartesianAxisAngleBrownianMotion&& brown) noexcept :
+BrownianMotionPose::BrownianMotionPose(BrownianMotionPose&& brown) noexcept :
     F_(std::move(brown.F_)),
     q_xy_(brown.q_xy_),
     theta_(brown.theta_),
@@ -74,19 +74,19 @@ CartesianAxisAngleBrownianMotion::CartesianAxisAngleBrownianMotion(CartesianAxis
 }
 
 
-CartesianAxisAngleBrownianMotion::~CartesianAxisAngleBrownianMotion() noexcept { }
+BrownianMotionPose::~BrownianMotionPose() noexcept { }
 
 
-CartesianAxisAngleBrownianMotion& CartesianAxisAngleBrownianMotion::operator=(const CartesianAxisAngleBrownianMotion& brown)
+BrownianMotionPose& BrownianMotionPose::operator=(const BrownianMotionPose& brown)
 {
-    CartesianAxisAngleBrownianMotion tmp(brown);
+    BrownianMotionPose tmp(brown);
     *this = std::move(tmp);
 
     return *this;
 }
 
 
-CartesianAxisAngleBrownianMotion& CartesianAxisAngleBrownianMotion::operator=(CartesianAxisAngleBrownianMotion&& brown) noexcept
+BrownianMotionPose& BrownianMotionPose::operator=(BrownianMotionPose&& brown) noexcept
 {
     F_          = std::move(brown.F_);
     q_xy_       = brown.q_xy_;
@@ -114,15 +114,13 @@ CartesianAxisAngleBrownianMotion& CartesianAxisAngleBrownianMotion::operator=(Ca
 }
 
 
-
-
-void CartesianAxisAngleBrownianMotion::propagate(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> prop_state)
+void BrownianMotionPose::propagate(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> prop_state)
 {
     prop_state = F_ * cur_state;
 }
 
 
-void CartesianAxisAngleBrownianMotion::motion(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> mot_state)
+void BrownianMotionPose::motion(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> mot_state)
 {
     propagate(cur_state, mot_state);
 
@@ -133,7 +131,7 @@ void CartesianAxisAngleBrownianMotion::motion(const Eigen::Ref<const Eigen::Matr
 }
 
 
-Eigen::MatrixXf CartesianAxisAngleBrownianMotion::getNoiseSample(const int num)
+Eigen::MatrixXf BrownianMotionPose::getNoiseSample(const int num)
 {
     MatrixXf sample(7, num);
 
@@ -161,7 +159,7 @@ Eigen::MatrixXf CartesianAxisAngleBrownianMotion::getNoiseSample(const int num)
 }
 
 
-void CartesianAxisAngleBrownianMotion::addAxisangleDisturbance(const Ref<const MatrixXf>& disturbance_vec, Ref<MatrixXf> current_vec)
+void BrownianMotionPose::addAxisangleDisturbance(const Ref<const MatrixXf>& disturbance_vec, Ref<MatrixXf> current_vec)
 {
     for (unsigned int i = 0; i < current_vec.cols(); ++i)
     {

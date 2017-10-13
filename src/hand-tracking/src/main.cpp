@@ -13,8 +13,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/cuda.hpp>
 
-#include "CartesianAxisAngleBrownianMotion.h"
-#include "CartesianAxisAnglePrediction.h"
+#include "BrownianMotionPose.h"
+#include "DrawParticlesPose.h"
 #include "iCubGatePose.h"
 #include "iCubFwdKinModel.h"
 #include "InitiCubArm.h"
@@ -22,8 +22,8 @@
 #include "PlayGatePose.h"
 #include "ResamplingWithPrior.h"
 #include "VisualProprioception.h"
-#include "VisualParticleFilterCorrection.h"
 #include "VisualSIRParticleFilter.h"
+#include "VisualUpdateParticles.h"
 
 using namespace bfl;
 using namespace cv;
@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     bool        play             = ((rf.findGroup("play").size() == 1 ? true : (rf.findGroup("play").size() == 2 ? rf.find("play").asBool() : false)));
     int         num_particles    = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
     int         gpu_count        = 1;
+    double      likelihood_gain  = 0.001;
 
     yInfo() << log_ID << "Running with:";
     yInfo() << log_ID << " - robot name:"          << robot_name;
@@ -80,11 +81,11 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - number of particles:" << num_particles;
 
     /* INITIALIZATION */
-    std::unique_ptr<Initialization> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", robot_cam_sel, robot_laterality));
+    std::unique_ptr<InitiCubArm> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", robot_cam_sel, robot_laterality));
 
 
     /* MOTION MODEL */
-    std::unique_ptr<StateModel> brown(new CartesianAxisAngleBrownianMotion(0.005, 0.005, 3.0, 2.5, 1));
+    std::unique_ptr<BrownianMotionPose> brown(new BrownianMotionPose(0.005, 0.005, 3.0, 2.5, 1));
     std::unique_ptr<StateModel> icub_motion;
     if (!play)
     {
@@ -98,7 +99,7 @@ int main(int argc, char *argv[])
     }
 
     /* PREDICTION */
-    std::unique_ptr<PFPrediction> pf_prediction(new CartesianAxisAnglePrediction(std::move(icub_motion)));
+    std::unique_ptr<DrawParticlesPose> pf_prediction(new DrawParticlesPose(std::move(icub_motion)));
 
 
     /* SENSOR MODEL */
@@ -117,9 +118,9 @@ int main(int argc, char *argv[])
     }
 
     /* CORRECTION */
-    std::unique_ptr<PFVisualCorrection> vpf_correction(new VisualParticleFilterCorrection(std::move(proprio), gpu_count));
+    std::unique_ptr<VisualUpdateParticles> vpf_correction(new VisualUpdateParticles(std::move(proprio), likelihood_gain, gpu_count));
 
-    std::unique_ptr<PFVisualCorrection> vpf_correction_gated;
+    std::unique_ptr<GatePose> vpf_correction_gated;
     if (!play)
     {
         std::unique_ptr<iCubGatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_correction),

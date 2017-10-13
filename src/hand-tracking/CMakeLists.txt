@@ -24,7 +24,7 @@ include(YarpInstallationHelpers)
 
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
-        include/CartesianAxisAngleBrownianMotion.h
+        include/BrownianMotionPose.h
         include/CartesianAxisAnglePrediction.h
         include/GatePose.h
         include/iCubFwdKinModel.h
@@ -34,12 +34,12 @@ set(${EXE_TARGET_NAME}_HDR
         include/PlayGatePose.h
         include/ResamplingWithPrior.h
         include/VisualProprioception.h
-        include/VisualParticleFilterCorrection.h
-        include/VisualSIRParticleFilter.h)
+        include/VisualSIRParticleFilter.h
+        include/VisualUpdateParticles.h)
 
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
-        src/CartesianAxisAngleBrownianMotion.cpp
+        src/BrownianMotionPose.cpp
         src/CartesianAxisAnglePrediction.cpp
         src/GatePose.cpp
         src/iCubFwdKinModel.cpp
@@ -49,8 +49,8 @@ set(${EXE_TARGET_NAME}_SRC
         src/PlayGatePose.cpp
         src/ResamplingWithPrior.cpp
         src/VisualProprioception.cpp
-        src/VisualParticleFilterCorrection.cpp
-        src/VisualSIRParticleFilter.cpp)
+        src/VisualSIRParticleFilter.cpp
+        src/VisualUpdateParticles.cpp)
 
 set(${EXE_TARGET_NAME}_THRIFT_HDR
         thrift/visualsirpf.thrift)
