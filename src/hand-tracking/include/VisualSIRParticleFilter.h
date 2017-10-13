@@ -9,9 +9,9 @@
 #include <BayesFilters/FilteringAlgorithm.h>
 #include <BayesFilters/Initialization.h>
 #include <BayesFilters/StateModel.h>
-#include <BayesFilters/ParticleFilterPrediction.h>
+#include <BayesFilters/PFPrediction.h>
 #include <BayesFilters/VisualObservationModel.h>
-#include <BayesFilters/VisualCorrection.h>
+#include <BayesFilters/PFVisualCorrection.h>
 #include <BayesFilters/Resampling.h>
 #include <Eigen/Dense>
 #include <iCub/ctrl/adaptWinPolyEstimator.h>
@@ -80,28 +80,19 @@ class VisualSIRParticleFilter: public bfl::FilteringAlgorithm,
                                public VisualSIRParticleFilterIDL
 {
 public:
-    /* Default constructor, disabled */
-    VisualSIRParticleFilter() = delete;
-
-    /* VisualSIR complete constructor */
     VisualSIRParticleFilter(std::unique_ptr<bfl::Initialization> initialization,
-                            std::unique_ptr<bfl::ParticleFilterPrediction> prediction, std::unique_ptr<bfl::VisualCorrection> correction,
+                            std::unique_ptr<bfl::PFPrediction> prediction, std::unique_ptr<bfl::PFVisualCorrection> correction,
                             std::unique_ptr<bfl::Resampling> resampling,
                             const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const int num_particles);
 
-    /* Destructor */
-    ~VisualSIRParticleFilter() noexcept override;
-
-    /* Copy constructor */
     VisualSIRParticleFilter(const VisualSIRParticleFilter& vsir_pf) = delete;
 
-    /* Move constructor */
     VisualSIRParticleFilter(VisualSIRParticleFilter&& vsir_pf) noexcept = delete;
 
-    /* Copy assignment operator */
+    ~VisualSIRParticleFilter() noexcept;
+
     VisualSIRParticleFilter& operator=(const VisualSIRParticleFilter& vsir_pf) = delete;
 
-    /* Move assignment operator */
     VisualSIRParticleFilter& operator=(VisualSIRParticleFilter&& vsir_pf) noexcept = delete;
 
     void initialization() override;
@@ -113,16 +104,16 @@ public:
     bool runCondition() override { return true; };
 
 protected:
-    std::unique_ptr<bfl::Initialization>           initialization_;
-    std::unique_ptr<bfl::ParticleFilterPrediction> prediction_;
-    std::unique_ptr<bfl::VisualCorrection>         correction_;
-    std::unique_ptr<bfl::Resampling>               resampling_;
+    std::unique_ptr<bfl::Initialization>     initialization_;
+    std::unique_ptr<bfl::PFPrediction>       prediction_;
+    std::unique_ptr<bfl::PFVisualCorrection> correction_;
+    std::unique_ptr<bfl::Resampling>         resampling_;
 
-    yarp::os::ConstString                          cam_sel_;
-    yarp::os::ConstString                          laterality_;
-    const int                                      num_particles_;
+    yarp::os::ConstString cam_sel_;
+    yarp::os::ConstString laterality_;
+    const int             num_particles_;
 
-    cv::Ptr<cv::cuda::HOG>                         cuda_hog_;
+    cv::Ptr<cv::cuda::HOG> cuda_hog_;
 
 
     yarp::os::BufferedPort<yarp::sig::Vector>                       port_estimates_out_;
@@ -182,8 +173,11 @@ protected:
     /* *************************** */
 
 private:
-    Eigen::MatrixXf particle_;
-    Eigen::VectorXf weight_;
+    Eigen::MatrixXf pred_particle_;
+    Eigen::VectorXf pred_weight_;
+
+    Eigen::MatrixXf cor_particle_;
+    Eigen::VectorXf cor_weight_;
 
 
     const int          block_size_        = 16;
