@@ -167,7 +167,7 @@ protected:
 
 
     /* Enum helpers */
-    enum class VisualServoControl { decoupled, robust };
+    enum class VisualServoControl { decoupled, robust, cartesian };
 
     enum class PixelControlMode { all, x, o };
 
@@ -191,21 +191,28 @@ private:
     bool                           vs_goal_reached_    = false;
     const double                   Ts_                 = 0.1; /* [s] */
     std::array<double, 2>          K_x_                = {{0.5, 0.25}};
-    std::array<double, 2>          K_o_                = {{0.5, 0.25}};
+    std::array<double, 2>          K_o_                = {{3.5, 0.5}};
     double                         max_x_dot_          = 0.025; /* [m/s] */
-    double                         max_o_dot_          = 5 * M_PI / 180.0; /* [rad/s] */
-    double                         K_x_tol_            = 20.0; /* [pixel] */
-    double                         K_o_tol_            = 20.0; /* [pixel] */
+    double                         max_o_dot_          = 5.0 * M_PI / 180.0; /* [rad/s] */
+    double                         K_x_tol_            = 10.0; /* [pixel] */
+    double                         K_o_tol_            = 10.0; /* [pixel] */
+    double                         K_position_tol_     = 0.03; /* [m] */
+    double                         K_orientation_tol_  = 9.0 * M_PI / 180.0; /* [rad] */
+    double                         K_angle_tol_        = 3.0 * M_PI / 180.0; /* [rad] */
     bool                           K_x_hysteresis_     = false;
     bool                           K_o_hysteresis_     = false;
-    double                         px_tol_             = 5.0; /* [pixel] */
+    bool                           K_pose_hysteresis_  = false;
+    double                         tol_px_             = 1.0; /* [pixel] */
+    double                         tol_position_       = 0.01; /* [m] */
+    double                         tol_orientation_    = 3.0 * M_PI / 180.0; /* [rad] */
+    double                         tol_angle_          = 1.0 * M_PI / 180.0; /* [rad] */
     double                         traj_time_          = 1.0; /* [s] */
 
     yarp::sig::Matrix              l_proj_;
     yarp::sig::Matrix              r_proj_;
 
     yarp::sig::Vector              goal_pose_    = yarp::math::zeros(7);
-    yarp::sig::Vector              px_des_       = yarp::math::zeros(12);
+    yarp::sig::Vector              px_des_       = yarp::math::zeros(16);
     yarp::sig::Matrix              l_H_eye_to_r_ = yarp::math::zeros(4, 4);
     yarp::sig::Matrix              r_H_eye_to_r_ = yarp::math::zeros(4, 4);
     yarp::sig::Matrix              l_H_r_to_cam_ = yarp::math::zeros(4, 4);
@@ -241,6 +248,8 @@ private:
     void decoupledImageBasedVisualServoControl();
 
     void robustImageBasedVisualServoControl();
+
+    void cartesianPositionBasedVisualServoControl();
 
     bool setRightArmCartesianController();
 
@@ -283,6 +292,27 @@ private:
     void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo()    << str; };
     void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning() << str; };
     void yErrorVerbose  (const yarp::os::ConstString& str) const { if(verbosity_) yError()   << str; };
+
+    /* EXPERIMENTAL */
+    yarp::sig::Vector averagePose(const yarp::sig::Vector& l_pose, const yarp::sig::Vector& r_pose) const;
+
+	bool checkVisualServoingStatus(const yarp::sig::Vector& pose_cur, const double tol_position, const double tol_orientation, const double tol_angle);
+
+    /* LOG */
+    yarp::sig::Vector stdVectorOfVectorsToVector(const std::vector<yarp::sig::Vector>& vectors);
+
+    yarp::os::BufferedPort<yarp::sig::Vector> port_pose_px_l_;
+    yarp::os::BufferedPort<yarp::sig::Vector> port_pose_px_r_;
+
+    yarp::os::BufferedPort<yarp::sig::Vector> port_kin_px_l_;
+    yarp::os::BufferedPort<yarp::sig::Vector> port_kin_px_r_;
+
+    yarp::os::BufferedPort<yarp::sig::Vector> port_goal_px_l_;
+    yarp::os::BufferedPort<yarp::sig::Vector> port_goal_px_r_;
+
+    yarp::os::BufferedPort<yarp::sig::Vector> port_pose_avg_;
+    yarp::os::BufferedPort<yarp::sig::Vector> port_pose_kin_;
+    yarp::os::BufferedPort<yarp::sig::Vector> port_pose_goal_;
 };
 
 #endif /* VISUALSERVOINGSERVER_H */

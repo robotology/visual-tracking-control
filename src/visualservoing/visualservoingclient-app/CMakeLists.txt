@@ -23,7 +23,9 @@ target_link_libraries(${APP_TARGET_NAME} ${YARP_LIBRARIES}
 # Application XML app files
 set(${APP_TARGET_NAME}_APP
         ${PROJECT_SOURCE_DIR}/app/visualservoing.xml
-        ${PROJECT_SOURCE_DIR}/app/visualservoing-SIM.xml)
+        ${PROJECT_SOURCE_DIR}/app/visualservoing-SIM.xml
+        ${PROJECT_SOURCE_DIR}/app/visualservoing-datadump.xml
+        ${PROJECT_SOURCE_DIR}/app/BackgroundApps-SIM.xml)
 
 install(TARGETS ${APP_TARGET_NAME}          DESTINATION bin)
 install(FILES   ${${APP_TARGET_NAME}_APP}   DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR})

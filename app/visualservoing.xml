@@ -4,8 +4,8 @@
 
     <!-- GENERIC INFORMATION -->
     <name>visualservoing</name>
-    <description>This app allows the iCub to perform visual servoing tasks. Must be used with the hand-tracking app.</description>
-    <version>0.5.0</version>
+    <description>This app allows the iCub to perform visual servoing tasks.</description>
+    <version>0.5.1</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -41,18 +41,6 @@
         <name>yarpview</name>
         <parameters>--name /view/cam_right/ee --x 340 --y 740 --RefreshTime 30</parameters>
         <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpdatadumper</name>
-        <node>localhost</node>
-        <parameters>--name /datadumper/cam_left/x --txTime --rxTime --type bottle</parameters>
-    </module>
-
-    <module>
-        <name>yarpdatadumper</name>
-        <node>localhost</node>
-        <parameters>--name /datadumper/cam_right/x --txTime --rxTime --type bottle</parameters>
     </module>
 
 
@@ -102,18 +90,6 @@
     <connection>
         <from>/visualservoing/cam_right/img:o</from>
         <to>/view/cam_right/ee</to>
-        <protocol>tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/visualservoing/cam_left/x:o</from>
-        <to>/datadumper/cam_left/x</to>
-        <protocol>tcp</protocol>
-    </connection>
-
-    <connection>
-        <from>/visualservoing/cam_right/x:o</from>
-        <to>/datadumper/cam_right/x</to>
         <protocol>tcp</protocol>
     </connection>
 
