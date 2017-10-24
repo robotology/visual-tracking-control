@@ -1,15 +1,15 @@
 # Copyright: (C) 2017 iCub Facility - Istituto Italiano di Tecnologia
 # Authors: Claudio Fantacci
 #
-# visualsirpf.thrift
+# visualsispf.thrift
 
 /**
- * VisualSIRParticleFilterIDL
+ * VisualSISParticleFilterIDL
  *
  * IDL Interface to \ref VisualSIRParticleFilter options.
  */
 
-service VisualSIRParticleFilterIDL
+service VisualSISParticleFilterIDL
 {
     /**
      * Initialize and run the visual SIR particle filter. Returns upon

@@ -1,4 +1,4 @@
-#include "VisualSIRParticleFilter.h"
+#include "VisualSISParticleFilter.h"
 
 #include <exception>
 #include <iostream>
@@ -28,7 +28,7 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<Initialization> initialization,
+VisualSISParticleFilter::VisualSISParticleFilter(std::unique_ptr<Initialization> initialization,
                                                  std::unique_ptr<PFPrediction> prediction, std::unique_ptr<PFVisualCorrection> correction,
                                                  std::unique_ptr<Resampling> resampling,
                                                  const ConstString& cam_sel, const ConstString& laterality, const int num_particles) :
@@ -49,7 +49,7 @@ VisualSIRParticleFilter::VisualSIRParticleFilter(std::unique_ptr<Initialization>
 }
 
 
-void VisualSIRParticleFilter::initialization()
+void VisualSISParticleFilter::initialization()
 {
     pred_particle_ = MatrixXf(7, num_particles_);
     pred_weight_   = VectorXf(num_particles_, 1);
@@ -63,14 +63,14 @@ void VisualSIRParticleFilter::initialization()
 }
 
 
-VisualSIRParticleFilter::~VisualSIRParticleFilter() noexcept
+VisualSISParticleFilter::~VisualSISParticleFilter() noexcept
 {
     port_image_in_.close();
     port_estimates_out_.close();
 }
 
 
-void VisualSIRParticleFilter::filteringStep()
+void VisualSISParticleFilter::filteringStep()
 {
     std::vector<float> descriptors_cam_left (descriptor_length_);
     cuda::GpuMat       cuda_img             (Size(img_width_, img_height_), CV_8UC3);
@@ -221,16 +221,16 @@ void VisualSIRParticleFilter::filteringStep()
 }
 
 
-void VisualSIRParticleFilter::getResult() { }
+void VisualSISParticleFilter::getResult() { }
 
 
-bool VisualSIRParticleFilter::attach(yarp::os::Port &source)
+bool VisualSISParticleFilter::attach(yarp::os::Port &source)
 {
     return this->yarp().attachAsServer(source);
 }
 
 
-bool VisualSIRParticleFilter::setCommandPort()
+bool VisualSISParticleFilter::setCommandPort()
 {
     std::cout << "Opening RPC command port." << std::endl;
     if (!port_rpc_command_.open("/hand-tracking/" + cam_sel_ + "/cmd:i"))
@@ -249,7 +249,7 @@ bool VisualSIRParticleFilter::setCommandPort()
 }
 
 
-bool VisualSIRParticleFilter::run_filter()
+bool VisualSISParticleFilter::run_filter()
 {
     run();
 
@@ -257,7 +257,7 @@ bool VisualSIRParticleFilter::run_filter()
 }
 
 
-bool VisualSIRParticleFilter::reset_filter()
+bool VisualSISParticleFilter::reset_filter()
 {
     reset();
 
@@ -265,7 +265,7 @@ bool VisualSIRParticleFilter::reset_filter()
 }
 
 
-bool VisualSIRParticleFilter::stop_filter()
+bool VisualSISParticleFilter::stop_filter()
 {
     reboot();
 
@@ -273,7 +273,7 @@ bool VisualSIRParticleFilter::stop_filter()
 }
 
 
-bool VisualSIRParticleFilter::use_analogs(const bool status)
+bool VisualSISParticleFilter::use_analogs(const bool status)
 {
     if (status)
         return correction_->getVisualObservationModel().setProperty("VP_ANALOGS_ON");
@@ -282,7 +282,7 @@ bool VisualSIRParticleFilter::use_analogs(const bool status)
 }
 
 
-std::vector<std::string> VisualSIRParticleFilter::get_info()
+std::vector<std::string> VisualSISParticleFilter::get_info()
 {
     std::vector<std::string> info;
 
@@ -306,7 +306,7 @@ std::vector<std::string> VisualSIRParticleFilter::get_info()
 }
 
 
-bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string& method)
+bool VisualSISParticleFilter::set_estimates_extraction_method(const std::string& method)
 {
     if (method == "mean")
     {
@@ -343,7 +343,7 @@ bool VisualSIRParticleFilter::set_estimates_extraction_method(const std::string&
 }
 
 
-bool VisualSIRParticleFilter::set_mobile_average_window(const int16_t window)
+bool VisualSISParticleFilter::set_mobile_average_window(const int16_t window)
 {
     if (window > 0)
         return hist_buffer_.setHistorySize(window);
@@ -352,13 +352,13 @@ bool VisualSIRParticleFilter::set_mobile_average_window(const int16_t window)
 }
 
 
-bool VisualSIRParticleFilter::enable_adaptive_window(const bool status)
+bool VisualSISParticleFilter::enable_adaptive_window(const bool status)
 {
     return hist_buffer_.enableAdaptiveWindow(status);
 }
 
 
-bool VisualSIRParticleFilter::quit()
+bool VisualSISParticleFilter::quit()
 {
     teardown();
 
@@ -366,7 +366,7 @@ bool VisualSIRParticleFilter::quit()
 }
 
 
-VectorXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
+VectorXf VisualSISParticleFilter::mean(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
 {
     VectorXf out_particle = VectorXf::Zero(7);
     float    s_ang        = 0;
@@ -393,7 +393,7 @@ VectorXf VisualSIRParticleFilter::mean(const Ref<const MatrixXf>& particles, con
 }
 
 
-VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
+VectorXf VisualSISParticleFilter::mode(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
 {
     MatrixXf::Index maxRow;
     MatrixXf::Index maxCol;
@@ -403,7 +403,7 @@ VectorXf VisualSIRParticleFilter::mode(const Ref<const MatrixXf>& particles, con
 }
 
 
-VectorXf VisualSIRParticleFilter::smAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
+VectorXf VisualSISParticleFilter::smAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
 {
     VectorXf cur_estimates = mean(particles, weights);
 
@@ -417,7 +417,7 @@ VectorXf VisualSIRParticleFilter::smAverage(const Ref<const MatrixXf>& particles
 }
 
 
-VectorXf VisualSIRParticleFilter::wmAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
+VectorXf VisualSISParticleFilter::wmAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
 {
     VectorXf cur_estimates = mean(particles, weights);
 
@@ -437,7 +437,7 @@ VectorXf VisualSIRParticleFilter::wmAverage(const Ref<const MatrixXf>& particles
 }
 
 
-VectorXf VisualSIRParticleFilter::emAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
+VectorXf VisualSISParticleFilter::emAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
 {
     VectorXf cur_estimates = mean(particles, weights);
 

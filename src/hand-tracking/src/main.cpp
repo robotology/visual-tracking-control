@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <BayesFilters/Resampling.h>
-#include <BayesFilters/SIRParticleFilter.h>
+#include <BayesFilters/SISParticleFilter.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
@@ -22,7 +22,7 @@
 #include "PlayGatePose.h"
 #include "ResamplingWithPrior.h"
 #include "VisualProprioception.h"
-#include "VisualSIRParticleFilter.h"
+#include "VisualSISParticleFilter.h"
 #include "VisualUpdateParticles.h"
 
 using namespace bfl;
@@ -190,14 +190,14 @@ int main(int argc, char *argv[])
 
 
     /* PARTICLE FILTER */
-    VisualSIRParticleFilter vsir_pf(std::move(init_arm),
+    VisualSISParticleFilter vsis_pf(std::move(init_arm),
                                     std::move(pf_prediction), std::move(vpf_correction_gated),
                                     std::move(resampling),
                                     paramss["cam_sel"], paramss["laterality"], paramsd["num_particles"]);
 
 
-    vsir_pf.prepare();
-    vsir_pf.wait();
+    vsis_pf.prepare();
+    vsis_pf.wait();
 
 
     yInfo() << log_ID << "Application closed succesfully.";

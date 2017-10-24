@@ -1,5 +1,5 @@
-#ifndef VISUALSIRPARTICLEFILTER_H
-#define VISUALSIRPARTICLEFILTER_H
+#ifndef VISUALSISPARTICLEFILTER_H
+#define VISUALSISPARTICLEFILTER_H
 
 #include <chrono>
 #include <deque>
@@ -18,7 +18,7 @@
 #include <iCub/ctrl/filters.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/cudaobjdetect.hpp>
-#include <thrift/VisualSIRParticleFilterIDL.h>
+#include <thrift/VisualSISParticleFilterIDL.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IAnalogSensor.h>
 #include <yarp/os/Bottle.h>
@@ -76,24 +76,24 @@ private:
 };
 
 
-class VisualSIRParticleFilter: public bfl::FilteringAlgorithm,
-                               public VisualSIRParticleFilterIDL
+class VisualSISParticleFilter: public bfl::FilteringAlgorithm,
+                               public VisualSISParticleFilterIDL
 {
 public:
-    VisualSIRParticleFilter(std::unique_ptr<bfl::Initialization> initialization,
+    VisualSISParticleFilter(std::unique_ptr<bfl::Initialization> initialization,
                             std::unique_ptr<bfl::PFPrediction> prediction, std::unique_ptr<bfl::PFVisualCorrection> correction,
                             std::unique_ptr<bfl::Resampling> resampling,
                             const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const int num_particles);
 
-    VisualSIRParticleFilter(const VisualSIRParticleFilter& vsir_pf) = delete;
+    VisualSISParticleFilter(const VisualSISParticleFilter& vsir_pf) = delete;
 
-    VisualSIRParticleFilter(VisualSIRParticleFilter&& vsir_pf) noexcept = delete;
+    VisualSISParticleFilter(VisualSISParticleFilter&& vsir_pf) noexcept = delete;
 
-    ~VisualSIRParticleFilter() noexcept;
+    ~VisualSISParticleFilter() noexcept;
 
-    VisualSIRParticleFilter& operator=(const VisualSIRParticleFilter& vsir_pf) = delete;
+    VisualSISParticleFilter& operator=(const VisualSISParticleFilter& vsir_pf) = delete;
 
-    VisualSIRParticleFilter& operator=(VisualSIRParticleFilter&& vsir_pf) noexcept = delete;
+    VisualSISParticleFilter& operator=(VisualSISParticleFilter&& vsir_pf) noexcept = delete;
 
     void initialization() override;
 
@@ -187,4 +187,4 @@ private:
     const unsigned int descriptor_length_ = (img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4;
 };
 
-#endif /* VISUALSIRPARTICLEFILTER_H */
+#endif /* VISUALSISPARTICLEFILTER_H */
