@@ -24,13 +24,4 @@ include(ICUBcontribOptions)
 icubcontrib_set_default_prefix()
 icubcontrib_add_uninstall_target()
 
-option(BUILD_TESTING "Build CMake tests" OFF)
-if(BUILD_TESTING)
-    enable_testing()
-endif()
-
 add_subdirectory(src)
-
-if(BUILD_TESTING)
-    add_subdirectory(test)
-endif()
