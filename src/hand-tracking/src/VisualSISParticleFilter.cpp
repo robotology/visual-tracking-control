@@ -28,11 +28,7 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSISParticleFilter::VisualSISParticleFilter(std::unique_ptr<Initialization> initialization,
-                                                 std::unique_ptr<PFPrediction> prediction, std::unique_ptr<PFVisualCorrection> correction,
-                                                 std::unique_ptr<Resampling> resampling,
-                                                 const ConstString& cam_sel, const ConstString& laterality, const int num_particles) :
-    initialization_(std::move(initialization)), prediction_(std::move(prediction)), correction_(std::move(correction)), resampling_(std::move(resampling)),
+VisualSISParticleFilter::VisualSISParticleFilter(const ConstString& cam_sel, const ConstString& laterality, const int num_particles) :
     cam_sel_(cam_sel), laterality_(laterality), num_particles_(num_particles)
 {
     cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);

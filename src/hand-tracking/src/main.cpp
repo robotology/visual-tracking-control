@@ -3,7 +3,6 @@
 #include <iostream>
 #include <memory>
 
-#include <BayesFilters/Resampling.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
@@ -190,10 +189,11 @@ int main(int argc, char *argv[])
 
 
     /* PARTICLE FILTER */
-    VisualSISParticleFilter vsis_pf(std::move(init_arm),
-                                    std::move(pf_prediction), std::move(vpf_correction_gated),
-                                    std::move(resampling),
-                                    paramss["cam_sel"], paramss["laterality"], paramsd["num_particles"]);
+    VisualSISParticleFilter vsis_pf(paramss["cam_sel"], paramss["laterality"], paramsd["num_particles"]);
+    vsis_pf.setInitialization(std::move(init_arm));
+    vsis_pf.setPrediction(std::move(pf_prediction));
+    vsis_pf.setCorrection(std::move(vpf_correction_gated));
+    vsis_pf.setResampling(std::move(resampling));
 
 
     vsis_pf.boot();

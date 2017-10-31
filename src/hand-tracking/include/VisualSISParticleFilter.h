@@ -6,13 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include <BayesFilters/FilteringAlgorithm.h>
-#include <BayesFilters/Initialization.h>
-#include <BayesFilters/StateModel.h>
-#include <BayesFilters/PFPrediction.h>
-#include <BayesFilters/VisualObservationModel.h>
-#include <BayesFilters/PFVisualCorrection.h>
-#include <BayesFilters/Resampling.h>
+#include <BayesFilters/VisualParticleFilter.h>
 #include <Eigen/Dense>
 #include <iCub/ctrl/adaptWinPolyEstimator.h>
 #include <iCub/ctrl/filters.h>
@@ -76,14 +70,11 @@ private:
 };
 
 
-class VisualSISParticleFilter: public bfl::FilteringAlgorithm,
+class VisualSISParticleFilter: public bfl::VisualParticleFilter,
                                public VisualSISParticleFilterIDL
 {
 public:
-    VisualSISParticleFilter(std::unique_ptr<bfl::Initialization> initialization,
-                            std::unique_ptr<bfl::PFPrediction> prediction, std::unique_ptr<bfl::PFVisualCorrection> correction,
-                            std::unique_ptr<bfl::Resampling> resampling,
-                            const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const int num_particles);
+    VisualSISParticleFilter(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const int num_particles);
 
     VisualSISParticleFilter(const VisualSISParticleFilter& vsir_pf) = delete;
 
@@ -106,10 +97,6 @@ protected:
 
     bool runCondition() override { return true; };
 
-    std::unique_ptr<bfl::Initialization>     initialization_;
-    std::unique_ptr<bfl::PFPrediction>       prediction_;
-    std::unique_ptr<bfl::PFVisualCorrection> correction_;
-    std::unique_ptr<bfl::Resampling>         resampling_;
 
     yarp::os::ConstString cam_sel_;
     yarp::os::ConstString laterality_;
