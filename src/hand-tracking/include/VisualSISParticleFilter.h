@@ -95,7 +95,7 @@ public:
 
     VisualSISParticleFilter& operator=(VisualSISParticleFilter&& vsir_pf) noexcept = delete;
 
-    void skip(const std::string& what_step, const bool status) override;
+    bool skip(const std::string& what_step, const bool status) override;
 
 protected:
     void initialization() override;
@@ -132,6 +132,8 @@ protected:
     bool                     reset_filter() override;
 
     bool                     stop_filter() override;
+
+    bool                     skip_step(const std::string& what_step, const bool status) override;
 
     bool                     use_analogs(const bool status) override;
 

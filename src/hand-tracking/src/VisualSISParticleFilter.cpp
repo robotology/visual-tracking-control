@@ -49,13 +49,15 @@ VisualSISParticleFilter::VisualSISParticleFilter(std::unique_ptr<Initialization>
 }
 
 
-void VisualSISParticleFilter::skip(const std::string& what_step, const bool status)
+bool VisualSISParticleFilter::skip(const std::string& what_step, const bool status)
 {
     if (what_step == "prediction")
-        prediction_->skip(status);
+        return prediction_->skip(status);
 
     if (what_step == "correction")
-        correction_->skip(status);
+        return correction_->skip(status);
+
+    return false;
 }
 
 
@@ -280,6 +282,12 @@ bool VisualSISParticleFilter::stop_filter()
     reboot();
 
     return true;
+}
+
+
+bool VisualSISParticleFilter::skip_step(const std::string& what_step, const bool status)
+{
+    return skip(what_step, status);
 }
 
 
