@@ -49,6 +49,16 @@ VisualSISParticleFilter::VisualSISParticleFilter(std::unique_ptr<Initialization>
 }
 
 
+void VisualSISParticleFilter::skip(const std::string& what_step, const bool status)
+{
+    if (what_step == "prediction")
+        prediction_->skip(status);
+
+    if (what_step == "correction")
+        correction_->skip(status);
+}
+
+
 void VisualSISParticleFilter::initialization()
 {
     pred_particle_ = MatrixXf(7, num_particles_);

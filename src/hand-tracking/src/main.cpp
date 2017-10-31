@@ -4,7 +4,6 @@
 #include <memory>
 
 #include <BayesFilters/Resampling.h>
-#include <BayesFilters/SISParticleFilter.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
@@ -143,7 +142,8 @@ int main(int argc, char *argv[])
     }
 
     /* PREDICTION */
-    std::unique_ptr<DrawParticlesPose> pf_prediction(new DrawParticlesPose(std::move(icub_motion)));
+    std::unique_ptr<DrawParticlesPose> pf_prediction(new DrawParticlesPose());
+    pf_prediction->setStateModel(std::move(icub_motion));
 
 
     /* SENSOR MODEL */
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
                                     paramss["cam_sel"], paramss["laterality"], paramsd["num_particles"]);
 
 
-    vsis_pf.prepare();
+    vsis_pf.boot();
     vsis_pf.wait();
 
 

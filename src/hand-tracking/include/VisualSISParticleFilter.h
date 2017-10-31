@@ -95,6 +95,9 @@ public:
 
     VisualSISParticleFilter& operator=(VisualSISParticleFilter&& vsir_pf) noexcept = delete;
 
+    void skip(const std::string& what_step, const bool status) override;
+
+protected:
     void initialization() override;
 
     void filteringStep() override;
@@ -103,7 +106,6 @@ public:
 
     bool runCondition() override { return true; };
 
-protected:
     std::unique_ptr<bfl::Initialization>     initialization_;
     std::unique_ptr<bfl::PFPrediction>       prediction_;
     std::unique_ptr<bfl::PFVisualCorrection> correction_;

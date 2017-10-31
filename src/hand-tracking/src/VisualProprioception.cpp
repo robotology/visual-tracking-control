@@ -173,7 +173,8 @@ VisualProprioception::VisualProprioception(const bool use_thumb, const bool use_
                             cam_width_, cam_height_,cam_fx_, cam_fy_, cam_cx_, cam_cy_,
                             num_images,
                             {1.0, 0.0, 0.0, M_PI},
-                            shader_path);
+                            shader_path,
+                            false);
     }
     catch (const std::runtime_error& e)
     {

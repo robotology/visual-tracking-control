@@ -57,24 +57,6 @@ VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioceptio
 VisualUpdateParticles::~VisualUpdateParticles() noexcept { }
 
 
-void VisualUpdateParticles::correct(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
-                                             Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
-{
-    VectorXf innovations(pred_states.cols());
-    innovation(pred_states, measurements, innovations);
-
-    cor_states = pred_states;
-
-    for (int i = 0; i < innovations.rows(); ++i)
-    {
-        cor_weights(i) = pred_weights(i) * likelihood(innovations.row(i));
-
-        if (cor_weights(i) <= 0)
-            cor_weights(i) = std::numeric_limits<float>::min();
-    }
-}
-
-
 void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, cv::InputArray measurements, Ref<MatrixXf> innovations)
 {
     for (int s = 0; s < num_cuda_stream_; ++s)
@@ -124,4 +106,30 @@ double VisualUpdateParticles::likelihood(const Ref<const MatrixXf>& innovations)
 bfl::VisualObservationModel& VisualUpdateParticles::getVisualObservationModel()
 {
     return *observation_model_;
+}
+
+
+void VisualUpdateParticles::setVisualObservationModel(std::unique_ptr<VisualObservationModel> visual_observation_model)
+{
+    VisualObservationModel* tmp_observation_model = visual_observation_model.release();
+
+    observation_model_ = std::unique_ptr<VisualProprioception>(dynamic_cast<VisualProprioception*>(tmp_observation_model));
+}
+
+
+void VisualUpdateParticles::correctStep(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
+                                        Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
+{
+    VectorXf innovations(pred_states.cols());
+    innovation(pred_states, measurements, innovations);
+
+    cor_states = pred_states;
+
+    for (int i = 0; i < innovations.rows(); ++i)
+    {
+        cor_weights(i) = pred_weights(i) * likelihood(innovations.row(i));
+
+        if (cor_weights(i) <= 0)
+            cor_weights(i) = std::numeric_limits<float>::min();
+    }
 }
