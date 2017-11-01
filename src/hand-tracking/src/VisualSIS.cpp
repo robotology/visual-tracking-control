@@ -48,7 +48,7 @@ VisualSIS::VisualSIS(const ConstString& cam_sel, const ConstString& laterality, 
 bool VisualSIS::skip(const std::string& what_step, const bool status)
 {
     if (what_step == "prediction")
-        return prediction_->skip(status);
+        return prediction_->skip(what_step, status);
 
     if (what_step == "correction")
         return correction_->skip(status);
@@ -66,8 +66,6 @@ void VisualSIS::initialization()
     cor_weight_   = VectorXf(num_particles_, 1);
 
     initialization_->initialize(pred_particle_, pred_weight_);
-
-    prediction_->getStateModel().setProperty("ICFW_PLAY_INIT");
 }
 
 
