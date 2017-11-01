@@ -141,7 +141,8 @@ int main(int argc, char *argv[])
     }
 
     /* PREDICTION */
-    std::unique_ptr<DrawParticlesPose> pf_prediction(new DrawParticlesPose());
+//    std::unique_ptr<DrawParticlesPose> pf_prediction(new DrawParticlesPose());
+    std::unique_ptr<DrawParticlesPoseCondWeight> pf_prediction(new DrawParticlesPoseCondWeight());
     pf_prediction->setStateModel(std::move(icub_motion));
 
 
