@@ -124,6 +124,7 @@ void BrownianMotionPose::motion(const Eigen::Ref<const Eigen::MatrixXf>& cur_sta
     sample = getNoiseSample(mot_state.cols());
 
     mot_state.topRows<3>() += sample.topRows<3>();
+    addAxisangleDisturbance(sample.bottomRows<4>(), mot_state.bottomRows<4>());
 }
 
 
@@ -159,7 +160,7 @@ void BrownianMotionPose::addAxisangleDisturbance(const Ref<const MatrixXf>& dist
 {
     for (unsigned int i = 0; i < current_vec.cols(); ++i)
     {
-        float ang = current_vec(i, 3) + disturbance_vec(i, 3);
+        float ang = current_vec(3, i) + disturbance_vec(3, i);
 
         if      (ang >   M_PI) ang -= 2.0 * M_PI;
         else if (ang <= -M_PI) ang += 2.0 * M_PI;
@@ -184,6 +185,6 @@ void BrownianMotionPose::addAxisangleDisturbance(const Ref<const MatrixXf>& dist
 
 
         current_vec.col(i).head<3>() = (R * disturbance_vec.col(i).head<3>()).normalized();
-        current_vec(i, 3)            = ang;
+        current_vec(3, i)            = ang;
     }
 }
