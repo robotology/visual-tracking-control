@@ -1,5 +1,5 @@
-#ifndef VISUALSISPARTICLEFILTER_H
-#define VISUALSISPARTICLEFILTER_H
+#ifndef VISUALSIS_H
+#define VISUALSIS_H
 
 #include <chrono>
 #include <deque>
@@ -70,21 +70,21 @@ private:
 };
 
 
-class VisualSISParticleFilter: public bfl::VisualParticleFilter,
-                               public VisualSISParticleFilterIDL
+class VisualSIS: public bfl::VisualParticleFilter,
+                 public VisualSISParticleFilterIDL
 {
 public:
-    VisualSISParticleFilter(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const int num_particles);
+    VisualSIS(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const int num_particles);
 
-    VisualSISParticleFilter(const VisualSISParticleFilter& vsir_pf) = delete;
+    VisualSIS(const VisualSIS& vsir_pf) = delete;
 
-    VisualSISParticleFilter(VisualSISParticleFilter&& vsir_pf) noexcept = delete;
+    VisualSIS(VisualSIS&& vsir_pf) noexcept = delete;
 
-    ~VisualSISParticleFilter() noexcept;
+    ~VisualSIS() noexcept;
 
-    VisualSISParticleFilter& operator=(const VisualSISParticleFilter& vsir_pf) = delete;
+    VisualSIS& operator=(const VisualSIS& vsir_pf) = delete;
 
-    VisualSISParticleFilter& operator=(VisualSISParticleFilter&& vsir_pf) noexcept = delete;
+    VisualSIS& operator=(VisualSIS&& vsir_pf) noexcept = delete;
 
     bool skip(const std::string& what_step, const bool status) override;
 
@@ -178,4 +178,4 @@ private:
     const unsigned int descriptor_length_ = (img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4;
 };
 
-#endif /* VISUALSISPARTICLEFILTER_H */
+#endif /* VISUALSIS_H */

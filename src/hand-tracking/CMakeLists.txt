@@ -34,7 +34,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/PlayGatePose.h
         include/ResamplingWithPrior.h
         include/VisualProprioception.h
-        include/VisualSISParticleFilter.h
+        include/VisualSIS.h
         include/VisualUpdateParticles.h)
 
 set(${EXE_TARGET_NAME}_SRC
@@ -49,11 +49,11 @@ set(${EXE_TARGET_NAME}_SRC
         src/PlayGatePose.cpp
         src/ResamplingWithPrior.cpp
         src/VisualProprioception.cpp
-        src/VisualSISParticleFilter.cpp
+        src/VisualSIS.cpp
         src/VisualUpdateParticles.cpp)
 
 set(${EXE_TARGET_NAME}_THRIFT_HDR
-        thrift/visualsispf.thrift)
+        thrift/visualsisparticlefilter.thrift)
 
 # Application target calls
 yarp_add_idl(${EXE_TARGET_NAME}_THRIFT_SRC ${${EXE_TARGET_NAME}_THRIFT_HDR})
