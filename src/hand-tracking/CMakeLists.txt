@@ -90,7 +90,7 @@ set(${EXE_TARGET_NAME}_APP
         ${PROJECT_SOURCE_DIR}/app/visual-tracking-SIM.xml)
 
 set(${EXE_TARGET_NAME}_CONF
-${CMAKE_CURRENT_SOURCE_DIR}/conf/config.ini)
+        ${CMAKE_CURRENT_SOURCE_DIR}/conf/config.ini)
 
 set(${EXE_TARGET_NAME}_SHADER_VERT
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.vert
