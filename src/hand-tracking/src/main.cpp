@@ -12,8 +12,7 @@
 #include <opencv2/core/cuda.hpp>
 
 #include <BrownianMotionPose.h>
-#include <DrawParticlesPose.h>
-#include <DrawParticlesPoseCondWeight.h>
+#include <DrawFwdKinPoses.h>
 #include <iCubGatePose.h>
 #include <iCubFwdKinModel.h>
 #include <InitiCubArm.h>
@@ -129,22 +128,22 @@ int main(int argc, char *argv[])
 
     /* MOTION MODEL */
     std::unique_ptr<BrownianMotionPose> brown(new BrownianMotionPose(paramsd["q_xy"], paramsd["q_z"], paramsd["theta"], paramsd["cone_angle"], paramsd["seed"]));
-    std::unique_ptr<StateModel> icub_motion;
+    std::unique_ptr<FwdKinModel> icub_motion;
     if (paramsd["play"] != 1.0)
     {
-        std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(std::move(brown), paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+        std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
         icub_motion = std::move(icub_fwdkin);
     }
     else
     {
-        std::unique_ptr<PlayFwdKinModel> play_fwdkin(new PlayFwdKinModel(std::move(brown), paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+        std::unique_ptr<PlayFwdKinModel> play_fwdkin(new PlayFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
         icub_motion = std::move(play_fwdkin);
     }
 
     /* PREDICTION */
-//    std::unique_ptr<DrawParticlesPose> pf_prediction(new DrawParticlesPose());
-    std::unique_ptr<DrawParticlesPoseCondWeight> pf_prediction(new DrawParticlesPoseCondWeight());
-    pf_prediction->setStateModel(std::move(icub_motion));
+    std::unique_ptr<DrawFwdKinPoses> pf_prediction(new DrawFwdKinPoses());
+    pf_prediction->setStateModel(std::move(brown));
+    pf_prediction->setExogenousModel(std::move(icub_motion));
 
 
     /* SENSOR MODEL */
