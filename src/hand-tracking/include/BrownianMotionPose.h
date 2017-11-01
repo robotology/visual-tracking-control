@@ -32,7 +32,7 @@ public:
 
     Eigen::MatrixXf getNoiseSample(const int num) override;
 
-    Eigen::MatrixXf getNoiseCovariance() override { return Eigen::MatrixXf::Zero(1, 1); };
+    Eigen::MatrixXf getNoiseCovarianceMatrix() override { return Eigen::MatrixXf::Zero(1, 1); };
 
     bool setProperty(const std::string& property) override { return false; };
 

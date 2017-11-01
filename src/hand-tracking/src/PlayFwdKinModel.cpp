@@ -95,9 +95,9 @@ MatrixXf PlayFwdKinModel::getNoiseSample(const int num)
 }
 
 
-MatrixXf PlayFwdKinModel::getNoiseCovariance()
+MatrixXf PlayFwdKinModel::getNoiseCovarianceMatrix()
 {
-    return StateModelDecorator::getNoiseCovariance();
+    return StateModelDecorator::getNoiseCovarianceMatrix();
 }
 
 

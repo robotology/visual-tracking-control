@@ -129,9 +129,9 @@ MatrixXf iCubFwdKinModel::getNoiseSample(const int num)
 }
 
 
-MatrixXf iCubFwdKinModel::getNoiseCovariance()
+MatrixXf iCubFwdKinModel::getNoiseCovarianceMatrix()
 {
-    return StateModelDecorator::getNoiseCovariance();
+    return StateModelDecorator::getNoiseCovarianceMatrix();
 }
 
 
