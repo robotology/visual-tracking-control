@@ -54,8 +54,8 @@ void GatePose::setVisualObservationModel(std::unique_ptr<VisualObservationModel>
 void GatePose::correctStep(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
                            Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
 {
-    PFVisualCorrectionDecorator::correct(pred_states, pred_weights, measurements,
-                                         cor_states, cor_weights);
+    PFVisualCorrectionDecorator::correctStep(pred_states, pred_weights, measurements,
+                                             cor_states, cor_weights);
 
     ee_pose_ = readPose();
 
