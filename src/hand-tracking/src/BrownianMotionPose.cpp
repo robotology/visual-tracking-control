@@ -8,7 +8,6 @@ using namespace Eigen;
 
 
 BrownianMotionPose::BrownianMotionPose(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept :
-    F_(MatrixXf::Identity(7, 7)),
     q_xy_(q_xy),
     q_z_(q_z),
     theta_(theta * (M_PI/180.0)),
@@ -34,7 +33,6 @@ BrownianMotionPose::BrownianMotionPose() noexcept :
 
 
 BrownianMotionPose::BrownianMotionPose(const BrownianMotionPose& brown) :
-    F_(brown.F_),
     q_xy_(brown.q_xy_),
     q_z_(brown.q_z_),
     theta_(brown.theta_),
@@ -52,7 +50,6 @@ BrownianMotionPose::BrownianMotionPose(const BrownianMotionPose& brown) :
 
 
 BrownianMotionPose::BrownianMotionPose(BrownianMotionPose&& brown) noexcept :
-    F_(std::move(brown.F_)),
     q_xy_(brown.q_xy_),
     theta_(brown.theta_),
     cone_angle_(brown.cone_angle_),
@@ -88,7 +85,6 @@ BrownianMotionPose& BrownianMotionPose::operator=(const BrownianMotionPose& brow
 
 BrownianMotionPose& BrownianMotionPose::operator=(BrownianMotionPose&& brown) noexcept
 {
-    F_          = std::move(brown.F_);
     q_xy_       = brown.q_xy_;
     q_z_        = brown.q_z_;
     theta_      = brown.theta_;
@@ -116,7 +112,7 @@ BrownianMotionPose& BrownianMotionPose::operator=(BrownianMotionPose&& brown) no
 
 void BrownianMotionPose::propagate(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> prop_state)
 {
-    prop_state = F_ * cur_state;
+    prop_state = cur_state;
 }
 
 

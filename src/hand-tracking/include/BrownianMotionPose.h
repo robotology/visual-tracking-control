@@ -37,7 +37,6 @@ public:
     bool setProperty(const std::string& property) override { return false; };
 
 protected:
-    Eigen::MatrixXf                       F_;           /* State transition matrix */
     float                                 q_xy_;        /* Noise standard deviation for z   3D position */
     float                                 q_z_;         /* Noise standard deviation for x-y 3D position */
     float                                 theta_;       /* Noise standard deviation for axis-angle rotation */
