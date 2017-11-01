@@ -376,9 +376,7 @@ bool VisualSIS::enable_adaptive_window(const bool status)
 
 bool VisualSIS::quit()
 {
-    teardown();
-
-    return true;
+    return teardown();
 }
 
 
