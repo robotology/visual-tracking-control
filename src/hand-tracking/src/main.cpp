@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - cone_angle:" << paramsd["cone_angle"];
     yInfo() << log_ID << " - seed:"       << paramsd["seed"];
 
-    yInfo() << log_ID << " - use_thumb:" << paramsd["use_thumb"];
+    yInfo() << log_ID << " - use_thumb:"   << paramsd["use_thumb"];
     yInfo() << log_ID << " - use_forearm:" << paramsd["use_forearm"];
 
     yInfo() << log_ID << " - likelihood_gain:" << paramsd["likelihood_gain"];
