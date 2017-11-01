@@ -1,7 +1,7 @@
 #ifndef VISUALUPDATEPARTICLES_H
 #define VISUALUPDATEPARTICLES_H
 
-#include "VisualProprioception.h"
+#include <VisualProprioception.h>
 
 #include <condition_variable>
 #include <mutex>

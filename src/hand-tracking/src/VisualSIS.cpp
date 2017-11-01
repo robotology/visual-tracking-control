@@ -1,4 +1,4 @@
-#include "VisualSIS.h"
+#include <VisualSIS.h>
 
 #include <exception>
 #include <iostream>

@@ -11,17 +11,18 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/cuda.hpp>
 
-#include "BrownianMotionPose.h"
-#include "DrawParticlesPose.h"
-#include "iCubGatePose.h"
-#include "iCubFwdKinModel.h"
-#include "InitiCubArm.h"
-#include "PlayFwdKinModel.h"
-#include "PlayGatePose.h"
-#include "ResamplingWithPrior.h"
-#include "VisualProprioception.h"
-#include "VisualSIS.h"
-#include "VisualUpdateParticles.h"
+#include <BrownianMotionPose.h>
+#include <DrawParticlesPose.h>
+#include <DrawParticlesPoseCondWeight.h>
+#include <iCubGatePose.h>
+#include <iCubFwdKinModel.h>
+#include <InitiCubArm.h>
+#include <PlayFwdKinModel.h>
+#include <PlayGatePose.h>
+#include <ResamplingWithPrior.h>
+#include <VisualProprioception.h>
+#include <VisualSIS.h>
+#include <VisualUpdateParticles.h>
 
 using namespace bfl;
 using namespace cv;

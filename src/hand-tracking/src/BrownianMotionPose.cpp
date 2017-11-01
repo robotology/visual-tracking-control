@@ -1,4 +1,4 @@
-#include "BrownianMotionPose.h"
+#include <BrownianMotionPose.h>
 
 #include <cmath>
 #include <iostream>

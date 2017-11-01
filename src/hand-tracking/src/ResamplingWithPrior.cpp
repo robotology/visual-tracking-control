@@ -1,4 +1,4 @@
-#include "ResamplingWithPrior.h"
+#include <ResamplingWithPrior.h>
 
 #include <vector>
 

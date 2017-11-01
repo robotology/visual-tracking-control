@@ -1,4 +1,4 @@
-#include "iCubGatePose.h"
+#include <iCubGatePose.h>
 
 #include <iCub/ctrl/math.h>
 #include <yarp/eigen/Eigen.h>
