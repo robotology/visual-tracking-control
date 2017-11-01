@@ -99,24 +99,8 @@ void VisualSIS::filteringStep()
 
         /* PREDICTION */
         if (getFilteringStep() != 0)
-        {
-//            VectorXf sorted_cor = cor_weight_;
-//            std::sort(sorted_cor.data(), sorted_cor.data() + sorted_cor.size());
-//            float threshold = sorted_cor.tail(6)(0);
-//
-//            prediction_->getStateModel().setProperty("ICFW_DELTA");
-//            for (int j = 0; j < num_particles_; ++j)
-//            {
-//                if (cor_weight_(j) <= threshold)
-//                    prediction_->getStateModel().motion(cor_particle_.col(j), pred_particle_.col(j));
-//                else
-//                    prediction_->getStateModel().propagate(cor_particle_.col(j), pred_particle_.col(j));
-//            }
-//
-//            pred_weight_ = cor_weight_;
             prediction_->predict(cor_particle_, cor_weight_,
                                  pred_particle_, pred_weight_);
-        }
 
         /* CORRECTION */
         correction_->getVisualObservationModel().setProperty("VP_PARAMS");
