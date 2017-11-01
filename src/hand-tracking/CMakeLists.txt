@@ -25,8 +25,8 @@ include(YarpInstallationHelpers)
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
-        include/DrawParticlesPose.h
-        include/DrawParticlesPoseCondWeight.h
+        include/DrawFwdKinPoses.h
+        include/FwdKinModel.h
         include/GatePose.h
         include/iCubFwdKinModel.h
         include/iCubGatePose.h
@@ -41,8 +41,8 @@ set(${EXE_TARGET_NAME}_HDR
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
         src/BrownianMotionPose.cpp
-        src/DrawParticlesPose.cpp
-        src/DrawParticlesPoseCondWeight.cpp
+        src/DrawFwdKinPoses.cpp
+        src/FwdKinModel.cpp
         src/GatePose.cpp
         src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
