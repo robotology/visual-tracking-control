@@ -1,12 +1,5 @@
 set(EXE_TARGET_NAME hand-tracking)
 
-# Thread preference flags
-if(NOT APPLE)
-    set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-    find_package(Threads REQUIRED)
-endif()
-
 # Dependencies
 find_package(BayesFilters    REQUIRED)
 find_package(Eigen3          REQUIRED CONFIG)
@@ -78,7 +71,11 @@ target_link_libraries(${EXE_TARGET_NAME} BayesFilters::BayesFilters
                                          SuperimposeMesh::SuperimposeMesh
                                          ${YARP_LIBRARIES})
 
-if(NOT APPLE)
+if(UNIX AND NOT APPLE)
+    set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+    find_package(Threads REQUIRED)
+
     target_link_libraries(${EXE_TARGET_NAME} Threads::Threads)
 endif()
 
