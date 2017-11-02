@@ -3,8 +3,6 @@
 #include <iostream>
 #include <memory>
 
-#include <BayesFilters/Resampling.h>
-#include <BayesFilters/SISParticleFilter.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
@@ -13,17 +11,17 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/cuda.hpp>
 
-#include "BrownianMotionPose.h"
-#include "DrawParticlesPose.h"
-#include "iCubGatePose.h"
-#include "iCubFwdKinModel.h"
-#include "InitiCubArm.h"
-#include "PlayFwdKinModel.h"
-#include "PlayGatePose.h"
-#include "ResamplingWithPrior.h"
-#include "VisualProprioception.h"
-#include "VisualSISParticleFilter.h"
-#include "VisualUpdateParticles.h"
+#include <BrownianMotionPose.h>
+#include <DrawFwdKinPoses.h>
+#include <iCubGatePose.h>
+#include <iCubFwdKinModel.h>
+#include <InitiCubArm.h>
+#include <PlayFwdKinModel.h>
+#include <PlayGatePose.h>
+#include <ResamplingWithPrior.h>
+#include <VisualProprioception.h>
+#include <VisualSIS.h>
+#include <VisualUpdateParticles.h>
 
 using namespace bfl;
 using namespace cv;
@@ -112,7 +110,7 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - cone_angle:" << paramsd["cone_angle"];
     yInfo() << log_ID << " - seed:"       << paramsd["seed"];
 
-    yInfo() << log_ID << " - use_thumb:" << paramsd["use_thumb"];
+    yInfo() << log_ID << " - use_thumb:"   << paramsd["use_thumb"];
     yInfo() << log_ID << " - use_forearm:" << paramsd["use_forearm"];
 
     yInfo() << log_ID << " - likelihood_gain:" << paramsd["likelihood_gain"];
@@ -130,20 +128,22 @@ int main(int argc, char *argv[])
 
     /* MOTION MODEL */
     std::unique_ptr<BrownianMotionPose> brown(new BrownianMotionPose(paramsd["q_xy"], paramsd["q_z"], paramsd["theta"], paramsd["cone_angle"], paramsd["seed"]));
-    std::unique_ptr<StateModel> icub_motion;
+    std::unique_ptr<FwdKinModel> icub_motion;
     if (paramsd["play"] != 1.0)
     {
-        std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(std::move(brown), paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+        std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
         icub_motion = std::move(icub_fwdkin);
     }
     else
     {
-        std::unique_ptr<PlayFwdKinModel> play_fwdkin(new PlayFwdKinModel(std::move(brown), paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+        std::unique_ptr<PlayFwdKinModel> play_fwdkin(new PlayFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
         icub_motion = std::move(play_fwdkin);
     }
 
     /* PREDICTION */
-    std::unique_ptr<DrawParticlesPose> pf_prediction(new DrawParticlesPose(std::move(icub_motion)));
+    std::unique_ptr<DrawFwdKinPoses> pf_prediction(new DrawFwdKinPoses());
+    pf_prediction->setStateModel(std::move(brown));
+    pf_prediction->setExogenousModel(std::move(icub_motion));
 
 
     /* SENSOR MODEL */
@@ -190,13 +190,14 @@ int main(int argc, char *argv[])
 
 
     /* PARTICLE FILTER */
-    VisualSISParticleFilter vsis_pf(std::move(init_arm),
-                                    std::move(pf_prediction), std::move(vpf_correction_gated),
-                                    std::move(resampling),
-                                    paramss["cam_sel"], paramss["laterality"], paramsd["num_particles"]);
+    VisualSIS vsis_pf(paramss["cam_sel"], paramss["laterality"], paramsd["num_particles"]);
+    vsis_pf.setInitialization(std::move(init_arm));
+    vsis_pf.setPrediction(std::move(pf_prediction));
+    vsis_pf.setCorrection(std::move(vpf_correction_gated));
+    vsis_pf.setResampling(std::move(resampling));
 
 
-    vsis_pf.prepare();
+    vsis_pf.boot();
     vsis_pf.wait();
 
 

@@ -1,4 +1,4 @@
-#include "GatePose.h"
+#include <GatePose.h>
 
 #include <cmath>
 
@@ -27,24 +27,6 @@ GatePose::GatePose(std::unique_ptr<PFVisualCorrection> visual_correction) noexce
 GatePose::~GatePose() noexcept { }
 
 
-void GatePose::correct(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
-                       Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
-{
-    PFVisualCorrectionDecorator::correct(pred_states, pred_weights, measurements,
-                                         cor_states, cor_weights);
-
-    ee_pose_ = readPose();
-
-    for (int i = 0; i < cor_states.cols(); ++i)
-    {
-        if (!isInsideEllipsoid(cor_states.col(i).head<3>())        ||
-            !isInsideCone     (cor_states.col(i).middleRows<3>(3)) ||
-            !isWithinRotation (cor_states(6, i))                     )
-            cor_weights(i) = std::numeric_limits<float>::min();
-    }
-}
-
-
 void GatePose::innovation(const Ref<const MatrixXf>& pred_states, cv::InputArray measurements, Ref<MatrixXf> innovations)
 {
     PFVisualCorrectionDecorator::innovation(pred_states, measurements, innovations);
@@ -60,6 +42,30 @@ double GatePose::likelihood(const Ref<const MatrixXf>& innovations)
 VisualObservationModel& GatePose::getVisualObservationModel()
 {
     return PFVisualCorrectionDecorator::getVisualObservationModel();
+}
+
+
+void GatePose::setVisualObservationModel(std::unique_ptr<VisualObservationModel> visual_observation_model)
+{
+    PFVisualCorrectionDecorator::setVisualObservationModel(std::move(visual_observation_model));
+}
+
+
+void GatePose::correctStep(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
+                           Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
+{
+    PFVisualCorrectionDecorator::correctStep(pred_states, pred_weights, measurements,
+                                             cor_states, cor_weights);
+
+    ee_pose_ = readPose();
+
+    for (int i = 0; i < cor_states.cols(); ++i)
+    {
+        if (!isInsideEllipsoid(cor_states.col(i).head<3>())        ||
+            !isInsideCone     (cor_states.col(i).middleRows<3>(3)) ||
+            !isWithinRotation (cor_states(6, i))                     )
+            cor_weights(i) = std::numeric_limits<float>::min();
+    }
 }
 
 

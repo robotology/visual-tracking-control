@@ -1,12 +1,5 @@
 set(EXE_TARGET_NAME hand-tracking)
 
-# Thread preference flags
-if(NOT APPLE)
-    set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-    find_package(Threads REQUIRED)
-endif()
-
 # Dependencies
 find_package(BayesFilters    REQUIRED)
 find_package(Eigen3          REQUIRED CONFIG)
@@ -25,7 +18,8 @@ include(YarpInstallationHelpers)
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
-        include/DrawParticlesPose.h
+        include/DrawFwdKinPoses.h
+        include/FwdKinModel.h
         include/GatePose.h
         include/iCubFwdKinModel.h
         include/iCubGatePose.h
@@ -34,13 +28,14 @@ set(${EXE_TARGET_NAME}_HDR
         include/PlayGatePose.h
         include/ResamplingWithPrior.h
         include/VisualProprioception.h
-        include/VisualSISParticleFilter.h
+        include/VisualSIS.h
         include/VisualUpdateParticles.h)
 
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
         src/BrownianMotionPose.cpp
-        src/DrawParticlesPose.cpp
+        src/DrawFwdKinPoses.cpp
+        src/FwdKinModel.cpp
         src/GatePose.cpp
         src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
@@ -49,11 +44,11 @@ set(${EXE_TARGET_NAME}_SRC
         src/PlayGatePose.cpp
         src/ResamplingWithPrior.cpp
         src/VisualProprioception.cpp
-        src/VisualSISParticleFilter.cpp
+        src/VisualSIS.cpp
         src/VisualUpdateParticles.cpp)
 
 set(${EXE_TARGET_NAME}_THRIFT_HDR
-        thrift/visualsispf.thrift)
+        thrift/visualsisparticlefilter.thrift)
 
 # Application target calls
 yarp_add_idl(${EXE_TARGET_NAME}_THRIFT_SRC ${${EXE_TARGET_NAME}_THRIFT_HDR})
@@ -76,19 +71,23 @@ target_link_libraries(${EXE_TARGET_NAME} BayesFilters::BayesFilters
                                          SuperimposeMesh::SuperimposeMesh
                                          ${YARP_LIBRARIES})
 
-if(NOT APPLE)
+if(UNIX AND NOT APPLE)
+    set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+    find_package(Threads REQUIRED)
+
     target_link_libraries(${EXE_TARGET_NAME} Threads::Threads)
 endif()
 
 
 # Custom command for RESOURCE/EXTRA files
 set(${EXE_TARGET_NAME}_APP
-        ${PROJECT_SOURCE_DIR}/app/hand-tracking.xml
-        ${PROJECT_SOURCE_DIR}/app/hand-tracking-BATCH.xml
-        ${PROJECT_SOURCE_DIR}/app/hand-tracking-SIM.xml)
+        ${PROJECT_SOURCE_DIR}/app/visual-tracking.xml
+        ${PROJECT_SOURCE_DIR}/app/visual-tracking-BATCH.xml
+        ${PROJECT_SOURCE_DIR}/app/visual-tracking-SIM.xml)
 
 set(${EXE_TARGET_NAME}_CONF
-${CMAKE_CURRENT_SOURCE_DIR}/conf/config.ini)
+        ${CMAKE_CURRENT_SOURCE_DIR}/conf/config.ini)
 
 set(${EXE_TARGET_NAME}_SHADER_VERT
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.vert
@@ -99,22 +98,22 @@ set(${EXE_TARGET_NAME}_SHADER_FRAG
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_background.frag)
 
 set(${EXE_TARGET_NAME}_MESH
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_palm.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail0.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail1.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail2.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ail3.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_forearm.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_indexbase.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml0.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml1.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml2.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_ml3.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl0.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl1.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl2.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl3.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_hand/r_tl4.obj)
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_palm.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_ail0.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_ail1.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_ail2.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_ail3.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_forearm.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_indexbase.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_ml0.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_ml1.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_ml2.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_ml3.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl0.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl1.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl2.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl3.obj
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl4.obj)
 
 add_custom_command(TARGET  ${EXE_TARGET_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_SHADER_VERT} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>

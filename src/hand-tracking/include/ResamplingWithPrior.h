@@ -1,7 +1,7 @@
 #ifndef RESAMPLINGWITHPRIOR_H
 #define RESAMPLINGWITHPRIOR_H
 
-#include "InitiCubArm.h"
+#include <InitiCubArm.h>
 
 #include <random>
 

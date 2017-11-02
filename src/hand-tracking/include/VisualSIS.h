@@ -1,18 +1,12 @@
-#ifndef VISUALSISPARTICLEFILTER_H
-#define VISUALSISPARTICLEFILTER_H
+#ifndef VISUALSIS_H
+#define VISUALSIS_H
 
 #include <chrono>
 #include <deque>
 #include <memory>
 #include <vector>
 
-#include <BayesFilters/FilteringAlgorithm.h>
-#include <BayesFilters/Initialization.h>
-#include <BayesFilters/StateModel.h>
-#include <BayesFilters/PFPrediction.h>
-#include <BayesFilters/VisualObservationModel.h>
-#include <BayesFilters/PFVisualCorrection.h>
-#include <BayesFilters/Resampling.h>
+#include <BayesFilters/VisualParticleFilter.h>
 #include <Eigen/Dense>
 #include <iCub/ctrl/adaptWinPolyEstimator.h>
 #include <iCub/ctrl/filters.h>
@@ -76,25 +70,25 @@ private:
 };
 
 
-class VisualSISParticleFilter: public bfl::FilteringAlgorithm,
-                               public VisualSISParticleFilterIDL
+class VisualSIS: public bfl::VisualParticleFilter,
+                 public VisualSISParticleFilterIDL
 {
 public:
-    VisualSISParticleFilter(std::unique_ptr<bfl::Initialization> initialization,
-                            std::unique_ptr<bfl::PFPrediction> prediction, std::unique_ptr<bfl::PFVisualCorrection> correction,
-                            std::unique_ptr<bfl::Resampling> resampling,
-                            const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const int num_particles);
+    VisualSIS(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const int num_particles);
 
-    VisualSISParticleFilter(const VisualSISParticleFilter& vsir_pf) = delete;
+    VisualSIS(const VisualSIS& vsir_pf) = delete;
 
-    VisualSISParticleFilter(VisualSISParticleFilter&& vsir_pf) noexcept = delete;
+    VisualSIS(VisualSIS&& vsir_pf) noexcept = delete;
 
-    ~VisualSISParticleFilter() noexcept;
+    ~VisualSIS() noexcept;
 
-    VisualSISParticleFilter& operator=(const VisualSISParticleFilter& vsir_pf) = delete;
+    VisualSIS& operator=(const VisualSIS& vsir_pf) = delete;
 
-    VisualSISParticleFilter& operator=(VisualSISParticleFilter&& vsir_pf) noexcept = delete;
+    VisualSIS& operator=(VisualSIS&& vsir_pf) noexcept = delete;
 
+    bool skip(const std::string& what_step, const bool status) override;
+
+protected:
     void initialization() override;
 
     void filteringStep() override;
@@ -103,11 +97,6 @@ public:
 
     bool runCondition() override { return true; };
 
-protected:
-    std::unique_ptr<bfl::Initialization>     initialization_;
-    std::unique_ptr<bfl::PFPrediction>       prediction_;
-    std::unique_ptr<bfl::PFVisualCorrection> correction_;
-    std::unique_ptr<bfl::Resampling>         resampling_;
 
     yarp::os::ConstString cam_sel_;
     yarp::os::ConstString laterality_;
@@ -130,6 +119,8 @@ protected:
     bool                     reset_filter() override;
 
     bool                     stop_filter() override;
+
+    bool                     skip_step(const std::string& what_step, const bool status) override;
 
     bool                     use_analogs(const bool status) override;
 
@@ -187,4 +178,4 @@ private:
     const unsigned int descriptor_length_ = (img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4;
 };
 
-#endif /* VISUALSISPARTICLEFILTER_H */
+#endif /* VISUALSIS_H */

@@ -1,4 +1,4 @@
-#include "PlayGatePose.h"
+#include <PlayGatePose.h>
 
 #include <iCub/ctrl/math.h>
 #include <yarp/eigen/Eigen.h>

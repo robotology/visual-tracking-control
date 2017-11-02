@@ -1,8 +1,10 @@
-#include "iCubFwdKinModel.h"
+#include <iCubFwdKinModel.h>
 
 #include <exception>
 #include <functional>
+
 #include <iCub/ctrl/math.h>
+#include <yarp/eigen/Eigen.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Property.h>
@@ -12,16 +14,15 @@ using namespace bfl;
 using namespace Eigen;
 using namespace iCub::ctrl;
 using namespace iCub::iKin;
+using namespace yarp::eigen;
 using namespace yarp::math;
 using namespace yarp::os;
 using namespace yarp::sig;
 
 
-iCubFwdKinModel::iCubFwdKinModel(std::unique_ptr<StateModel> state_model, const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
-    StateModelDecorator(std::move(state_model)),
+iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
     icub_kin_arm_(iCubArm(laterality+"_v2")),
-    robot_(robot), laterality_(laterality), port_prefix_(port_prefix),
-    delta_hand_pose_(VectorXd::Zero(7)), delta_angle_(0.0)
+    robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
 {
     Property opt_arm_enc;
     opt_arm_enc.put("device", "remote_controlboard");
@@ -90,10 +91,6 @@ iCubFwdKinModel::iCubFwdKinModel(std::unique_ptr<StateModel> state_model, const 
         throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open torso remote_controlboard!");
     }
 
-    Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
-    Map<VectorXd> cur_ee_pose(ee_pose.data(), 7, 1);
-    prev_ee_pose_ = cur_ee_pose;
-
     yInfo() << log_ID_ << "Succesfully initialized.";
 }
 
@@ -105,43 +102,17 @@ iCubFwdKinModel::~iCubFwdKinModel() noexcept
 }
 
 
-void iCubFwdKinModel::propagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> prop_state)
-{
-    MatrixXf temp_state(cur_state.rows(), cur_state.cols());
-    iCubFwdKinPropagate(cur_state, temp_state);
-
-    StateModelDecorator::propagate(temp_state, prop_state);
-}
-
-
-void iCubFwdKinModel::motion(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> mot_state)
-{
-    MatrixXf temp_state(cur_state.rows(), cur_state.cols());
-    iCubFwdKinPropagate(cur_state, temp_state);
-
-    StateModelDecorator::motion(temp_state, mot_state);
-}
-
-
-MatrixXf iCubFwdKinModel::getNoiseSample(const int num)
-{
-    return StateModelDecorator::getNoiseSample(num);
-}
-
-
-MatrixXf iCubFwdKinModel::getNoiseCovariance()
-{
-    return StateModelDecorator::getNoiseCovariance();
-}
-
-
 bool iCubFwdKinModel::setProperty(const std::string& property)
 {
-    if (!StateModelDecorator::setProperty(property))
-        if (property == "ICFW_DELTA")
-            return setDeltaMotion();
+    return FwdKinModel::setProperty(property);
+}
 
-    return false;
+
+VectorXd iCubFwdKinModel::readPose()
+{
+    Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
+
+    return toEigen(ee_pose);
 }
 
 
@@ -174,42 +145,4 @@ Vector iCubFwdKinModel::readRootToEE()
         root_ee_enc(i + 3) = enc_arm(i);
 
     return root_ee_enc;
-}
-
-
-bool iCubFwdKinModel::setDeltaMotion()
-{
-    Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
-    Map<VectorXd> cur_ee_pose(ee_pose.data(), 7, 1);
-
-    delta_hand_pose_.head<3>() = cur_ee_pose.head<3>() - prev_ee_pose_.head<3>();
-
-    delta_hand_pose_.middleRows<3>(3) = cur_ee_pose.middleRows<3>(3) - prev_ee_pose_.middleRows<3>(3);
-
-    delta_angle_ = cur_ee_pose(6) - prev_ee_pose_(6);
-    if      (delta_angle_ >   M_PI) delta_angle_ -= 2.0 * M_PI;
-    else if (delta_angle_ <= -M_PI) delta_angle_ += 2.0 * M_PI;
-
-    prev_ee_pose_ = cur_ee_pose;
-
-    return true;
-}
-
-
-void iCubFwdKinModel::iCubFwdKinPropagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> prop_state)
-{
-    prop_state.topRows<3>() = cur_state.topRows<3>().colwise() + delta_hand_pose_.head<3>().cast<float>();
-
-    prop_state.middleRows<3>(3) = (cur_state.middleRows<3>(3).colwise() + delta_hand_pose_.middleRows<3>(3).cast<float>());
-    prop_state.middleRows<3>(3).colwise().normalize();
-
-    RowVectorXf ang = cur_state.bottomRows<1>().array() + static_cast<float>(delta_angle_);
-
-    for (unsigned int i = 0; i < ang.cols(); ++i)
-    {
-        if      (ang(i) >   M_PI) ang(i) -= 2.0 * M_PI;
-        else if (ang(i) <= -M_PI) ang(i) += 2.0 * M_PI;
-    }
-
-    prop_state.bottomRows<1>() = ang;
 }

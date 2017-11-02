@@ -1,7 +1,7 @@
 #ifndef ICUBGATEPOSE_H
 #define ICUBGATEPOSE_H
 
-#include "GatePose.h"
+#include <GatePose.h>
 
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/dev/IEncoders.h>

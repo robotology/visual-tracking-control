@@ -1,4 +1,4 @@
-#include "InitiCubArm.h"
+#include <InitiCubArm.h>
 
 #include <iCub/ctrl/math.h>
 
