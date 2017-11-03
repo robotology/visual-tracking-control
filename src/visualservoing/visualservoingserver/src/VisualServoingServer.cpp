@@ -307,6 +307,43 @@ bool VisualServoingServer::initFacilities(const bool use_direct_kin)
         yInfoVerbose("...done!");
 
 
+        yInfoVerbose("Skipping state model propagation and correction to use only known exogenous robot inputs...");
+
+        cmd.clear();
+        cmd.addString("skip_step state true");
+
+        response_left.clear();
+        if (!port_rpc_tracker_left_.write(cmd, response_left))
+            return false;
+
+        if (!response_left.get(0).asBool())
+            return false;
+
+        response_right.clear();
+        if (!port_rpc_tracker_right_.write(cmd, response_right))
+            return false;
+
+        if (!response_right.get(0).asBool())
+            return false;
+
+
+        cmd.clear();
+        cmd.addString("skip_step correction true");
+
+        response_left.clear();
+        if (!port_rpc_tracker_left_.write(cmd, response_left))
+            return false;
+
+        if (!response_left.get(0).asBool())
+            return false;
+
+        response_right.clear();
+        if (!port_rpc_tracker_right_.write(cmd, response_right))
+            return false;
+
+        yInfoVerbose("...done!");
+
+
         yInfoVerbose("Connecting to external pose trackers output ports.");
 
         if (!Network::connect("/hand-tracking/left/result/estimates:o",   port_pose_left_in_.getName(),  "tcp", !verbosity_))
@@ -390,6 +427,43 @@ bool VisualServoingServer::stopFacilities()
 
         if (!Network::disconnect(port_rpc_tracker_right_.getName(), "/hand-tracking/right/cmd:i", !verbosity_))
             return false;
+
+
+        yInfoVerbose("Disable skipping state model propagation and correction...");
+
+        cmd.clear();
+        cmd.addString("skip_step state false");
+
+        response_left.clear();
+        if (!port_rpc_tracker_left_.write(cmd, response_left))
+            return false;
+
+        if (!response_left.get(0).asBool())
+            return false;
+
+        response_right.clear();
+        if (!port_rpc_tracker_right_.write(cmd, response_right))
+            return false;
+
+        if (!response_right.get(0).asBool())
+            return false;
+
+
+        cmd.clear();
+        cmd.addString("skip_step correction false");
+
+        response_left.clear();
+        if (!port_rpc_tracker_left_.write(cmd, response_left))
+            return false;
+
+        if (!response_left.get(0).asBool())
+            return false;
+
+        response_right.clear();
+        if (!port_rpc_tracker_right_.write(cmd, response_right))
+            return false;
+        
+        yInfoVerbose("...done!");
 
 
         yInfoVerbose("Disconnecting from external pose trackers output ports.");
