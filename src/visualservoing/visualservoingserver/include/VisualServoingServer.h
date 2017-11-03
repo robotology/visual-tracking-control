@@ -287,18 +287,18 @@ private:
     void backproc_UpdateVisualServoingParamters();
     bool is_stopping_backproc_update_vs_params = true;
 
+    yarp::sig::Vector averagePose(const yarp::sig::Vector& l_pose, const yarp::sig::Vector& r_pose) const;
+
     bool checkVisualServoingStatus(const yarp::sig::Vector& px_cur, const double tol);
 
+    bool checkVisualServoingStatus(const yarp::sig::Vector& pose_cur, const double tol_position, const double tol_orientation, const double tol_angle);
+
+
+    /* LOG */
     void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo()    << str; };
     void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning() << str; };
     void yErrorVerbose  (const yarp::os::ConstString& str) const { if(verbosity_) yError()   << str; };
 
-    /* EXPERIMENTAL */
-    yarp::sig::Vector averagePose(const yarp::sig::Vector& l_pose, const yarp::sig::Vector& r_pose) const;
-
-	bool checkVisualServoingStatus(const yarp::sig::Vector& pose_cur, const double tol_position, const double tol_orientation, const double tol_angle);
-
-    /* LOG */
     yarp::sig::Vector stdVectorOfVectorsToVector(const std::vector<yarp::sig::Vector>& vectors);
 
     yarp::os::BufferedPort<yarp::sig::Vector> port_pose_px_l_;

@@ -616,8 +616,8 @@ std::vector<Vector> VisualServoingServer::getGoalPixelsFrom3DPose(const Vector& 
     pose.setSubvector(0, x);
     pose.setSubvector(3, o);
 
-    yWarningVerbose("<!-- Invoking setPoseGoal() to set the goal pose for visual servoing.");
-    yWarningVerbose("<!-- Be warned that this specific invokation will be removed in upcoming releases.");
+//    yWarningVerbose("<!-- Invoking setPoseGoal() to set the goal pose for visual servoing.");
+//    yWarningVerbose("<!-- Be warned that this specific invokation will be removed in upcoming releases.");
     setPoseGoal(x, o);
 
     setCameraTransformations();
@@ -2729,18 +2729,6 @@ void VisualServoingServer::backproc_UpdateVisualServoingParamters()
 }
 
 
-bool VisualServoingServer::checkVisualServoingStatus(const Vector& px_cur, const double tol)
-{
-    yAssert(px_cur.size() == 16);
-    yAssert(tol > 0);
-
-    return ((std::abs(px_des_(0)  - px_cur(0))  < tol) && (std::abs(px_des_(1)  - px_cur(1))  < tol) && (std::abs(px_des_(2)  - px_cur(2))  < tol) && (std::abs(px_des_(3)  - px_cur(3))  < tol) &&
-            (std::abs(px_des_(4)  - px_cur(4))  < tol) && (std::abs(px_des_(5)  - px_cur(5))  < tol) && (std::abs(px_des_(6)  - px_cur(6))  < tol) && (std::abs(px_des_(7)  - px_cur(7))  < tol) &&
-            (std::abs(px_des_(8)  - px_cur(8))  < tol) && (std::abs(px_des_(9)  - px_cur(9))  < tol) && (std::abs(px_des_(10) - px_cur(10)) < tol) && (std::abs(px_des_(11) - px_cur(11)) < tol) &&
-            (std::abs(px_des_(12) - px_cur(12)) < tol) && (std::abs(px_des_(13) - px_cur(13)) < tol) && (std::abs(px_des_(14) - px_cur(14)) < tol) && (std::abs(px_des_(15) - px_cur(15)) < tol));
-}
-
-
 Vector VisualServoingServer::averagePose(const Vector& l_pose, const Vector& r_pose) const
 {
     Vector pose_out = zeros(7);
@@ -2755,6 +2743,18 @@ Vector VisualServoingServer::averagePose(const Vector& l_pose, const Vector& r_p
     pose_out(6) = std::atan2(s_ang, c_ang);
 
     return pose_out;
+}
+
+
+bool VisualServoingServer::checkVisualServoingStatus(const Vector& px_cur, const double tol)
+{
+    yAssert(px_cur.size() == 16);
+    yAssert(tol > 0);
+
+    return ((std::abs(px_des_(0)  - px_cur(0))  < tol) && (std::abs(px_des_(1)  - px_cur(1))  < tol) && (std::abs(px_des_(2)  - px_cur(2))  < tol) && (std::abs(px_des_(3)  - px_cur(3))  < tol) &&
+            (std::abs(px_des_(4)  - px_cur(4))  < tol) && (std::abs(px_des_(5)  - px_cur(5))  < tol) && (std::abs(px_des_(6)  - px_cur(6))  < tol) && (std::abs(px_des_(7)  - px_cur(7))  < tol) &&
+            (std::abs(px_des_(8)  - px_cur(8))  < tol) && (std::abs(px_des_(9)  - px_cur(9))  < tol) && (std::abs(px_des_(10) - px_cur(10)) < tol) && (std::abs(px_des_(11) - px_cur(11)) < tol) &&
+            (std::abs(px_des_(12) - px_cur(12)) < tol) && (std::abs(px_des_(13) - px_cur(13)) < tol) && (std::abs(px_des_(14) - px_cur(14)) < tol) && (std::abs(px_des_(15) - px_cur(15)) < tol));
 }
 
 
