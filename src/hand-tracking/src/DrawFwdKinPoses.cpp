@@ -66,7 +66,7 @@ void DrawFwdKinPoses::predictStep(const Ref<const MatrixXf>& prev_states, const 
         if (!getSkipExogenous())
             exogenous_model_->propagate(prev_states.col(j), tmp_states);
         else
-            tmp_states = pred_states;
+            tmp_states = prev_states.col(j);
 
         if (!getSkipState() && prev_weights(j) <= threshold)
             state_model_->motion(tmp_states, pred_states.col(j));
