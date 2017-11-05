@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
 
 
     /* PARTICLE FILTER */
-    VisualSIS vsis_pf(paramss["cam_sel"], paramss["laterality"], paramsd["num_particles"]);
+    VisualSIS vsis_pf(paramss["cam_sel"], paramsd["num_particles"]);
     vsis_pf.setInitialization(std::move(init_arm));
     vsis_pf.setPrediction(std::move(pf_prediction));
     vsis_pf.setCorrection(std::move(vpf_correction_gated));

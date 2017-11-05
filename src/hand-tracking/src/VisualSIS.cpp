@@ -28,8 +28,9 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIS::VisualSIS(const ConstString& cam_sel, const ConstString& laterality, const int num_particles) :
-    cam_sel_(cam_sel), laterality_(laterality), num_particles_(num_particles)
+VisualSIS::VisualSIS(const ConstString& cam_sel, const int num_particles) :
+    cam_sel_(cam_sel),
+    num_particles_(num_particles)
 {
     cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
     cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
@@ -290,7 +291,6 @@ std::vector<std::string> VisualSIS::get_info()
     info.push_back("<| The Particle Filter is " + std::string(isRunning() ? "not " : "") + "running |>");
     info.push_back("<| Filtering step: " + std::to_string(getFilteringStep()) + " |>");
     info.push_back("<| Using " + cam_sel_ + " camera images |>");
-    info.push_back("<| Using encoders from " + laterality_ + " iCub arm |>");
     info.push_back("<| Using " + std::to_string(num_particles_) + " particles |>");
     info.push_back("<| Adaptive window: " +
                    std::string(hist_buffer_.getAdaptiveWindowStatus() ? "enabled" : "disabled") + " |>");
