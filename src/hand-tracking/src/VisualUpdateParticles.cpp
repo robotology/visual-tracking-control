@@ -1,6 +1,7 @@
 #include <VisualUpdateParticles.h>
 
 #include <cmath>
+#include <exception>
 #include <functional>
 #include <iostream>
 #include <utility>
@@ -28,7 +29,9 @@ VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioceptio
 VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_cuda_stream) noexcept :
     observation_model_(std::move(observation_model)),
     likelihood_gain_(likelihood_gain),
-    num_cuda_stream_(num_cuda_stream), num_img_stream_(observation_model_->getOGLTilesNumber()), cuda_stream_(std::vector<cuda::Stream>(num_cuda_stream))
+    num_cuda_stream_(num_cuda_stream),
+    num_img_stream_(observation_model_->getOGLTilesNumber()),
+    cuda_stream_(std::vector<cuda::Stream>(num_cuda_stream))
 {
     int          block_size     = 16;
     int          bin_number     = 9;
@@ -111,6 +114,8 @@ bfl::VisualObservationModel& VisualUpdateParticles::getVisualObservationModel()
 
 void VisualUpdateParticles::setVisualObservationModel(std::unique_ptr<VisualObservationModel> visual_observation_model)
 {
+    throw std::runtime_error("ERROR::VISUALUPDATEPARTICLES::SETVISUALOBSERVATIONMODEL\nERROR:\n\tClass under development. Do not invoke this method.");
+
     VisualObservationModel* tmp_observation_model = visual_observation_model.release();
 
     observation_model_ = std::unique_ptr<VisualProprioception>(dynamic_cast<VisualProprioception*>(tmp_observation_model));
