@@ -66,8 +66,8 @@ int main(int argc, char *argv[])
     rf.configure(argc, argv);
 
     FilteringParamtersD paramsd;
-    paramsd["num_particles"] = rf.findGroup("PF").check("num_particles", Value(50.0)).asDouble();
-    paramsd["gpu_count"]     = rf.findGroup("PF").check("gpu_count",     Value(1.0)).asDouble();
+    paramsd["num_particles"] = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
+    paramsd["gpu_count"]     = rf.findGroup("PF").check("gpu_count",     Value(1.0)).asInt();
     paramsd["num_images"]    = paramsd["num_particles"] / paramsd["gpu_count"];
     paramsd["play"]          = rf.findGroup("PF").check("play",          Value(1.0)).asDouble();
 
