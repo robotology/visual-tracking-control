@@ -310,7 +310,9 @@ bool VisualServoingServer::initFacilities(const bool use_direct_kin)
         yInfoVerbose("Skipping state model propagation and correction to use only known exogenous robot inputs...");
 
         cmd.clear();
-        cmd.addString("skip_step state true");
+        cmd.addString("skip_step");
+        cmd.addString("state");
+        cmd.addString("true");
 
         response_left.clear();
         if (!port_rpc_tracker_left_.write(cmd, response_left))
@@ -328,7 +330,9 @@ bool VisualServoingServer::initFacilities(const bool use_direct_kin)
 
 
         cmd.clear();
-        cmd.addString("skip_step correction true");
+        cmd.addString("skip_step");
+        cmd.addString("correction");
+        cmd.addString("true");
 
         response_left.clear();
         if (!port_rpc_tracker_left_.write(cmd, response_left))
@@ -432,7 +436,25 @@ bool VisualServoingServer::stopFacilities()
         yInfoVerbose("Disable skipping state model propagation and correction...");
 
         cmd.clear();
-        cmd.addString("skip_step state false");
+        cmd.addString("skip_step");
+        cmd.addString("correction");
+        cmd.addString("false");
+
+        response_left.clear();
+        if (!port_rpc_tracker_left_.write(cmd, response_left))
+            return false;
+
+        if (!response_left.get(0).asBool())
+            return false;
+
+        response_right.clear();
+        if (!port_rpc_tracker_right_.write(cmd, response_right))
+            return false;
+
+        cmd.clear();
+        cmd.addString("skip_step");
+        cmd.addString("state");
+        cmd.addString("false");
 
         response_left.clear();
         if (!port_rpc_tracker_left_.write(cmd, response_left))
@@ -446,21 +468,6 @@ bool VisualServoingServer::stopFacilities()
             return false;
 
         if (!response_right.get(0).asBool())
-            return false;
-
-
-        cmd.clear();
-        cmd.addString("skip_step correction false");
-
-        response_left.clear();
-        if (!port_rpc_tracker_left_.write(cmd, response_left))
-            return false;
-
-        if (!response_left.get(0).asBool())
-            return false;
-
-        response_right.clear();
-        if (!port_rpc_tracker_right_.write(cmd, response_right))
             return false;
         
         yInfoVerbose("...done!");
