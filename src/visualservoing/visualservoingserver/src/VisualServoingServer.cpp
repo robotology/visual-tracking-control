@@ -349,7 +349,7 @@ bool VisualServoingServer::initFacilities(const bool use_direct_kin)
         if (!Network::connect("/hand-tracking/left/result/estimates:o",   port_pose_left_in_.getName(),  "tcp", !verbosity_))
             return false;
 
-        if (!Network::connect("/hand-tracking/right/result/estimates:o ", port_pose_right_in_.getName(), "tcp", !verbosity_))
+        if (!Network::connect("/hand-tracking/right/result/estimates:o", port_pose_right_in_.getName(), "tcp", !verbosity_))
             return false;
 
         yInfoVerbose("Receiving end-effector pose from external trackers.");
@@ -471,7 +471,7 @@ bool VisualServoingServer::stopFacilities()
         if (!Network::disconnect("/hand-tracking/left/result/estimates:o",   port_pose_left_in_.getName(), !verbosity_))
             return false;
 
-        if (!Network::disconnect("/hand-tracking/right/result/estimates:o ", port_pose_right_in_.getName(), !verbosity_))
+        if (!Network::disconnect("/hand-tracking/right/result/estimates:o", port_pose_right_in_.getName(), !verbosity_))
             return false;
 
         yInfoVerbose("Disconnected from external trackers.");
