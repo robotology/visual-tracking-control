@@ -299,6 +299,7 @@ bool VisualServoingServer::initFacilities(const bool use_direct_kin)
 
         yInfoVerbose("Right camera external pose tracker running.");
 
+
         yInfoVerbose("Using external pose trackers information for visual servoing.");
 
 
@@ -312,7 +313,7 @@ bool VisualServoingServer::initFacilities(const bool use_direct_kin)
         cmd.clear();
         cmd.addString("skip_step");
         cmd.addString("state");
-        cmd.addString("true");
+        cmd.addInt(1);
 
         response_left.clear();
         if (!port_rpc_tracker_left_.write(cmd, response_left))
@@ -332,7 +333,7 @@ bool VisualServoingServer::initFacilities(const bool use_direct_kin)
         cmd.clear();
         cmd.addString("skip_step");
         cmd.addString("correction");
-        cmd.addString("true");
+        cmd.addInt(1);
 
         response_left.clear();
         if (!port_rpc_tracker_left_.write(cmd, response_left))
@@ -404,8 +405,13 @@ bool VisualServoingServer::stopFacilities()
     {
         yInfoVerbose("Sending commands to external pose trackers.");
 
+
+        yInfoVerbose("Disable skipping state model propagation and correction...");
+
         Bottle cmd;
-        cmd.addString("stop_filter");
+        cmd.addString("skip_step");
+        cmd.addString("correction");
+        cmd.addInt(0);
 
         Bottle response_left;
         if (!port_rpc_tracker_left_.write(cmd, response_left))
@@ -414,13 +420,51 @@ bool VisualServoingServer::stopFacilities()
         if (!response_left.get(0).asBool())
             return false;
 
+        Bottle response_right;
+        if (!port_rpc_tracker_right_.write(cmd, response_right))
+            return false;
+
+
+        cmd.clear();
+        cmd.addString("skip_step");
+        cmd.addString("state");
+        cmd.addInt(0);
+
+        response_left.clear();
+        if (!port_rpc_tracker_left_.write(cmd, response_left))
+            return false;
+
+        if (!response_left.get(0).asBool())
+            return false;
+
+        response_right.clear();
+        if (!port_rpc_tracker_right_.write(cmd, response_right))
+            return false;
+
+        if (!response_right.get(0).asBool())
+            return false;
+
+        yInfoVerbose("...done!");
+
+
+        cmd.clear();
+        cmd.addString("stop_filter");
+
+        response_left.clear();
+        if (!port_rpc_tracker_left_.write(cmd, response_left))
+            return false;
+
+        if (!response_left.get(0).asBool())
+            return false;
+
         yInfoVerbose("Left camera external pose tracker stopped.");
+
 
         if (!Network::disconnect(port_rpc_tracker_left_.getName(),  "/hand-tracking/left/cmd:i", !verbosity_))
             return false;
 
 
-        Bottle response_right;
+        response_right.clear();
         if (!port_rpc_tracker_right_.write(cmd, response_right))
             return false;
 
@@ -429,48 +473,9 @@ bool VisualServoingServer::stopFacilities()
 
         yInfoVerbose("Right camera external pose tracker stopped.");
 
+
         if (!Network::disconnect(port_rpc_tracker_right_.getName(), "/hand-tracking/right/cmd:i", !verbosity_))
             return false;
-
-
-        yInfoVerbose("Disable skipping state model propagation and correction...");
-
-        cmd.clear();
-        cmd.addString("skip_step");
-        cmd.addString("correction");
-        cmd.addString("false");
-
-        response_left.clear();
-        if (!port_rpc_tracker_left_.write(cmd, response_left))
-            return false;
-
-        if (!response_left.get(0).asBool())
-            return false;
-
-        response_right.clear();
-        if (!port_rpc_tracker_right_.write(cmd, response_right))
-            return false;
-
-        cmd.clear();
-        cmd.addString("skip_step");
-        cmd.addString("state");
-        cmd.addString("false");
-
-        response_left.clear();
-        if (!port_rpc_tracker_left_.write(cmd, response_left))
-            return false;
-
-        if (!response_left.get(0).asBool())
-            return false;
-
-        response_right.clear();
-        if (!port_rpc_tracker_right_.write(cmd, response_right))
-            return false;
-
-        if (!response_right.get(0).asBool())
-            return false;
-        
-        yInfoVerbose("...done!");
 
 
         yInfoVerbose("Disconnecting from external pose trackers output ports.");
