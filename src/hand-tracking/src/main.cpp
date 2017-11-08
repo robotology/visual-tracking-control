@@ -90,7 +90,10 @@ int main(int argc, char *argv[])
 
     FilteringParamtersS paramss;
     paramss["robot"]      = rf.findGroup("PF").check("robot",      Value("icub")).asString();
-    paramss["cam_sel"]    = rf.findGroup("PF").check("cam_sel",    Value("left")).asString();
+    if (rf.check("cam"))
+        paramss["cam_sel"] = rf.find("cam").asString();
+    else
+        paramss["cam_sel"] = rf.findGroup("PF").check("cam_sel",    Value("left")).asString();
     paramss["laterality"] = rf.findGroup("PF").check("laterality", Value("right")).asString();
 
 

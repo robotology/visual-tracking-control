@@ -15,13 +15,13 @@
     <!-- REQUIRED MODULES -->
     <module>
         <name>hand-tracking</name>
-        <parameters>--play --cam left</parameters>
+        <parameters>--cam left</parameters>
         <node>localhost</node>
     </module>
 
     <module>
         <name>hand-tracking</name>
-        <parameters>--play --cam right</parameters>
+        <parameters>--cam right</parameters>
         <node>localhost</node>
     </module>
 
