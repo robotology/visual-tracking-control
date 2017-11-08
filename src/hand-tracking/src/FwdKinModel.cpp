@@ -76,7 +76,7 @@ bool FwdKinModel::setDeltaMotion()
     }
     else
     {
-        delta_hand_pose_ = VectorXd::Zero(7);
+        delta_hand_pose_ = VectorXd::Zero(6);
         delta_angle_     = 0.0;
         init_delta_      = true;
     }
