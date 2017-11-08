@@ -60,9 +60,10 @@ void DrawFwdKinPoses::predictStep(const Ref<const MatrixXf>& prev_states, const 
 
     exogenous_model_->setProperty("ICFW_DELTA");
 
-    VectorXf tmp_states = VectorXf::Zero(prev_states.rows());
     for (int j = 0; j < prev_weights.rows(); ++j)
     {
+        VectorXf tmp_states = VectorXf::Zero(prev_states.rows());
+
         if (!getSkipExogenous())
             exogenous_model_->propagate(prev_states.col(j), tmp_states);
         else
