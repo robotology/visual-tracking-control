@@ -68,7 +68,11 @@ void VisualSIS::initialization()
     cor_particle_ = MatrixXf(7, num_particles_);
     cor_weight_   = VectorXf(num_particles_, 1);
 
+    hist_buffer_.initializeHistory();
+
     initialization_->initialize(pred_particle_, pred_weight_);
+
+    prediction_->getExogenousModel().setProperty("ICFW_INIT");
 }
 
 
@@ -516,6 +520,13 @@ bool HistoryBuffer::decreaseHistorySize()
 bool HistoryBuffer::increaseHistorySize()
 {
     return setHistorySize(window_ + 1);
+}
+
+
+bool HistoryBuffer::initializeHistory()
+{
+    hist_buffer_.clear();
+    return true;
 }
 
 

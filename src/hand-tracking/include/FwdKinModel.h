@@ -25,7 +25,7 @@ public:
 protected:
     virtual Eigen::VectorXd readPose() = 0;
 
-    bool init_delta_ = false;
+    bool initialize_delta_ = true;
     bool setDeltaMotion();
 
 private:

@@ -43,6 +43,8 @@ public:
 
     bool            increaseHistorySize();
 
+    bool            initializeHistory();
+
     bool            enableAdaptiveWindow(const bool status);
 
     bool            getAdaptiveWindowStatus() { return adaptive_window_; };

@@ -56,6 +56,12 @@ bool FwdKinModel::setProperty(const std::string& property)
     if (property == "ICFW_DELTA")
         return setDeltaMotion();
 
+    if (property == "ICFW_INIT")
+    {
+        initialize_delta_ = true;
+        return setDeltaMotion();
+    }
+
     return false;
 }
 
@@ -64,7 +70,7 @@ bool FwdKinModel::setDeltaMotion()
 {
     VectorXd ee_pose = readPose();
 
-    if (init_delta_)
+    if (!initialize_delta_)
     {
         delta_hand_pose_.head<3>() = ee_pose.head<3>() - prev_ee_pose_.head<3>();
 
@@ -76,9 +82,9 @@ bool FwdKinModel::setDeltaMotion()
     }
     else
     {
-        delta_hand_pose_ = VectorXd::Zero(6);
-        delta_angle_     = 0.0;
-        init_delta_      = true;
+        delta_hand_pose_  = VectorXd::Zero(6);
+        delta_angle_      = 0.0;
+        initialize_delta_ = false;
     }
 
     prev_ee_pose_ = ee_pose;
