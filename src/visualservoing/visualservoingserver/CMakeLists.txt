@@ -40,11 +40,11 @@ target_include_directories(${PLUGIN_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CM
                                                          ${ICUB_INCLUDE_DIRS}
                                                          ${YARP_INCLUDE_DIRS})
 
-target_link_libraries(${PLUGIN_TARGET_NAME} ctrlLib
-                                            ${ICUB_LIBRARIES}
-                                            iKin
-                                            ${OpenCV_LIBS}
-                                            ${YARP_LIBRARIES})
+target_link_libraries(${PLUGIN_TARGET_NAME} PRIVATE ctrlLib
+                                                    ${ICUB_LIBRARIES}
+                                                    iKin
+                                                    ${OpenCV_LIBS}
+                                                    ${YARP_LIBRARIES})
 
 yarp_install(TARGETS ${PLUGIN_TARGET_NAME}
              COMPONENT plugin

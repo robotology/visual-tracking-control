@@ -3,8 +3,6 @@ set(EXE_TARGET_NAME hand-tracking)
 # Dependencies
 find_package(BayesFilters    REQUIRED)
 find_package(Eigen3          REQUIRED CONFIG)
-find_package(glew            REQUIRED)
-find_package(glfw3           REQUIRED)
 find_package(ICUB            REQUIRED)
 find_package(OpenCV          REQUIRED)
 find_package(SuperimposeMesh REQUIRED)
@@ -60,16 +58,14 @@ target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE
                                                       ${ICUB_INCLUDE_DIRS}
                                                       ${YARP_INCLUDE_DIRS})
 
-target_link_libraries(${EXE_TARGET_NAME} BayesFilters::BayesFilters
-                                         ctrlLib
-                                         Eigen3::Eigen
-                                         GLEW::GLEW
-                                         glfw
-                                         ${ICUB_LIBRARIES}
-                                         iKin
-                                         ${OpenCV_LIBS}
-                                         SuperimposeMesh::SuperimposeMesh
-                                         ${YARP_LIBRARIES})
+target_link_libraries(${EXE_TARGET_NAME} PRIVATE BayesFilters::BayesFilters
+                                                 ctrlLib
+                                                 Eigen3::Eigen
+                                                 ${ICUB_LIBRARIES}
+                                                 iKin
+                                                 ${OpenCV_LIBS}
+                                                 SuperimposeMesh::SuperimposeMesh
+                                                 ${YARP_LIBRARIES})
 
 if(UNIX AND NOT APPLE)
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
