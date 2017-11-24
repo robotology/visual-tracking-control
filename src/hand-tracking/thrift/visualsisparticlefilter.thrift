@@ -49,7 +49,7 @@ service VisualSISParticleFilterIDL
      *  4) correction: skips the whole correction step
      *
      * @param what_step the step to skipping
-     * @param status enable/disbale skipping
+     * @param status enable/disable skipping
      *
      * @return true/false on success/failure.
      */
@@ -75,10 +75,10 @@ service VisualSISParticleFilterIDL
     list<string> get_info();
 
     /**
-     * Cheange the current method to extract the state estimates from the
+     * Change the current method to extract the state estimates from the
      * particle set.
      *
-     * @param status a string with the state estimete extraction method to use;
+     * @param status a string with the state estimate extraction method to use;
      *               the string shall be one of the available methods returned
      *               by the get_info() method.
      *
@@ -87,7 +87,7 @@ service VisualSISParticleFilterIDL
     bool set_estimates_extraction_method(1:string method);
 
     /**
-     * Cheange the window size of mobile averages for estimates extraction.
+     * Change the window size of mobile averages for estimates extraction.
      *
      * @param window specifies the mobile window size.
      *
