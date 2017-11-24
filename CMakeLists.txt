@@ -24,4 +24,14 @@ include(ICUBcontribOptions)
 icubcontrib_set_default_prefix()
 icubcontrib_add_uninstall_target()
 
+# Support RPATH?
+option(ENABLE_RPATH "Enable RPATH for this library" ON)
+mark_as_advanced(ENABLE_RPATH)
+include(AddInstallRPATHSupport)
+add_install_rpath_support(BIN_DIRS "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
+                          LIB_DIRS "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
+                          INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}"
+                          DEPENDS ENABLE_RPATH
+                          USE_LINK_PATH)
+
 add_subdirectory(src)
