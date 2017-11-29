@@ -39,8 +39,8 @@
 
     <module>
         <name>yarpview</name>
-        <parameters>--name /view/cam_right/ee --x 340 --y 740 --RefreshTime 30</parameters>
-        <node>localhost</node>
+        <parameters>--name /view/cam_right/ee --x 1620 --y 0 --RefreshTime 30 --compact</parameters>
+        <node>icub22</node>
     </module>
 
 
