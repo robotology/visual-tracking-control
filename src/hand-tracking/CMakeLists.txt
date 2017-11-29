@@ -58,21 +58,29 @@ target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE
                                                       ${ICUB_INCLUDE_DIRS}
                                                       ${YARP_INCLUDE_DIRS})
 
-target_link_libraries(${EXE_TARGET_NAME} PRIVATE BayesFilters::BayesFilters
-                                                 ctrlLib
-                                                 Eigen3::Eigen
-                                                 ${ICUB_LIBRARIES}
-                                                 iKin
-                                                 ${OpenCV_LIBS}
-                                                 SuperimposeMesh::SuperimposeMesh
-                                                 ${YARP_LIBRARIES})
-
 if(UNIX AND NOT APPLE)
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set(THREADS_PREFER_PTHREAD_FLAG TRUE)
     find_package(Threads REQUIRED)
 
-    target_link_libraries(${EXE_TARGET_NAME} Threads::Threads)
+    target_link_libraries(${EXE_TARGET_NAME} PRIVATE BayesFilters::BayesFilters
+                                                     ctrlLib
+                                                     Eigen3::Eigen
+                                                     ${ICUB_LIBRARIES}
+                                                     iKin
+                                                     ${OpenCV_LIBS}
+                                                     SuperimposeMesh::SuperimposeMesh
+                                                     Threads::Threads
+                                                     ${YARP_LIBRARIES})
+else()
+    target_link_libraries(${EXE_TARGET_NAME} PRIVATE BayesFilters::BayesFilters
+                                                     ctrlLib
+                                                     Eigen3::Eigen
+                                                     ${ICUB_LIBRARIES}
+                                                     iKin
+                                                     ${OpenCV_LIBS}
+                                                     SuperimposeMesh::SuperimposeMesh
+                                                     ${YARP_LIBRARIES})
 endif()
 
 
