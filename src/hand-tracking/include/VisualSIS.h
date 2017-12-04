@@ -177,6 +177,10 @@ private:
     const int          img_height_        = 240;
     const int          bin_number_        = 9;
     const unsigned int descriptor_length_ = (img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4;
+
+
+    bool init_img_in_ = false;
+    yarp::sig::ImageOf<yarp::sig::PixelRgb> img_in_;
 };
 
 #endif /* VISUALSIS_H */

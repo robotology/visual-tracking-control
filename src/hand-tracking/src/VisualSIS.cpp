@@ -41,6 +41,8 @@ VisualSIS::VisualSIS(const ConstString& cam_sel, const int num_particles) :
     port_image_in_.open     ("/hand-tracking/" + cam_sel_ + "/img:i");
     port_estimates_out_.open("/hand-tracking/" + cam_sel_ + "/result/estimates:o");
 
+    img_in_.resize(320, 240);
+    img_in_.zero();
 
     setCommandPort();
 }
@@ -90,13 +92,21 @@ void VisualSIS::filteringStep()
     cuda::GpuMat       cuda_img_alpha       (Size(img_width_, img_height_), CV_8UC4);
     cuda::GpuMat       descriptors_cam_cuda (Size(descriptor_length_, 1),   CV_32F );
 
-    ImageOf<PixelRgb>* img_in = port_image_in_.read(true);
-    if (img_in != YARP_NULLPTR)
+
+    ImageOf<PixelRgb>* tmp_imgin = YARP_NULLPTR;
+    tmp_imgin = port_image_in_.read(false);
+    if (tmp_imgin != YARP_NULLPTR)
+    {
+        init_img_in_ = true;
+        img_in_ = *tmp_imgin;
+    }
+
+    if (init_img_in_)
     {
         /* PROCESS CURRENT MEASUREMENT */
         Mat measurement;
 
-        measurement = cvarrToMat(img_in->getIplImage());
+        measurement = cvarrToMat(img_in_.getIplImage());
         cuda_img.upload(measurement);
         cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);
         cuda_hog_->compute(cuda_img_alpha, descriptors_cam_cuda);
