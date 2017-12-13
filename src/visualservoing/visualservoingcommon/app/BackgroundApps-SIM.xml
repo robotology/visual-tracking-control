@@ -11,8 +11,8 @@
 
     <!-- GENERIC INFORMATION-->
     <name>BackgroundApps-SIM</name>
-    <description>Background applications for iCubSim-based simulations</description>
-    <version>3.0.0</version>
+    <description>Background applications for iCub_SIM-based simulations</description>
+    <version>0.5.0.0</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>

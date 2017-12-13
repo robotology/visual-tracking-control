@@ -4,8 +4,8 @@
 
     <!-- GENERIC INFORMATION -->
     <name>visualservoing-datadump</name>
-    <description>This app allows the iCub to perform visual servoing tasks and save data.</description>
-    <version>0.1.0</version>
+    <description>This app allows iCub to perform visual servoing tasks while saving data.</description>
+    <version>0.5.0.0</version>
 
     <authors>
         <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
@@ -104,13 +104,13 @@
     <connection>
         <from>/icub/camcalib/left/out</from>
         <to>/view/cam_left</to>
-        <protocol>tcp</protocol>
+        <protocol>mcast</protocol>
     </connection>
 
     <connection>
         <from>/icub/camcalib/left/out</from>
         <to>/visualservoing/cam_left/img:i</to>
-        <protocol>tcp</protocol>
+        <protocol>mcast</protocol>
     </connection>
 
     <connection>
@@ -134,13 +134,13 @@
     <connection>
         <from>/icub/camcalib/right/out</from>
         <to>/view/cam_right</to>
-        <protocol>tcp</protocol>
+        <protocol>mcast</protocol>
     </connection>
 
     <connection>
         <from>/icub/camcalib/right/out</from>
         <to>/visualservoing/cam_right/img:i</to>
-        <protocol>tcp</protocol>
+        <protocol>mcast</protocol>
     </connection>
 
     <connection>

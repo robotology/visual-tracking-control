@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+<application>
+
+    <!-- GENERIC INFORMATION -->
+    <name>visualservoing</name>
+    <description>This app allows iCub to perform visual servoing tasks.</description>
+    <version>0.5.0.0</version>
+
+    <authors>
+        <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
+    </authors>
+
+
+    <!-- REQUIRED MODULES -->
+    <module>
+        <name>yarpdev</name>
+        <parameters>--device visualservoingserver --verbosity true --robot icub</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/cam_left/ee --x 20 --y 740 --RefreshTime 30</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpview</name>
+        <parameters>--name /view/cam_right/ee --x 1620 --y 0 --RefreshTime 30 --compact</parameters>
+        <node>icub22</node>
+    </module>
+
+
+    <!-- REQUIRED CONNECTIONS -->
+    <connection>
+        <from>/icub/camcalib/left/out</from>
+        <to>/view/cam_left</to>
+        <protocol>mcast</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/camcalib/left/out</from>
+        <to>/visualservoing/cam_left/img:i</to>
+        <protocol>mcast</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/cam_left/img:o</from>
+        <to>/view/cam_left/ee</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/camcalib/right/out</from>
+        <to>/view/cam_right</to>
+        <protocol>mcast</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/camcalib/right/out</from>
+        <to>/visualservoing/cam_right/img:i</to>
+        <protocol>mcast</protocol>
+    </connection>
+
+    <connection>
+        <from>/visualservoing/cam_right/img:o</from>
+        <to>/view/cam_right/ee</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+</application>
