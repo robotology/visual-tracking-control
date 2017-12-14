@@ -86,9 +86,9 @@ endif()
 
 # Custom command for RESOURCE/EXTRA files
 set(${EXE_TARGET_NAME}_APP
-        ${PROJECT_SOURCE_DIR}/app/visual-tracking.xml
-        ${PROJECT_SOURCE_DIR}/app/visual-tracking-BATCH.xml
-        ${PROJECT_SOURCE_DIR}/app/visual-tracking-SIM.xml)
+        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking.xml
+        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-BATCH.xml
+        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-SIM.xml)
 
 set(${EXE_TARGET_NAME}_CONF
         ${CMAKE_CURRENT_SOURCE_DIR}/conf/config.ini)
