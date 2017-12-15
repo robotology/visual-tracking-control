@@ -98,18 +98,6 @@ service VisualSISParticleFilterIDL
     bool set_mobile_average_window(1:i16 window = 20);
 
     /**
-     * Enable/Disable adaptive window size of mobile averages for estimates
-     * extraction.
-     *
-     * @param status true/false to enable/disable adaptive window size.
-     *
-     * @return true/false if adaptive window window size is enabled/disabled.
-     *
-     * @note By default adaptive window is disabled.
-     */
-    bool enable_adaptive_window(1:bool status);
-
-    /**
      * Gently close the application, deallocating resources.
      */
     bool quit();

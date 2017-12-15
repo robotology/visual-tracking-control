@@ -70,7 +70,7 @@ void VisualSIS::initialization()
     cor_particle_ = MatrixXf(7, num_particles_);
     cor_weight_   = VectorXf(num_particles_, 1);
 
-    hist_buffer_.initializeHistory();
+    estimate_extraction_.clear();
 
     initialization_->initialize(pred_particle_, pred_weight_);
 
@@ -125,33 +125,7 @@ void VisualSIS::filteringStep()
 
 
         /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
-        VectorXf out_particle(7);
-        switch (ext_mode)
-        {
-            case EstimatesExtraction::mean :
-                out_particle = mean(cor_particle_, cor_weight_);
-                break;
-
-            case EstimatesExtraction::mode :
-                out_particle = mode(cor_particle_, cor_weight_);
-                break;
-
-            case EstimatesExtraction::sm_average :
-                out_particle = smAverage(cor_particle_, cor_weight_);
-                break;
-
-            case EstimatesExtraction::wm_average :
-                out_particle = wmAverage(cor_particle_, cor_weight_);
-                break;
-
-            case EstimatesExtraction::em_average :
-                out_particle = emAverage(cor_particle_, cor_weight_);
-                break;
-
-            default:
-                out_particle.fill(0.0);
-                break;
-        }
+        VectorXf out_particle = estimate_extraction_.extract(cor_particle_, cor_weight_);
 
 
         /* RESAMPLING */
@@ -306,15 +280,10 @@ std::vector<std::string> VisualSIS::get_info()
     info.push_back("<| Filtering step: " + std::to_string(getFilteringStep()) + " |>");
     info.push_back("<| Using " + cam_sel_ + " camera images |>");
     info.push_back("<| Using " + std::to_string(num_particles_) + " particles |>");
-    info.push_back("<| Adaptive window: " +
-                   std::string(hist_buffer_.getAdaptiveWindowStatus() ? "enabled" : "disabled") + " |>");
-    info.push_back("<| Current window size: " + std::to_string(hist_buffer_.getHistorySize()) + " |>");
-    info.push_back("<| Available estimate extraction methods:" +
-                   std::string(ext_mode == EstimatesExtraction::mean       ? "1) mean <-- In use; "       : "1) mean; ") +
-                   std::string(ext_mode == EstimatesExtraction::mode       ? "2) mode <-- In use; "       : "2) mode; ") +
-                   std::string(ext_mode == EstimatesExtraction::sm_average ? "3) sm_average <-- In use; " : "3) sm_average; ") +
-                   std::string(ext_mode == EstimatesExtraction::wm_average ? "4) wm_average <-- In use; " : "4) wm_average; ") +
-                   std::string(ext_mode == EstimatesExtraction::em_average ? "5) em_average <-- In use; " : "5) em_average") + " |>");
+
+    std::vector<std::string> est_ext_info = estimate_extraction_.getInfo();
+
+    info.insert(info.end(), est_ext_info.begin(), est_ext_info.end());
 
     return info;
 }
@@ -324,31 +293,49 @@ bool VisualSIS::set_estimates_extraction_method(const std::string& method)
 {
     if (method == "mean")
     {
-        ext_mode = EstimatesExtraction::mean;
+        estimate_extraction_.setMethod(EstimatesExtraction::ExtractionMethod::mean);
+
+        return true;
+    }
+    else if (method == "smean")
+    {
+        estimate_extraction_.setMethod(EstimatesExtraction::ExtractionMethod::smean);
+
+        return true;
+    }
+    else if (method == "wmean")
+    {
+        estimate_extraction_.setMethod(EstimatesExtraction::ExtractionMethod::wmean);
+
+        return true;
+    }
+    else if (method == "emean")
+    {
+        estimate_extraction_.setMethod(EstimatesExtraction::ExtractionMethod::emean);
 
         return true;
     }
     else if (method == "mode")
     {
-        ext_mode = EstimatesExtraction::mode;
+        estimate_extraction_.setMethod(EstimatesExtraction::ExtractionMethod::mode);
 
         return true;
     }
-    else if (method == "sm_average")
+    else if (method == "smode")
     {
-        ext_mode = EstimatesExtraction::sm_average;
+        estimate_extraction_.setMethod(EstimatesExtraction::ExtractionMethod::smode);
 
         return true;
     }
-    else if (method == "wm_average")
+    else if (method == "wmode")
     {
-        ext_mode = EstimatesExtraction::wm_average;
+        estimate_extraction_.setMethod(EstimatesExtraction::ExtractionMethod::wmode);
 
         return true;
     }
-    else if (method == "em_average")
+    else if (method == "emode")
     {
-        ext_mode = EstimatesExtraction::em_average;
+        estimate_extraction_.setMethod(EstimatesExtraction::ExtractionMethod::emode);
 
         return true;
     }
@@ -360,229 +347,13 @@ bool VisualSIS::set_estimates_extraction_method(const std::string& method)
 bool VisualSIS::set_mobile_average_window(const int16_t window)
 {
     if (window > 0)
-        return hist_buffer_.setHistorySize(window);
+        return estimate_extraction_.setMobileAverageWindowSize(window);
     else
         return false;
-}
-
-
-bool VisualSIS::enable_adaptive_window(const bool status)
-{
-    return hist_buffer_.enableAdaptiveWindow(status);
 }
 
 
 bool VisualSIS::quit()
 {
     return teardown();
-}
-
-
-VectorXf VisualSIS::mean(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
-{
-    VectorXf out_particle = VectorXf::Zero(7);
-    float    s_ang        = 0;
-    float    c_ang        = 0;
-
-    for (int i = 0; i < particles.cols(); ++i)
-    {
-        out_particle.head<3>()        += weights(i) * particles.col(i).head<3>();
-        out_particle.middleRows<3>(3) += weights(i) * particles.col(i).middleRows<3>(3);
-
-        s_ang += weights(i) * std::sin(particles(6, i));
-        c_ang += weights(i) * std::cos(particles(6, i));
-    }
-
-    float versor_norm = out_particle.middleRows<3>(3).norm();
-    if ( versor_norm >= 0.99)
-        out_particle.middleRows<3>(3) /= versor_norm;
-    else
-        out_particle.middleRows<3>(3) = mode(particles, weights).middleRows<3>(3);
-
-    out_particle(6) = std::atan2(s_ang, c_ang);
-
-    return out_particle;
-}
-
-
-VectorXf VisualSIS::mode(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights) const
-{
-    MatrixXf::Index maxRow;
-    MatrixXf::Index maxCol;
-    weights.maxCoeff(&maxRow, &maxCol);
-
-    return particles.col(maxRow);
-}
-
-
-VectorXf VisualSIS::smAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
-{
-    VectorXf cur_estimates = mean(particles, weights);
-
-    hist_buffer_.addElement(cur_estimates);
-
-    MatrixXf history = hist_buffer_.getHistoryBuffer();
-    if (sm_weights_.size() != history.cols())
-        sm_weights_ = VectorXf::Ones(history.cols()) / history.cols();
-
-    return mean(history, sm_weights_);
-}
-
-
-VectorXf VisualSIS::wmAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
-{
-    VectorXf cur_estimates = mean(particles, weights);
-
-    hist_buffer_.addElement(cur_estimates);
-
-    MatrixXf history = hist_buffer_.getHistoryBuffer();
-    if (wm_weights_.size() != history.cols())
-    {
-        wm_weights_.resize(history.cols());
-        for (unsigned int i = 0; i < history.cols(); ++i)
-            wm_weights_(i) = history.cols() - i;
-
-        wm_weights_ /= wm_weights_.sum();
-    }
-
-    return mean(history, wm_weights_);
-}
-
-
-VectorXf VisualSIS::emAverage(const Ref<const MatrixXf>& particles, const Ref<const VectorXf>& weights)
-{
-    VectorXf cur_estimates = mean(particles, weights);
-
-    hist_buffer_.addElement(cur_estimates);
-
-    MatrixXf history = hist_buffer_.getHistoryBuffer();
-    if (em_weights_.size() != history.cols())
-    {
-        em_weights_.resize(history.cols());
-        for (unsigned int i = 0; i < history.cols(); ++i)
-            em_weights_(i) = std::exp(-(static_cast<double>(i) / history.cols()));
-
-        em_weights_ /= em_weights_.sum();
-    }
-
-    return mean(history, em_weights_);
-}
-
-
-HistoryBuffer::HistoryBuffer() noexcept
-{
-    lin_est_x_.reset();
-    lin_est_o_.reset();
-    lin_est_theta_.reset();
-}
-
-
-void HistoryBuffer::addElement(const Ref<const VectorXf>& element)
-{
-    if (adaptive_window_)
-        adaptWindow(element);
-
-    hist_buffer_.push_front(element);
-
-    if (hist_buffer_.size() > window_)
-        hist_buffer_.pop_back();
-}
-
-
-MatrixXf HistoryBuffer::getHistoryBuffer()
-{
-    MatrixXf hist_out(7, hist_buffer_.size());
-
-    unsigned int i = 0;
-    for (const Ref<const VectorXf>& element : hist_buffer_)
-        hist_out.col(i++) = element;
-
-    return hist_out;
-}
-
-
-bool HistoryBuffer::setHistorySize(const unsigned int window)
-{
-    unsigned int tmp;
-    if      (window == window_)     return true;
-    else if (window < 2)            tmp = 2;
-    else if (window >= max_window_) tmp = max_window_;
-    else                            tmp = window;
-
-    if (tmp < window_ && tmp < hist_buffer_.size())
-    {
-        for (unsigned int i = 0; i < (window_ - tmp); ++i)
-            hist_buffer_.pop_back();
-    }
-
-    window_ = tmp;
-
-    return true;
-}
-
-
-bool HistoryBuffer::decreaseHistorySize()
-{
-    return setHistorySize(window_ - 1);
-}
-
-
-bool HistoryBuffer::increaseHistorySize()
-{
-    return setHistorySize(window_ + 1);
-}
-
-
-bool HistoryBuffer::initializeHistory()
-{
-    hist_buffer_.clear();
-    return true;
-}
-
-
-bool HistoryBuffer::enableAdaptiveWindow(const bool status)
-{
-    if (status)
-        mem_window_ = window_;
-    else
-    {
-        window_ = mem_window_;
-        setHistorySize(window_);
-    }
-
-    adaptive_window_ = status;
-
-    return true;
-}
-
-
-void HistoryBuffer::adaptWindow(const Ref<const VectorXf>& element)
-{
-    double time_now = Time::now();
-
-    Vector x(3);
-    toEigen(x) = element.head<3>().cast<double>();
-    AWPolyElement element_x(x, time_now);
-
-    Vector dot_x = lin_est_x_.estimate(element_x);
-
-
-    Vector o(3);
-    toEigen(o) = element.middleRows<3>(3).cast<double>();
-    AWPolyElement element_o(o, time_now);
-
-    Vector dot_o = lin_est_o_.estimate(element_o);
-
-
-    Vector theta(1);
-    theta(0) = element(6);
-    AWPolyElement element_theta(theta, time_now);
-
-    Vector dot_theta = lin_est_theta_.estimate(element_theta);
-
-
-    if (norm(dot_x) <= lin_est_x_thr_ || norm(dot_o) <= lin_est_o_thr_ || std::abs(dot_theta(0)) <= lin_est_theta_thr_)
-        increaseHistorySize();
-    else if (norm(dot_x) > lin_est_x_thr_ || norm(dot_o) > lin_est_o_thr_ || std::abs(dot_theta(0)) > lin_est_theta_thr_)
-        decreaseHistorySize();
 }

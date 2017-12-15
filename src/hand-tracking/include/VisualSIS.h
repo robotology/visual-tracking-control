@@ -6,10 +6,9 @@
 #include <memory>
 #include <vector>
 
+#include <BayesFilters/EstimatesExtraction.h>
 #include <BayesFilters/VisualParticleFilter.h>
 #include <Eigen/Dense>
-#include <iCub/ctrl/adaptWinPolyEstimator.h>
-#include <iCub/ctrl/filters.h>
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/cudaobjdetect.hpp>
 #include <thrift/VisualSISParticleFilterIDL.h>
@@ -22,54 +21,6 @@
 #include <yarp/sig/Image.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
-
-
-class HistoryBuffer
-{
-public:
-    HistoryBuffer() noexcept;
-
-    ~HistoryBuffer() noexcept { };
-
-    void            addElement(const Eigen::Ref<const Eigen::VectorXf>& element);
-
-    Eigen::MatrixXf getHistoryBuffer();
-
-    bool            setHistorySize(const unsigned int window);
-
-    unsigned int    getHistorySize() { return window_; };
-
-    bool            decreaseHistorySize();
-
-    bool            increaseHistorySize();
-
-    bool            initializeHistory();
-
-    bool            enableAdaptiveWindow(const bool status);
-
-    bool            getAdaptiveWindowStatus() { return adaptive_window_; };
-
-private:
-    unsigned int                window_     = 5;
-
-    const unsigned int          max_window_ = 30;
-
-    unsigned int                mem_window_ = 5;
-
-    std::deque<Eigen::VectorXf> hist_buffer_;
-
-    bool                        adaptive_window_ = false;
-
-    double                      lin_est_x_thr_     = 0.03;
-    double                      lin_est_o_thr_     = 0.5;
-    double                      lin_est_theta_thr_ = 3.0 * iCub::ctrl::CTRL_DEG2RAD;
-
-    iCub::ctrl::AWLinEstimator  lin_est_x_         {4, 0.1};
-    iCub::ctrl::AWLinEstimator  lin_est_o_         {4, 0.6};
-    iCub::ctrl::AWLinEstimator  lin_est_theta_     {4, 6.0 * iCub::ctrl::CTRL_DEG2RAD};
-
-    void                        adaptWindow(const Eigen::Ref<const Eigen::VectorXf>& element);
-};
 
 
 class VisualSIS: public bfl::VisualParticleFilter,
@@ -130,39 +81,9 @@ protected:
     bool                     quit() override;
 
 
-    /* ESTIMATE EXTRACTION METHODS */
     bool set_estimates_extraction_method(const std::string& method) override;
 
     bool set_mobile_average_window(const int16_t window) override;
-
-    bool enable_adaptive_window(const bool status) override;
-
-    HistoryBuffer hist_buffer_;
-
-    enum class EstimatesExtraction
-    {
-        mean,
-        mode,
-        sm_average,
-        wm_average,
-        em_average
-    };
-
-    EstimatesExtraction ext_mode = EstimatesExtraction::em_average;
-
-    Eigen::VectorXf mean(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
-
-    Eigen::VectorXf mode(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights) const;
-
-    Eigen::VectorXf smAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
-    Eigen::VectorXf sm_weights_;
-
-    Eigen::VectorXf wmAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
-    Eigen::VectorXf wm_weights_;
-
-    Eigen::VectorXf emAverage(const Eigen::Ref<const Eigen::MatrixXf>& particles, const Eigen::Ref<const Eigen::VectorXf>& weights);
-    Eigen::VectorXf em_weights_;
-    /* *************************** */
 
 private:
     Eigen::MatrixXf pred_particle_;
@@ -170,6 +91,9 @@ private:
 
     Eigen::MatrixXf cor_particle_;
     Eigen::VectorXf cor_weight_;
+
+
+    bfl::EstimatesExtraction estimate_extraction_;
 
 
     const int          block_size_        = 16;
