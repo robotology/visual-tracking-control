@@ -1,7 +1,9 @@
 #include <FwdKinModel.h>
 
 #include <exception>
+#include <iostream>
 #include <functional>
+
 #include <iCub/ctrl/math.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/Bottle.h>
