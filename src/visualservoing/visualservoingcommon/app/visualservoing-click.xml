@@ -3,7 +3,7 @@
 <application>
 
     <!-- GENERIC INFORMATION -->
-    <name>visualservoing</name>
+    <name>visualservoing-click</name>
     <description>This app allows iCub to perform visual servoing tasks.</description>
     <version>0.5.0.0</version>
 
