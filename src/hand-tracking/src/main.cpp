@@ -69,7 +69,10 @@ int main(int argc, char *argv[])
     paramsd["num_particles"] = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
     paramsd["gpu_count"]     = rf.findGroup("PF").check("gpu_count",     Value(1.0)).asInt();
     paramsd["num_images"]    = paramsd["num_particles"] / paramsd["gpu_count"];
-    paramsd["play"]          = rf.findGroup("PF").check("play",          Value(1.0)).asDouble();
+    if (rf.check("play"))
+        paramsd["play"] = 1.0;
+    else
+        paramsd["play"] = rf.findGroup("PF").check("play", Value(1.0)).asDouble();
 
     paramsd["q_xy"]       = rf.findGroup("BROWNIANMOTION").check("q_xy",       Value(0.005)).asDouble();
     paramsd["q_z"]        = rf.findGroup("BROWNIANMOTION").check("q_z",        Value(0.005)).asDouble();
