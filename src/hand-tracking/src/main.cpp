@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 
+#include <BayesFilters/ResamplingWithPrior.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
@@ -18,7 +19,6 @@
 #include <InitiCubArm.h>
 #include <PlayFwdKinModel.h>
 #include <PlayGatePose.h>
-#include <ResamplingWithPrior.h>
 #include <VisualProprioception.h>
 #include <VisualSIS.h>
 #include <VisualUpdateParticles.h>
@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
     paramsd["num_particles"] = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
     paramsd["gpu_count"]     = rf.findGroup("PF").check("gpu_count",     Value(1.0)).asInt();
     paramsd["num_images"]    = paramsd["num_particles"] / paramsd["gpu_count"];
+    paramsd["res_prior"]     = rf.findGroup("PF").check("res_prior",     Value(1.0)).asInt();
     if (rf.check("play"))
         paramsd["play"] = 1.0;
     else
@@ -91,12 +92,14 @@ int main(int argc, char *argv[])
     paramsd["gate_aperture"] = rf.findGroup("GATEPOSE").check("gate_aperture", Value(15.0)).asDouble();
     paramsd["gate_rotation"] = rf.findGroup("GATEPOSE").check("gate_rotation", Value(30.0)).asDouble();
 
+    paramsd["prior_ratio"]    = rf.findGroup("RESAMPLING").check("prior_ratio", Value(2.0)).asDouble();
+
     FilteringParamtersS paramss;
     paramss["robot"]      = rf.findGroup("PF").check("robot",      Value("icub")).asString();
     if (rf.check("cam"))
         paramss["cam_sel"] = rf.find("cam").asString();
     else
-        paramss["cam_sel"] = rf.findGroup("PF").check("cam_sel",    Value("left")).asString();
+        paramss["cam_sel"] = rf.findGroup("PF").check("cam_sel",   Value("left")).asString();
     paramss["laterality"] = rf.findGroup("PF").check("laterality", Value("right")).asString();
 
 
@@ -108,6 +111,7 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - num_particles:" << paramsd["num_particles"];
     yInfo() << log_ID << " - gpu_count:"     << paramsd["gpu_count"];
     yInfo() << log_ID << " - num_images:"    << paramsd["num_images"];
+    yInfo() << log_ID << " - res_prior:"     << paramsd["res_prior"];
     yInfo() << log_ID << " - play:"          << (paramsd["play"] == 1.0 ? "true" : "false");
 
     yInfo() << log_ID << " - q_xy:"       << paramsd["q_xy"];
@@ -120,6 +124,8 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - use_forearm:" << paramsd["use_forearm"];
 
     yInfo() << log_ID << " - likelihood_gain:" << paramsd["likelihood_gain"];
+
+    yInfo() << log_ID << " - prior_ratio:"    << paramsd["prior_ratio"];
 
     yInfo() << log_ID << " - gate_x:"        << paramsd["gate_x"];
     yInfo() << log_ID << " - gate_y:"        << paramsd["gate_y"];
@@ -191,8 +197,20 @@ int main(int argc, char *argv[])
 
 
     /* RESAMPLING */
-//    std::unique_ptr<Resampling> resampling(new Resampling());
-    std::unique_ptr<Resampling> resampling(new ResamplingWithPrior("hand-tracking/ResamplingWithPrior", paramss["cam_sel"], paramss["laterality"]));
+    std::unique_ptr<Resampling> pf_resampling;
+    if (paramsd["res_prior"] != 1.0)
+    {
+        std::unique_ptr<Resampling> resampling(new Resampling());
+
+        pf_resampling = std::move(resampling);
+    }
+    else
+    {
+        std::unique_ptr<InitiCubArm> resample_init_arm(new InitiCubArm("hand-tracking/ResamplingWithPrior/InitiCubArm", paramss["cam_sel"], paramss["laterality"]));
+        std::unique_ptr<Resampling>  resampling_prior(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
+
+        pf_resampling = std::move(resampling_prior);
+    }
 
 
     /* PARTICLE FILTER */
@@ -200,7 +218,7 @@ int main(int argc, char *argv[])
     vsis_pf.setInitialization(std::move(init_arm));
     vsis_pf.setPrediction(std::move(pf_prediction));
     vsis_pf.setCorrection(std::move(vpf_correction_gated));
-    vsis_pf.setResampling(std::move(resampling));
+    vsis_pf.setResampling(std::move(pf_resampling));
 
 
     vsis_pf.boot();
