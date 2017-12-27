@@ -43,7 +43,7 @@ VisualSIS::VisualSIS(const yarp::os::ConstString& cam_sel,
 
 
     cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
-    cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
+    cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
     cuda_hog_->setGammaCorrection(true);
     cuda_hog_->setWinStride(Size(img_width_, img_height_));
 
