@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
     paramsd["num_particles"]    = rf.findGroup("PF").check("num_particles",    Value(50)).asInt();
     paramsd["gpu_count"]        = rf.findGroup("PF").check("gpu_count",        Value(1.0)).asInt();
     paramsd["resample_prior"]   = rf.findGroup("PF").check("resample_prior",   Value(1.0)).asInt();
+    paramsd["gate_pose"]        = rf.findGroup("PF").check("gate_pose",        Value(0.0)).asInt();
     paramsd["resolution_ratio"] = rf.findGroup("PF").check("resolution_ratio", Value(1.0)).asInt();
     paramsd["num_images"]       = paramsd["num_particles"] / paramsd["gpu_count"];
     if (rf.check("play"))
@@ -114,6 +115,7 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - gpu_count:"      << paramsd["gpu_count"];
     yInfo() << log_ID << " - num_images:"     << paramsd["num_images"];
     yInfo() << log_ID << " - resample_prior:" << paramsd["resample_prior"];
+    yInfo() << log_ID << " - gate_pose:"      << paramsd["gate_pose"];
     yInfo() << log_ID << " - play:"           << (paramsd["play"] == 1.0 ? "true" : "false");
 
     yInfo() << log_ID << " - q_xy:"       << paramsd["q_xy"];
@@ -188,22 +190,27 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualUpdateParticles> vpf_correction(new VisualUpdateParticles(std::move(proprio), paramsd["likelihood_gain"], paramsd["gpu_count"]));
 
     std::unique_ptr<GatePose> vpf_correction_gated;
-    if (paramsd["play"] != 1.0)
+    if (paramsd["gate_pose"] == 1.0)
     {
-        std::unique_ptr<iCubGatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_correction),
-                                                                      paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
-                                                                      paramsd["gate_aperture"], paramsd["gate_rotation"],
-                                                                      paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
-        vpf_correction_gated = std::move(icub_gate_pose);
+        if (paramsd["play"] != 1.0)
+        {
+            std::unique_ptr<iCubGatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_update_particles),
+                                                                          paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
+                                                                          paramsd["gate_aperture"], paramsd["gate_rotation"],
+                                                                          paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+            vpf_correction = std::move(icub_gate_pose);
+        }
+        else
+        {
+            std::unique_ptr<PlayGatePose> icub_gate_pose(new PlayGatePose(std::move(vpf_update_particles),
+                                                                          paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
+                                                                          paramsd["gate_aperture"], paramsd["gate_rotation"],
+                                                                          paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+            vpf_correction = std::move(icub_gate_pose);
+        }
     }
     else
-    {
-        std::unique_ptr<PlayGatePose> icub_gate_pose(new PlayGatePose(std::move(vpf_correction),
-                                                                      paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
-                                                                      paramsd["gate_aperture"], paramsd["gate_rotation"],
-                                                                      paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
-        vpf_correction_gated = std::move(icub_gate_pose);
-    }
+        vpf_correction = std::move(vpf_update_particles);
 
 
     /* RESAMPLING */
