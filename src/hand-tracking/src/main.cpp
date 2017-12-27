@@ -66,10 +66,10 @@ int main(int argc, char *argv[])
     rf.configure(argc, argv);
 
     FilteringParamtersD paramsd;
-    paramsd["num_particles"] = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
-    paramsd["gpu_count"]     = rf.findGroup("PF").check("gpu_count",     Value(1.0)).asInt();
-    paramsd["num_images"]    = paramsd["num_particles"] / paramsd["gpu_count"];
-    paramsd["res_prior"]     = rf.findGroup("PF").check("res_prior",     Value(1.0)).asInt();
+    paramsd["num_particles"]  = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
+    paramsd["gpu_count"]      = rf.findGroup("PF").check("gpu_count",     Value(1.0)).asInt();
+    paramsd["num_images"]     = paramsd["num_particles"] / paramsd["gpu_count"];
+    paramsd["resample_prior"] = rf.findGroup("PF").check("resample_prior",     Value(1.0)).asInt();
     if (rf.check("play"))
         paramsd["play"] = 1.0;
     else
@@ -108,11 +108,11 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - cam_sel:"       << paramss["cam_sel"];
     yInfo() << log_ID << " - laterality:"    << paramss["laterality"];
 
-    yInfo() << log_ID << " - num_particles:" << paramsd["num_particles"];
-    yInfo() << log_ID << " - gpu_count:"     << paramsd["gpu_count"];
-    yInfo() << log_ID << " - num_images:"    << paramsd["num_images"];
-    yInfo() << log_ID << " - res_prior:"     << paramsd["res_prior"];
-    yInfo() << log_ID << " - play:"          << (paramsd["play"] == 1.0 ? "true" : "false");
+    yInfo() << log_ID << " - num_particles:"  << paramsd["num_particles"];
+    yInfo() << log_ID << " - gpu_count:"      << paramsd["gpu_count"];
+    yInfo() << log_ID << " - num_images:"     << paramsd["num_images"];
+    yInfo() << log_ID << " - resample_prior:" << paramsd["resample_prior"];
+    yInfo() << log_ID << " - play:"           << (paramsd["play"] == 1.0 ? "true" : "false");
 
     yInfo() << log_ID << " - q_xy:"       << paramsd["q_xy"];
     yInfo() << log_ID << " - q_z:"        << paramsd["q_z"];
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 
     /* RESAMPLING */
     std::unique_ptr<Resampling> pf_resampling;
-    if (paramsd["res_prior"] != 1.0)
+    if (paramsd["resample_prior"] != 1.0)
     {
         std::unique_ptr<Resampling> resampling(new Resampling());
 
