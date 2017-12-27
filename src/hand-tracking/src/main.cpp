@@ -140,12 +140,13 @@ int main(int argc, char *argv[])
 
 
     /* INITIALIZATION */
-    std::unique_ptr<InitiCubArm> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", paramss["cam_sel"], paramss["laterality"]));
+    std::unique_ptr<Initialization> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", paramss["cam_sel"], paramss["laterality"]));
 
 
     /* MOTION MODEL */
-    std::unique_ptr<BrownianMotionPose> brown(new BrownianMotionPose(paramsd["q_xy"], paramsd["q_z"], paramsd["theta"], paramsd["cone_angle"], paramsd["seed"]));
-    std::unique_ptr<FwdKinModel> icub_motion;
+    std::unique_ptr<StateModel> brown(new BrownianMotionPose(paramsd["q_xy"], paramsd["q_z"], paramsd["theta"], paramsd["cone_angle"], paramsd["seed"]));
+
+    std::unique_ptr<ExogenousModel> icub_motion;
     if (paramsd["play"] != 1.0)
     {
         std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
@@ -187,9 +188,10 @@ int main(int argc, char *argv[])
     }
 
     /* CORRECTION */
-    std::unique_ptr<VisualUpdateParticles> vpf_correction(new VisualUpdateParticles(std::move(proprio), paramsd["likelihood_gain"], paramsd["gpu_count"]));
+    std::unique_ptr<PFVisualCorrection> vpf_correction;
 
-    std::unique_ptr<GatePose> vpf_correction_gated;
+    std::unique_ptr<PFVisualCorrection> vpf_update_particles(new VisualUpdateParticles(std::move(proprio), paramsd["likelihood_gain"], paramsd["gpu_count"]));
+
     if (paramsd["gate_pose"] == 1.0)
     {
         if (paramsd["play"] != 1.0)
@@ -237,7 +239,7 @@ int main(int argc, char *argv[])
                       paramsd["resample_ratio"]);
     vsis_pf.setInitialization(std::move(init_arm));
     vsis_pf.setPrediction(std::move(pf_prediction));
-    vsis_pf.setCorrection(std::move(vpf_correction_gated));
+    vsis_pf.setCorrection(std::move(vpf_correction));
     vsis_pf.setResampling(std::move(pf_resampling));
 
 
