@@ -11,6 +11,7 @@
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/cudaimgproc.hpp>
+#include <opencv2/cudawarping.hpp>
 #include <yarp/eigen/Eigen.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/Time.h>
@@ -29,12 +30,18 @@ using yarp::sig::PixelRgb;
 
 
 VisualSIS::VisualSIS(const yarp::os::ConstString& cam_sel,
+                     const int img_width, const int img_height,
                      const int num_particles,
                      const double resample_ratio) :
     cam_sel_(cam_sel),
+    img_width_(img_width),
+    img_height_(img_height),
     num_particles_(num_particles),
     resample_ratio_(resample_ratio)
 {
+    descriptor_length_ = (img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4;
+
+
     cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
     cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
     cuda_hog_->setGammaCorrection(true);
@@ -111,6 +118,7 @@ void VisualSIS::filteringStep()
 
         measurement = cvarrToMat(img_in_.getIplImage());
         cuda_img.upload(measurement);
+        cuda::resize(cuda_img, cuda_img, Size(img_width_, img_height_));
         cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);
         cuda_hog_->compute(cuda_img_alpha, descriptors_cam_cuda);
         descriptors_cam_cuda.download(descriptors_cam_left);

@@ -21,13 +21,20 @@ using namespace yarp::math;
 using yarp::sig::Vector;
 
 
-VisualProprioception::VisualProprioception(const bool use_thumb, const bool use_forearm, const int num_images,
-                                           const ConstString& cam_sel, const ConstString& laterality, const ConstString& context) :
+VisualProprioception::VisualProprioception(const bool use_thumb,
+                                           const bool use_forearm,
+                                           const int num_images,
+                                           const double resolution_ratio,
+                                           const ConstString& cam_sel,
+                                           const ConstString& laterality,
+                                           const ConstString& context) :
     laterality_(laterality),
     icub_arm_(iCubArm(laterality+"_v2")),
     icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")},
     cam_sel_(cam_sel),
-    use_thumb_(use_thumb), use_forearm_(use_forearm)
+    resolution_ratio_(resolution_ratio),
+    use_thumb_(use_thumb),
+    use_forearm_(use_forearm)
 {
     ResourceFinder rf;
 
@@ -82,13 +89,30 @@ VisualProprioception::VisualProprioception(const bool use_thumb, const bool use_
             cam_cy_     = 120.0;
         }
     }
-    yInfo() << log_ID_ << "[CAM]" << "Running with:";
+
+    yInfo() << log_ID_ << "[CAM]" << "Found camera information:";
     yInfo() << log_ID_ << "[CAM]" << " - width:"  << cam_width_;
     yInfo() << log_ID_ << "[CAM]" << " - height:" << cam_height_;
     yInfo() << log_ID_ << "[CAM]" << " - fx:"     << cam_fx_;
     yInfo() << log_ID_ << "[CAM]" << " - fy:"     << cam_fy_;
     yInfo() << log_ID_ << "[CAM]" << " - cx:"     << cam_cx_;
     yInfo() << log_ID_ << "[CAM]" << " - cy:"     << cam_cy_;
+
+    cam_width_  /= resolution_ratio_;
+    cam_height_ /= resolution_ratio_;
+    cam_fx_     /= resolution_ratio_;
+    cam_cx_     /= resolution_ratio_;
+    cam_fy_     /= resolution_ratio_;
+    cam_cy_     /= resolution_ratio_;
+
+    yInfo() << log_ID_ << "[CAM]" << "Running with:";
+    yInfo() << log_ID_ << "[CAM]" << " - resolution_ratio:"  << resolution_ratio_;
+    yInfo() << log_ID_ << "[CAM]" << " - width:"             << cam_width_;
+    yInfo() << log_ID_ << "[CAM]" << " - height:"            << cam_height_;
+    yInfo() << log_ID_ << "[CAM]" << " - fx:"                << cam_fx_;
+    yInfo() << log_ID_ << "[CAM]" << " - fy:"                << cam_fy_;
+    yInfo() << log_ID_ << "[CAM]" << " - cx:"                << cam_cx_;
+    yInfo() << log_ID_ << "[CAM]" << " - cy:"                << cam_cy_;
 
     cam_x_[0] = 0;
     cam_x_[1] = 0;
@@ -235,8 +259,14 @@ VisualProprioception::~VisualProprioception() noexcept
 
 
 VisualProprioception::VisualProprioception(const VisualProprioception& proprio) :
-    cam_width_(proprio.cam_width_), cam_height_(proprio.cam_height_), cam_fx_(proprio.cam_fx_), cam_cx_(proprio.cam_cx_), cam_fy_(proprio.cam_fy_), cam_cy_(proprio.cam_cy_),
-    cad_obj_(proprio.cad_obj_), si_cad_(proprio.si_cad_)
+    cam_width_(proprio.cam_width_),
+    cam_height_(proprio.cam_height_),
+    cam_fx_(proprio.cam_fx_),
+    cam_cx_(proprio.cam_cx_),
+    cam_fy_(proprio.cam_fy_),
+    cam_cy_(proprio.cam_cy_),
+    cad_obj_(proprio.cad_obj_),
+    si_cad_(proprio.si_cad_)
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -257,8 +287,14 @@ VisualProprioception::VisualProprioception(const VisualProprioception& proprio) 
 
 VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexcept :
     icub_arm_(std::move(proprio.icub_arm_)),
-    cam_width_(std::move(proprio.cam_width_)), cam_height_(std::move(proprio.cam_height_)), cam_fx_(std::move(proprio.cam_fx_)), cam_cx_(std::move(proprio.cam_cx_)), cam_fy_(std::move(proprio.cam_fy_)), cam_cy_(std::move(proprio.cam_cy_)),
-    cad_obj_(std::move(proprio.cad_obj_)), si_cad_(std::move(proprio.si_cad_))
+    cam_width_(std::move(proprio.cam_width_)),
+    cam_height_(std::move(proprio.cam_height_)),
+    cam_fx_(std::move(proprio.cam_fx_)),
+    cam_cx_(std::move(proprio.cam_cx_)),
+    cam_fy_(std::move(proprio.cam_fy_)),
+    cam_cy_(std::move(proprio.cam_cy_)),
+    cad_obj_(std::move(proprio.cad_obj_)),
+    si_cad_(std::move(proprio.si_cad_))
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];

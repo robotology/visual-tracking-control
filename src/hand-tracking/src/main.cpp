@@ -97,12 +97,12 @@ int main(int argc, char *argv[])
     paramsd["prior_ratio"]    = rf.findGroup("RESAMPLING").check("prior_ratio", Value(2.0)).asDouble();
 
     FilteringParamtersS paramss;
-    paramss["robot"]      = rf.findGroup("PF").check("robot",      Value("icub")).asString();
+    paramss["robot"]       = rf.findGroup("PF").check("robot",      Value("icub")).asString();
     if (rf.check("cam"))
         paramss["cam_sel"] = rf.find("cam").asString();
     else
-        paramss["cam_sel"] = rf.findGroup("PF").check("cam_sel",   Value("left")).asString();
-    paramss["laterality"] = rf.findGroup("PF").check("laterality", Value("right")).asString();
+        paramss["cam_sel"] = rf.findGroup("PF").check("cam_sel",    Value("left")).asString();
+    paramss["laterality"]  = rf.findGroup("PF").check("laterality", Value("right")).asString();
 
 
     yInfo() << log_ID << "Running with:";
@@ -165,11 +165,18 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(paramsd["use_thumb"], paramsd["use_forearm"],
-                                                                          paramsd["num_images"], paramss["cam_sel"], paramss["laterality"], rf.getContext()));
+        std::unique_ptr<VisualProprioception> vp(new VisualProprioception(paramsd["use_thumb"],
+                                                                          paramsd["use_forearm"],
+                                                                          paramsd["num_images"],
+                                                                          paramsd["resolution_ratio"],
+                                                                          paramss["cam_sel"],
+                                                                          paramss["laterality"],
+                                                                          rf.getContext()));
 
         proprio = std::move(vp);
         paramsd["num_particles"] = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * paramsd["gpu_count"];
+        paramsd["cam_width"]     = proprio->getCamWidth();
+        paramsd["cam_height"]    = proprio->getCamHeight();
     }
     catch (const std::runtime_error& e)
     {
@@ -218,6 +225,7 @@ int main(int argc, char *argv[])
 
     /* PARTICLE FILTER */
     VisualSIS vsis_pf(paramss["cam_sel"],
+                      paramsd["cam_width"], paramsd["cam_height"],
                       paramsd["num_particles"],
                       paramsd["resample_ratio"]);
     vsis_pf.setInitialization(std::move(init_arm));

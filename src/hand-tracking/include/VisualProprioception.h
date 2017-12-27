@@ -20,8 +20,13 @@
 class VisualProprioception : public bfl::VisualObservationModel
 {
 public:
-    VisualProprioception(const bool use_thumb, const bool use_forearm, const int num_images,
-                         const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality, const yarp::os::ConstString& context);
+    VisualProprioception(const bool use_thumb,
+                         const bool use_forearm,
+                         const int num_images,
+                         const double resolution_ratio,
+                         const yarp::os::ConstString& cam_sel,
+                         const yarp::os::ConstString& laterality,
+                         const yarp::os::ConstString& context);
 
     VisualProprioception(const VisualProprioception& proprio);
 
@@ -97,6 +102,7 @@ protected:
     float                 cam_cx_;
     float                 cam_fy_;
     float                 cam_cy_;
+    double                resolution_ratio_;
 
     bool                      use_thumb_;
     bool                      use_forearm_;
