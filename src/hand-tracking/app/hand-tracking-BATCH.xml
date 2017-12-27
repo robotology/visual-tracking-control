@@ -158,28 +158,28 @@
         <protocol>tcp</protocol>
     </connection>
 
-    <!-- ResamplingWithPriorConnections -->
+    <!-- ResamplingWithPrior connections -->
     <connection>
         <from>/icub/torso/state:o</from>
-        <to>/hand-tracking/ResamplingWithPrior/cam/left/torso:i</to>
+        <to>/hand-tracking/ResamplingWithPrior/InitiCubArm/cam/left/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/icub/right_arm/state:o</from>
-        <to>/hand-tracking/ResamplingWithPrior/cam/left/right_arm:i</to>
+        <to>/hand-tracking/ResamplingWithPrior/InitiCubArm/cam/left/right_arm:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/icub/torso/state:o</from>
-        <to>/hand-tracking/ResamplingWithPrior/cam/right/torso:i</to>
+        <to>/hand-tracking/ResamplingWithPrior/InitiCubArm/cam/right/torso:i</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
         <from>/icub/right_arm/state:o</from>
-        <to>/hand-tracking/ResamplingWithPrior/cam/right/right_arm:i</to>
+        <to>/hand-tracking/ResamplingWithPrior/InitiCubArm/cam/right/right_arm:i</to>
         <protocol>tcp</protocol>
     </connection>
 
