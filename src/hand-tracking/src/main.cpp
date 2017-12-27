@@ -66,10 +66,11 @@ int main(int argc, char *argv[])
     rf.configure(argc, argv);
 
     FilteringParamtersD paramsd;
-    paramsd["num_particles"]  = rf.findGroup("PF").check("num_particles", Value(50)).asInt();
-    paramsd["gpu_count"]      = rf.findGroup("PF").check("gpu_count",     Value(1.0)).asInt();
-    paramsd["num_images"]     = paramsd["num_particles"] / paramsd["gpu_count"];
-    paramsd["resample_prior"] = rf.findGroup("PF").check("resample_prior",     Value(1.0)).asInt();
+    paramsd["num_particles"]    = rf.findGroup("PF").check("num_particles",    Value(50)).asInt();
+    paramsd["gpu_count"]        = rf.findGroup("PF").check("gpu_count",        Value(1.0)).asInt();
+    paramsd["resample_prior"]   = rf.findGroup("PF").check("resample_prior",   Value(1.0)).asInt();
+    paramsd["resolution_ratio"] = rf.findGroup("PF").check("resolution_ratio", Value(1.0)).asInt();
+    paramsd["num_images"]       = paramsd["num_particles"] / paramsd["gpu_count"];
     if (rf.check("play"))
         paramsd["play"] = 1.0;
     else
@@ -92,6 +93,7 @@ int main(int argc, char *argv[])
     paramsd["gate_aperture"] = rf.findGroup("GATEPOSE").check("gate_aperture", Value(15.0)).asDouble();
     paramsd["gate_rotation"] = rf.findGroup("GATEPOSE").check("gate_rotation", Value(30.0)).asDouble();
 
+    paramsd["resample_ratio"] = rf.findGroup("RESAMPLING").check("resample_ratio", Value(0.3)).asDouble();
     paramsd["prior_ratio"]    = rf.findGroup("RESAMPLING").check("prior_ratio", Value(2.0)).asDouble();
 
     FilteringParamtersS paramss;
@@ -125,6 +127,7 @@ int main(int argc, char *argv[])
 
     yInfo() << log_ID << " - likelihood_gain:" << paramsd["likelihood_gain"];
 
+    yInfo() << log_ID << " - resample_ratio:" << paramsd["resample_ratio"];
     yInfo() << log_ID << " - prior_ratio:"    << paramsd["prior_ratio"];
 
     yInfo() << log_ID << " - gate_x:"        << paramsd["gate_x"];
@@ -214,7 +217,9 @@ int main(int argc, char *argv[])
 
 
     /* PARTICLE FILTER */
-    VisualSIS vsis_pf(paramss["cam_sel"], paramsd["num_particles"]);
+    VisualSIS vsis_pf(paramss["cam_sel"],
+                      paramsd["num_particles"],
+                      paramsd["resample_ratio"]);
     vsis_pf.setInitialization(std::move(init_arm));
     vsis_pf.setPrediction(std::move(pf_prediction));
     vsis_pf.setCorrection(std::move(vpf_correction_gated));

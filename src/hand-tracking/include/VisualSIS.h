@@ -27,7 +27,9 @@ class VisualSIS: public bfl::VisualParticleFilter,
                  public VisualSISParticleFilterIDL
 {
 public:
-    VisualSIS(const yarp::os::ConstString& cam_sel, const int num_particles);
+    VisualSIS(const yarp::os::ConstString& cam_sel,
+              const int num_particles,
+              const double resample_ratio);
 
     VisualSIS(const VisualSIS& vsir_pf) = delete;
 
@@ -53,6 +55,7 @@ protected:
 
     yarp::os::ConstString cam_sel_;
     const int             num_particles_;
+    double                resample_ratio_;
 
     cv::Ptr<cv::cuda::HOG> cuda_hog_;
 

@@ -28,9 +28,12 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIS::VisualSIS(const ConstString& cam_sel, const int num_particles) :
+VisualSIS::VisualSIS(const yarp::os::ConstString& cam_sel,
+                     const int num_particles,
+                     const double resample_ratio) :
     cam_sel_(cam_sel),
-    num_particles_(num_particles)
+    num_particles_(num_particles),
+    resample_ratio_(resample_ratio)
 {
     cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
     cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_COL_BY_COL);
@@ -131,7 +134,7 @@ void VisualSIS::filteringStep()
         /* RESAMPLING */
         std::cout << "Step: " << getFilteringStep() << std::endl;
         std::cout << "Neff: " << resampling_->neff(cor_weight_) << std::endl;
-        if (resampling_->neff(cor_weight_) < std::round(num_particles_ / 5.f))
+        if (resampling_->neff(cor_weight_) < std::round(num_particles_ * resample_ratio_))
         {
             std::cout << "Resampling!" << std::endl;
 
