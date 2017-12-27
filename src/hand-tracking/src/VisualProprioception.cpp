@@ -730,7 +730,7 @@ bool VisualProprioception::closeAnalogs()
 
 Vector VisualProprioception::readTorso()
 {
-    Bottle* b = port_torso_enc_.read();
+    Bottle* b = port_torso_enc_.read(true);
     if (!b) return Vector(3, 0.0);
 
     Vector torso_enc(3);
@@ -744,7 +744,7 @@ Vector VisualProprioception::readTorso()
 
 Vector VisualProprioception::readRootToFingers()
 {
-    Bottle* b = port_arm_enc_.read();
+    Bottle* b = port_arm_enc_.read(true);
     if (!b) return Vector(19, 0.0);
 
     Vector root_fingers_enc(19);
@@ -758,7 +758,7 @@ Vector VisualProprioception::readRootToFingers()
 
 Vector VisualProprioception::readRootToEye(const ConstString cam_sel)
 {
-    Bottle* b = port_head_enc_.read();
+    Bottle* b = port_head_enc_.read(true);
     if (!b) return Vector(8, 0.0);
 
     Vector root_eye_enc(8);
