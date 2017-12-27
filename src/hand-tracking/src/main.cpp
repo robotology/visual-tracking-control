@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     paramsd["gate_rotation"] = rf.findGroup("GATEPOSE").check("gate_rotation", Value(30.0)).asDouble();
 
     paramsd["resample_ratio"] = rf.findGroup("RESAMPLING").check("resample_ratio", Value(0.3)).asDouble();
-    paramsd["prior_ratio"]    = rf.findGroup("RESAMPLING").check("prior_ratio", Value(2.0)).asDouble();
+    paramsd["prior_ratio"]    = rf.findGroup("RESAMPLING").check("prior_ratio",    Value(0.5)).asDouble();
 
     FilteringParamtersS paramss;
     paramss["robot"]       = rf.findGroup("PF").check("robot",      Value("icub")).asString();
