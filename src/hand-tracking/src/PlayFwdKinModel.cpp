@@ -60,7 +60,7 @@ VectorXd PlayFwdKinModel::readPose()
 
 Vector PlayFwdKinModel::readTorso()
 {
-    Bottle* b = port_torso_enc_.read();
+    Bottle* b = port_torso_enc_.read(true);
     if (!b) return Vector(3, 0.0);
 
     Vector torso_enc(3);
@@ -74,7 +74,7 @@ Vector PlayFwdKinModel::readTorso()
 
 Vector PlayFwdKinModel::readRootToEE()
 {
-    Bottle* b = port_arm_enc_.read();
+    Bottle* b = port_arm_enc_.read(true);
     if (!b) return Vector(10, 0.0);
 
     Vector root_ee_enc(10);

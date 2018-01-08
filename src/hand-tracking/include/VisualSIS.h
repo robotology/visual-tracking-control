@@ -27,7 +27,10 @@ class VisualSIS: public bfl::VisualParticleFilter,
                  public VisualSISParticleFilterIDL
 {
 public:
-    VisualSIS(const yarp::os::ConstString& cam_sel, const int num_particles);
+    VisualSIS(const yarp::os::ConstString& cam_sel,
+              const int img_width, const int img_height,
+              const int num_particles,
+              const double resample_ratio);
 
     VisualSIS(const VisualSIS& vsir_pf) = delete;
 
@@ -52,7 +55,14 @@ protected:
 
 
     yarp::os::ConstString cam_sel_;
-    const int             num_particles_;
+    int                   img_width_;
+    int                   img_height_;
+    int                   num_particles_;
+    unsigned int          descriptor_length_;
+    double                resample_ratio_;
+
+    const int block_size_ = 16;
+    const int bin_number_ = 9;
 
     cv::Ptr<cv::cuda::HOG> cuda_hog_;
 
@@ -94,13 +104,6 @@ private:
 
 
     bfl::EstimatesExtraction estimate_extraction_;
-
-
-    const int          block_size_        = 16;
-    const int          img_width_         = 320;
-    const int          img_height_        = 240;
-    const int          bin_number_        = 9;
-    const unsigned int descriptor_length_ = (img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4;
 
 
     bool init_img_in_ = false;

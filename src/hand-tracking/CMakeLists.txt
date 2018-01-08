@@ -24,7 +24,6 @@ set(${EXE_TARGET_NAME}_HDR
         include/InitiCubArm.h
         include/PlayFwdKinModel.h
         include/PlayGatePose.h
-        include/ResamplingWithPrior.h
         include/VisualProprioception.h
         include/VisualSIS.h
         include/VisualUpdateParticles.h)
@@ -40,7 +39,6 @@ set(${EXE_TARGET_NAME}_SRC
         src/InitiCubArm.cpp
         src/PlayFwdKinModel.cpp
         src/PlayGatePose.cpp
-        src/ResamplingWithPrior.cpp
         src/VisualProprioception.cpp
         src/VisualSIS.cpp
         src/VisualUpdateParticles.cpp)
