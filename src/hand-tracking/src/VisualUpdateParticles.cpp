@@ -6,6 +6,7 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <chrono>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/cuda.hpp>
@@ -33,26 +34,24 @@ VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioceptio
     num_img_stream_(observation_model_->getOGLTilesNumber()),
     cuda_stream_(std::vector<cuda::Stream>(num_cuda_stream))
 {
-    int          block_size     = 16;
-    int          bin_number     = 9;
-    unsigned int img_width      = observation_model_->getCamWidth();
-    unsigned int img_height     = observation_model_->getCamHeight();
-    unsigned int ogl_tiles_cols = observation_model_->getOGLTilesCols();
-    unsigned int ogl_tiles_rows = observation_model_->getOGLTilesRows();
-    unsigned int feature_dim    = (img_width/block_size*2-1) * (img_height/block_size*2-1) * bin_number * 4;
+    img_width_      = observation_model_->getCamWidth();
+    img_height_     = observation_model_->getCamHeight();
+    ogl_tiles_cols_ = observation_model_->getOGLTilesCols();
+    ogl_tiles_rows_ = observation_model_->getOGLTilesRows();
+    feature_dim_    = (img_width_ / block_size_ * 2 - 1) * (img_height_ / block_size_ * 2 - 1) * bin_number_ * 4;
 
-    cuda_hog_ = cuda::HOG::create(Size(img_width, img_height), Size(block_size, block_size), Size(block_size/2, block_size/2), Size(block_size/2, block_size/2), bin_number);
+    cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
     cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
     cuda_hog_->setGammaCorrection(true);
-    cuda_hog_->setWinStride(Size(img_width, img_height));
+    cuda_hog_->setWinStride(Size(img_width_, img_height_));
 
     for (int s = 0; s < num_cuda_stream_; ++s)
     {
-        hand_rendered_.emplace_back   (Mat(         Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC3));
-        cuda_img_.emplace_back        (cuda::GpuMat(Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC3));
-        cuda_img_alpha_.emplace_back  (cuda::GpuMat(Size(img_width * ogl_tiles_cols, img_height* ogl_tiles_rows), CV_8UC4));
-        cuda_descriptors_.emplace_back(cuda::GpuMat(Size(num_img_stream_, feature_dim),                           CV_32F ));
-        cpu_descriptors_.emplace_back (Mat(         Size(num_img_stream_, feature_dim),                           CV_32F ));
+        hand_rendered_.emplace_back   (Mat(         Size(img_width_ * ogl_tiles_cols_, img_height_* ogl_tiles_rows_), CV_8UC3));
+        cuda_img_.emplace_back        (cuda::GpuMat(Size(img_width_ * ogl_tiles_cols_, img_height_* ogl_tiles_rows_), CV_8UC3));
+        cuda_img_alpha_.emplace_back  (cuda::GpuMat(Size(img_width_ * ogl_tiles_cols_, img_height_* ogl_tiles_rows_), CV_8UC4));
+        cuda_descriptors_.emplace_back(cuda::GpuMat(Size(num_img_stream_, feature_dim_),                           CV_32F ));
+        cpu_descriptors_.emplace_back (Mat(         Size(num_img_stream_, feature_dim_),                           CV_32F ));
     }
 }
 
@@ -72,31 +71,50 @@ void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, c
         cuda_hog_->compute(cuda_img_alpha_[s], cuda_descriptors_[s], cuda_stream_[s]);
     }
 
+    using namespace std::chrono;
+
+    steady_clock::time_point t1 = steady_clock::now();
+
+    const std::vector<float>* measurements_ptr = static_cast<const std::vector<float>*>(measurements.getObj());
+    Map<const VectorXf> descriptor_image(measurements_ptr->data(), measurements_ptr->size());
+
     for (int s = 0; s < num_cuda_stream_; ++s)
     {
         cuda_stream_[s].waitForCompletion();
 
         cuda_descriptors_[s].download(cpu_descriptors_[s], cuda_stream_[s]);
 
+        MatrixXf descriptors_render;
+        cv2eigen(cpu_descriptors_[s], descriptors_render);
+
         for (int i = 0; i < num_img_stream_; ++i)
         {
-            float sum_diff = 0;
-            {
-            auto it_cam     = (static_cast<const std::vector<float>*>(measurements.getObj()))->begin();
-            auto it_cam_end = (static_cast<const std::vector<float>*>(measurements.getObj()))->end();
-            int  j          = 0;
-            while (it_cam < it_cam_end)
-            {
-                sum_diff += abs((*it_cam) - cpu_descriptors_[s].at<float>(i, j));
+            double sum_kldnormchi = 0;
 
-                ++it_cam;
-                ++j;
-            }
+            for(int j = 0; j < feature_dim_; j += (bin_number_ * 4))
+            {
+                const VectorXf descriptor_image_hist = descriptor_image.middleRows(j, bin_number_ * 4).array() + std::numeric_limits<float>::min();
+                const VectorXf descriptor_image_pmf  = descriptor_image_hist / descriptor_image_hist.lpNorm<1>();
+
+                const VectorXf descriptor_render_hist = descriptors_render.row(i).middleCols(j, bin_number_ * 4).array() + std::numeric_limits<float>::min();
+                const VectorXf descriptor_render_pmf  = descriptor_render_hist / descriptor_render_hist.lpNorm<1>();
+
+                double kld  = (descriptor_render_pmf.cast<double>().array() * (descriptor_render_pmf.cast<double>().array().log() - descriptor_image_pmf.cast<double>().array().log())).sum();
+                double norm = (descriptor_image_hist.cast<double>() - descriptor_render_hist.cast<double>()).lpNorm<2>();
+                double chi  = (((descriptor_image_hist.cast<double>() - descriptor_render_hist.cast<double>()).array().square()).array() / (descriptor_image_hist.cast<double>() + descriptor_render_hist.cast<double>()).array()).sum();
+
+                sum_kldnormchi += kld * norm * chi;
             }
 
-            innovations(s * num_img_stream_ + i, 0) = sum_diff;
+            innovations(s * num_img_stream_ + i, 0) = sum_kldnormchi;
         }
     }
+
+    steady_clock::time_point t2 = steady_clock::now();
+
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+
+    std::cout << "It took me " << time_span.count() << " seconds." << std::endl;
 }
 
 

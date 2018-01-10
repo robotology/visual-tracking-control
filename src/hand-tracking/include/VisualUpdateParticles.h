@@ -49,6 +49,14 @@ protected:
     std::vector<cv::cuda::GpuMat>         cuda_img_alpha_;
     std::vector<cv::cuda::GpuMat>         cuda_descriptors_;
     std::vector<cv::Mat>                  cpu_descriptors_;
+
+    const int    block_size_ = 16;
+    const int    bin_number_ = 9;
+    unsigned int img_width_;
+    unsigned int img_height_;
+    unsigned int ogl_tiles_cols_;
+    unsigned int ogl_tiles_rows_;
+    unsigned int feature_dim_;
 };
 
 #endif /* VISUALUPDATEPARTICLES_H */
