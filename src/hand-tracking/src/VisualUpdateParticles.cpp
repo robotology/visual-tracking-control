@@ -6,7 +6,6 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include <chrono>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/cuda.hpp>
@@ -71,12 +70,7 @@ void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, c
         cuda_hog_->compute(cuda_img_alpha_[s], cuda_descriptors_[s], cuda_stream_[s]);
     }
 
-    using namespace std::chrono;
-
-    steady_clock::time_point t1 = steady_clock::now();
-
     const std::vector<float>* measurements_ptr = static_cast<const std::vector<float>*>(measurements.getObj());
-    Map<const VectorXf> descriptor_image(measurements_ptr->data(), measurements_ptr->size());
 
     for (int s = 0; s < num_cuda_stream_; ++s)
     {
@@ -89,32 +83,29 @@ void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, c
 
         for (int i = 0; i < num_img_stream_; ++i)
         {
-            double sum_kldnormchi = 0;
+            double norm = 0;
+            double sum_norm = 0;
 
-            for(int j = 0; j < feature_dim_; j += (bin_number_ * 4))
+            auto it_cam     = measurements_ptr->begin();
+            auto it_cam_end = measurements_ptr->end();
+            int  j          = 0;
+            while (it_cam < it_cam_end)
             {
-                const VectorXf descriptor_image_hist = descriptor_image.middleRows(j, bin_number_ * 4).array() + std::numeric_limits<float>::min();
-                const VectorXf descriptor_image_pmf  = descriptor_image_hist / descriptor_image_hist.lpNorm<1>();
+                norm += std::pow((*it_cam) - cpu_descriptors_[s].at<float>(i, j), 2.0);
 
-                const VectorXf descriptor_render_hist = descriptors_render.row(i).middleCols(j, bin_number_ * 4).array() + std::numeric_limits<float>::min();
-                const VectorXf descriptor_render_pmf  = descriptor_render_hist / descriptor_render_hist.lpNorm<1>();
+                ++it_cam;
+                ++j;
 
-                double kld  = (descriptor_render_pmf.cast<double>().array() * (descriptor_render_pmf.cast<double>().array().log() - descriptor_image_pmf.cast<double>().array().log())).sum();
-                double norm = (descriptor_image_hist.cast<double>() - descriptor_render_hist.cast<double>()).lpNorm<2>();
-                double chi  = (((descriptor_image_hist.cast<double>() - descriptor_render_hist.cast<double>()).array().square()).array() / (descriptor_image_hist.cast<double>() + descriptor_render_hist.cast<double>()).array()).sum();
-
-                sum_kldnormchi += kld * norm * chi;
+                if (j % (bin_number_ * 4 - 1))
+                {
+                    sum_norm += std::sqrt(norm);
+                    norm = 0.0;
+                }
             }
 
-            innovations(s * num_img_stream_ + i, 0) = sum_kldnormchi;
+            innovations(s * num_img_stream_ + i, 0) = sum_norm;
         }
     }
-
-    steady_clock::time_point t2 = steady_clock::now();
-
-    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-
-    std::cout << "It took me " << time_span.count() << " seconds." << std::endl;
 }
 
 
