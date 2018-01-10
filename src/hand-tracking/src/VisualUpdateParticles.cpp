@@ -84,7 +84,9 @@ void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, c
         for (int i = 0; i < num_img_stream_; ++i)
         {
             double norm = 0;
-            double sum_norm = 0;
+            double chi = 0;
+
+            double sum_normchi = 0;
 
             auto it_cam     = measurements_ptr->begin();
             auto it_cam_end = measurements_ptr->end();
@@ -93,17 +95,21 @@ void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, c
             {
                 norm += std::pow((*it_cam) - cpu_descriptors_[s].at<float>(i, j), 2.0);
 
+                chi += (std::pow((*it_cam) - cpu_descriptors_[s].at<float>(i, j), 2.0)) / ((*it_cam) + cpu_descriptors_[s].at<float>(i, j) + std::numeric_limits<float>::min());
+
                 ++it_cam;
                 ++j;
 
                 if (j % (bin_number_ * 4 - 1))
                 {
-                    sum_norm += std::sqrt(norm);
-                    norm = 0.0;
+                    sum_normchi += std::sqrt(norm) * chi;
+
+                    norm = 0;
+                    chi = 0;
                 }
             }
 
-            innovations(s * num_img_stream_ + i, 0) = sum_norm;
+            innovations(s * num_img_stream_ + i, 0) = sum_normchi;
         }
     }
 }
