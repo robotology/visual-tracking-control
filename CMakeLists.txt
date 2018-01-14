@@ -22,6 +22,9 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 if(WIN32)
     add_definitions(-D_USE_MATH_DEFINES)
+    if(MSVC)
+        set(CMAKE_DEBUG_POSTFIX "d")
+    endif()
 endif()
 
 ### iCub-contrib project
