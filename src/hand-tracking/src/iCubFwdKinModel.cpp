@@ -20,7 +20,7 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
+iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) :
     icub_kin_arm_(iCubArm(laterality+"_v2")),
     robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
 {

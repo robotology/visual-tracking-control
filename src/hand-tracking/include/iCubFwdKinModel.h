@@ -13,7 +13,7 @@
 class iCubFwdKinModel : public FwdKinModel
 {
 public:
-    iCubFwdKinModel(const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+    iCubFwdKinModel(const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix);
 
     ~iCubFwdKinModel() noexcept;
 
