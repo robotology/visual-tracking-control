@@ -196,7 +196,7 @@ VisualProprioception::VisualProprioception(const bool use_thumb,
     try
     {
         si_cad_ = new SICAD(cad_obj_,
-                            cam_width_, cam_height_,cam_fx_, cam_fy_, cam_cx_, cam_cy_,
+                            cam_width_, cam_height_, cam_fx_, cam_fy_, cam_cx_, cam_cy_,
                             num_images,
                             {1.0, 0.0, 0.0, static_cast<float>(M_PI)},
                             shader_path,
