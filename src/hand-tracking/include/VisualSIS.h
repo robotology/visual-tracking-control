@@ -34,9 +34,6 @@ public:
 
     ~VisualSIS() noexcept;
 
-
-    bool skip(const std::string& what_step, const bool status) override;
-
 protected:
     void initialization() override;
 

@@ -58,20 +58,6 @@ VisualSIS::VisualSIS(const yarp::os::ConstString& cam_sel,
 }
 
 
-bool VisualSIS::skip(const std::string& what_step, const bool status)
-{
-    if (what_step == "prediction" ||
-        what_step == "state"      ||
-        what_step == "exogenous"    )
-        return prediction_->skip(what_step, status);
-
-    if (what_step == "correction")
-        return correction_->skip(status);
-
-    return false;
-}
-
-
 void VisualSIS::initialization()
 {
     pred_particle_ = MatrixXf(7, num_particles_);
