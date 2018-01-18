@@ -32,15 +32,8 @@ public:
               const int num_particles,
               const double resample_ratio);
 
-    VisualSIS(const VisualSIS& vsir_pf) = delete;
-
-    VisualSIS(VisualSIS&& vsir_pf) noexcept = delete;
-
     ~VisualSIS() noexcept;
 
-    VisualSIS& operator=(const VisualSIS& vsir_pf) = delete;
-
-    VisualSIS& operator=(VisualSIS&& vsir_pf) noexcept = delete;
 
     bool skip(const std::string& what_step, const bool status) override;
 
