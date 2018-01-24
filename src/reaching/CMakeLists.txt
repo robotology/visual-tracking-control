@@ -1,14 +1,13 @@
 set(EXE_TARGET_NAME reaching)
 
-find_package(glew        REQUIRED)
-find_package(ICUB        REQUIRED)
-find_package(OpenCV      REQUIRED)
-find_package(SuperImpose REQUIRED)
-find_package(YARP        REQUIRED)
+find_package(glew            REQUIRED)
+find_package(ICUB            REQUIRED)
+find_package(OpenCV          REQUIRED)
+find_package(SuperimposeMesh REQUIRED)
+find_package(YARP            REQUIRED)
 
 LIST(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
-                              ${ICUB_MODULE_PATH}
-                              ${ICUBCONTRIB_MODULE_PATH})
+                              ${ICUB_MODULE_PATH})
 
 include(YarpInstallationHelpers)
 
@@ -26,10 +25,8 @@ target_link_libraries(${EXE_TARGET_NAME} ctrlLib
                                          ${ICUB_LIBRARIES}
                                          iKin
                                          ${OpenCV_LIBS}
-                                         SuperImpose::SuperImpose
+                                         SuperimposeMesh::SuperimposeMesh
                                          ${YARP_LIBRARIES})
-
-target_compile_features(${EXE_TARGET_NAME} PUBLIC cxx_nullptr cxx_constexpr)
 
 set(${EXE_TARGET_NAME}_APP
         ${PROJECT_SOURCE_DIR}/app/reaching.xml

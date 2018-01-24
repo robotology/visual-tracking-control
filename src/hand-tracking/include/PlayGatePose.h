@@ -13,12 +13,13 @@ class PlayGatePose : public GatePose
 {
 public:
     /* Constructor */
-    PlayGatePose(std::unique_ptr<VisualCorrection> visual_correction,
-                 double gate_x, double gate_y, double gate_z,
-                 double gate_aperture, double gate_rotation,
+    PlayGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
+                 const double gate_x, const double gate_y, const double gate_z,
+                 const double gate_aperture,
+                 const double gate_rotation,
                  const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
-    PlayGatePose(std::unique_ptr<VisualCorrection> visual_correction,
+    PlayGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
                  const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
     /* Destructor */
@@ -36,12 +37,12 @@ protected:
     yarp::sig::Vector readTorso();
 
 private:
-    yarp::os::ConstString  ID_     = "PlayGatePose";
-    yarp::os::ConstString  log_ID_ = "[" + ID_ + "]";
+    const yarp::os::ConstString ID_     = "PlayGatePose";
+    const yarp::os::ConstString log_ID_ = "[" + ID_ + "]";
 
-    yarp::os::ConstString  robot_;
-    yarp::os::ConstString  laterality_;
-    yarp::os::ConstString  port_prefix_;
+    yarp::os::ConstString robot_;
+    yarp::os::ConstString laterality_;
+    yarp::os::ConstString port_prefix_;
 };
 
 #endif /* PLAYGATEPOSE_H */

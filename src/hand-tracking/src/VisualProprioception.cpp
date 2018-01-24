@@ -1,4 +1,4 @@
-#include "VisualProprioception.h"
+#include <VisualProprioception.h>
 
 #include <cmath>
 #include <exception>
@@ -21,9 +21,20 @@ using namespace yarp::math;
 using yarp::sig::Vector;
 
 
-VisualProprioception::VisualProprioception(const int num_images, const ConstString& cam_sel, const ConstString& laterality, const ConstString& context) :
-    laterality_(laterality), icub_arm_(iCubArm(laterality+"_v2")), icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")},
-    cam_sel_(cam_sel)
+VisualProprioception::VisualProprioception(const bool use_thumb,
+                                           const bool use_forearm,
+                                           const int num_images,
+                                           const double resolution_ratio,
+                                           const ConstString& cam_sel,
+                                           const ConstString& laterality,
+                                           const ConstString& context) :
+    laterality_(laterality),
+    icub_arm_(iCubArm(laterality+"_v2")),
+    icub_kin_finger_{iCubFinger(laterality+"_thumb"), iCubFinger(laterality+"_index"), iCubFinger(laterality+"_middle")},
+    cam_sel_(cam_sel),
+    resolution_ratio_(resolution_ratio),
+    use_thumb_(use_thumb),
+    use_forearm_(use_forearm)
 {
     ResourceFinder rf;
 
@@ -48,11 +59,11 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     }
     else
     {
-        yWarning() << log_ID_ << "[CAM PARAMS]" << "No intrinisc camera information could be found by the ctor. Looking for fallback values in parameters.ini.";
+        yWarning() << log_ID_ << "[CAM PARAMS]" << "No intrinisc camera information could be found by the ctor. Looking for fallback values in config.ini.";
 
         rf.setVerbose();
         rf.setDefaultContext(context);
-        rf.setDefaultConfigFile("parameters.ini");
+        rf.setDefaultConfigFile("config.ini");
         rf.configure(0, YARP_NULLPTR);
 
         Bottle* fallback_intrinsic = rf.findGroup("FALLBACK").find("intrinsic_" + cam_sel_).asList();
@@ -60,25 +71,26 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
         {
             yInfo() << log_ID_ << "[FALLBACK][CAM PARAMS]" << fallback_intrinsic->toString();
 
-            cam_width_  = fallback_intrinsic->get(0).asDouble();
-            cam_height_ = fallback_intrinsic->get(1).asDouble();
-            cam_fx_     = fallback_intrinsic->get(2).asDouble();
-            cam_cx_     = fallback_intrinsic->get(3).asDouble();
-            cam_fy_     = fallback_intrinsic->get(4).asDouble();
-            cam_cy_     = fallback_intrinsic->get(5).asDouble();
+            cam_width_  = static_cast<unsigned int>(fallback_intrinsic->get(0).asInt());
+            cam_height_ = static_cast<unsigned int>(fallback_intrinsic->get(1).asInt());
+            cam_fx_     = static_cast<float>(fallback_intrinsic->get(2).asDouble());
+            cam_cx_     = static_cast<float>(fallback_intrinsic->get(3).asDouble());
+            cam_fy_     = static_cast<float>(fallback_intrinsic->get(4).asDouble());
+            cam_cy_     = static_cast<float>(fallback_intrinsic->get(5).asDouble());
         }
         else
         {
-            yWarning() << log_ID_ << "[CAM PARAMS]" << "No fallback values could be found in parameters.ini by the ctor for the intrinisc camera parameters. Falling (even more) back to iCub_SIM values.";
+            yWarning() << log_ID_ << "[CAM PARAMS]" << "No fallback values could be found in config.ini by the ctor for the intrinisc camera parameters. Falling (even more) back to iCub_SIM values.";
             cam_width_  = 320;
             cam_height_ = 240;
             cam_fx_     = 257.34;
-            cam_cx_     = 160;
-            cam_fy_     = 120;
-            cam_cy_     = 257.34;
+            cam_cx_     = 160.0;
+            cam_fy_     = 257.34;
+            cam_cy_     = 120.0;
         }
     }
-    yInfo() << log_ID_ << "[CAM]" << "Running with:";
+
+    yInfo() << log_ID_ << "[CAM]" << "Found camera information:";
     yInfo() << log_ID_ << "[CAM]" << " - width:"  << cam_width_;
     yInfo() << log_ID_ << "[CAM]" << " - height:" << cam_height_;
     yInfo() << log_ID_ << "[CAM]" << " - fx:"     << cam_fx_;
@@ -86,14 +98,30 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     yInfo() << log_ID_ << "[CAM]" << " - cx:"     << cam_cx_;
     yInfo() << log_ID_ << "[CAM]" << " - cy:"     << cam_cy_;
 
-    cam_x_[0]   = 0;
-    cam_x_[1]   = 0;
-    cam_x_[2]   = 0;
+    cam_width_  /= resolution_ratio_;
+    cam_height_ /= resolution_ratio_;
+    cam_fx_     /= resolution_ratio_;
+    cam_cx_     /= resolution_ratio_;
+    cam_fy_     /= resolution_ratio_;
+    cam_cy_     /= resolution_ratio_;
 
-    cam_o_[0]   = 0;
-    cam_o_[1]   = 0;
-    cam_o_[2]   = 0;
-    cam_o_[3]   = 0;
+    yInfo() << log_ID_ << "[CAM]" << "Running with:";
+    yInfo() << log_ID_ << "[CAM]" << " - resolution_ratio:"  << resolution_ratio_;
+    yInfo() << log_ID_ << "[CAM]" << " - width:"             << cam_width_;
+    yInfo() << log_ID_ << "[CAM]" << " - height:"            << cam_height_;
+    yInfo() << log_ID_ << "[CAM]" << " - fx:"                << cam_fx_;
+    yInfo() << log_ID_ << "[CAM]" << " - fy:"                << cam_fy_;
+    yInfo() << log_ID_ << "[CAM]" << " - cx:"                << cam_cx_;
+    yInfo() << log_ID_ << "[CAM]" << " - cy:"                << cam_cy_;
+
+    cam_x_[0] = 0;
+    cam_x_[1] = 0;
+    cam_x_[2] = 0;
+
+    cam_o_[0] = 0;
+    cam_o_[1] = 0;
+    cam_o_[2] = 0;
+    cam_o_[3] = 0;
 
     /* Comment/Uncomment to add/remove limbs */
     rf.setDefaultContext(context + "/mesh");
@@ -102,21 +130,24 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     if (!file_found(cad_obj_["palm"]))
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_palm.obj not found!");
 
-//    cad_obj_["thumb1"] = rf.findFileByName("r_tl0.obj");
-//    if (!file_found(cad_obj_["thumb1"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
-//    cad_obj_["thumb2"] = rf.findFileByName("r_tl1.obj");
-//    if (!file_found(cad_obj_["thumb2"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
-//    cad_obj_["thumb3"] = rf.findFileByName("r_tl2.obj");
-//    if (!file_found(cad_obj_["thumb3"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
-//    cad_obj_["thumb4"] = rf.findFileByName("r_tl3.obj");
-//    if (!file_found(cad_obj_["thumb4"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
-//    cad_obj_["thumb5"] = rf.findFileByName("r_tl4.obj");
-//    if (!file_found(cad_obj_["thumb5"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
+    if (use_thumb)
+    {
+        cad_obj_["thumb1"] = rf.findFileByName("r_tl0.obj");
+        if (!file_found(cad_obj_["thumb1"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
+        cad_obj_["thumb2"] = rf.findFileByName("r_tl1.obj");
+        if (!file_found(cad_obj_["thumb2"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
+        cad_obj_["thumb3"] = rf.findFileByName("r_tl2.obj");
+        if (!file_found(cad_obj_["thumb3"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
+        cad_obj_["thumb4"] = rf.findFileByName("r_tl3.obj");
+        if (!file_found(cad_obj_["thumb4"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
+        cad_obj_["thumb5"] = rf.findFileByName("r_tl4.obj");
+        if (!file_found(cad_obj_["thumb5"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
+    }
 
     cad_obj_["index0"] = rf.findFileByName("r_indexbase.obj");
     if (!file_found(cad_obj_["index0"]))
@@ -147,20 +178,29 @@ VisualProprioception::VisualProprioception(const int num_images, const ConstStri
     if (!file_found(cad_obj_["medium3"]))
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ml3.obj not found!");
 
-//    cad_obj_["forearm"] = rf.findFileByName("r_forearm.obj");
-//    if (!file_found(cad_obj_["forearm"]))
-//        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_forearm.obj not found!");
+    if (use_forearm)
+    {
+        cad_obj_["forearm"] = rf.findFileByName("r_forearm.obj");
+        if (!file_found(cad_obj_["forearm"]))
+            throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_forearm.obj not found!");
+    }
 
     rf.setDefaultContext(context + "/shader");
     ConstString shader_path = rf.findFileByName("shader_model.vert");
     if (!file_found(shader_path))
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::DIR\nERROR: shader directory not found!");
-    shader_path = shader_path.substr(0, shader_path.rfind("/"));
+    size_t rfind_slash     = shader_path.rfind("/");
+    size_t rfind_backslash = shader_path.rfind("\\");
+    shader_path = shader_path.substr(0, rfind_slash > rfind_backslash ? rfind_slash : rfind_backslash);
 
     try
     {
-        si_cad_ = new SICAD(cad_obj_, cam_width_, cam_height_, num_images, shader_path,
-                            cam_fx_, cam_fy_, cam_cx_, cam_cy_);
+        si_cad_ = new SICAD(cad_obj_,
+                            cam_width_, cam_height_, cam_fx_, cam_fy_, cam_cx_, cam_cy_,
+                            num_images,
+                            {1.0, 0.0, 0.0, static_cast<float>(M_PI)},
+                            shader_path,
+                            false);
     }
     catch (const std::runtime_error& e)
     {
@@ -221,8 +261,14 @@ VisualProprioception::~VisualProprioception() noexcept
 
 
 VisualProprioception::VisualProprioception(const VisualProprioception& proprio) :
-    cam_width_(proprio.cam_width_), cam_height_(proprio.cam_height_), cam_fx_(proprio.cam_fx_), cam_cx_(proprio.cam_cx_), cam_fy_(proprio.cam_fy_), cam_cy_(proprio.cam_cy_),
-    cad_obj_(proprio.cad_obj_), si_cad_(proprio.si_cad_)
+    cam_width_(proprio.cam_width_),
+    cam_height_(proprio.cam_height_),
+    cam_fx_(proprio.cam_fx_),
+    cam_cx_(proprio.cam_cx_),
+    cam_fy_(proprio.cam_fy_),
+    cam_cy_(proprio.cam_cy_),
+    cad_obj_(proprio.cad_obj_),
+    si_cad_(proprio.si_cad_)
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -243,8 +289,14 @@ VisualProprioception::VisualProprioception(const VisualProprioception& proprio) 
 
 VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexcept :
     icub_arm_(std::move(proprio.icub_arm_)),
-    cam_width_(std::move(proprio.cam_width_)), cam_height_(std::move(proprio.cam_height_)), cam_fx_(std::move(proprio.cam_fx_)), cam_cx_(std::move(proprio.cam_cx_)), cam_fy_(std::move(proprio.cam_fy_)), cam_cy_(std::move(proprio.cam_cy_)),
-    cad_obj_(std::move(proprio.cad_obj_)), si_cad_(std::move(proprio.si_cad_))
+    cam_width_(std::move(proprio.cam_width_)),
+    cam_height_(std::move(proprio.cam_height_)),
+    cam_fx_(std::move(proprio.cam_fx_)),
+    cam_cx_(std::move(proprio.cam_cx_)),
+    cam_fy_(std::move(proprio.cam_fy_)),
+    cam_cy_(std::move(proprio.cam_cy_)),
+    cad_obj_(std::move(proprio.cad_obj_)),
+    si_cad_(std::move(proprio.si_cad_))
 {
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
@@ -286,7 +338,7 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
     icub_kin_finger_[0] = std::move(proprio.icub_kin_finger_[0]);
     icub_kin_finger_[1] = std::move(proprio.icub_kin_finger_[1]);
     icub_kin_finger_[2] = std::move(proprio.icub_kin_finger_[2]);
-    
+
     cam_x_[0] = proprio.cam_x_[0];
     cam_x_[1] = proprio.cam_x_[1];
     cam_x_[2] = proprio.cam_x_[2];
@@ -304,7 +356,7 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
     cam_cy_     = std::move(proprio.cam_cy_);
 
     cad_obj_ = std::move(proprio.cad_obj_);
-    si_cad_   = std::move(proprio.si_cad_);
+    si_cad_  = std::move(proprio.si_cad_);
 
     proprio.cam_x_[0] = 0.0;
     proprio.cam_x_[1] = 0.0;
@@ -319,26 +371,25 @@ VisualProprioception& VisualProprioception::operator=(VisualProprioception&& pro
 }
 
 
-void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::vector<SuperImpose::ObjPoseMap>& hand_poses)
+void VisualProprioception::getModelPose(const Ref<const MatrixXf>& cur_states, std::vector<Superimpose::ModelPoseContainer>& hand_poses)
 {
-    for (int j = 0; j < cur_state.cols(); ++j)
+    for (int j = 0; j < cur_states.cols(); ++j)
     {
-        SuperImpose::ObjPoseMap hand_pose;
-        SuperImpose::ObjPose    pose;
-        Vector                  ee_t(4);
-        Vector                  ee_o(4);
-        float                   ang;
+        Superimpose::ModelPoseContainer hand_pose;
+        Superimpose::ModelPose          pose;
+        Vector                          ee_t(4);
+        Vector                          ee_o(4);
 
 
-        ee_t(0) = cur_state(0, j);
-        ee_t(1) = cur_state(1, j);
-        ee_t(2) = cur_state(2, j);
-        ee_t(3) =             1.0;
-        ang     = cur_state.col(j).tail(3).norm();
-        ee_o(0) = cur_state(3, j) / ang;
-        ee_o(1) = cur_state(4, j) / ang;
-        ee_o(2) = cur_state(5, j) / ang;
-        ee_o(3) = ang;
+        ee_t(0) = cur_states(0, j);
+        ee_t(1) = cur_states(1, j);
+        ee_t(2) = cur_states(2, j);
+        ee_t(3) =              1.0;
+
+        ee_o(0) = cur_states(3, j);
+        ee_o(1) = cur_states(4, j);
+        ee_o(2) = cur_states(5, j);
+        ee_o(3) = cur_states(6, j);
 
         pose.assign(ee_t.data(), ee_t.data()+3);
         pose.insert(pose.end(),  ee_o.data(), ee_o.data()+4);
@@ -347,7 +398,7 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
         /* Change index to add/remove limbs */
         yarp::sig::Matrix Ha = axis2dcm(ee_o);
         Ha.setCol(3, ee_t);
-        for (size_t fng = 1; fng < 3; ++fng)
+        for (unsigned int fng = (use_thumb_ ? 0 : 1); fng < 3; ++fng)
         {
             std::string finger_s;
             pose.clear();
@@ -378,29 +429,32 @@ void VisualProprioception::getPoses(const Ref<const MatrixXf>& cur_state, std::v
                 hand_pose.emplace(finger_s, pose);
             }
         }
-        /* Comment/Uncomment to add/remove limbs */
-//        yarp::sig::Matrix invH6 = Ha *
-//                                  getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
-//                                  getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8));
-//        Vector j_x = invH6.getCol(3).subVector(0, 2);
-//        Vector j_o = dcm2axis(invH6);
-//        pose.clear();
-//        pose.assign(j_x.data(), j_x.data()+3);
-//        pose.insert(pose.end(), j_o.data(), j_o.data()+4);
-//        hand_pose.emplace("forearm", pose);
+        if (use_forearm_)
+        {
+            yarp::sig::Matrix invH6 = Ha *
+                                      getInvertedH(-0.0625, -0.02598,       0,   -M_PI, -icub_arm_.getAng(9)) *
+                                      getInvertedH(      0,        0, -M_PI_2, -M_PI_2, -icub_arm_.getAng(8)) *
+                                      getInvertedH(      0,   0.1413, -M_PI_2,  M_PI_2, 0);
+            Vector j_x = invH6.getCol(3).subVector(0, 2);
+            Vector j_o = dcm2axis(invH6);
+            pose.clear();
+            pose.assign(j_x.data(), j_x.data()+3);
+            pose.insert(pose.end(), j_o.data(), j_o.data()+4);
+            hand_pose.emplace("forearm", pose);
+        }
 
         hand_poses.push_back(hand_pose);
     }
 }
 
 
-void VisualProprioception::observe(const Ref<const MatrixXf>& cur_state, OutputArray observation)
+void VisualProprioception::observe(const Ref<const MatrixXf>& cur_states, OutputArray observations)
 {
-    std::vector<SuperImpose::ObjPoseMap> hand_poses;
-    getPoses(cur_state, hand_poses);
+    std::vector<Superimpose::ModelPoseContainer> hand_poses;
+    getModelPose(cur_states, hand_poses);
 
-    observation.create(cam_height_ * si_cad_->getTilesRows(), cam_width_ * si_cad_->getTilesCols(), CV_8UC3);
-    Mat hand_ogl = observation.getMat();
+    observations.create(cam_height_ * si_cad_->getTilesRows(), cam_width_ * si_cad_->getTilesCols(), CV_8UC3);
+    Mat hand_ogl = observations.getMat();
 
     si_cad_->superimpose(hand_poses, cam_x_, cam_o_, hand_ogl);
 }
@@ -424,14 +478,19 @@ bool VisualProprioception::setiCubParams()
 {
     Vector left_eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * readRootToEye(cam_sel_));
 
-    cam_x_[0] = left_eye_pose(0); cam_x_[1] = left_eye_pose(1); cam_x_[2] = left_eye_pose(2);
-    cam_o_[0] = left_eye_pose(3); cam_o_[1] = left_eye_pose(4); cam_o_[2] = left_eye_pose(5); cam_o_[3] = left_eye_pose(6);
+    cam_x_[0] = left_eye_pose(0);
+    cam_x_[1] = left_eye_pose(1);
+    cam_x_[2] = left_eye_pose(2);
+
+    cam_o_[0] = left_eye_pose(3);
+    cam_o_[1] = left_eye_pose(4);
+    cam_o_[2] = left_eye_pose(5);
+    cam_o_[3] = left_eye_pose(6);
 
 
     Vector q = readRootToFingers();
-
-    q(10) = 32.0;
-    q(11) = 30.0;
+//    q(10) = 32.0;
+//    q(11) = 30.0;
 //    q(12) = 0.0;
 //    q(13) = 0.0;
 //    q(14) = 0.0;
@@ -560,7 +619,7 @@ yarp::sig::Matrix VisualProprioception::getInvertedH(const double a, const doubl
      *  i = 8	0           0           pi/2              90 + ( 10 ->   -65)
      *  i = 9	62.5        25.98       0                180 + (-25 ->    25)
      **/
-    
+
     yarp::sig::Matrix H(4, 4);
 
     double theta = offset + q;
@@ -606,6 +665,7 @@ bool VisualProprioception::openGazeController()
         if (!itf_gaze_)
         {
             yError() << log_ID_ << "Cannot get head gazecontrollerclient interface!";
+
             drv_gaze_.close();
             return false;
         }
@@ -613,6 +673,7 @@ bool VisualProprioception::openGazeController()
     else
     {
         yError() << log_ID_ << "Cannot open head gazecontrollerclient!";
+
         return false;
     }
 
@@ -635,6 +696,7 @@ bool VisualProprioception::openAnalogs()
             if (!itf_right_hand_analog_)
             {
                 yError() << log_ID_ << "Cannot get right hand analogsensorclient interface!";
+
                 drv_right_hand_analog_.close();
                 return false;
             }
@@ -642,6 +704,7 @@ bool VisualProprioception::openAnalogs()
         else
         {
             yError() << log_ID_ << "Cannot open right hand analogsensorclient!";
+
             return false;
         }
 
@@ -669,10 +732,8 @@ bool VisualProprioception::closeAnalogs()
 
 Vector VisualProprioception::readTorso()
 {
-    Bottle* b = port_torso_enc_.read();
+    Bottle* b = port_torso_enc_.read(true);
     if (!b) return Vector(3, 0.0);
-
-    yAssert(b->size() == 3);
 
     Vector torso_enc(3);
     torso_enc(0) = b->get(2).asDouble();
@@ -685,17 +746,13 @@ Vector VisualProprioception::readTorso()
 
 Vector VisualProprioception::readRootToFingers()
 {
-    Bottle* b = port_arm_enc_.read();
+    Bottle* b = port_arm_enc_.read(true);
     if (!b) return Vector(19, 0.0);
-
-    yAssert(b->size() == 16);
 
     Vector root_fingers_enc(19);
     root_fingers_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 16; ++i)
-    {
-        root_fingers_enc(3+i) = b->get(i).asDouble();
-    }
+        root_fingers_enc(3 + i) = b->get(i).asDouble();
 
     return root_fingers_enc;
 }
@@ -703,17 +760,14 @@ Vector VisualProprioception::readRootToFingers()
 
 Vector VisualProprioception::readRootToEye(const ConstString cam_sel)
 {
-    Bottle* b = port_head_enc_.read();
+    Bottle* b = port_head_enc_.read(true);
     if (!b) return Vector(8, 0.0);
-
-    yAssert(b->size() == 6);
 
     Vector root_eye_enc(8);
     root_eye_enc.setSubvector(0, readTorso());
     for (size_t i = 0; i < 4; ++i)
-    {
-        root_eye_enc(3+i) = b->get(i).asDouble();
-    }
+        root_eye_enc(3 + i) = b->get(i).asDouble();
+
     if (cam_sel == "left")  root_eye_enc(7) = b->get(4).asDouble() + b->get(5).asDouble()/2.0;
     if (cam_sel == "right") root_eye_enc(7) = b->get(4).asDouble() - b->get(5).asDouble()/2.0;
 

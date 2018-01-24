@@ -1,4 +1,4 @@
-#include "iCubGatePose.h"
+#include <iCubGatePose.h>
 
 #include <iCub/ctrl/math.h>
 #include <yarp/eigen/Eigen.h>
@@ -16,19 +16,27 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
-                           double gate_x, double gate_y, double gate_z,
-                           double gate_rotation, double gate_aperture,
-                           const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
+iCubGatePose::iCubGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
+                           const double gate_x, const double gate_y, const double gate_z,
+                           const double gate_rotation,
+                           const double gate_aperture,
+                           const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) :
     GatePose(std::move(visual_correction),
              gate_x, gate_y, gate_z,
-             gate_rotation, gate_aperture),
-    robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
+             gate_rotation,
+             gate_aperture),
+    icub_kin_arm_(iCubArm(laterality + "_v2")), robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
 {
+    icub_kin_arm_.setAllConstraints(false);
+    icub_kin_arm_.releaseLink(0);
+    icub_kin_arm_.releaseLink(1);
+    icub_kin_arm_.releaseLink(2);
+
+
     Property opt_arm_enc;
     opt_arm_enc.put("device", "remote_controlboard");
     opt_arm_enc.put("local",  "/hand-tracking/" + ID_ + "/" + port_prefix + "/control_" + laterality_ + "_arm");
-    opt_arm_enc.put("remote", "/" + robot_ + "/right_arm");
+    opt_arm_enc.put("remote", "/" + robot_ + "/" + laterality_ + "_arm");
 
     yInfo() << log_ID_ << "Opening " + laterality_ + " arm remote_controlboard driver...";
     if (drv_arm_enc_.open(opt_arm_enc))
@@ -36,25 +44,25 @@ iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
         yInfo() << log_ID_ << "Succesfully opened " + laterality_ + " arm remote_controlboard interface.";
 
         yInfo() << log_ID_ << "Getting " + laterality_ + " arm encoder interface...";
+
         drv_arm_enc_.view(itf_arm_enc_);
         if (!itf_arm_enc_)
         {
             yError() << log_ID_ << "Cannot get " + laterality_ + " arm encoder interface!";
+
             drv_arm_enc_.close();
             throw std::runtime_error("ERROR::" + ID_ + "::CTOR::INTERFACE\nERROR: cannot get " + laterality_ + " arm encoder interface!");
         }
+
         yInfo() << log_ID_ << "Succesfully got " + laterality_ + " arm encoder interface.";
     }
     else
     {
         yError() << log_ID_ << "Cannot open " + laterality_ + " arm remote_controlboard!";
+
         throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open " + laterality_ + " arm remote_controlboard!");
     }
 
-    icub_kin_arm_.setAllConstraints(false);
-    icub_kin_arm_.releaseLink(0);
-    icub_kin_arm_.releaseLink(1);
-    icub_kin_arm_.releaseLink(2);
 
     Property opt_torso_enc;
     opt_torso_enc.put("device", "remote_controlboard");
@@ -62,23 +70,28 @@ iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
     opt_torso_enc.put("remote", "/" + robot_ + "/torso");
 
     yInfo() << log_ID_ << "Opening torso remote_controlboard driver...";
+
     if (drv_torso_enc_.open(opt_torso_enc))
     {
         yInfo() << log_ID_ << "Succesfully opened torso remote_controlboard driver.";
 
         yInfo() << log_ID_ << "Getting torso encoder interface...";
+
         drv_torso_enc_.view(itf_torso_enc_);
         if (!itf_torso_enc_)
         {
             yError() << log_ID_ << "Cannot get torso encoder interface!";
+
             drv_torso_enc_.close();
             throw std::runtime_error("ERROR::" + ID_ + "::CTOR::INTERFACE\nERROR: cannot get torso encoder interface!");
         }
+
         yInfo() << log_ID_ << "Succesfully got torso encoder interface.";
     }
     else
     {
         yError() << log_ID_ << "Cannot open torso remote_controlboard!";
+
         throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open torso remote_controlboard!");
     }
 
@@ -86,8 +99,8 @@ iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
 }
 
 
-iCubGatePose::iCubGatePose(std::unique_ptr<VisualCorrection> visual_correction,
-                           const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
+iCubGatePose::iCubGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
+                           const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) :
     iCubGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30, robot, laterality, port_prefix) { }
 
 
@@ -97,7 +110,7 @@ iCubGatePose::~iCubGatePose() noexcept { }
 Vector iCubGatePose::readTorso()
 {
     int torso_enc_num;
-    itf_arm_enc_->getAxes(&torso_enc_num);
+    itf_torso_enc_->getAxes(&torso_enc_num);
     Vector enc_torso(torso_enc_num);
 
     while (!itf_torso_enc_->getEncoders(enc_torso.data()));
@@ -119,8 +132,9 @@ Vector iCubGatePose::readRootToEE()
     root_ee_enc.setSubvector(0, readTorso());
 
     while (!itf_arm_enc_->getEncoders(enc_arm.data()));
+
     for (size_t i = 0; i < 7; ++i)
-        root_ee_enc(i+3) = enc_arm(i);
+        root_ee_enc(i + 3) = enc_arm(i);
 
     return root_ee_enc;
 }

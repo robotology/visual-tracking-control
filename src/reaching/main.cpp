@@ -5,7 +5,7 @@
 #include <iCub/iKin/iKinFwd.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <SuperImpose/SISkeleton.h>
+#include <SuperimposeMesh/SISkeleton.h>
 #include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/PolyDriver.h>

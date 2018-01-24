@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+<application>
+
+    <!-- GENERIC INFORMATION -->
+    <name>hand-tracking</name>
+    <description>Visual hand tracking of the iCub hand by means of a 3D model-aided particle filter</description>
+    <version>0.5.0.0</version>
+
+    <authors>
+        <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
+    </authors>
+
+
+    <!-- REQUIRED MODULES -->
+    <module>
+        <name>hand-tracking</name>
+        <parameters>--cam left</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>hand-tracking</name>
+        <parameters>--cam right</parameters>
+        <node>localhost</node>
+    </module>
+
+
+    <!-- REQUIRED CONNECTIONS -->
+    <!-- RC: Particle filter connections -->
+    <connection>
+        <from>/icub/camcalib/left/out</from>
+        <to>/hand-tracking/left/img:i</to>
+        <protocol>mcast</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/camcalib/right/out</from>
+        <to>/hand-tracking/right/img:i</to>
+        <protocol>mcast</protocol>
+    </connection>
+
+    <!-- RC: Initialitazion connections -->
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/InitiCubArm/cam/left/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/InitiCubArm/cam/left/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/InitiCubArm/cam/right/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/InitiCubArm/cam/right/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <!-- VisualProprioception connections -->
+    <connection>
+        <from>/icub/head/state:o</from>
+        <to>/hand-tracking/VisualProprioception/left/head:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/head/state:o</from>
+        <to>/hand-tracking/VisualProprioception/right/head:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/VisualProprioception/left/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/VisualProprioception/right/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/VisualProprioception/left/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/VisualProprioception/right/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <!-- RC: ResamplingWithPrior connections -->
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/ResamplingWithPrior/InitiCubArm/cam/left/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/ResamplingWithPrior/InitiCubArm/cam/left/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/torso/state:o</from>
+        <to>/hand-tracking/ResamplingWithPrior/InitiCubArm/cam/right/torso:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/icub/right_arm/state:o</from>
+        <to>/hand-tracking/ResamplingWithPrior/InitiCubArm/cam/right/right_arm:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <!-- Visualization via iCubProprioception -->
+    <connection>
+        <from>/hand-tracking/left/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/cam/left/hand/right_pose:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+        <from>/hand-tracking/right/result/estimates:o</from>
+        <to>/iCubProprioception/ExtCADSuperimposer/cam/right/hand/right_pose:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+
+</application>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+<application>
+
+    <!-- REQUIRED -->
+    <dependencies>
+        <port>/yarprun</port>
+        <port>/vmdeb</port>
+    </dependencies>
+
+
+    <!-- GENERIC INFORMATION-->
+    <name>BackgroundApps-SIM</name>
+    <description>Background applications for iCub_SIM-based simulations</description>
+    <version>0.5.0.0</version>
+
+    <authors>
+        <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
+    </authors>
+
+
+    <!-- REQUIRED MODULES -->
+    <module>
+        <name>yarplogger</name>
+        <node>yarprun</node>
+        <parameters>--start</parameters>
+	</module>
+
+    <module>
+        <name>iCub_SIM</name>
+		<node>vmdeb</node>
+        <dependencies>
+            <port timeout="5.0">/yarplogger</port>
+        </dependencies>
+    </module>
+
+    <module>
+        <name>yarprobotinterface</name>
+        <parameters>--context simCartesianControl</parameters>
+        <node>yarprun</node>
+        <dependencies>
+        	<port timeout="5.0">/icubSim/right_arm/state:o</port>
+        </dependencies>
+    </module>
+
+    <module>
+        <name>iKinCartesianSolver</name>
+        <parameters>--context simCartesianControl --part right_arm</parameters>
+        <node>yarprun</node>
+        <dependencies>
+        	<port timeout="5.0">/icubSim/right_arm/state:o</port>
+        </dependencies>
+    </module>
+
+    <module>
+        <name>iKinGazeCtrl</name>
+        <parameters>--from configSim.ini</parameters>
+        <node>yarprun</node>
+        <dependencies>
+        	<port timeout="5.0">/icubSim/head/state:o</port>
+        </dependencies>
+    </module>
+
+</application>
