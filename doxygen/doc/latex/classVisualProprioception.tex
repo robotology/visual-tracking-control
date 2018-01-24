@@ -1,0 +1,1039 @@
+\hypertarget{classVisualProprioception}{}\section{Visual\+Proprioception Class Reference}
+\label{classVisualProprioception}\index{Visual\+Proprioception@{Visual\+Proprioception}}
+
+
+{\ttfamily \#include $<$Visual\+Proprioception.\+h$>$}
+
+
+
+Inheritance diagram for Visual\+Proprioception\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{classVisualProprioception__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classVisualProprioception_a46f58af24667f43811e214023ec00dcb}{Visual\+Proprioception} (const bool use\+\_\+thumb, const bool use\+\_\+forearm, const int num\+\_\+images, const double resolution\+\_\+ratio, const yarp\+::os\+::\+Const\+String \&cam\+\_\+sel, const yarp\+::os\+::\+Const\+String \&laterality, const yarp\+::os\+::\+Const\+String \&context)
+\item 
+\hyperlink{classVisualProprioception_a25b2467569d795d63f806ffcdb9c2be4}{Visual\+Proprioception} (const \hyperlink{classVisualProprioception}{Visual\+Proprioception} \&proprio)
+\item 
+\hyperlink{classVisualProprioception_a64d833138ea6dda6e893693df8768ba9}{Visual\+Proprioception} (\hyperlink{classVisualProprioception}{Visual\+Proprioception} \&\&proprio) noexcept
+\item 
+\hyperlink{classVisualProprioception_a7c108406fb3ab7e381b15f8e06325513}{$\sim$\+Visual\+Proprioception} () noexcept
+\item 
+\hyperlink{classVisualProprioception}{Visual\+Proprioception} \& \hyperlink{classVisualProprioception_a86f418db34161e128fabf2572ef4e880}{operator=} (const \hyperlink{classVisualProprioception}{Visual\+Proprioception} \&proprio)
+\item 
+\hyperlink{classVisualProprioception}{Visual\+Proprioception} \& \hyperlink{classVisualProprioception_adfec67b962ad60f2afa575e681b44f3f}{operator=} (\hyperlink{classVisualProprioception}{Visual\+Proprioception} \&\&proprio) noexcept
+\item 
+void \hyperlink{classVisualProprioception_a9ca620e3c2dde045da52f34a600daa47}{observe} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&cur\+\_\+states, cv\+::\+Output\+Array observations) override
+\item 
+bool \hyperlink{classVisualProprioception_a59835a3e089f463855de8e228fc4fd91}{set\+Property} (const std\+::string property) override
+\item 
+int \hyperlink{classVisualProprioception_a0b3a18baa3f51b4c88155c87ab48759a}{get\+O\+G\+L\+Tiles\+Number} ()
+\item 
+int \hyperlink{classVisualProprioception_ac0f57686b122f7ab867d9715281692a2}{get\+O\+G\+L\+Tiles\+Rows} ()
+\item 
+int \hyperlink{classVisualProprioception_a1f292b50c80393a45c557f83c82f26fd}{get\+O\+G\+L\+Tiles\+Cols} ()
+\item 
+unsigned int \hyperlink{classVisualProprioception_ac0507d6a1074bce7d5b6219a296977a5}{get\+Cam\+Width} ()
+\item 
+unsigned int \hyperlink{classVisualProprioception_a79a29f5b902dc1010c6e4def39e3e50d}{get\+Cam\+Height} ()
+\item 
+float \hyperlink{classVisualProprioception_a91eb7689001066cc251ebc4aa45e361e}{get\+Cam\+Fx} ()
+\item 
+float \hyperlink{classVisualProprioception_ad10ced05538f8f5f86b4c320e857bb19}{get\+Cam\+Fy} ()
+\item 
+float \hyperlink{classVisualProprioception_aca4a0fe7a02cdab6fa8587fd0341d824}{get\+Cam\+Cx} ()
+\item 
+float \hyperlink{classVisualProprioception_a1fb91fd83b8bf70134f36b3c8f3023b5}{get\+Cam\+Cy} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+yarp\+::sig\+::\+Matrix \hyperlink{classVisualProprioception_a30b0283a5c8b29bdf828c291e7868e51}{get\+InvertedH} (const double a, const double d, const double alpha, const double offset, const double q)
+\item 
+bool \hyperlink{classVisualProprioception_aaa7b46247c25b4e69a389b82472caadf}{open\+Gaze\+Controller} ()
+\item 
+bool \hyperlink{classVisualProprioception_aade0b47250e8315166b36f7b731d360d}{open\+Analogs} ()
+\item 
+bool \hyperlink{classVisualProprioception_a0d7954358702576e252efd76694d9a18}{close\+Analogs} ()
+\item 
+bool \hyperlink{classVisualProprioception_a23b9c75f9a3c44442a371676a0379a19}{seti\+Cub\+Params} ()
+\item 
+void \hyperlink{classVisualProprioception_afe0bc2a5d6fea18d75764ed12755f3ee}{set\+Arm\+Joints} (const yarp\+::sig\+::\+Vector \&q)
+\item 
+void \hyperlink{classVisualProprioception_ae701fa6d07822f151bfb2bce4384fb32}{set\+Arm\+Joints} (const yarp\+::sig\+::\+Vector \&q, const yarp\+::sig\+::\+Vector \&analogs, const yarp\+::sig\+::\+Matrix \&analog\+\_\+bounds)
+\item 
+void \hyperlink{classVisualProprioception_a06131e57aab757389277f6c06bbd6dc7}{get\+Model\+Pose} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&cur\+\_\+states, std\+::vector$<$ Superimpose\+::\+Model\+Pose\+Container $>$ \&hand\+\_\+poses)
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualProprioception_a9a1a2dd7b57fc600388244a3001b16ad}{read\+Arm\+Encoders} ()
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualProprioception_a3bf5b9321ccf560bb3955cbe17fc5cab}{read\+Torso} ()
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualProprioception_af3370849532d77174f5848f415c08e9e}{read\+Root\+To\+Fingers} ()
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualProprioception_aa0ce08aa7f8fa882ade6997a1c9297ad}{read\+Root\+To\+Eye} (const yarp\+::os\+::\+Const\+String cam\+\_\+sel)
+\item 
+bool \hyperlink{classVisualProprioception_ab7be48b8a9dae0913d7554c3e30ad9e4}{file\+\_\+found} (const yarp\+::os\+::\+Const\+String \&file)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classVisualProprioception_ac23b912f12c8c4b639d12f343ca4fef4}{log\+\_\+\+I\+D\+\_\+} = \char`\"{}\mbox{[}Visual\+Proprioception\mbox{]}\char`\"{}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classVisualProprioception_a03d34b9887450f1def5b22b3358ea99c}{laterality\+\_\+}
+\item 
+yarp\+::dev\+::\+Poly\+Driver \hyperlink{classVisualProprioception_a73058b557c8169f92920f599ff0f7319}{drv\+\_\+gaze\+\_\+}
+\item 
+yarp\+::dev\+::\+I\+Gaze\+Control $\ast$ \hyperlink{classVisualProprioception_a775bf77a04b5c23488e53a58b47d7e20}{itf\+\_\+gaze\+\_\+}
+\item 
+i\+Cub\+::i\+Kin\+::i\+Cub\+Arm \hyperlink{classVisualProprioception_a4031f349da8660db553cccf2e2eed709}{icub\+\_\+arm\+\_\+}
+\item 
+i\+Cub\+::i\+Kin\+::i\+Cub\+Finger \hyperlink{classVisualProprioception_a629e04a45391f571094e4ae8a8dedbff}{icub\+\_\+kin\+\_\+finger\+\_\+} \mbox{[}3\mbox{]}
+\item 
+i\+Cub\+::i\+Kin\+::i\+Cub\+Eye \hyperlink{classVisualProprioception_ab19c8d684a0be7316a4dbb4e528ea784}{icub\+\_\+kin\+\_\+eye\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::os\+::\+Bottle $>$ \hyperlink{classVisualProprioception_a1499b951384754d12a31c66fd88385b9}{port\+\_\+head\+\_\+enc\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::os\+::\+Bottle $>$ \hyperlink{classVisualProprioception_acc3edbcc142167ccd748b1953fd08983}{port\+\_\+torso\+\_\+enc\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::os\+::\+Bottle $>$ \hyperlink{classVisualProprioception_a9cafb14a81554af9192456cf2f29f12b}{port\+\_\+arm\+\_\+enc\+\_\+}
+\item 
+yarp\+::dev\+::\+Poly\+Driver \hyperlink{classVisualProprioception_af3518d76b3cac4b3fbfcb3b89ce695f1}{drv\+\_\+right\+\_\+hand\+\_\+analog\+\_\+}
+\item 
+yarp\+::dev\+::\+I\+Analog\+Sensor $\ast$ \hyperlink{classVisualProprioception_a16a22e76ad42cd33fbeacd47aa408a74}{itf\+\_\+right\+\_\+hand\+\_\+analog\+\_\+}
+\item 
+yarp\+::sig\+::\+Matrix \hyperlink{classVisualProprioception_aba826482fa47277e17277ab6b82b8039}{right\+\_\+hand\+\_\+analogs\+\_\+bounds\+\_\+}
+\item 
+bool \hyperlink{classVisualProprioception_a86284ecba20206e3ecb3125fc90f3ce8}{analogs\+\_\+} = false
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classVisualProprioception_af0e11e8cc5facba0c725fac0b51be679}{cam\+\_\+sel\+\_\+}
+\item 
+double \hyperlink{classVisualProprioception_ab98ec8641e0cfbed4628e11dd10c9fb8}{cam\+\_\+x\+\_\+} \mbox{[}3\mbox{]}
+\item 
+double \hyperlink{classVisualProprioception_ae3278b7356ddf3fe357cc74129988521}{cam\+\_\+o\+\_\+} \mbox{[}4\mbox{]}
+\item 
+unsigned int \hyperlink{classVisualProprioception_aa432bf481b6dd29f2701b095f68b1e19}{cam\+\_\+width\+\_\+}
+\item 
+unsigned int \hyperlink{classVisualProprioception_a220e87c836c81743f3602da5cc3acebf}{cam\+\_\+height\+\_\+}
+\item 
+float \hyperlink{classVisualProprioception_a24c5fd2daa8ebf8837ec2746feb98bef}{cam\+\_\+fx\+\_\+}
+\item 
+float \hyperlink{classVisualProprioception_a8539c7bfe046289d21f82c3617da7896}{cam\+\_\+cx\+\_\+}
+\item 
+float \hyperlink{classVisualProprioception_a9ca32d1a6bbaf726c980871159b1e21c}{cam\+\_\+fy\+\_\+}
+\item 
+float \hyperlink{classVisualProprioception_ada8161ede00c312b8b2422deb5aa29e7}{cam\+\_\+cy\+\_\+}
+\item 
+double \hyperlink{classVisualProprioception_abf67fe6231fc4ecb742ccf9995169e62}{resolution\+\_\+ratio\+\_\+}
+\item 
+bool \hyperlink{classVisualProprioception_a1c25db32433ee1965a74b3b1af8a4f97}{use\+\_\+thumb\+\_\+}
+\item 
+bool \hyperlink{classVisualProprioception_a86e0db2eddb88029d98fdc5b4e31dc02}{use\+\_\+forearm\+\_\+}
+\item 
+S\+I\+C\+A\+D\+::\+Model\+Path\+Container \hyperlink{classVisualProprioception_ae7488d918a9c1893192622cd371d0277}{cad\+\_\+obj\+\_\+}
+\item 
+S\+I\+C\+AD $\ast$ \hyperlink{classVisualProprioception_aac9aae5f3844b662bd2918273d850120}{si\+\_\+cad\+\_\+}
+\item 
+int \hyperlink{classVisualProprioception_ac93a3e13b787e20720ff37dfc1e7fbb4}{ogl\+\_\+tiles\+\_\+rows\+\_\+}
+\item 
+int \hyperlink{classVisualProprioception_a23cd7f7cc9cbbf0e8430c858d7e7bce0}{ogl\+\_\+tiles\+\_\+cols\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 20 of file Visual\+Proprioception.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classVisualProprioception_a46f58af24667f43811e214023ec00dcb}\label{classVisualProprioception_a46f58af24667f43811e214023ec00dcb}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!Visual\+Proprioception@{Visual\+Proprioception}}
+\index{Visual\+Proprioception@{Visual\+Proprioception}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{Visual\+Proprioception()}{VisualProprioception()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily Visual\+Proprioception\+::\+Visual\+Proprioception (\begin{DoxyParamCaption}\item[{const bool}]{use\+\_\+thumb,  }\item[{const bool}]{use\+\_\+forearm,  }\item[{const int}]{num\+\_\+images,  }\item[{const double}]{resolution\+\_\+ratio,  }\item[{const yarp\+::os\+::\+Const\+String \&}]{cam\+\_\+sel,  }\item[{const yarp\+::os\+::\+Const\+String \&}]{laterality,  }\item[{const yarp\+::os\+::\+Const\+String \&}]{context }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classVisualProprioception_a25b2467569d795d63f806ffcdb9c2be4}\label{classVisualProprioception_a25b2467569d795d63f806ffcdb9c2be4}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!Visual\+Proprioception@{Visual\+Proprioception}}
+\index{Visual\+Proprioception@{Visual\+Proprioception}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{Visual\+Proprioception()}{VisualProprioception()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily Visual\+Proprioception\+::\+Visual\+Proprioception (\begin{DoxyParamCaption}\item[{const \hyperlink{classVisualProprioception}{Visual\+Proprioception} \&}]{proprio }\end{DoxyParamCaption})}
+
+
+
+Definition at line 263 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cam\+\_\+o\+\_\+, cam\+\_\+x\+\_\+, icub\+\_\+arm\+\_\+, and icub\+\_\+kin\+\_\+finger\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_a64d833138ea6dda6e893693df8768ba9}\label{classVisualProprioception_a64d833138ea6dda6e893693df8768ba9}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!Visual\+Proprioception@{Visual\+Proprioception}}
+\index{Visual\+Proprioception@{Visual\+Proprioception}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{Visual\+Proprioception()}{VisualProprioception()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily Visual\+Proprioception\+::\+Visual\+Proprioception (\begin{DoxyParamCaption}\item[{\hyperlink{classVisualProprioception}{Visual\+Proprioception} \&\&}]{proprio }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 290 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cam\+\_\+o\+\_\+, cam\+\_\+x\+\_\+, and icub\+\_\+kin\+\_\+finger\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_a7c108406fb3ab7e381b15f8e06325513}\label{classVisualProprioception_a7c108406fb3ab7e381b15f8e06325513}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!````~Visual\+Proprioception@{$\sim$\+Visual\+Proprioception}}
+\index{````~Visual\+Proprioception@{$\sim$\+Visual\+Proprioception}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{$\sim$\+Visual\+Proprioception()}{~VisualProprioception()}}
+{\footnotesize\ttfamily Visual\+Proprioception\+::$\sim$\+Visual\+Proprioception (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 250 of file Visual\+Proprioception.\+cpp.
+
+
+
+References Play\+Gate\+Pose\+::port\+\_\+arm\+\_\+enc\+\_\+, and Play\+Gate\+Pose\+::port\+\_\+torso\+\_\+enc\+\_\+.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classVisualProprioception_a0d7954358702576e252efd76694d9a18}\label{classVisualProprioception_a0d7954358702576e252efd76694d9a18}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!close\+Analogs@{close\+Analogs}}
+\index{close\+Analogs@{close\+Analogs}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{close\+Analogs()}{closeAnalogs()}}
+{\footnotesize\ttfamily bool Visual\+Proprioception\+::close\+Analogs (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 719 of file Visual\+Proprioception.\+cpp.
+
+
+
+References analogs\+\_\+, and drv\+\_\+right\+\_\+hand\+\_\+analog\+\_\+.
+
+
+
+Referenced by set\+Property().
+
+\mbox{\Hypertarget{classVisualProprioception_ab7be48b8a9dae0913d7554c3e30ad9e4}\label{classVisualProprioception_ab7be48b8a9dae0913d7554c3e30ad9e4}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!file\+\_\+found@{file\+\_\+found}}
+\index{file\+\_\+found@{file\+\_\+found}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{file\+\_\+found()}{file\_found()}}
+{\footnotesize\ttfamily bool Visual\+Proprioception\+::file\+\_\+found (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{file }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 541 of file Visual\+Proprioception.\+cpp.
+
+
+
+References log\+\_\+\+I\+D\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_aca4a0fe7a02cdab6fa8587fd0341d824}\label{classVisualProprioception_aca4a0fe7a02cdab6fa8587fd0341d824}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+Cam\+Cx@{get\+Cam\+Cx}}
+\index{get\+Cam\+Cx@{get\+Cam\+Cx}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+Cam\+Cx()}{getCamCx()}}
+{\footnotesize\ttfamily float Visual\+Proprioception\+::get\+Cam\+Cx (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 595 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cam\+\_\+cx\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_a1fb91fd83b8bf70134f36b3c8f3023b5}\label{classVisualProprioception_a1fb91fd83b8bf70134f36b3c8f3023b5}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+Cam\+Cy@{get\+Cam\+Cy}}
+\index{get\+Cam\+Cy@{get\+Cam\+Cy}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+Cam\+Cy()}{getCamCy()}}
+{\footnotesize\ttfamily float Visual\+Proprioception\+::get\+Cam\+Cy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 601 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cam\+\_\+cy\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_a91eb7689001066cc251ebc4aa45e361e}\label{classVisualProprioception_a91eb7689001066cc251ebc4aa45e361e}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+Cam\+Fx@{get\+Cam\+Fx}}
+\index{get\+Cam\+Fx@{get\+Cam\+Fx}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+Cam\+Fx()}{getCamFx()}}
+{\footnotesize\ttfamily float Visual\+Proprioception\+::get\+Cam\+Fx (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 583 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cam\+\_\+fx\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_ad10ced05538f8f5f86b4c320e857bb19}\label{classVisualProprioception_ad10ced05538f8f5f86b4c320e857bb19}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+Cam\+Fy@{get\+Cam\+Fy}}
+\index{get\+Cam\+Fy@{get\+Cam\+Fy}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+Cam\+Fy()}{getCamFy()}}
+{\footnotesize\ttfamily float Visual\+Proprioception\+::get\+Cam\+Fy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 589 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cam\+\_\+fy\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_a79a29f5b902dc1010c6e4def39e3e50d}\label{classVisualProprioception_a79a29f5b902dc1010c6e4def39e3e50d}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+Cam\+Height@{get\+Cam\+Height}}
+\index{get\+Cam\+Height@{get\+Cam\+Height}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+Cam\+Height()}{getCamHeight()}}
+{\footnotesize\ttfamily unsigned int Visual\+Proprioception\+::get\+Cam\+Height (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 577 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cam\+\_\+height\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_ac0507d6a1074bce7d5b6219a296977a5}\label{classVisualProprioception_ac0507d6a1074bce7d5b6219a296977a5}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+Cam\+Width@{get\+Cam\+Width}}
+\index{get\+Cam\+Width@{get\+Cam\+Width}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+Cam\+Width()}{getCamWidth()}}
+{\footnotesize\ttfamily unsigned int Visual\+Proprioception\+::get\+Cam\+Width (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 571 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cam\+\_\+width\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_a30b0283a5c8b29bdf828c291e7868e51}\label{classVisualProprioception_a30b0283a5c8b29bdf828c291e7868e51}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+InvertedH@{get\+InvertedH}}
+\index{get\+InvertedH@{get\+InvertedH}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+Inverted\+H()}{getInvertedH()}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Matrix Visual\+Proprioception\+::get\+InvertedH (\begin{DoxyParamCaption}\item[{const double}]{a,  }\item[{const double}]{d,  }\item[{const double}]{alpha,  }\item[{const double}]{offset,  }\item[{const double}]{q }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 607 of file Visual\+Proprioception.\+cpp.
+
+
+
+Referenced by get\+Model\+Pose().
+
+\mbox{\Hypertarget{classVisualProprioception_a06131e57aab757389277f6c06bbd6dc7}\label{classVisualProprioception_a06131e57aab757389277f6c06bbd6dc7}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+Model\+Pose@{get\+Model\+Pose}}
+\index{get\+Model\+Pose@{get\+Model\+Pose}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+Model\+Pose()}{getModelPose()}}
+{\footnotesize\ttfamily void Visual\+Proprioception\+::get\+Model\+Pose (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{cur\+\_\+states,  }\item[{std\+::vector$<$ Superimpose\+::\+Model\+Pose\+Container $>$ \&}]{hand\+\_\+poses }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 374 of file Visual\+Proprioception.\+cpp.
+
+
+
+References get\+Inverted\+H(), icub\+\_\+arm\+\_\+, icub\+\_\+kin\+\_\+finger\+\_\+, use\+\_\+forearm\+\_\+, and use\+\_\+thumb\+\_\+.
+
+
+
+Referenced by observe().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classVisualProprioception_a06131e57aab757389277f6c06bbd6dc7_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualProprioception_a1f292b50c80393a45c557f83c82f26fd}\label{classVisualProprioception_a1f292b50c80393a45c557f83c82f26fd}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+O\+G\+L\+Tiles\+Cols@{get\+O\+G\+L\+Tiles\+Cols}}
+\index{get\+O\+G\+L\+Tiles\+Cols@{get\+O\+G\+L\+Tiles\+Cols}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+O\+G\+L\+Tiles\+Cols()}{getOGLTilesCols()}}
+{\footnotesize\ttfamily int Visual\+Proprioception\+::get\+O\+G\+L\+Tiles\+Cols (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 565 of file Visual\+Proprioception.\+cpp.
+
+
+
+References si\+\_\+cad\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_a0b3a18baa3f51b4c88155c87ab48759a}\label{classVisualProprioception_a0b3a18baa3f51b4c88155c87ab48759a}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+O\+G\+L\+Tiles\+Number@{get\+O\+G\+L\+Tiles\+Number}}
+\index{get\+O\+G\+L\+Tiles\+Number@{get\+O\+G\+L\+Tiles\+Number}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+O\+G\+L\+Tiles\+Number()}{getOGLTilesNumber()}}
+{\footnotesize\ttfamily int Visual\+Proprioception\+::get\+O\+G\+L\+Tiles\+Number (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 553 of file Visual\+Proprioception.\+cpp.
+
+
+
+References si\+\_\+cad\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_ac0f57686b122f7ab867d9715281692a2}\label{classVisualProprioception_ac0f57686b122f7ab867d9715281692a2}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!get\+O\+G\+L\+Tiles\+Rows@{get\+O\+G\+L\+Tiles\+Rows}}
+\index{get\+O\+G\+L\+Tiles\+Rows@{get\+O\+G\+L\+Tiles\+Rows}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{get\+O\+G\+L\+Tiles\+Rows()}{getOGLTilesRows()}}
+{\footnotesize\ttfamily int Visual\+Proprioception\+::get\+O\+G\+L\+Tiles\+Rows (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 559 of file Visual\+Proprioception.\+cpp.
+
+
+
+References si\+\_\+cad\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_a9ca620e3c2dde045da52f34a600daa47}\label{classVisualProprioception_a9ca620e3c2dde045da52f34a600daa47}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!observe@{observe}}
+\index{observe@{observe}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{observe()}{observe()}}
+{\footnotesize\ttfamily void Visual\+Proprioception\+::observe (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{cur\+\_\+states,  }\item[{cv\+::\+Output\+Array}]{observations }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 451 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cam\+\_\+o\+\_\+, cam\+\_\+x\+\_\+, get\+Model\+Pose(), and si\+\_\+cad\+\_\+.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classVisualProprioception_a9ca620e3c2dde045da52f34a600daa47_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualProprioception_aade0b47250e8315166b36f7b731d360d}\label{classVisualProprioception_aade0b47250e8315166b36f7b731d360d}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!open\+Analogs@{open\+Analogs}}
+\index{open\+Analogs@{open\+Analogs}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{open\+Analogs()}{openAnalogs()}}
+{\footnotesize\ttfamily bool Visual\+Proprioception\+::open\+Analogs (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 684 of file Visual\+Proprioception.\+cpp.
+
+
+
+References analogs\+\_\+, cam\+\_\+sel\+\_\+, drv\+\_\+right\+\_\+hand\+\_\+analog\+\_\+, itf\+\_\+right\+\_\+hand\+\_\+analog\+\_\+, laterality\+\_\+, and log\+\_\+\+I\+D\+\_\+.
+
+
+
+Referenced by set\+Property().
+
+\mbox{\Hypertarget{classVisualProprioception_aaa7b46247c25b4e69a389b82472caadf}\label{classVisualProprioception_aaa7b46247c25b4e69a389b82472caadf}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!open\+Gaze\+Controller@{open\+Gaze\+Controller}}
+\index{open\+Gaze\+Controller@{open\+Gaze\+Controller}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{open\+Gaze\+Controller()}{openGazeController()}}
+{\footnotesize\ttfamily bool Visual\+Proprioception\+::open\+Gaze\+Controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 655 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cam\+\_\+sel\+\_\+, drv\+\_\+gaze\+\_\+, itf\+\_\+gaze\+\_\+, and log\+\_\+\+I\+D\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_a86f418db34161e128fabf2572ef4e880}\label{classVisualProprioception_a86f418db34161e128fabf2572ef4e880}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!operator=@{operator=}}
+\index{operator=@{operator=}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \hyperlink{classVisualProprioception}{Visual\+Proprioception} \& Visual\+Proprioception\+::operator= (\begin{DoxyParamCaption}\item[{const \hyperlink{classVisualProprioception}{Visual\+Proprioception} \&}]{proprio }\end{DoxyParamCaption})}
+
+
+
+Definition at line 325 of file Visual\+Proprioception.\+cpp.
+
+\mbox{\Hypertarget{classVisualProprioception_adfec67b962ad60f2afa575e681b44f3f}\label{classVisualProprioception_adfec67b962ad60f2afa575e681b44f3f}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!operator=@{operator=}}
+\index{operator=@{operator=}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \hyperlink{classVisualProprioception}{Visual\+Proprioception} \& Visual\+Proprioception\+::operator= (\begin{DoxyParamCaption}\item[{\hyperlink{classVisualProprioception}{Visual\+Proprioception} \&\&}]{proprio }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 334 of file Visual\+Proprioception.\+cpp.
+
+
+
+References cad\+\_\+obj\+\_\+, cam\+\_\+o\+\_\+, cam\+\_\+x\+\_\+, icub\+\_\+arm\+\_\+, icub\+\_\+kin\+\_\+finger\+\_\+, and si\+\_\+cad\+\_\+.
+
+\mbox{\Hypertarget{classVisualProprioception_a9a1a2dd7b57fc600388244a3001b16ad}\label{classVisualProprioception_a9a1a2dd7b57fc600388244a3001b16ad}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!read\+Arm\+Encoders@{read\+Arm\+Encoders}}
+\index{read\+Arm\+Encoders@{read\+Arm\+Encoders}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{read\+Arm\+Encoders()}{readArmEncoders()}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Vector Visual\+Proprioception\+::read\+Arm\+Encoders (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classVisualProprioception_aa0ce08aa7f8fa882ade6997a1c9297ad}\label{classVisualProprioception_aa0ce08aa7f8fa882ade6997a1c9297ad}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!read\+Root\+To\+Eye@{read\+Root\+To\+Eye}}
+\index{read\+Root\+To\+Eye@{read\+Root\+To\+Eye}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{read\+Root\+To\+Eye()}{readRootToEye()}}
+{\footnotesize\ttfamily Vector Visual\+Proprioception\+::read\+Root\+To\+Eye (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String}]{cam\+\_\+sel }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 761 of file Visual\+Proprioception.\+cpp.
+
+
+
+References port\+\_\+head\+\_\+enc\+\_\+, and read\+Torso().
+
+
+
+Referenced by seti\+Cub\+Params().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classVisualProprioception_aa0ce08aa7f8fa882ade6997a1c9297ad_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualProprioception_af3370849532d77174f5848f415c08e9e}\label{classVisualProprioception_af3370849532d77174f5848f415c08e9e}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!read\+Root\+To\+Fingers@{read\+Root\+To\+Fingers}}
+\index{read\+Root\+To\+Fingers@{read\+Root\+To\+Fingers}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{read\+Root\+To\+Fingers()}{readRootToFingers()}}
+{\footnotesize\ttfamily Vector Visual\+Proprioception\+::read\+Root\+To\+Fingers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 747 of file Visual\+Proprioception.\+cpp.
+
+
+
+References port\+\_\+arm\+\_\+enc\+\_\+, and read\+Torso().
+
+
+
+Referenced by seti\+Cub\+Params().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classVisualProprioception_af3370849532d77174f5848f415c08e9e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualProprioception_a3bf5b9321ccf560bb3955cbe17fc5cab}\label{classVisualProprioception_a3bf5b9321ccf560bb3955cbe17fc5cab}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!read\+Torso@{read\+Torso}}
+\index{read\+Torso@{read\+Torso}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{read\+Torso()}{readTorso()}}
+{\footnotesize\ttfamily Vector Visual\+Proprioception\+::read\+Torso (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 733 of file Visual\+Proprioception.\+cpp.
+
+
+
+References port\+\_\+torso\+\_\+enc\+\_\+.
+
+
+
+Referenced by read\+Root\+To\+Eye(), and read\+Root\+To\+Fingers().
+
+\mbox{\Hypertarget{classVisualProprioception_afe0bc2a5d6fea18d75764ed12755f3ee}\label{classVisualProprioception_afe0bc2a5d6fea18d75764ed12755f3ee}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!set\+Arm\+Joints@{set\+Arm\+Joints}}
+\index{set\+Arm\+Joints@{set\+Arm\+Joints}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{set\+Arm\+Joints()}{setArmJoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Visual\+Proprioception\+::set\+Arm\+Joints (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{q }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Referenced by seti\+Cub\+Params().
+
+\mbox{\Hypertarget{classVisualProprioception_ae701fa6d07822f151bfb2bce4384fb32}\label{classVisualProprioception_ae701fa6d07822f151bfb2bce4384fb32}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!set\+Arm\+Joints@{set\+Arm\+Joints}}
+\index{set\+Arm\+Joints@{set\+Arm\+Joints}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{set\+Arm\+Joints()}{setArmJoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Visual\+Proprioception\+::set\+Arm\+Joints (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{q,  }\item[{const yarp\+::sig\+::\+Vector \&}]{analogs,  }\item[{const yarp\+::sig\+::\+Matrix \&}]{analog\+\_\+bounds }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classVisualProprioception_a23b9c75f9a3c44442a371676a0379a19}\label{classVisualProprioception_a23b9c75f9a3c44442a371676a0379a19}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!seti\+Cub\+Params@{seti\+Cub\+Params}}
+\index{seti\+Cub\+Params@{seti\+Cub\+Params}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{seti\+Cub\+Params()}{setiCubParams()}}
+{\footnotesize\ttfamily bool Visual\+Proprioception\+::seti\+Cub\+Params (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 477 of file Visual\+Proprioception.\+cpp.
+
+
+
+References analogs\+\_\+, cam\+\_\+o\+\_\+, cam\+\_\+sel\+\_\+, cam\+\_\+x\+\_\+, icub\+\_\+arm\+\_\+, icub\+\_\+kin\+\_\+eye\+\_\+, icub\+\_\+kin\+\_\+finger\+\_\+, itf\+\_\+right\+\_\+hand\+\_\+analog\+\_\+, read\+Root\+To\+Eye(), read\+Root\+To\+Fingers(), right\+\_\+hand\+\_\+analogs\+\_\+bounds\+\_\+, and set\+Arm\+Joints().
+
+
+
+Referenced by set\+Property().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classVisualProprioception_a23b9c75f9a3c44442a371676a0379a19_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualProprioception_a59835a3e089f463855de8e228fc4fd91}\label{classVisualProprioception_a59835a3e089f463855de8e228fc4fd91}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!set\+Property@{set\+Property}}
+\index{set\+Property@{set\+Property}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{set\+Property()}{setProperty()}}
+{\footnotesize\ttfamily bool Visual\+Proprioception\+::set\+Property (\begin{DoxyParamCaption}\item[{const std\+::string}]{property }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 463 of file Visual\+Proprioception.\+cpp.
+
+
+
+References close\+Analogs(), open\+Analogs(), and seti\+Cub\+Params().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classVisualProprioception_a59835a3e089f463855de8e228fc4fd91_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classVisualProprioception_a86284ecba20206e3ecb3125fc90f3ce8}\label{classVisualProprioception_a86284ecba20206e3ecb3125fc90f3ce8}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!analogs\+\_\+@{analogs\+\_\+}}
+\index{analogs\+\_\+@{analogs\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{analogs\+\_\+}{analogs\_}}
+{\footnotesize\ttfamily bool Visual\+Proprioception\+::analogs\+\_\+ = false\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 80 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by close\+Analogs(), open\+Analogs(), and seti\+Cub\+Params().
+
+\mbox{\Hypertarget{classVisualProprioception_ae7488d918a9c1893192622cd371d0277}\label{classVisualProprioception_ae7488d918a9c1893192622cd371d0277}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!cad\+\_\+obj\+\_\+@{cad\+\_\+obj\+\_\+}}
+\index{cad\+\_\+obj\+\_\+@{cad\+\_\+obj\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{cad\+\_\+obj\+\_\+}{cad\_obj\_}}
+{\footnotesize\ttfamily S\+I\+C\+A\+D\+::\+Model\+Path\+Container Visual\+Proprioception\+::cad\+\_\+obj\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 109 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by operator=().
+
+\mbox{\Hypertarget{classVisualProprioception_a8539c7bfe046289d21f82c3617da7896}\label{classVisualProprioception_a8539c7bfe046289d21f82c3617da7896}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!cam\+\_\+cx\+\_\+@{cam\+\_\+cx\+\_\+}}
+\index{cam\+\_\+cx\+\_\+@{cam\+\_\+cx\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{cam\+\_\+cx\+\_\+}{cam\_cx\_}}
+{\footnotesize\ttfamily float Visual\+Proprioception\+::cam\+\_\+cx\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 102 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+Cam\+Cx().
+
+\mbox{\Hypertarget{classVisualProprioception_ada8161ede00c312b8b2422deb5aa29e7}\label{classVisualProprioception_ada8161ede00c312b8b2422deb5aa29e7}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!cam\+\_\+cy\+\_\+@{cam\+\_\+cy\+\_\+}}
+\index{cam\+\_\+cy\+\_\+@{cam\+\_\+cy\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{cam\+\_\+cy\+\_\+}{cam\_cy\_}}
+{\footnotesize\ttfamily float Visual\+Proprioception\+::cam\+\_\+cy\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 104 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+Cam\+Cy().
+
+\mbox{\Hypertarget{classVisualProprioception_a24c5fd2daa8ebf8837ec2746feb98bef}\label{classVisualProprioception_a24c5fd2daa8ebf8837ec2746feb98bef}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!cam\+\_\+fx\+\_\+@{cam\+\_\+fx\+\_\+}}
+\index{cam\+\_\+fx\+\_\+@{cam\+\_\+fx\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{cam\+\_\+fx\+\_\+}{cam\_fx\_}}
+{\footnotesize\ttfamily float Visual\+Proprioception\+::cam\+\_\+fx\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 101 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+Cam\+Fx().
+
+\mbox{\Hypertarget{classVisualProprioception_a9ca32d1a6bbaf726c980871159b1e21c}\label{classVisualProprioception_a9ca32d1a6bbaf726c980871159b1e21c}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!cam\+\_\+fy\+\_\+@{cam\+\_\+fy\+\_\+}}
+\index{cam\+\_\+fy\+\_\+@{cam\+\_\+fy\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{cam\+\_\+fy\+\_\+}{cam\_fy\_}}
+{\footnotesize\ttfamily float Visual\+Proprioception\+::cam\+\_\+fy\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 103 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+Cam\+Fy().
+
+\mbox{\Hypertarget{classVisualProprioception_a220e87c836c81743f3602da5cc3acebf}\label{classVisualProprioception_a220e87c836c81743f3602da5cc3acebf}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!cam\+\_\+height\+\_\+@{cam\+\_\+height\+\_\+}}
+\index{cam\+\_\+height\+\_\+@{cam\+\_\+height\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{cam\+\_\+height\+\_\+}{cam\_height\_}}
+{\footnotesize\ttfamily unsigned int Visual\+Proprioception\+::cam\+\_\+height\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 100 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+Cam\+Height().
+
+\mbox{\Hypertarget{classVisualProprioception_ae3278b7356ddf3fe357cc74129988521}\label{classVisualProprioception_ae3278b7356ddf3fe357cc74129988521}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!cam\+\_\+o\+\_\+@{cam\+\_\+o\+\_\+}}
+\index{cam\+\_\+o\+\_\+@{cam\+\_\+o\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{cam\+\_\+o\+\_\+}{cam\_o\_}}
+{\footnotesize\ttfamily double Visual\+Proprioception\+::cam\+\_\+o\+\_\+\mbox{[}4\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 98 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by observe(), operator=(), seti\+Cub\+Params(), and Visual\+Proprioception().
+
+\mbox{\Hypertarget{classVisualProprioception_af0e11e8cc5facba0c725fac0b51be679}\label{classVisualProprioception_af0e11e8cc5facba0c725fac0b51be679}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!cam\+\_\+sel\+\_\+@{cam\+\_\+sel\+\_\+}}
+\index{cam\+\_\+sel\+\_\+@{cam\+\_\+sel\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{cam\+\_\+sel\+\_\+}{cam\_sel\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Visual\+Proprioception\+::cam\+\_\+sel\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 96 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by open\+Analogs(), open\+Gaze\+Controller(), and seti\+Cub\+Params().
+
+\mbox{\Hypertarget{classVisualProprioception_aa432bf481b6dd29f2701b095f68b1e19}\label{classVisualProprioception_aa432bf481b6dd29f2701b095f68b1e19}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!cam\+\_\+width\+\_\+@{cam\+\_\+width\+\_\+}}
+\index{cam\+\_\+width\+\_\+@{cam\+\_\+width\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{cam\+\_\+width\+\_\+}{cam\_width\_}}
+{\footnotesize\ttfamily unsigned int Visual\+Proprioception\+::cam\+\_\+width\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 99 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+Cam\+Width().
+
+\mbox{\Hypertarget{classVisualProprioception_ab98ec8641e0cfbed4628e11dd10c9fb8}\label{classVisualProprioception_ab98ec8641e0cfbed4628e11dd10c9fb8}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!cam\+\_\+x\+\_\+@{cam\+\_\+x\+\_\+}}
+\index{cam\+\_\+x\+\_\+@{cam\+\_\+x\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{cam\+\_\+x\+\_\+}{cam\_x\_}}
+{\footnotesize\ttfamily double Visual\+Proprioception\+::cam\+\_\+x\+\_\+\mbox{[}3\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 97 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by observe(), operator=(), seti\+Cub\+Params(), and Visual\+Proprioception().
+
+\mbox{\Hypertarget{classVisualProprioception_a73058b557c8169f92920f599ff0f7319}\label{classVisualProprioception_a73058b557c8169f92920f599ff0f7319}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!drv\+\_\+gaze\+\_\+@{drv\+\_\+gaze\+\_\+}}
+\index{drv\+\_\+gaze\+\_\+@{drv\+\_\+gaze\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{drv\+\_\+gaze\+\_\+}{drv\_gaze\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+Poly\+Driver Visual\+Proprioception\+::drv\+\_\+gaze\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 62 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by open\+Gaze\+Controller().
+
+\mbox{\Hypertarget{classVisualProprioception_af3518d76b3cac4b3fbfcb3b89ce695f1}\label{classVisualProprioception_af3518d76b3cac4b3fbfcb3b89ce695f1}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!drv\+\_\+right\+\_\+hand\+\_\+analog\+\_\+@{drv\+\_\+right\+\_\+hand\+\_\+analog\+\_\+}}
+\index{drv\+\_\+right\+\_\+hand\+\_\+analog\+\_\+@{drv\+\_\+right\+\_\+hand\+\_\+analog\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{drv\+\_\+right\+\_\+hand\+\_\+analog\+\_\+}{drv\_right\_hand\_analog\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+Poly\+Driver Visual\+Proprioception\+::drv\+\_\+right\+\_\+hand\+\_\+analog\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 70 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by close\+Analogs(), and open\+Analogs().
+
+\mbox{\Hypertarget{classVisualProprioception_a4031f349da8660db553cccf2e2eed709}\label{classVisualProprioception_a4031f349da8660db553cccf2e2eed709}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!icub\+\_\+arm\+\_\+@{icub\+\_\+arm\+\_\+}}
+\index{icub\+\_\+arm\+\_\+@{icub\+\_\+arm\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{icub\+\_\+arm\+\_\+}{icub\_arm\_}}
+{\footnotesize\ttfamily i\+Cub\+::i\+Kin\+::i\+Cub\+Arm Visual\+Proprioception\+::icub\+\_\+arm\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 64 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+Model\+Pose(), operator=(), seti\+Cub\+Params(), and Visual\+Proprioception().
+
+\mbox{\Hypertarget{classVisualProprioception_ab19c8d684a0be7316a4dbb4e528ea784}\label{classVisualProprioception_ab19c8d684a0be7316a4dbb4e528ea784}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!icub\+\_\+kin\+\_\+eye\+\_\+@{icub\+\_\+kin\+\_\+eye\+\_\+}}
+\index{icub\+\_\+kin\+\_\+eye\+\_\+@{icub\+\_\+kin\+\_\+eye\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{icub\+\_\+kin\+\_\+eye\+\_\+}{icub\_kin\_eye\_}}
+{\footnotesize\ttfamily i\+Cub\+::i\+Kin\+::i\+Cub\+Eye Visual\+Proprioception\+::icub\+\_\+kin\+\_\+eye\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 66 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by seti\+Cub\+Params().
+
+\mbox{\Hypertarget{classVisualProprioception_a629e04a45391f571094e4ae8a8dedbff}\label{classVisualProprioception_a629e04a45391f571094e4ae8a8dedbff}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!icub\+\_\+kin\+\_\+finger\+\_\+@{icub\+\_\+kin\+\_\+finger\+\_\+}}
+\index{icub\+\_\+kin\+\_\+finger\+\_\+@{icub\+\_\+kin\+\_\+finger\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{icub\+\_\+kin\+\_\+finger\+\_\+}{icub\_kin\_finger\_}}
+{\footnotesize\ttfamily i\+Cub\+::i\+Kin\+::i\+Cub\+Finger Visual\+Proprioception\+::icub\+\_\+kin\+\_\+finger\+\_\+\mbox{[}3\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 65 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+Model\+Pose(), operator=(), seti\+Cub\+Params(), and Visual\+Proprioception().
+
+\mbox{\Hypertarget{classVisualProprioception_a775bf77a04b5c23488e53a58b47d7e20}\label{classVisualProprioception_a775bf77a04b5c23488e53a58b47d7e20}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!itf\+\_\+gaze\+\_\+@{itf\+\_\+gaze\+\_\+}}
+\index{itf\+\_\+gaze\+\_\+@{itf\+\_\+gaze\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{itf\+\_\+gaze\+\_\+}{itf\_gaze\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+I\+Gaze\+Control$\ast$ Visual\+Proprioception\+::itf\+\_\+gaze\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 63 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by open\+Gaze\+Controller().
+
+\mbox{\Hypertarget{classVisualProprioception_a16a22e76ad42cd33fbeacd47aa408a74}\label{classVisualProprioception_a16a22e76ad42cd33fbeacd47aa408a74}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!itf\+\_\+right\+\_\+hand\+\_\+analog\+\_\+@{itf\+\_\+right\+\_\+hand\+\_\+analog\+\_\+}}
+\index{itf\+\_\+right\+\_\+hand\+\_\+analog\+\_\+@{itf\+\_\+right\+\_\+hand\+\_\+analog\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{itf\+\_\+right\+\_\+hand\+\_\+analog\+\_\+}{itf\_right\_hand\_analog\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+I\+Analog\+Sensor$\ast$ Visual\+Proprioception\+::itf\+\_\+right\+\_\+hand\+\_\+analog\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 71 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by open\+Analogs(), and seti\+Cub\+Params().
+
+\mbox{\Hypertarget{classVisualProprioception_a03d34b9887450f1def5b22b3358ea99c}\label{classVisualProprioception_a03d34b9887450f1def5b22b3358ea99c}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!laterality\+\_\+@{laterality\+\_\+}}
+\index{laterality\+\_\+@{laterality\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{laterality\+\_\+}{laterality\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Visual\+Proprioception\+::laterality\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 61 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by open\+Analogs().
+
+\mbox{\Hypertarget{classVisualProprioception_ac23b912f12c8c4b639d12f343ca4fef4}\label{classVisualProprioception_ac23b912f12c8c4b639d12f343ca4fef4}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!log\+\_\+\+I\+D\+\_\+@{log\+\_\+\+I\+D\+\_\+}}
+\index{log\+\_\+\+I\+D\+\_\+@{log\+\_\+\+I\+D\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{log\+\_\+\+I\+D\+\_\+}{log\_ID\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Visual\+Proprioception\+::log\+\_\+\+I\+D\+\_\+ = \char`\"{}\mbox{[}Visual\+Proprioception\mbox{]}\char`\"{}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 58 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by file\+\_\+found(), open\+Analogs(), and open\+Gaze\+Controller().
+
+\mbox{\Hypertarget{classVisualProprioception_a23cd7f7cc9cbbf0e8430c858d7e7bce0}\label{classVisualProprioception_a23cd7f7cc9cbbf0e8430c858d7e7bce0}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!ogl\+\_\+tiles\+\_\+cols\+\_\+@{ogl\+\_\+tiles\+\_\+cols\+\_\+}}
+\index{ogl\+\_\+tiles\+\_\+cols\+\_\+@{ogl\+\_\+tiles\+\_\+cols\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{ogl\+\_\+tiles\+\_\+cols\+\_\+}{ogl\_tiles\_cols\_}}
+{\footnotesize\ttfamily int Visual\+Proprioception\+::ogl\+\_\+tiles\+\_\+cols\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 112 of file Visual\+Proprioception.\+h.
+
+\mbox{\Hypertarget{classVisualProprioception_ac93a3e13b787e20720ff37dfc1e7fbb4}\label{classVisualProprioception_ac93a3e13b787e20720ff37dfc1e7fbb4}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!ogl\+\_\+tiles\+\_\+rows\+\_\+@{ogl\+\_\+tiles\+\_\+rows\+\_\+}}
+\index{ogl\+\_\+tiles\+\_\+rows\+\_\+@{ogl\+\_\+tiles\+\_\+rows\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{ogl\+\_\+tiles\+\_\+rows\+\_\+}{ogl\_tiles\_rows\_}}
+{\footnotesize\ttfamily int Visual\+Proprioception\+::ogl\+\_\+tiles\+\_\+rows\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 111 of file Visual\+Proprioception.\+h.
+
+\mbox{\Hypertarget{classVisualProprioception_a9cafb14a81554af9192456cf2f29f12b}\label{classVisualProprioception_a9cafb14a81554af9192456cf2f29f12b}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!port\+\_\+arm\+\_\+enc\+\_\+@{port\+\_\+arm\+\_\+enc\+\_\+}}
+\index{port\+\_\+arm\+\_\+enc\+\_\+@{port\+\_\+arm\+\_\+enc\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{port\+\_\+arm\+\_\+enc\+\_\+}{port\_arm\_enc\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::os\+::\+Bottle$>$ Visual\+Proprioception\+::port\+\_\+arm\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 69 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by read\+Root\+To\+Fingers().
+
+\mbox{\Hypertarget{classVisualProprioception_a1499b951384754d12a31c66fd88385b9}\label{classVisualProprioception_a1499b951384754d12a31c66fd88385b9}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!port\+\_\+head\+\_\+enc\+\_\+@{port\+\_\+head\+\_\+enc\+\_\+}}
+\index{port\+\_\+head\+\_\+enc\+\_\+@{port\+\_\+head\+\_\+enc\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{port\+\_\+head\+\_\+enc\+\_\+}{port\_head\_enc\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::os\+::\+Bottle$>$ Visual\+Proprioception\+::port\+\_\+head\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 67 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by read\+Root\+To\+Eye().
+
+\mbox{\Hypertarget{classVisualProprioception_acc3edbcc142167ccd748b1953fd08983}\label{classVisualProprioception_acc3edbcc142167ccd748b1953fd08983}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!port\+\_\+torso\+\_\+enc\+\_\+@{port\+\_\+torso\+\_\+enc\+\_\+}}
+\index{port\+\_\+torso\+\_\+enc\+\_\+@{port\+\_\+torso\+\_\+enc\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{port\+\_\+torso\+\_\+enc\+\_\+}{port\_torso\_enc\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::os\+::\+Bottle$>$ Visual\+Proprioception\+::port\+\_\+torso\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 68 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by read\+Torso().
+
+\mbox{\Hypertarget{classVisualProprioception_abf67fe6231fc4ecb742ccf9995169e62}\label{classVisualProprioception_abf67fe6231fc4ecb742ccf9995169e62}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!resolution\+\_\+ratio\+\_\+@{resolution\+\_\+ratio\+\_\+}}
+\index{resolution\+\_\+ratio\+\_\+@{resolution\+\_\+ratio\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{resolution\+\_\+ratio\+\_\+}{resolution\_ratio\_}}
+{\footnotesize\ttfamily double Visual\+Proprioception\+::resolution\+\_\+ratio\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 105 of file Visual\+Proprioception.\+h.
+
+\mbox{\Hypertarget{classVisualProprioception_aba826482fa47277e17277ab6b82b8039}\label{classVisualProprioception_aba826482fa47277e17277ab6b82b8039}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!right\+\_\+hand\+\_\+analogs\+\_\+bounds\+\_\+@{right\+\_\+hand\+\_\+analogs\+\_\+bounds\+\_\+}}
+\index{right\+\_\+hand\+\_\+analogs\+\_\+bounds\+\_\+@{right\+\_\+hand\+\_\+analogs\+\_\+bounds\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{right\+\_\+hand\+\_\+analogs\+\_\+bounds\+\_\+}{right\_hand\_analogs\_bounds\_}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Matrix Visual\+Proprioception\+::right\+\_\+hand\+\_\+analogs\+\_\+bounds\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 72 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by seti\+Cub\+Params().
+
+\mbox{\Hypertarget{classVisualProprioception_aac9aae5f3844b662bd2918273d850120}\label{classVisualProprioception_aac9aae5f3844b662bd2918273d850120}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!si\+\_\+cad\+\_\+@{si\+\_\+cad\+\_\+}}
+\index{si\+\_\+cad\+\_\+@{si\+\_\+cad\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{si\+\_\+cad\+\_\+}{si\_cad\_}}
+{\footnotesize\ttfamily S\+I\+C\+AD$\ast$ Visual\+Proprioception\+::si\+\_\+cad\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 110 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+O\+G\+L\+Tiles\+Cols(), get\+O\+G\+L\+Tiles\+Number(), get\+O\+G\+L\+Tiles\+Rows(), observe(), and operator=().
+
+\mbox{\Hypertarget{classVisualProprioception_a86e0db2eddb88029d98fdc5b4e31dc02}\label{classVisualProprioception_a86e0db2eddb88029d98fdc5b4e31dc02}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!use\+\_\+forearm\+\_\+@{use\+\_\+forearm\+\_\+}}
+\index{use\+\_\+forearm\+\_\+@{use\+\_\+forearm\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{use\+\_\+forearm\+\_\+}{use\_forearm\_}}
+{\footnotesize\ttfamily bool Visual\+Proprioception\+::use\+\_\+forearm\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 108 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+Model\+Pose().
+
+\mbox{\Hypertarget{classVisualProprioception_a1c25db32433ee1965a74b3b1af8a4f97}\label{classVisualProprioception_a1c25db32433ee1965a74b3b1af8a4f97}} 
+\index{Visual\+Proprioception@{Visual\+Proprioception}!use\+\_\+thumb\+\_\+@{use\+\_\+thumb\+\_\+}}
+\index{use\+\_\+thumb\+\_\+@{use\+\_\+thumb\+\_\+}!Visual\+Proprioception@{Visual\+Proprioception}}
+\subsubsection{\texorpdfstring{use\+\_\+thumb\+\_\+}{use\_thumb\_}}
+{\footnotesize\ttfamily bool Visual\+Proprioception\+::use\+\_\+thumb\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 107 of file Visual\+Proprioception.\+h.
+
+
+
+Referenced by get\+Model\+Pose().
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/include/\hyperlink{VisualProprioception_8h}{Visual\+Proprioception.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/src/\hyperlink{VisualProprioception_8cpp}{Visual\+Proprioception.\+cpp}\end{DoxyCompactItemize}

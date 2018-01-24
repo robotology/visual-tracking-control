@@ -1,0 +1,56 @@
+\hypertarget{index_overview}{}\section{Overview}\label{index_overview}
+The {\bfseries visual-\/tracking-\/control} project is a {\itshape suite} of cross-\/platform applications for visual tracking and visual servoing for the humanoid robot platform i\+Cub.
+
+The suite includes\+:
+\begin{DoxyItemize}
+\item {\bfseries hand-\/tracking}\+: a visual end-\/effector tracker using a 3D model-\/aided particle filter \href{https://arxiv.org/abs/1703.04771}{\tt \mbox{[}1\mbox{]}};
+\item {\bfseries visual-\/servoing}\+: a visual servoing {\ttfamily Y\+A\+RP} plugin to control the pose (position and orientation) of the end-\/effector using image feedback \href{https://arxiv.org/abs/1710.04465}{\tt \mbox{[}2\mbox{]}}.
+\begin{DoxyItemize}
+\item The {\ttfamily visual-\/servoing} consist of two plugins, a client and server version. On one hand, the server must be always running via {\ttfamily yarpdev} and is responsible to command the robot. On the other hand, the client is dynamically loaded by any application using visual servoing interfaces and has the sole purpose of communicating commands to the server. This architecture enable distributed computation over different machine and decouples client and server implementations.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+The output of the hand-\/tracking application can be visualized by means of the \href{https://github.com/claudiofantacci/iCubProprioception}{\tt i\+Cub\+Proprioception} module. i\+Cub\+Proprioception provides an augmented-\/reality application which superimposes the 3D model of the end-\/effector onto the camera images, using the estimated pose provided by hand-\/tracking.
+
+\href{https://robotology.github.io/visual-tracking-control/doxygen/doc/html/index.html}{\tt }\hypertarget{index_dependencies}{}\section{🎛 Dependencies}\label{index_dependencies}
+
+
+ visual-\/tracking-\/control suite depends on
+\begin{DoxyItemize}
+\item \href{https://github.com/robotology/bayes-filters-lib}{\tt Bayes\+Filters} -\/ {\ttfamily version $>$= 0.\+6}
+\item \href{https://github.com/robotology/icub-main}{\tt i\+Cub}
+\item \href{https://github.com/robotology/icub-contrib-common}{\tt i\+Cub\+Contrib}
+\item \href{http://opencv.org}{\tt Open\+CV} -\/ {\ttfamily version $>$= 3.\+3}, built with {\ttfamily C\+U\+DA $>$= 8.\+0}
+\item \href{https://github.com/robotology/superimpose-mesh-lib}{\tt Superimpose\+Mesh} -\/ {\ttfamily version $>$= 0.\+9}
+\item \href{http://www.yarp.it}{\tt Y\+A\+RP}
+\end{DoxyItemize}\hypertarget{index_build-the-suite}{}\section{🔨 Build the suite}\label{index_build-the-suite}
+
+
+ Use the following commands to build, install and link the library.\hypertarget{index_build}{}\subsection{Build}\label{index_build}
+With {\ttfamily make} facilities\+: 
+\begin{DoxyCode}
+$ git clone https://github.com/robotology/visual-tracking-control
+$ cd visual-tracking-control
+$ mkdir build && cd build
+$ cmake -DBUILD\_HAND\_TRACKING=ON -DBUILD\_VISUAL\_SERVOING\_CLIENT=ON -DBUILD\_VISUAL\_SERVOING\_SERVER=ON ..
+$ make
+$ [sudo] make install
+\end{DoxyCode}
+
+
+With I\+DE build tool facilities\+: 
+\begin{DoxyCode}
+$ git clone https://github.com/robotology/visual-tracking-control
+$ cd visual-tracking-control
+$ mkdir build && cd build
+$ cmake -DBUILD\_HAND\_TRACKING=ON -DBUILD\_VISUAL\_SERVOING\_CLIENT=ON -DBUILD\_VISUAL\_SERVOING\_SERVER=ON ..
+$ cmake --build . --target ALL\_BUILD --config Release
+$ cmake --build . --target INSTALL --config Release
+\end{DoxyCode}
+\hypertarget{index_references}{}\section{📑 References}\label{index_references}
+
+
+
+
+\mbox{[}1\mbox{]} C. Fantacci, U. Pattacini, V. Tikhanoff and L. Natale, \char`\"{}\+Visual end-\/effector tracking using a 3\+D model-\/aided particle filter for humanoid robot platforms\char`\"{}, I\+E\+E\+E/\+R\+SJ International Conference on Intelligent Robots and Systems (I\+R\+OS), Vancouver, BC, Canada, 2017. {\itshape ar\+Xiv preprint \href{https://arxiv.org/abs/1703.04771}{\tt ar\+Xiv\+:1703.\+04771}}.~\newline
+ \mbox{[}2\mbox{]} C. Fantacci, G. Vezzani, U. Pattacini, V. Tikhanoff and L. Natale, \char`\"{}\+Markerless visual servoing on unknown objects for humanoid robot platforms\char`\"{}, I\+E\+EE International Conference on Robotics and Automation (I\+C\+RA), Brisbane, AU, 2018. {\itshape ar\+Xiv preprint \href{https://arxiv.org/abs/1710.04465}{\tt ar\+Xiv\+:1710.\+04465}}. 

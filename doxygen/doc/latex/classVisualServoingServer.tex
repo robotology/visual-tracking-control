@@ -1,0 +1,2450 @@
+\hypertarget{classVisualServoingServer}{}\section{Visual\+Servoing\+Server Class Reference}
+\label{classVisualServoingServer}\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+
+
+{\ttfamily \#include $<$Visual\+Servoing\+Server.\+h$>$}
+
+
+
+Inheritance diagram for Visual\+Servoing\+Server\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classVisualServoingServer__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classVisualServoingServer_a35df4de4c8cdb167b3eb15403beae653}{Visual\+Servoing\+Server} ()
+\item 
+\hyperlink{classVisualServoingServer_abb0f23eae68c9f453a5d66051744cadf}{$\sim$\+Visual\+Servoing\+Server} ()
+\item 
+bool \hyperlink{classVisualServoingServer_a0698977ddac02801eba3c35b47b9aa19}{open} (yarp\+::os\+::\+Searchable \&config) override
+\item 
+bool \hyperlink{classVisualServoingServer_ad9679d0bc524de74f4e96a1e8be23ca0}{close} () override
+\item 
+bool \hyperlink{classVisualServoingServer_a136cfac8840eda92c012851149b8624a}{init\+Facilities} (const bool use\+\_\+direct\+\_\+kin) override
+\item 
+bool \hyperlink{classVisualServoingServer_a39ea1de5ec159bd6779929c2bff84450}{reset\+Facilities} () override
+\item 
+bool \hyperlink{classVisualServoingServer_a0cd7a77750df9c1faaf1a18be6305de9}{stop\+Facilities} () override
+\item 
+bool \hyperlink{classVisualServoingServer_a085bb298e50f295d670bff6e4cb808d8}{go\+To\+Goal} (const yarp\+::sig\+::\+Vector \&vec\+\_\+x, const yarp\+::sig\+::\+Vector \&vec\+\_\+o) override
+\item 
+bool \hyperlink{classVisualServoingServer_a40ab9e9804793a58243077f31a2d79a4}{go\+To\+Goal} (const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&vec\+\_\+px\+\_\+l, const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&vec\+\_\+px\+\_\+r) override
+\item 
+bool \hyperlink{classVisualServoingServer_a6adf93e234e936879efe30cb9788b7ad}{set\+Modality} (const std\+::string \&mode) override
+\item 
+bool \hyperlink{classVisualServoingServer_a4a3ab24e71fed8052b04a9775cc86764}{set\+Visual\+Servo\+Control} (const std\+::string \&control) override
+\item 
+bool \hyperlink{classVisualServoingServer_a437c76c0ac9751cab05c76cd1f571d9b}{set\+Control\+Point} (const yarp\+::os\+::\+Const\+String \&point) override
+\item 
+bool \hyperlink{classVisualServoingServer_a66db1dfa1ebde34ada94bc36248e2ec8}{get\+Visual\+Servoing\+Info} (yarp\+::os\+::\+Bottle \&info) override
+\item 
+bool \hyperlink{classVisualServoingServer_ad632db85663df2f8c7ca5c27eaacfd71}{set\+Go\+To\+Goal\+Tolerance} (const double tol=15.\+0) override
+\item 
+bool \hyperlink{classVisualServoingServer_afa417f05dd02d2e91ff2c848f082a33b}{check\+Visual\+Servoing\+Controller} () override
+\item 
+bool \hyperlink{classVisualServoingServer_a3b462062db0cdcf3c8777469376bb5b6}{wait\+Visual\+Servoing\+Done} (const double period=0.\+1, const double timeout=0.\+0) override
+\item 
+bool \hyperlink{classVisualServoingServer_a4a21e5698a1d3b8db7c82772252bd215}{stop\+Controller} () override
+\item 
+bool \hyperlink{classVisualServoingServer_ab995d07572eb6e1103c73cc190c00e4a}{set\+Translation\+Gain} (const double K\+\_\+x\+\_\+1=1.\+0, const double K\+\_\+x\+\_\+2=0.\+25) override
+\item 
+bool \hyperlink{classVisualServoingServer_aa9b4b1b69b8600d7eac62a66af483bdb}{set\+Max\+Translation\+Velocity} (const double max\+\_\+x\+\_\+dot) override
+\item 
+bool \hyperlink{classVisualServoingServer_a5274182a8ff476c6b734ddf7cc78bef2}{set\+Translation\+Gain\+Switch\+Tolerance} (const double K\+\_\+x\+\_\+tol=30.\+0) override
+\item 
+bool \hyperlink{classVisualServoingServer_afb7ac6f85a55f928aa75134ba0ad1d79}{set\+Orientation\+Gain} (const double K\+\_\+x\+\_\+1=1.\+5, const double K\+\_\+x\+\_\+2=0.\+375) override
+\item 
+bool \hyperlink{classVisualServoingServer_a9f93de2ddb7818555bebad9ad0705029}{set\+Max\+Orientation\+Velocity} (const double max\+\_\+o\+\_\+dot) override
+\item 
+bool \hyperlink{classVisualServoingServer_a5a32f1ee99bff8b8a34d3825c30ffffc}{set\+Orientation\+Gain\+Switch\+Tolerance} (const double K\+\_\+o\+\_\+tol=30.\+0) override
+\item 
+std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_acc8932e08714c503ba6cfda11461976e}{get3\+D\+Goal\+Positions\+From3\+D\+Pose} (const yarp\+::sig\+::\+Vector \&x, const yarp\+::sig\+::\+Vector \&o) override
+\item 
+std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a9d35a09c55cc8c059dc7bdbeeed8cfb1}{get\+Goal\+Pixels\+From3\+D\+Pose} (const yarp\+::sig\+::\+Vector \&x, const yarp\+::sig\+::\+Vector \&o, const Cam\+Sel \&cam) override
+\item 
+bool \hyperlink{classVisualServoingServer_abf97ec3877e208f4e889a094298a1e1a}{stored\+Init} (const std\+::string \&label) override
+\item 
+bool \hyperlink{classVisualServoingServer_a6d6ec7fee5b76d8a59d75a626b1bd11b}{stored\+Go\+To\+Goal} (const std\+::string \&label) override
+\item 
+bool \hyperlink{classVisualServoingServer_a6d051da5da8c07b0e0879d5af50a248f}{go\+To\+S\+F\+M\+Goal} () override
+\item 
+virtual bool \hyperlink{classVisualServoingIDL_a75929f915651161c43ed032e9f69a361}{go\+\_\+to\+\_\+px\+\_\+goal} (const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&vec\+\_\+px\+\_\+l, const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&vec\+\_\+px\+\_\+r)
+\begin{DoxyCompactList}\small\item\em Set the goal points on both left and right camera image plane and start visual servoing. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a97106bf829447896de03680d78b960a5}{read} (yarp\+::os\+::\+Connection\+Reader \&connection) override
+\item 
+virtual std\+::vector$<$ std\+::string $>$ \hyperlink{classVisualServoingIDL_a99974ef8858179f14e2762c2d7bf4ed5}{help} (const std\+::string \&function\+Name=\char`\"{}-\/-\/all\char`\"{})
+\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3}{Visual\+Servo\+Control} \{ \hyperlink{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a8c5f04f9df63b44bea9b7edcb4dd1038}{Visual\+Servo\+Control\+::decoupled}, 
+\hyperlink{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a00bd624b5b21d2b07edf398c1ce98b5e}{Visual\+Servo\+Control\+::robust}, 
+\hyperlink{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a7949e6c02de2124dcdddd71b5430b8f0}{Visual\+Servo\+Control\+::cartesian}
+ \}
+\item 
+enum \hyperlink{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0e}{Pixel\+Control\+Mode} \{ \hyperlink{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0eaa181a603769c1f98ad927e7367c7aa51}{Pixel\+Control\+Mode\+::all}, 
+\hyperlink{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0ea9dd4e461268c8034f5c8564e155c67a6}{Pixel\+Control\+Mode\+::x}, 
+\hyperlink{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0ead95679752134a2d9eb61dbd7b91c4bcc}{Pixel\+Control\+Mode\+::o}
+ \}
+\item 
+enum \hyperlink{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915}{Operating\+Mode} \{ \hyperlink{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915a4757fe07fd492a8be0ea6a760d683d6e}{Operating\+Mode\+::position}, 
+\hyperlink{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915ada1639422ad8f355d2371428471379b5}{Operating\+Mode\+::orientation}, 
+\hyperlink{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915a2d5f8ae9328c6535be72ed28bff47560}{Operating\+Mode\+::pose}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classVisualServoingServer_a4f23c649522804e21c7e60655a5dad99}{before\+Start} () override
+\item 
+bool \hyperlink{classVisualServoingServer_aa8673d3ac18d4aa4be94e8354ef0bad5}{thread\+Init} () override
+\item 
+void \hyperlink{classVisualServoingServer_a2397c1d1c5a5c65d1851075947f61f7e}{run} () override
+\item 
+void \hyperlink{classVisualServoingServer_ae6977911d131001eb4c9a07b83495518}{after\+Start} (bool success) override
+\item 
+void \hyperlink{classVisualServoingServer_a1401f7ee34d88728dd103439b25f9cf5}{on\+Stop} () override
+\item 
+void \hyperlink{classVisualServoingServer_a65744a18718c014e19f882dc1052a517}{thread\+Release} () override
+\item 
+bool \hyperlink{classVisualServoingServer_ad3668e0fc8818f9d2827bbc50087d353}{init\+\_\+facilities} (const bool use\+\_\+direct\+\_\+kin) override
+\begin{DoxyCompactList}\small\item\em Initialize support modules and connections to perform a visual servoing task. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_ae397fa9823f425fccf2837122629383f}{reset\+\_\+facilities} () override
+\begin{DoxyCompactList}\small\item\em Reset support modules and connections to perform the current initialized visual servoing task. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_ae5e4ac8d334374f2de259a530781443b}{stop\+\_\+facilities} () override
+\begin{DoxyCompactList}\small\item\em Stop and disconnect support modules and connections used for visual servoing. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a6b68da9fe211a5779fc7a24e406dc8f0}{go\+\_\+to\+\_\+px\+\_\+goal} (const std\+::vector$<$ std\+::vector$<$ double $>$$>$ \&vec\+\_\+px\+\_\+l, const std\+::vector$<$ std\+::vector$<$ double $>$$>$ \&vec\+\_\+px\+\_\+r) override
+\item 
+bool \hyperlink{classVisualServoingServer_a77f26ac40c67d7a9b7e4ad7840532681}{go\+\_\+to\+\_\+pose\+\_\+goal} (const std\+::vector$<$ double $>$ \&vec\+\_\+x, const std\+::vector$<$ double $>$ \&vec\+\_\+o) override
+\begin{DoxyCompactList}\small\item\em Set the goal point (3D for the position + 4D axis-\/angle for the orientation) and start visual servoing. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a6d9ec4489caebf0a52b2e5ee149aeb6d}{set\+\_\+modality} (const std\+::string \&mode) override
+\begin{DoxyCompactList}\small\item\em Set visual servoing operating mode between\+: \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a2f28e67b1dd44d9afba4a79fd89f4bc8}{set\+\_\+visual\+\_\+servo\+\_\+control} (const std\+::string \&control) override
+\begin{DoxyCompactList}\small\item\em Set visual servo control law between\+: \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a4a20a08fec9cfa4765e1245cfce5f9a8}{set\+\_\+control\+\_\+point} (const std\+::string \&point) override
+\begin{DoxyCompactList}\small\item\em Set the point controlled during visual servoing. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::string $>$ \hyperlink{classVisualServoingServer_af085e2c5d4c4cfe940b3564b4ba69af6}{get\+\_\+visual\+\_\+servoing\+\_\+info} () override
+\begin{DoxyCompactList}\small\item\em Return useful information for visual servoing. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a0efdb8edb2e4b91dc3168b5051b27f56}{set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance} (const double tol) override
+\begin{DoxyCompactList}\small\item\em Set visual servoing goal tolerance. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a17a9b2913815c52b5a1bd2fd84d9f18e}{check\+\_\+visual\+\_\+servoing\+\_\+controller} () override
+\begin{DoxyCompactList}\small\item\em Check once whether the visual servoing controller is running or not. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_afcd501bb1d5070e8a0735f422a4c9ac0}{wait\+\_\+visual\+\_\+servoing\+\_\+done} (const double period, const double timeout) override
+\begin{DoxyCompactList}\small\item\em Wait until visual servoing reaches the goal. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_ac8d5b33c4ae61707e121c5154a973ab8}{stop\+\_\+controller} () override
+\begin{DoxyCompactList}\small\item\em Ask for an immediate stop of the visual servoing controller. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a66324b38d90efb1e68cdfff9fd969487}{set\+\_\+translation\+\_\+gain} (const double K\+\_\+x\+\_\+1, const double K\+\_\+x\+\_\+2) override
+\begin{DoxyCompactList}\small\item\em Set the translation gains of the visual servoing control algorithm. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a393d1a1d1a7a68fc2098a7c7e8724cc9}{set\+\_\+max\+\_\+translation\+\_\+velocity} (const double max\+\_\+x\+\_\+dot) override
+\begin{DoxyCompactList}\small\item\em Set the maximum translation velocity of the visual servoing control algorithm (same for each axis). \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a280690a55037cfaaacd39ca95470a507}{set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance} (const double K\+\_\+x\+\_\+tol) override
+\begin{DoxyCompactList}\small\item\em Set the tolerance, in pixels, at which the translation control law swithces its gain value. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a19bdb0b44a8b556bad599dc03fca5f3f}{set\+\_\+orientation\+\_\+gain} (const double K\+\_\+o\+\_\+1, const double K\+\_\+o\+\_\+2) override
+\begin{DoxyCompactList}\small\item\em Set the orientation gains of the visual servoing control algorithm. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_aa3226ef2de2c1743e67788d1bff60679}{set\+\_\+max\+\_\+orientation\+\_\+velocity} (const double max\+\_\+o\+\_\+dot) override
+\begin{DoxyCompactList}\small\item\em Set the maximum angular velocity of the axis-\/angle velocity vector of the visual servoing control algorithm. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a7d8c034f8a133f13ba9b4060ebcaf4bb}{set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance} (const double K\+\_\+o\+\_\+tol) override
+\begin{DoxyCompactList}\small\item\em Set the tolerance, in pixels, at which the orientation control law swithces its gain value. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{classVisualServoingServer_a542e0a6bf6158563a601740363911474}{get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose} (const std\+::vector$<$ double $>$ \&x, const std\+::vector$<$ double $>$ \&o) override
+\begin{DoxyCompactList}\small\item\em Helper function\+: extract four Cartesian points lying on the plane defined by the frame o in the position x relative to the robot base frame. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{classVisualServoingServer_aaa84d7964120ee1056f422dc2d5eb070}{get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose} (const std\+::vector$<$ double $>$ \&x, const std\+::vector$<$ double $>$ \&o, const std\+::string \&cam) override
+\begin{DoxyCompactList}\small\item\em Helper function\+: extract four 2D pixel points lying on the plane defined by the frame o in the position x relative to the robot base frame. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_ac438c7abfb838df458f85e250ead3222}{quit} () override
+\begin{DoxyCompactList}\small\item\em Gently close the visual servoing device, deallocating resources. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_aded37e0e0111c40fe5f869b16bb1f799}{stored\+\_\+init} (const std\+::string \&label) override
+\begin{DoxyCompactList}\small\item\em Initialize the robot to an initial position. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a1c5018056e6a7db492cc6b1418f8d1e5}{stored\+\_\+go\+\_\+to\+\_\+goal} (const std\+::string \&label) override
+\begin{DoxyCompactList}\small\item\em Set the robot visual servoing goal. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualServoingServer_a3b0e5078c2f32493a2ef31ea32450d80}{get\+\_\+goal\+\_\+from\+\_\+sfm} () override
+\begin{DoxyCompactList}\small\item\em Get goal point from S\+FM module. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classVisualServoingServer_a79aafac31c32f2028836e1ef0f69dd99}{decoupled\+Image\+Based\+Visual\+Servo\+Control} ()
+\item 
+void \hyperlink{classVisualServoingServer_a34576cda7f4ed36dfae809a48f364d2b}{robust\+Image\+Based\+Visual\+Servo\+Control} ()
+\item 
+void \hyperlink{classVisualServoingServer_a9ad2bd94ff95fde9e309c4fb62de7377}{cartesian\+Position\+Based\+Visual\+Servo\+Control} ()
+\item 
+bool \hyperlink{classVisualServoingServer_a080585bc03f073b70a10bcdd6b36b309}{set\+Right\+Arm\+Cartesian\+Controller} ()
+\item 
+bool \hyperlink{classVisualServoingServer_a1cea1b6c32f9719cd63c36224fc1b9d2}{set\+Gaze\+Controller} ()
+\item 
+bool \hyperlink{classVisualServoingServer_a27c26de8415dee1c3165edd1e1d362a2}{set\+Command\+Port} ()
+\item 
+bool \hyperlink{classVisualServoingServer_a9e031793c83063b80035f8769d28a99f}{set\+Torso\+D\+OF} ()
+\item 
+bool \hyperlink{classVisualServoingServer_a509750822f0f1e0db26d54288f8eb1fd}{unset\+Torso\+D\+OF} ()
+\item 
+std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a04f3caed0ac350b3579efeb4cd548eb8}{get\+Pixels\+From\+Pose} (const yarp\+::sig\+::\+Vector \&pose, const Cam\+Sel \&cam)
+\item 
+std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a67bfc714271a28bf55fa49c89019b53c}{get\+Control\+Pixels\+From\+Pose} (const yarp\+::sig\+::\+Vector \&pose, const Cam\+Sel \&cam, const \hyperlink{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0e}{Pixel\+Control\+Mode} \&mode)
+\item 
+std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_ac9e6020f30b6df05db3fc34a44fee0d4}{get\+Control\+Points\+From\+Pose} (const yarp\+::sig\+::\+Vector \&pose)
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualServoingServer_a997029621c723c1e9962b35a917167cc}{get\+Pixel\+From\+Point} (const Cam\+Sel \&cam, const yarp\+::sig\+::\+Vector \&p) const
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualServoingServer_a43cf45e933a71214cfb4d8248005761e}{get\+Control\+Pixel\+From\+Point} (const Cam\+Sel \&cam, const yarp\+::sig\+::\+Vector \&p) const
+\item 
+void \hyperlink{classVisualServoingServer_ad5334ed717f373cfbd40290824d9ed1f}{get\+Current\+Stereo\+Features\+And\+Jacobian} (const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&left\+\_\+px, const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&right\+\_\+px, yarp\+::sig\+::\+Vector \&features, yarp\+::sig\+::\+Matrix \&jacobian)
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualServoingServer_a3aa225c2c4f417c4ea7dd27e9b6d0c8a}{get\+JacobianU} (const Cam\+Sel \&cam, const yarp\+::sig\+::\+Vector \&px)
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualServoingServer_a51667642f6d882df082f79ec01111181}{get\+JacobianV} (const Cam\+Sel \&cam, const yarp\+::sig\+::\+Vector \&px)
+\item 
+bool \hyperlink{classVisualServoingServer_a141036fb33bfb74199691ad444b29082}{set\+Camera\+Transformations} ()
+\item 
+bool \hyperlink{classVisualServoingServer_a53616791e66a24c1131e2cb3a3634a6d}{set\+Pose\+Goal} (const yarp\+::sig\+::\+Vector \&goal\+\_\+x, const yarp\+::sig\+::\+Vector \&goal\+\_\+o)
+\item 
+bool \hyperlink{classVisualServoingServer_aea96fc77c6255e0826bd17190214a29b}{set\+Pixel\+Goal} (const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&l\+\_\+px\+\_\+goal, const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&r\+\_\+px\+\_\+goal)
+\item 
+void \hyperlink{classVisualServoingServer_abe1d3c25e81378f9a1a834d64cf0c496}{backproc\+\_\+\+Update\+Visual\+Servoing\+Paramters} ()
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualServoingServer_a66e3aaa742d5b0d23a6d3a33a800c088}{average\+Pose} (const yarp\+::sig\+::\+Vector \&l\+\_\+pose, const yarp\+::sig\+::\+Vector \&r\+\_\+pose) const
+\item 
+bool \hyperlink{classVisualServoingServer_a6201a672d3efe497dd0114df50aee4d7}{check\+Visual\+Servoing\+Status} (const yarp\+::sig\+::\+Vector \&px\+\_\+cur, const double tol)
+\item 
+bool \hyperlink{classVisualServoingServer_afbcab623f48e3d2e648e144e22df4f19}{check\+Visual\+Servoing\+Status} (const yarp\+::sig\+::\+Vector \&pose\+\_\+cur, const double tol\+\_\+position, const double tol\+\_\+orientation, const double tol\+\_\+angle)
+\item 
+void \hyperlink{classVisualServoingServer_a6b16f76335ebbd9e4ba9e5ddb67cf883}{y\+Info\+Verbose} (const yarp\+::os\+::\+Const\+String \&str) const
+\item 
+void \hyperlink{classVisualServoingServer_a570985820c386689a9507066a016b839}{y\+Warning\+Verbose} (const yarp\+::os\+::\+Const\+String \&str) const
+\item 
+void \hyperlink{classVisualServoingServer_a8eb3cf6c73a515f6f435f01327d37bd1}{y\+Error\+Verbose} (const yarp\+::os\+::\+Const\+String \&str) const
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualServoingServer_adcc6db0a6cf857c4bd44d495ec445954}{std\+Vector\+Of\+Vectors\+To\+Vector} (const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&vectors)
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classVisualServoingServer_a559b6106818be3b9c48352b614e658c7}{verbosity\+\_\+} = false
+\item 
+bool \hyperlink{classVisualServoingServer_ad847ce0f5480013481f037bc554ae96e}{sim\+\_\+} = false
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classVisualServoingServer_adb8cccbe6de08ec4b686d2eca8a99dfd}{robot\+\_\+name\+\_\+} = \char`\"{}icub\char`\"{}
+\item 
+\hyperlink{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3}{Visual\+Servo\+Control} \hyperlink{classVisualServoingServer_ac8da8eea9620e8cce4ba2502bb1ec86a}{vs\+\_\+control\+\_\+} = \hyperlink{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a8c5f04f9df63b44bea9b7edcb4dd1038}{Visual\+Servo\+Control\+::decoupled}
+\item 
+\hyperlink{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915}{Operating\+Mode} \hyperlink{classVisualServoingServer_af6b808cf1ef56df5fb432196335e1ceb}{op\+\_\+mode\+\_\+} = \hyperlink{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915a2d5f8ae9328c6535be72ed28bff47560}{Operating\+Mode\+::pose}
+\item 
+yarp\+::dev\+::\+Poly\+Driver \hyperlink{classVisualServoingServer_a46e47b0abc5b52fbba314cf9c2ce0df5}{rightarm\+\_\+cartesian\+\_\+driver\+\_\+}
+\item 
+yarp\+::dev\+::\+I\+Cartesian\+Control $\ast$ \hyperlink{classVisualServoingServer_a62c8f5c6ba2d62db4754d94984b98632}{itf\+\_\+rightarm\+\_\+cart\+\_\+}
+\item 
+yarp\+::dev\+::\+Poly\+Driver \hyperlink{classVisualServoingServer_a5da42a79826f631e1e40b723e3620c0a}{gaze\+\_\+driver\+\_\+}
+\item 
+yarp\+::dev\+::\+I\+Gaze\+Control $\ast$ \hyperlink{classVisualServoingServer_ac884095733af31af336373edbe09eae3}{itf\+\_\+gaze\+\_\+}
+\item 
+bool \hyperlink{classVisualServoingServer_aeb48fa3b045d9fb074b03ea9d8441972}{vs\+\_\+control\+\_\+running\+\_\+} = false
+\item 
+bool \hyperlink{classVisualServoingServer_aae9c2aa802fa83d8b77b5094af94fa38}{vs\+\_\+goal\+\_\+reached\+\_\+} = false
+\item 
+const double \hyperlink{classVisualServoingServer_a48bcc91d15c80f7b3b248fa205e8e3de}{Ts\+\_\+} = 0.\+1
+\item 
+std\+::array$<$ double, 2 $>$ \hyperlink{classVisualServoingServer_a6153b1e315817cf41cb36b7deca83be7}{K\+\_\+x\+\_\+} = \{\{0.\+5, 0.\+25\}\}
+\item 
+std\+::array$<$ double, 2 $>$ \hyperlink{classVisualServoingServer_a5a7eaa18a77566e129a325e556691e24}{K\+\_\+o\+\_\+} = \{\{3.\+5, 0.\+5\}\}
+\item 
+double \hyperlink{classVisualServoingServer_a82df6acf27455af727ce31758856ee48}{max\+\_\+x\+\_\+dot\+\_\+} = 0.\+035
+\item 
+double \hyperlink{classVisualServoingServer_a2fb091edd86b425b79b36c968a0929e1}{max\+\_\+o\+\_\+dot\+\_\+} = 10.\+0 $\ast$ M\+\_\+\+PI / 180.\+0
+\item 
+double \hyperlink{classVisualServoingServer_aa59bfed390207a42a4a05dd1fe720f6b}{K\+\_\+x\+\_\+tol\+\_\+} = 10.\+0
+\item 
+double \hyperlink{classVisualServoingServer_ab372aee55fa6ffb7d87d0f9103ea3266}{K\+\_\+o\+\_\+tol\+\_\+} = 10.\+0
+\item 
+double \hyperlink{classVisualServoingServer_aaef2ff3c3853c7a73bc620225f824e4e}{K\+\_\+position\+\_\+tol\+\_\+} = 0.\+03
+\item 
+double \hyperlink{classVisualServoingServer_ab1c7e6dbab2608694d520e849da043f8}{K\+\_\+orientation\+\_\+tol\+\_\+} = 9.\+0 $\ast$ M\+\_\+\+PI / 180.\+0
+\item 
+double \hyperlink{classVisualServoingServer_a3eaf0fc5ef519ebb94fc89f3a1e490a2}{K\+\_\+angle\+\_\+tol\+\_\+} = 3.\+0 $\ast$ M\+\_\+\+PI / 180.\+0
+\item 
+bool \hyperlink{classVisualServoingServer_a8b8f0cda1bb882c1783db88b720b5597}{K\+\_\+x\+\_\+hysteresis\+\_\+} = false
+\item 
+bool \hyperlink{classVisualServoingServer_a19e92e42912ae3f4d784d80465ed55b1}{K\+\_\+o\+\_\+hysteresis\+\_\+} = false
+\item 
+bool \hyperlink{classVisualServoingServer_a4fdd46d1c8be0e8eb8b28af84cfe8a6b}{K\+\_\+pose\+\_\+hysteresis\+\_\+} = false
+\item 
+double \hyperlink{classVisualServoingServer_a74ac88af1fee404c750afb59fad98fc6}{tol\+\_\+px\+\_\+} = 1.\+0
+\item 
+double \hyperlink{classVisualServoingServer_ab2cc91975c9a3f949a99fd6737a2b3bd}{tol\+\_\+position\+\_\+} = 0.\+01
+\item 
+double \hyperlink{classVisualServoingServer_a2ebbd8cf0f5bf0968bb574fbadb681e8}{tol\+\_\+orientation\+\_\+} = 3.\+0 $\ast$ M\+\_\+\+PI / 180.\+0
+\item 
+double \hyperlink{classVisualServoingServer_a8a39a62f89dc07cbfbdc91441ad71975}{tol\+\_\+angle\+\_\+} = 1.\+0 $\ast$ M\+\_\+\+PI / 180.\+0
+\item 
+double \hyperlink{classVisualServoingServer_ac397cdbba97a35d454ab2974db0c5005}{traj\+\_\+time\+\_\+} = 1.\+0
+\item 
+yarp\+::sig\+::\+Matrix \hyperlink{classVisualServoingServer_a19525066e8d98f781f28600ff526ce68}{l\+\_\+proj\+\_\+}
+\item 
+yarp\+::sig\+::\+Matrix \hyperlink{classVisualServoingServer_a5bd4d326f2247a39065747e937246677}{r\+\_\+proj\+\_\+}
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualServoingServer_aadfea10f7ca8a2e745c4091d2a1b7c46}{goal\+\_\+pose\+\_\+} = yarp\+::math\+::zeros(7)
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classVisualServoingServer_a26d45260d6b8e1e17c57bf339890c124}{px\+\_\+des\+\_\+} = yarp\+::math\+::zeros(16)
+\item 
+yarp\+::sig\+::\+Matrix \hyperlink{classVisualServoingServer_afbf7be0f4c935dcbcd8a23b07b7972ba}{l\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+} = yarp\+::math\+::zeros(4, 4)
+\item 
+yarp\+::sig\+::\+Matrix \hyperlink{classVisualServoingServer_a5de06681532722dae98703c4d3e60ba1}{r\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+} = yarp\+::math\+::zeros(4, 4)
+\item 
+yarp\+::sig\+::\+Matrix \hyperlink{classVisualServoingServer_a43b53260b0903efb5479becf664f33ae}{l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+} = yarp\+::math\+::zeros(4, 4)
+\item 
+yarp\+::sig\+::\+Matrix \hyperlink{classVisualServoingServer_a82bdf1e87c5f65bbbea97655a78fceb6}{r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+} = yarp\+::math\+::zeros(4, 4)
+\item 
+std\+::mutex \hyperlink{classVisualServoingServer_a63758b38bb0069515d047449aafc9597}{mtx\+\_\+px\+\_\+des\+\_\+}
+\item 
+std\+::mutex \hyperlink{classVisualServoingServer_a379f8205d854495f481bbaa37825dfcb}{mtx\+\_\+\+H\+\_\+eye\+\_\+cam\+\_\+}
+\item 
+std\+::thread $\ast$ \hyperlink{classVisualServoingServer_a01078c56ef8966f186d5cbf22c8c1c0c}{thr\+\_\+background\+\_\+update\+\_\+params\+\_\+}
+\item 
+std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a3f7efc9e5a4bbb030a4dd81030643398}{l\+\_\+px\+\_\+goal\+\_\+} = std\+::vector$<$yarp\+::sig\+::\+Vector$>$(4)
+\item 
+std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a831ffb606b1ff70d0475b645441f469d}{r\+\_\+px\+\_\+goal\+\_\+} = std\+::vector$<$yarp\+::sig\+::\+Vector$>$(4)
+\item 
+int \hyperlink{classVisualServoingServer_a85d6a488bf20eaeb155677a80f731614}{ctx\+\_\+local\+\_\+cart\+\_\+}
+\item 
+int \hyperlink{classVisualServoingServer_a815f9069588f590419cd8645afd3f017}{ctx\+\_\+remote\+\_\+cart\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a4c250786d095b0e8a8f5546b2976a669}{port\+\_\+pose\+\_\+left\+\_\+in\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a708ab93d60ae60ae28fbe7a9f1bffe29}{port\+\_\+pose\+\_\+right\+\_\+in\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Image\+Of$<$ yarp\+::sig\+::\+Pixel\+Rgb $>$ $>$ \hyperlink{classVisualServoingServer_a0561904e7a2d8f680812f042eec3b2d8}{port\+\_\+image\+\_\+left\+\_\+in\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Image\+Of$<$ yarp\+::sig\+::\+Pixel\+Rgb $>$ $>$ \hyperlink{classVisualServoingServer_ac8e9e8c8e3c0a412bd1dd464b58931bd}{port\+\_\+image\+\_\+left\+\_\+out\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::os\+::\+Bottle $>$ \hyperlink{classVisualServoingServer_a46d59d98a68e0a88b810835c447241f6}{port\+\_\+click\+\_\+left\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Image\+Of$<$ yarp\+::sig\+::\+Pixel\+Rgb $>$ $>$ \hyperlink{classVisualServoingServer_a776855ca4deb47cf1c739bde2e07bc8e}{port\+\_\+image\+\_\+right\+\_\+in\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Image\+Of$<$ yarp\+::sig\+::\+Pixel\+Rgb $>$ $>$ \hyperlink{classVisualServoingServer_ab5c7a20d3e8545331970517c75d79f2a}{port\+\_\+image\+\_\+right\+\_\+out\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::os\+::\+Bottle $>$ \hyperlink{classVisualServoingServer_a67701a55fce8ed1301417ecda99eff06}{port\+\_\+click\+\_\+right\+\_\+}
+\item 
+yarp\+::os\+::\+Port \hyperlink{classVisualServoingServer_af10ae1004d335193ab8bd23821a6007f}{port\+\_\+rpc\+\_\+command\+\_\+}
+\item 
+yarp\+::os\+::\+Rpc\+Client \hyperlink{classVisualServoingServer_a3835afd8ec4c21b2c1d217f7d68a71bb}{port\+\_\+rpc\+\_\+tracker\+\_\+left\+\_\+}
+\item 
+yarp\+::os\+::\+Rpc\+Client \hyperlink{classVisualServoingServer_a36df02520e7cc2814d8404e05a42409b}{port\+\_\+rpc\+\_\+tracker\+\_\+right\+\_\+}
+\item 
+bool \hyperlink{classVisualServoingServer_a36243aeb865e36c5e91d3cd3375b9f29}{is\+\_\+stopping\+\_\+backproc\+\_\+update\+\_\+vs\+\_\+params} = true
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_aa72393af28f4b424eeb2966962cbd319}{port\+\_\+pose\+\_\+px\+\_\+l\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_ab068de8542a539175a18d698e5b2289f}{port\+\_\+pose\+\_\+px\+\_\+r\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a5c6969762a136abeb5de050637e6fbc7}{port\+\_\+kin\+\_\+px\+\_\+l\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a0a681791d720678229a3365a5bb0bfd6}{port\+\_\+kin\+\_\+px\+\_\+r\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_ac4fad3f3691ad57d8a1f693e573f75be}{port\+\_\+goal\+\_\+px\+\_\+l\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_ad06d05e912dbba4c1ded31ae6e0e3004}{port\+\_\+goal\+\_\+px\+\_\+r\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a31db93e3ee0db64e8681d762428b85a9}{port\+\_\+pose\+\_\+avg\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a0f4787672f7b6dea128d688aff2056fc}{port\+\_\+pose\+\_\+kin\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingServer_a73e57c16019ed76e14e92a600f1e761b}{port\+\_\+pose\+\_\+goal\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 32 of file Visual\+Servoing\+Server.\+h.
+
+
+
+\subsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915}\label{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!Operating\+Mode@{Operating\+Mode}}
+\index{Operating\+Mode@{Operating\+Mode}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{Operating\+Mode}{OperatingMode}}
+{\footnotesize\ttfamily enum \hyperlink{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915}{Visual\+Servoing\+Server\+::\+Operating\+Mode}\hspace{0.3cm}{\ttfamily [strong]}, {\ttfamily [protected]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{position@{position}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!position@{position}}}\mbox{\Hypertarget{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915a4757fe07fd492a8be0ea6a760d683d6e}\label{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915a4757fe07fd492a8be0ea6a760d683d6e}} 
+position&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{orientation@{orientation}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!orientation@{orientation}}}\mbox{\Hypertarget{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915ada1639422ad8f355d2371428471379b5}\label{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915ada1639422ad8f355d2371428471379b5}} 
+orientation&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{pose@{pose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!pose@{pose}}}\mbox{\Hypertarget{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915a2d5f8ae9328c6535be72ed28bff47560}\label{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915a2d5f8ae9328c6535be72ed28bff47560}} 
+pose&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line 174 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0e}\label{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0e}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!Pixel\+Control\+Mode@{Pixel\+Control\+Mode}}
+\index{Pixel\+Control\+Mode@{Pixel\+Control\+Mode}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{Pixel\+Control\+Mode}{PixelControlMode}}
+{\footnotesize\ttfamily enum \hyperlink{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0e}{Visual\+Servoing\+Server\+::\+Pixel\+Control\+Mode}\hspace{0.3cm}{\ttfamily [strong]}, {\ttfamily [protected]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{all@{all}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!all@{all}}}\mbox{\Hypertarget{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0eaa181a603769c1f98ad927e7367c7aa51}\label{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0eaa181a603769c1f98ad927e7367c7aa51}} 
+all&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{x@{x}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!x@{x}}}\mbox{\Hypertarget{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0ea9dd4e461268c8034f5c8564e155c67a6}\label{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0ea9dd4e461268c8034f5c8564e155c67a6}} 
+x&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{o@{o}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!o@{o}}}\mbox{\Hypertarget{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0ead95679752134a2d9eb61dbd7b91c4bcc}\label{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0ead95679752134a2d9eb61dbd7b91c4bcc}} 
+o&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line 172 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3}\label{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!Visual\+Servo\+Control@{Visual\+Servo\+Control}}
+\index{Visual\+Servo\+Control@{Visual\+Servo\+Control}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{Visual\+Servo\+Control}{VisualServoControl}}
+{\footnotesize\ttfamily enum \hyperlink{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3}{Visual\+Servoing\+Server\+::\+Visual\+Servo\+Control}\hspace{0.3cm}{\ttfamily [strong]}, {\ttfamily [protected]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{decoupled@{decoupled}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!decoupled@{decoupled}}}\mbox{\Hypertarget{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a8c5f04f9df63b44bea9b7edcb4dd1038}\label{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a8c5f04f9df63b44bea9b7edcb4dd1038}} 
+decoupled&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{robust@{robust}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!robust@{robust}}}\mbox{\Hypertarget{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a00bd624b5b21d2b07edf398c1ce98b5e}\label{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a00bd624b5b21d2b07edf398c1ce98b5e}} 
+robust&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{cartesian@{cartesian}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!cartesian@{cartesian}}}\mbox{\Hypertarget{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a7949e6c02de2124dcdddd71b5430b8f0}\label{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a7949e6c02de2124dcdddd71b5430b8f0}} 
+cartesian&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line 170 of file Visual\+Servoing\+Server.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classVisualServoingServer_a35df4de4c8cdb167b3eb15403beae653}\label{classVisualServoingServer_a35df4de4c8cdb167b3eb15403beae653}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{Visual\+Servoing\+Server()}{VisualServoingServer()}}
+{\footnotesize\ttfamily Visual\+Servoing\+Server\+::\+Visual\+Servoing\+Server (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 20 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_abb0f23eae68c9f453a5d66051744cadf}\label{classVisualServoingServer_abb0f23eae68c9f453a5d66051744cadf}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!````~Visual\+Servoing\+Server@{$\sim$\+Visual\+Servoing\+Server}}
+\index{````~Visual\+Servoing\+Server@{$\sim$\+Visual\+Servoing\+Server}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{$\sim$\+Visual\+Servoing\+Server()}{~VisualServoingServer()}}
+{\footnotesize\ttfamily Visual\+Servoing\+Server\+::$\sim$\+Visual\+Servoing\+Server (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 27 of file Visual\+Servoing\+Server.\+cpp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classVisualServoingServer_ae6977911d131001eb4c9a07b83495518}\label{classVisualServoingServer_ae6977911d131001eb4c9a07b83495518}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!after\+Start@{after\+Start}}
+\index{after\+Start@{after\+Start}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{after\+Start()}{afterStart()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::after\+Start (\begin{DoxyParamCaption}\item[{bool}]{success }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 1032 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a66e3aaa742d5b0d23a6d3a33a800c088}\label{classVisualServoingServer_a66e3aaa742d5b0d23a6d3a33a800c088}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!average\+Pose@{average\+Pose}}
+\index{average\+Pose@{average\+Pose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{average\+Pose()}{averagePose()}}
+{\footnotesize\ttfamily Vector Visual\+Servoing\+Server\+::average\+Pose (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{l\+\_\+pose,  }\item[{const yarp\+::sig\+::\+Vector \&}]{r\+\_\+pose }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2818 of file Visual\+Servoing\+Server.\+cpp.
+
+
+
+References check\+Visual\+Servoing\+Status().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classVisualServoingServer_a66e3aaa742d5b0d23a6d3a33a800c088_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualServoingServer_abe1d3c25e81378f9a1a834d64cf0c496}\label{classVisualServoingServer_abe1d3c25e81378f9a1a834d64cf0c496}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!backproc\+\_\+\+Update\+Visual\+Servoing\+Paramters@{backproc\+\_\+\+Update\+Visual\+Servoing\+Paramters}}
+\index{backproc\+\_\+\+Update\+Visual\+Servoing\+Paramters@{backproc\+\_\+\+Update\+Visual\+Servoing\+Paramters}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{backproc\+\_\+\+Update\+Visual\+Servoing\+Paramters()}{backproc\_UpdateVisualServoingParamters()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::backproc\+\_\+\+Update\+Visual\+Servoing\+Paramters (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2796 of file Visual\+Servoing\+Server.\+cpp.
+
+
+
+Referenced by thread\+Init().
+
+\mbox{\Hypertarget{classVisualServoingServer_a4f23c649522804e21c7e60655a5dad99}\label{classVisualServoingServer_a4f23c649522804e21c7e60655a5dad99}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!before\+Start@{before\+Start}}
+\index{before\+Start@{before\+Start}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{before\+Start()}{beforeStart()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::before\+Start (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 986 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a9ad2bd94ff95fde9e309c4fb62de7377}\label{classVisualServoingServer_a9ad2bd94ff95fde9e309c4fb62de7377}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!cartesian\+Position\+Based\+Visual\+Servo\+Control@{cartesian\+Position\+Based\+Visual\+Servo\+Control}}
+\index{cartesian\+Position\+Based\+Visual\+Servo\+Control@{cartesian\+Position\+Based\+Visual\+Servo\+Control}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{cartesian\+Position\+Based\+Visual\+Servo\+Control()}{cartesianPositionBasedVisualServoControl()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::cartesian\+Position\+Based\+Visual\+Servo\+Control (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2071 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a17a9b2913815c52b5a1bd2fd84d9f18e}\label{classVisualServoingServer_a17a9b2913815c52b5a1bd2fd84d9f18e}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!check\+\_\+visual\+\_\+servoing\+\_\+controller@{check\+\_\+visual\+\_\+servoing\+\_\+controller}}
+\index{check\+\_\+visual\+\_\+servoing\+\_\+controller@{check\+\_\+visual\+\_\+servoing\+\_\+controller}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{check\+\_\+visual\+\_\+servoing\+\_\+controller()}{check\_visual\_servoing\_controller()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::check\+\_\+visual\+\_\+servoing\+\_\+controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Check once whether the visual servoing controller is running or not. 
+
+\begin{DoxyReturn}{Returns}
+true/false on it is running/not running. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The visual servoing controller may be terminated due to many different reasons, not strictly related to reaching the goal. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a6426bda1341487c0dbb1f6a048a45deb}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1220 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_afa417f05dd02d2e91ff2c848f082a33b}\label{classVisualServoingServer_afa417f05dd02d2e91ff2c848f082a33b}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!check\+Visual\+Servoing\+Controller@{check\+Visual\+Servoing\+Controller}}
+\index{check\+Visual\+Servoing\+Controller@{check\+Visual\+Servoing\+Controller}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{check\+Visual\+Servoing\+Controller()}{checkVisualServoingController()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::check\+Visual\+Servoing\+Controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 589 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a6201a672d3efe497dd0114df50aee4d7}\label{classVisualServoingServer_a6201a672d3efe497dd0114df50aee4d7}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!check\+Visual\+Servoing\+Status@{check\+Visual\+Servoing\+Status}}
+\index{check\+Visual\+Servoing\+Status@{check\+Visual\+Servoing\+Status}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{check\+Visual\+Servoing\+Status()}{checkVisualServoingStatus()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::check\+Visual\+Servoing\+Status (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{px\+\_\+cur,  }\item[{const double}]{tol }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Referenced by average\+Pose().
+
+\mbox{\Hypertarget{classVisualServoingServer_afbcab623f48e3d2e648e144e22df4f19}\label{classVisualServoingServer_afbcab623f48e3d2e648e144e22df4f19}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!check\+Visual\+Servoing\+Status@{check\+Visual\+Servoing\+Status}}
+\index{check\+Visual\+Servoing\+Status@{check\+Visual\+Servoing\+Status}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{check\+Visual\+Servoing\+Status()}{checkVisualServoingStatus()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::check\+Visual\+Servoing\+Status (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{pose\+\_\+cur,  }\item[{const double}]{tol\+\_\+position,  }\item[{const double}]{tol\+\_\+orientation,  }\item[{const double}]{tol\+\_\+angle }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classVisualServoingServer_ad9679d0bc524de74f4e96a1e8be23ca0}\label{classVisualServoingServer_ad9679d0bc524de74f4e96a1e8be23ca0}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!close@{close}}
+\index{close@{close}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::close (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 185 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a79aafac31c32f2028836e1ef0f69dd99}\label{classVisualServoingServer_a79aafac31c32f2028836e1ef0f69dd99}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!decoupled\+Image\+Based\+Visual\+Servo\+Control@{decoupled\+Image\+Based\+Visual\+Servo\+Control}}
+\index{decoupled\+Image\+Based\+Visual\+Servo\+Control@{decoupled\+Image\+Based\+Visual\+Servo\+Control}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{decoupled\+Image\+Based\+Visual\+Servo\+Control()}{decoupledImageBasedVisualServoControl()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::decoupled\+Image\+Based\+Visual\+Servo\+Control (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 1315 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_acc8932e08714c503ba6cfda11461976e}\label{classVisualServoingServer_acc8932e08714c503ba6cfda11461976e}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get3\+D\+Goal\+Positions\+From3\+D\+Pose@{get3\+D\+Goal\+Positions\+From3\+D\+Pose}}
+\index{get3\+D\+Goal\+Positions\+From3\+D\+Pose@{get3\+D\+Goal\+Positions\+From3\+D\+Pose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get3\+D\+Goal\+Positions\+From3\+D\+Pose()}{get3DGoalPositionsFrom3DPose()}}
+{\footnotesize\ttfamily std\+::vector$<$ Vector $>$ Visual\+Servoing\+Server\+::get3\+D\+Goal\+Positions\+From3\+D\+Pose (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{x,  }\item[{const yarp\+::sig\+::\+Vector \&}]{o }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 675 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a542e0a6bf6158563a601740363911474}\label{classVisualServoingServer_a542e0a6bf6158563a601740363911474}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose@{get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose}}
+\index{get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose@{get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose()}{get\_3D\_goal\_positions\_from\_3D\_pose()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Visual\+Servoing\+Server\+::get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ double $>$ \&}]{x,  }\item[{const std\+::vector$<$ double $>$ \&}]{o }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Helper function\+: extract four Cartesian points lying on the plane defined by the frame o in the position x relative to the robot base frame. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & a 3D vector which is filled with the actual position (x, y, z) \mbox{[}m\mbox{]}. \\
+\hline
+{\em o} & a 4D vector which is filled with the actual orientation using axis-\/angle representation (xa, ya, za) and (theta) \mbox{[}rad\mbox{]}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+on success\+: a collection of four Cartesian points (position only) extracted from the plane defined by x and o; on failure\+: an empty list. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+It is always suggested to check whether the returned list is empty or not and to take proper counter actions. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a175b2d3fb77000e0012c7a8d16e9a379}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1274 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a3b0e5078c2f32493a2ef31ea32450d80}\label{classVisualServoingServer_a3b0e5078c2f32493a2ef31ea32450d80}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+\_\+goal\+\_\+from\+\_\+sfm@{get\+\_\+goal\+\_\+from\+\_\+sfm}}
+\index{get\+\_\+goal\+\_\+from\+\_\+sfm@{get\+\_\+goal\+\_\+from\+\_\+sfm}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+\_\+goal\+\_\+from\+\_\+sfm()}{get\_goal\_from\_sfm()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::get\+\_\+goal\+\_\+from\+\_\+sfm (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Get goal point from S\+FM module. 
+
+The point is taken by clicking on a dedicated \textquotesingle{}yarpview\textquotesingle{} G\+UI and the orientation is hard-\/coded. \begin{DoxyNote}{Note}
+This service is experimental and should be used with care. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true upon success, false otherwise. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_aff8af7d3ebe68f5fbfa7197eb7115723}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1099 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_aaa84d7964120ee1056f422dc2d5eb070}\label{classVisualServoingServer_aaa84d7964120ee1056f422dc2d5eb070}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose@{get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose}}
+\index{get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose@{get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose()}{get\_goal\_pixels\_from\_3D\_pose()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::vector$<$ double $>$ $>$ Visual\+Servoing\+Server\+::get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ double $>$ \&}]{x,  }\item[{const std\+::vector$<$ double $>$ \&}]{o,  }\item[{const std\+::string \&}]{cam }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Helper function\+: extract four 2D pixel points lying on the plane defined by the frame o in the position x relative to the robot base frame. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & a 3D vector which is filled with the actual position (x, y, z) \mbox{[}m\mbox{]}. \\
+\hline
+{\em o} & a 4D vector which is filled with the actual orientation using axis-\/angle representation (xa, ya, za) and (theta) \mbox{[}m\mbox{]}/\mbox{[}rad\mbox{]}. \\
+\hline
+{\em cam} & either \char`\"{}left\char`\"{} or \char`\"{}right\char`\"{} to select left or right camera. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+on success\+: a collection of three (u, v) pixel points extracted from the plane defined by x and o; on failure\+: an empty list. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+It is always suggested to check whether the returned list is empty or not and to take proper counter actions. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_afb359486a7e42bfda3ddf66a2e518e90}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1292 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_af085e2c5d4c4cfe940b3564b4ba69af6}\label{classVisualServoingServer_af085e2c5d4c4cfe940b3564b4ba69af6}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+\_\+visual\+\_\+servoing\+\_\+info@{get\+\_\+visual\+\_\+servoing\+\_\+info}}
+\index{get\+\_\+visual\+\_\+servoing\+\_\+info@{get\+\_\+visual\+\_\+servoing\+\_\+info}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+\_\+visual\+\_\+servoing\+\_\+info()}{get\_visual\_servoing\_info()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::string $>$ Visual\+Servoing\+Server\+::get\+\_\+visual\+\_\+servoing\+\_\+info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Return useful information for visual servoing. 
+
+\begin{DoxyReturn}{Returns}
+All the visual servoing information. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a9654ec3984d53b41f50e0d70b2991203}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1202 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a43cf45e933a71214cfb4d8248005761e}\label{classVisualServoingServer_a43cf45e933a71214cfb4d8248005761e}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+Control\+Pixel\+From\+Point@{get\+Control\+Pixel\+From\+Point}}
+\index{get\+Control\+Pixel\+From\+Point@{get\+Control\+Pixel\+From\+Point}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+Control\+Pixel\+From\+Point()}{getControlPixelFromPoint()}}
+{\footnotesize\ttfamily Vector Visual\+Servoing\+Server\+::get\+Control\+Pixel\+From\+Point (\begin{DoxyParamCaption}\item[{const Cam\+Sel \&}]{cam,  }\item[{const yarp\+::sig\+::\+Vector \&}]{p }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2626 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a67bfc714271a28bf55fa49c89019b53c}\label{classVisualServoingServer_a67bfc714271a28bf55fa49c89019b53c}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+Control\+Pixels\+From\+Pose@{get\+Control\+Pixels\+From\+Pose}}
+\index{get\+Control\+Pixels\+From\+Pose@{get\+Control\+Pixels\+From\+Pose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+Control\+Pixels\+From\+Pose()}{getControlPixelsFromPose()}}
+{\footnotesize\ttfamily std\+::vector$<$ Vector $>$ Visual\+Servoing\+Server\+::get\+Control\+Pixels\+From\+Pose (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{pose,  }\item[{const Cam\+Sel \&}]{cam,  }\item[{const \hyperlink{classVisualServoingServer_a3a1cce02f57cebb9056da5653d4dff0e}{Pixel\+Control\+Mode} \&}]{mode }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2553 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_ac9e6020f30b6df05db3fc34a44fee0d4}\label{classVisualServoingServer_ac9e6020f30b6df05db3fc34a44fee0d4}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+Control\+Points\+From\+Pose@{get\+Control\+Points\+From\+Pose}}
+\index{get\+Control\+Points\+From\+Pose@{get\+Control\+Points\+From\+Pose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+Control\+Points\+From\+Pose()}{getControlPointsFromPose()}}
+{\footnotesize\ttfamily std\+::vector$<$ Vector $>$ Visual\+Servoing\+Server\+::get\+Control\+Points\+From\+Pose (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{pose }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2576 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_ad5334ed717f373cfbd40290824d9ed1f}\label{classVisualServoingServer_ad5334ed717f373cfbd40290824d9ed1f}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+Current\+Stereo\+Features\+And\+Jacobian@{get\+Current\+Stereo\+Features\+And\+Jacobian}}
+\index{get\+Current\+Stereo\+Features\+And\+Jacobian@{get\+Current\+Stereo\+Features\+And\+Jacobian}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+Current\+Stereo\+Features\+And\+Jacobian()}{getCurrentStereoFeaturesAndJacobian()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::get\+Current\+Stereo\+Features\+And\+Jacobian (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&}]{left\+\_\+px,  }\item[{const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&}]{right\+\_\+px,  }\item[{yarp\+::sig\+::\+Vector \&}]{features,  }\item[{yarp\+::sig\+::\+Matrix \&}]{jacobian }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2646 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a9d35a09c55cc8c059dc7bdbeeed8cfb1}\label{classVisualServoingServer_a9d35a09c55cc8c059dc7bdbeeed8cfb1}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+Goal\+Pixels\+From3\+D\+Pose@{get\+Goal\+Pixels\+From3\+D\+Pose}}
+\index{get\+Goal\+Pixels\+From3\+D\+Pose@{get\+Goal\+Pixels\+From3\+D\+Pose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+Goal\+Pixels\+From3\+D\+Pose()}{getGoalPixelsFrom3DPose()}}
+{\footnotesize\ttfamily std\+::vector$<$ Vector $>$ Visual\+Servoing\+Server\+::get\+Goal\+Pixels\+From3\+D\+Pose (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{x,  }\item[{const yarp\+::sig\+::\+Vector \&}]{o,  }\item[{const Cam\+Sel \&}]{cam }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 695 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a3aa225c2c4f417c4ea7dd27e9b6d0c8a}\label{classVisualServoingServer_a3aa225c2c4f417c4ea7dd27e9b6d0c8a}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+JacobianU@{get\+JacobianU}}
+\index{get\+JacobianU@{get\+JacobianU}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+Jacobian\+U()}{getJacobianU()}}
+{\footnotesize\ttfamily Vector Visual\+Servoing\+Server\+::get\+JacobianU (\begin{DoxyParamCaption}\item[{const Cam\+Sel \&}]{cam,  }\item[{const yarp\+::sig\+::\+Vector \&}]{px }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2685 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a51667642f6d882df082f79ec01111181}\label{classVisualServoingServer_a51667642f6d882df082f79ec01111181}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+JacobianV@{get\+JacobianV}}
+\index{get\+JacobianV@{get\+JacobianV}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+Jacobian\+V()}{getJacobianV()}}
+{\footnotesize\ttfamily Vector Visual\+Servoing\+Server\+::get\+JacobianV (\begin{DoxyParamCaption}\item[{const Cam\+Sel \&}]{cam,  }\item[{const yarp\+::sig\+::\+Vector \&}]{px }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2710 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a997029621c723c1e9962b35a917167cc}\label{classVisualServoingServer_a997029621c723c1e9962b35a917167cc}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+Pixel\+From\+Point@{get\+Pixel\+From\+Point}}
+\index{get\+Pixel\+From\+Point@{get\+Pixel\+From\+Point}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+Pixel\+From\+Point()}{getPixelFromPoint()}}
+{\footnotesize\ttfamily Vector Visual\+Servoing\+Server\+::get\+Pixel\+From\+Point (\begin{DoxyParamCaption}\item[{const Cam\+Sel \&}]{cam,  }\item[{const yarp\+::sig\+::\+Vector \&}]{p }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2620 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a04f3caed0ac350b3579efeb4cd548eb8}\label{classVisualServoingServer_a04f3caed0ac350b3579efeb4cd548eb8}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+Pixels\+From\+Pose@{get\+Pixels\+From\+Pose}}
+\index{get\+Pixels\+From\+Pose@{get\+Pixels\+From\+Pose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+Pixels\+From\+Pose()}{getPixelsFromPose()}}
+{\footnotesize\ttfamily std\+::vector$<$ Vector $>$ Visual\+Servoing\+Server\+::get\+Pixels\+From\+Pose (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{pose,  }\item[{const Cam\+Sel \&}]{cam }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2537 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a66db1dfa1ebde34ada94bc36248e2ec8}\label{classVisualServoingServer_a66db1dfa1ebde34ada94bc36248e2ec8}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!get\+Visual\+Servoing\+Info@{get\+Visual\+Servoing\+Info}}
+\index{get\+Visual\+Servoing\+Info@{get\+Visual\+Servoing\+Info}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{get\+Visual\+Servoing\+Info()}{getVisualServoingInfo()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::get\+Visual\+Servoing\+Info (\begin{DoxyParamCaption}\item[{yarp\+::os\+::\+Bottle \&}]{info }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 573 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a77f26ac40c67d7a9b7e4ad7840532681}\label{classVisualServoingServer_a77f26ac40c67d7a9b7e4ad7840532681}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!go\+\_\+to\+\_\+pose\+\_\+goal@{go\+\_\+to\+\_\+pose\+\_\+goal}}
+\index{go\+\_\+to\+\_\+pose\+\_\+goal@{go\+\_\+to\+\_\+pose\+\_\+goal}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{go\+\_\+to\+\_\+pose\+\_\+goal()}{go\_to\_pose\_goal()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::go\+\_\+to\+\_\+pose\+\_\+goal (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ double $>$ \&}]{vec\+\_\+x,  }\item[{const std\+::vector$<$ double $>$ \&}]{vec\+\_\+o }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set the goal point (3D for the position + 4D axis-\/angle for the orientation) and start visual servoing. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vec\+\_\+x} & a 3D vector which contains the (x, y, z) Cartesian coordinates of the goal. \\
+\hline
+{\em vec\+\_\+o} & a 4D vector which contains the (x, y, z) axis and theta angle of rotation of the goal. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+By invoking this method, the visual servoing goal will be reached in position and orientation together with two parallel tasks. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a697368ff5a1b3f16069d1d10f25ca888}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1172 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a75929f915651161c43ed032e9f69a361}\label{classVisualServoingIDL_a75929f915651161c43ed032e9f69a361}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!go\+\_\+to\+\_\+px\+\_\+goal@{go\+\_\+to\+\_\+px\+\_\+goal}}
+\index{go\+\_\+to\+\_\+px\+\_\+goal@{go\+\_\+to\+\_\+px\+\_\+goal}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{go\+\_\+to\+\_\+px\+\_\+goal()}{go\_to\_px\_goal()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::go\+\_\+to\+\_\+px\+\_\+goal (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&}]{vec\+\_\+px\+\_\+l,  }\item[{const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&}]{vec\+\_\+px\+\_\+r }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Set the goal points on both left and right camera image plane and start visual servoing. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vec\+\_\+px\+\_\+l} & a collection of four 2D vectors which contains the (u, v) coordinates of the pixels within the left image plane. \\
+\hline
+{\em vec\+\_\+px\+\_\+r} & a collection of four 2D vectors which contains the (u, v) coordinates of the pixels within the right image plane. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+By invoking this method, the visual servoing goal will be reached in orientation first, then in position. This is because there may not be a feasible position solution for every possible orientation. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classVisualServoingServer_a6b68da9fe211a5779fc7a24e406dc8f0}\label{classVisualServoingServer_a6b68da9fe211a5779fc7a24e406dc8f0}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!go\+\_\+to\+\_\+px\+\_\+goal@{go\+\_\+to\+\_\+px\+\_\+goal}}
+\index{go\+\_\+to\+\_\+px\+\_\+goal@{go\+\_\+to\+\_\+px\+\_\+goal}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{go\+\_\+to\+\_\+px\+\_\+goal()}{go\_to\_px\_goal()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::go\+\_\+to\+\_\+px\+\_\+goal (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::vector$<$ double $>$$>$ \&}]{vec\+\_\+px\+\_\+l,  }\item[{const std\+::vector$<$ std\+::vector$<$ double $>$$>$ \&}]{vec\+\_\+px\+\_\+r }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 1145 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a085bb298e50f295d670bff6e4cb808d8}\label{classVisualServoingServer_a085bb298e50f295d670bff6e4cb808d8}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!go\+To\+Goal@{go\+To\+Goal}}
+\index{go\+To\+Goal@{go\+To\+Goal}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{go\+To\+Goal()}{goToGoal()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::go\+To\+Goal (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{vec\+\_\+x,  }\item[{const yarp\+::sig\+::\+Vector \&}]{vec\+\_\+o }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Referenced by stop\+Facilities().
+
+\mbox{\Hypertarget{classVisualServoingServer_a40ab9e9804793a58243077f31a2d79a4}\label{classVisualServoingServer_a40ab9e9804793a58243077f31a2d79a4}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!go\+To\+Goal@{go\+To\+Goal}}
+\index{go\+To\+Goal@{go\+To\+Goal}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{go\+To\+Goal()}{goToGoal()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::go\+To\+Goal (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&}]{vec\+\_\+px\+\_\+l,  }\item[{const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&}]{vec\+\_\+px\+\_\+r }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+\mbox{\Hypertarget{classVisualServoingServer_a6d051da5da8c07b0e0879d5af50a248f}\label{classVisualServoingServer_a6d051da5da8c07b0e0879d5af50a248f}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!go\+To\+S\+F\+M\+Goal@{go\+To\+S\+F\+M\+Goal}}
+\index{go\+To\+S\+F\+M\+Goal@{go\+To\+S\+F\+M\+Goal}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{go\+To\+S\+F\+M\+Goal()}{goToSFMGoal()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::go\+To\+S\+F\+M\+Goal (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 925 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a99974ef8858179f14e2762c2d7bf4ed5}\label{classVisualServoingIDL_a99974ef8858179f14e2762c2d7bf4ed5}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!help@{help}}
+\index{help@{help}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{help()}{help()}}
+{\footnotesize\ttfamily virtual std\+::vector$<$std\+::string$>$ Visual\+Servoing\+I\+D\+L\+::help (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{function\+Name = {\ttfamily \char`\"{}-\/-\/all\char`\"{}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classVisualServoingServer_ad3668e0fc8818f9d2827bbc50087d353}\label{classVisualServoingServer_ad3668e0fc8818f9d2827bbc50087d353}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!init\+\_\+facilities@{init\+\_\+facilities}}
+\index{init\+\_\+facilities@{init\+\_\+facilities}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{init\+\_\+facilities()}{init\_facilities()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::init\+\_\+facilities (\begin{DoxyParamCaption}\item[{const bool}]{use\+\_\+direct\+\_\+kin }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Initialize support modules and connections to perform a visual servoing task. 
+
+This method must be called before any other visual servoing methods. Returns upon successful or failure setup. 
+\begin{DoxyParams}{Parameters}
+{\em use\+\_\+direct\+\_\+kin} & instruct the visual servoing control to either use direct kinematic or an estimated/refined pose of the end-\/effector. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Default value\+: false. There usually is an error in the robot direct kinematics that should be compensated to perform precise visual servoing. To this end, a recursive Bayesian estimation filter is used to compensate for this error. Such filter is initialized during initialization execution. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_aae4ee4c07b50956396fd59bbb00fd9c7}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1127 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a136cfac8840eda92c012851149b8624a}\label{classVisualServoingServer_a136cfac8840eda92c012851149b8624a}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!init\+Facilities@{init\+Facilities}}
+\index{init\+Facilities@{init\+Facilities}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{init\+Facilities()}{initFacilities()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::init\+Facilities (\begin{DoxyParamCaption}\item[{const bool}]{use\+\_\+direct\+\_\+kin }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 253 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a1401f7ee34d88728dd103439b25f9cf5}\label{classVisualServoingServer_a1401f7ee34d88728dd103439b25f9cf5}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!on\+Stop@{on\+Stop}}
+\index{on\+Stop@{on\+Stop}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{on\+Stop()}{onStop()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::on\+Stop (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 1051 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a0698977ddac02801eba3c35b47b9aa19}\label{classVisualServoingServer_a0698977ddac02801eba3c35b47b9aa19}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!open@{open}}
+\index{open@{open}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{open()}{open()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::open (\begin{DoxyParamCaption}\item[{yarp\+::os\+::\+Searchable \&}]{config }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 35 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_ac438c7abfb838df458f85e250ead3222}\label{classVisualServoingServer_ac438c7abfb838df458f85e250ead3222}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!quit@{quit}}
+\index{quit@{quit}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{quit()}{quit()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::quit (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Gently close the visual servoing device, deallocating resources. 
+
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a3d5503e1d4bb2b25a11cbd5357b3013b}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1105 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a97106bf829447896de03680d78b960a5}\label{classVisualServoingIDL_a97106bf829447896de03680d78b960a5}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!read@{read}}
+\index{read@{read}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::read (\begin{DoxyParamCaption}\item[{yarp\+::os\+::\+Connection\+Reader \&}]{connection }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classVisualServoingServer_ae397fa9823f425fccf2837122629383f}\label{classVisualServoingServer_ae397fa9823f425fccf2837122629383f}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!reset\+\_\+facilities@{reset\+\_\+facilities}}
+\index{reset\+\_\+facilities@{reset\+\_\+facilities}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{reset\+\_\+facilities()}{reset\_facilities()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::reset\+\_\+facilities (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reset support modules and connections to perform the current initialized visual servoing task. 
+
+Returns upon successful or failure setup. \begin{DoxyNote}{Note}
+This method also resets the recursive Bayesian estimation filter. It may happen that the recursive Bayesian filter does not provide satisfactory pose estimation or diverges. Thus this method can be used to reset the filter. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a23929f03db99f80426a859cdad68e48c}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1133 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a39ea1de5ec159bd6779929c2bff84450}\label{classVisualServoingServer_a39ea1de5ec159bd6779929c2bff84450}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!reset\+Facilities@{reset\+Facilities}}
+\index{reset\+Facilities@{reset\+Facilities}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{reset\+Facilities()}{resetFacilities()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::reset\+Facilities (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 367 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a34576cda7f4ed36dfae809a48f364d2b}\label{classVisualServoingServer_a34576cda7f4ed36dfae809a48f364d2b}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!robust\+Image\+Based\+Visual\+Servo\+Control@{robust\+Image\+Based\+Visual\+Servo\+Control}}
+\index{robust\+Image\+Based\+Visual\+Servo\+Control@{robust\+Image\+Based\+Visual\+Servo\+Control}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{robust\+Image\+Based\+Visual\+Servo\+Control()}{robustImageBasedVisualServoControl()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::robust\+Image\+Based\+Visual\+Servo\+Control (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 1716 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a2397c1d1c5a5c65d1851075947f61f7e}\label{classVisualServoingServer_a2397c1d1c5a5c65d1851075947f61f7e}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!run@{run}}
+\index{run@{run}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 1021 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a4a20a08fec9cfa4765e1245cfce5f9a8}\label{classVisualServoingServer_a4a20a08fec9cfa4765e1245cfce5f9a8}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+\_\+control\+\_\+point@{set\+\_\+control\+\_\+point}}
+\index{set\+\_\+control\+\_\+point@{set\+\_\+control\+\_\+point}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+\_\+control\+\_\+point()}{set\_control\_point()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+\_\+control\+\_\+point (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{point }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set the point controlled during visual servoing. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em point} & label of the point to control. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The points available to control are identified by a distinct, unique label. Such labels can are stored in the bottle returned by the get\+Info() method. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a9b84b61f0d80d9c931e1947a5e86c761}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1196 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a0efdb8edb2e4b91dc3168b5051b27f56}\label{classVisualServoingServer_a0efdb8edb2e4b91dc3168b5051b27f56}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance@{set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance}}
+\index{set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance@{set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance()}{set\_go\_to\_goal\_tolerance()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance (\begin{DoxyParamCaption}\item[{const double}]{tol }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set visual servoing goal tolerance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tol} & the tolerance in pixel. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Default value\+: 15.\+0 \mbox{[}pixel\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_aa465471a7300861c1f991f08eb257694}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1214 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_aa3226ef2de2c1743e67788d1bff60679}\label{classVisualServoingServer_aa3226ef2de2c1743e67788d1bff60679}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+\_\+max\+\_\+orientation\+\_\+velocity@{set\+\_\+max\+\_\+orientation\+\_\+velocity}}
+\index{set\+\_\+max\+\_\+orientation\+\_\+velocity@{set\+\_\+max\+\_\+orientation\+\_\+velocity}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+\_\+max\+\_\+orientation\+\_\+velocity()}{set\_max\_orientation\_velocity()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+\_\+max\+\_\+orientation\+\_\+velocity (\begin{DoxyParamCaption}\item[{const double}]{max\+\_\+o\+\_\+dot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set the maximum angular velocity of the axis-\/angle velocity vector of the visual servoing control algorithm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em max\+\_\+x\+\_\+dot} & the maximum allowed angular velocity \mbox{[}rad/s\mbox{]}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Default value\+: 5 $\ast$ (PI / 180.\+0) \mbox{[}rad/s\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_ad2495422c8f1dda27b85db96c42a7042}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1262 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a393d1a1d1a7a68fc2098a7c7e8724cc9}\label{classVisualServoingServer_a393d1a1d1a7a68fc2098a7c7e8724cc9}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+\_\+max\+\_\+translation\+\_\+velocity@{set\+\_\+max\+\_\+translation\+\_\+velocity}}
+\index{set\+\_\+max\+\_\+translation\+\_\+velocity@{set\+\_\+max\+\_\+translation\+\_\+velocity}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+\_\+max\+\_\+translation\+\_\+velocity()}{set\_max\_translation\_velocity()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+\_\+max\+\_\+translation\+\_\+velocity (\begin{DoxyParamCaption}\item[{const double}]{max\+\_\+x\+\_\+dot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set the maximum translation velocity of the visual servoing control algorithm (same for each axis). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em max\+\_\+x\+\_\+dot} & the maximum allowed velocity for x, y, z coordinates \mbox{[}m/s\mbox{]}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Default value\+: max\+\_\+x\+\_\+dot = 0.\+025 \mbox{[}m/s\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_af928c1409ad82c6b5fa1aff93ef9d0c4}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1244 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a6d9ec4489caebf0a52b2e5ee149aeb6d}\label{classVisualServoingServer_a6d9ec4489caebf0a52b2e5ee149aeb6d}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+\_\+modality@{set\+\_\+modality}}
+\index{set\+\_\+modality@{set\+\_\+modality}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+\_\+modality()}{set\_modality()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+\_\+modality (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{mode }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set visual servoing operating mode between\+: 
+
+
+\begin{DoxyEnumerate}
+\item \textquotesingle{}position\textquotesingle{}\+: position-\/only visual servo control;
+\item \textquotesingle{}orientation\textquotesingle{}\+: orientation-\/only visual servo control;
+\item \textquotesingle{}pose\textquotesingle{}\+: position + orientation visual servo control. 
+\begin{DoxyParams}{Parameters}
+{\em mode} & a label referring to one of the three operating mode, i.\+e. \textquotesingle{}position\textquotesingle{}, \textquotesingle{}orientation\textquotesingle{} or \textquotesingle{}pose\textquotesingle{}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+\end{DoxyEnumerate}
+
+Reimplemented from \hyperlink{classVisualServoingIDL_acf88e08e442c512452efe69f103f8f12}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1184 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a19bdb0b44a8b556bad599dc03fca5f3f}\label{classVisualServoingServer_a19bdb0b44a8b556bad599dc03fca5f3f}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+\_\+orientation\+\_\+gain@{set\+\_\+orientation\+\_\+gain}}
+\index{set\+\_\+orientation\+\_\+gain@{set\+\_\+orientation\+\_\+gain}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+\_\+orientation\+\_\+gain()}{set\_orientation\_gain()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+\_\+orientation\+\_\+gain (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+o\+\_\+1,  }\item[{const double}]{K\+\_\+o\+\_\+2 }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set the orientation gains of the visual servoing control algorithm. 
+
+The two values are used, respectively, when the end-\/effector is far away from and close to the goal. \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Warning\+: higher values of the gain corresponds to higher orientation velocities and oscillation about the goal. 
+
+Default values\+: K\+\_\+o\+\_\+1 = 1.\+5, K\+\_\+o\+\_\+2 = 0.\+375. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a63069a57bf0a190f0d76b5c0eba694fb}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1256 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a7d8c034f8a133f13ba9b4060ebcaf4bb}\label{classVisualServoingServer_a7d8c034f8a133f13ba9b4060ebcaf4bb}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance@{set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance}}
+\index{set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance@{set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance()}{set\_orientation\_gain\_switch\_tolerance()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+o\+\_\+tol }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set the tolerance, in pixels, at which the orientation control law swithces its gain value. 
+
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Default value\+: K\+\_\+o\+\_\+tol = 30.\+0 \mbox{[}pixel\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_acaf4ad7fa8a2443d4719e3f56b8d72b0}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1268 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a66324b38d90efb1e68cdfff9fd969487}\label{classVisualServoingServer_a66324b38d90efb1e68cdfff9fd969487}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+\_\+translation\+\_\+gain@{set\+\_\+translation\+\_\+gain}}
+\index{set\+\_\+translation\+\_\+gain@{set\+\_\+translation\+\_\+gain}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+\_\+translation\+\_\+gain()}{set\_translation\_gain()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+\_\+translation\+\_\+gain (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+x\+\_\+1,  }\item[{const double}]{K\+\_\+x\+\_\+2 }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set the translation gains of the visual servoing control algorithm. 
+
+The two values are used, respectively, when the end-\/effector is far away from and close to the goal. \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Warning\+: higher values of the gain corresponds to higher translation velocities and oscillation about the goal. 
+
+Default values\+: K\+\_\+x\+\_\+1 = 1.\+0, K\+\_\+x\+\_\+2 = 0.\+25. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a49034ed3c3d7b150ea0edb984217af31}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1238 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a280690a55037cfaaacd39ca95470a507}\label{classVisualServoingServer_a280690a55037cfaaacd39ca95470a507}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance@{set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance}}
+\index{set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance@{set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance()}{set\_translation\_gain\_switch\_tolerance()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+x\+\_\+tol }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set the tolerance, in pixels, at which the translation control law swithces its gain value. 
+
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Default value\+: K\+\_\+x\+\_\+tol = 30.\+0 \mbox{[}pixel\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_ad7800969fdb9a88cce5e59552fca8b1f}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1250 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a2f28e67b1dd44d9afba4a79fd89f4bc8}\label{classVisualServoingServer_a2f28e67b1dd44d9afba4a79fd89f4bc8}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+\_\+visual\+\_\+servo\+\_\+control@{set\+\_\+visual\+\_\+servo\+\_\+control}}
+\index{set\+\_\+visual\+\_\+servo\+\_\+control@{set\+\_\+visual\+\_\+servo\+\_\+control}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+\_\+visual\+\_\+servo\+\_\+control()}{set\_visual\_servo\_control()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+\_\+visual\+\_\+servo\+\_\+control (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{control }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set visual servo control law between\+: 
+
+
+\begin{DoxyEnumerate}
+\item \textquotesingle{}decoupled\textquotesingle{}\+: image-\/based visual servoing with decoupled position and orientation control law, the control law was proposed in \mbox{[}1\mbox{]};
+\item \textquotesingle{}robust\textquotesingle{}\+: image-\/based visual servoing with averaged image Jacobians, the control law was proposed in \mbox{[}2\mbox{]}; 
+\begin{DoxyParams}{Parameters}
+{\em mode} & a label referring to one of the three visual servo controls, i.\+e. \textquotesingle{}position\textquotesingle{}, \textquotesingle{}orientation\textquotesingle{} or \textquotesingle{}pose\textquotesingle{}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+\mbox{[}1\mbox{]} C. Fantacci, G. Vezzani, U. Pattacini, V. Tikhanoff and L. Natale, \char`\"{}\+Precise markerless visual servoing on unknown objects for
+      humanoid robot platforms\char`\"{}, to appear. \mbox{[}2\mbox{]} E. Malis, “\+Improving vision-\/based control using efficient second-\/order minimization techniques”, I\+E\+EE I\+C\+RA, vol. 2, p. 1843–1848, 2004. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+\end{DoxyEnumerate}
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a3db9d27ad8982f561f44a644897c8a9e}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1190 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a141036fb33bfb74199691ad444b29082}\label{classVisualServoingServer_a141036fb33bfb74199691ad444b29082}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Camera\+Transformations@{set\+Camera\+Transformations}}
+\index{set\+Camera\+Transformations@{set\+Camera\+Transformations}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Camera\+Transformations()}{setCameraTransformations()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Camera\+Transformations (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2735 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a27c26de8415dee1c3165edd1e1d362a2}\label{classVisualServoingServer_a27c26de8415dee1c3165edd1e1d362a2}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Command\+Port@{set\+Command\+Port}}
+\index{set\+Command\+Port@{set\+Command\+Port}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Command\+Port()}{setCommandPort()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Command\+Port (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2457 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a437c76c0ac9751cab05c76cd1f571d9b}\label{classVisualServoingServer_a437c76c0ac9751cab05c76cd1f571d9b}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Control\+Point@{set\+Control\+Point}}
+\index{set\+Control\+Point@{set\+Control\+Point}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Control\+Point()}{setControlPoint()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Control\+Point (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{point }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 565 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a1cea1b6c32f9719cd63c36224fc1b9d2}\label{classVisualServoingServer_a1cea1b6c32f9719cd63c36224fc1b9d2}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Gaze\+Controller@{set\+Gaze\+Controller}}
+\index{set\+Gaze\+Controller@{set\+Gaze\+Controller}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Gaze\+Controller()}{setGazeController()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Gaze\+Controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2430 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_ad632db85663df2f8c7ca5c27eaacfd71}\label{classVisualServoingServer_ad632db85663df2f8c7ca5c27eaacfd71}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Go\+To\+Goal\+Tolerance@{set\+Go\+To\+Goal\+Tolerance}}
+\index{set\+Go\+To\+Goal\+Tolerance@{set\+Go\+To\+Goal\+Tolerance}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Go\+To\+Goal\+Tolerance()}{setGoToGoalTolerance()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Go\+To\+Goal\+Tolerance (\begin{DoxyParamCaption}\item[{const double}]{tol = {\ttfamily 15.0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 581 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a9f93de2ddb7818555bebad9ad0705029}\label{classVisualServoingServer_a9f93de2ddb7818555bebad9ad0705029}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Max\+Orientation\+Velocity@{set\+Max\+Orientation\+Velocity}}
+\index{set\+Max\+Orientation\+Velocity@{set\+Max\+Orientation\+Velocity}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Max\+Orientation\+Velocity()}{setMaxOrientationVelocity()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Max\+Orientation\+Velocity (\begin{DoxyParamCaption}\item[{const double}]{max\+\_\+o\+\_\+dot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 659 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_aa9b4b1b69b8600d7eac62a66af483bdb}\label{classVisualServoingServer_aa9b4b1b69b8600d7eac62a66af483bdb}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Max\+Translation\+Velocity@{set\+Max\+Translation\+Velocity}}
+\index{set\+Max\+Translation\+Velocity@{set\+Max\+Translation\+Velocity}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Max\+Translation\+Velocity()}{setMaxTranslationVelocity()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Max\+Translation\+Velocity (\begin{DoxyParamCaption}\item[{const double}]{max\+\_\+x\+\_\+dot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 634 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a6adf93e234e936879efe30cb9788b7ad}\label{classVisualServoingServer_a6adf93e234e936879efe30cb9788b7ad}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Modality@{set\+Modality}}
+\index{set\+Modality@{set\+Modality}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Modality()}{setModality()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Modality (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{mode }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 535 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_afb7ac6f85a55f928aa75134ba0ad1d79}\label{classVisualServoingServer_afb7ac6f85a55f928aa75134ba0ad1d79}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Orientation\+Gain@{set\+Orientation\+Gain}}
+\index{set\+Orientation\+Gain@{set\+Orientation\+Gain}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Orientation\+Gain()}{setOrientationGain()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Orientation\+Gain (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+x\+\_\+1 = {\ttfamily 1.5},  }\item[{const double}]{K\+\_\+x\+\_\+2 = {\ttfamily 0.375} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 650 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a5a32f1ee99bff8b8a34d3825c30ffffc}\label{classVisualServoingServer_a5a32f1ee99bff8b8a34d3825c30ffffc}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Orientation\+Gain\+Switch\+Tolerance@{set\+Orientation\+Gain\+Switch\+Tolerance}}
+\index{set\+Orientation\+Gain\+Switch\+Tolerance@{set\+Orientation\+Gain\+Switch\+Tolerance}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Orientation\+Gain\+Switch\+Tolerance()}{setOrientationGainSwitchTolerance()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Orientation\+Gain\+Switch\+Tolerance (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+o\+\_\+tol = {\ttfamily 30.0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 667 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_aea96fc77c6255e0826bd17190214a29b}\label{classVisualServoingServer_aea96fc77c6255e0826bd17190214a29b}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Pixel\+Goal@{set\+Pixel\+Goal}}
+\index{set\+Pixel\+Goal@{set\+Pixel\+Goal}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Pixel\+Goal()}{setPixelGoal()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Pixel\+Goal (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&}]{l\+\_\+px\+\_\+goal,  }\item[{const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&}]{r\+\_\+px\+\_\+goal }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2776 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a53616791e66a24c1131e2cb3a3634a6d}\label{classVisualServoingServer_a53616791e66a24c1131e2cb3a3634a6d}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Pose\+Goal@{set\+Pose\+Goal}}
+\index{set\+Pose\+Goal@{set\+Pose\+Goal}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Pose\+Goal()}{setPoseGoal()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Pose\+Goal (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{goal\+\_\+x,  }\item[{const yarp\+::sig\+::\+Vector \&}]{goal\+\_\+o }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2767 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a080585bc03f073b70a10bcdd6b36b309}\label{classVisualServoingServer_a080585bc03f073b70a10bcdd6b36b309}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Right\+Arm\+Cartesian\+Controller@{set\+Right\+Arm\+Cartesian\+Controller}}
+\index{set\+Right\+Arm\+Cartesian\+Controller@{set\+Right\+Arm\+Cartesian\+Controller}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Right\+Arm\+Cartesian\+Controller()}{setRightArmCartesianController()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Right\+Arm\+Cartesian\+Controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2353 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a9e031793c83063b80035f8769d28a99f}\label{classVisualServoingServer_a9e031793c83063b80035f8769d28a99f}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Torso\+D\+OF@{set\+Torso\+D\+OF}}
+\index{set\+Torso\+D\+OF@{set\+Torso\+D\+OF}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Torso\+D\+O\+F()}{setTorsoDOF()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Torso\+D\+OF (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2491 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_ab995d07572eb6e1103c73cc190c00e4a}\label{classVisualServoingServer_ab995d07572eb6e1103c73cc190c00e4a}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Translation\+Gain@{set\+Translation\+Gain}}
+\index{set\+Translation\+Gain@{set\+Translation\+Gain}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Translation\+Gain()}{setTranslationGain()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Translation\+Gain (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+x\+\_\+1 = {\ttfamily 1.0},  }\item[{const double}]{K\+\_\+x\+\_\+2 = {\ttfamily 0.25} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 625 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a5274182a8ff476c6b734ddf7cc78bef2}\label{classVisualServoingServer_a5274182a8ff476c6b734ddf7cc78bef2}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Translation\+Gain\+Switch\+Tolerance@{set\+Translation\+Gain\+Switch\+Tolerance}}
+\index{set\+Translation\+Gain\+Switch\+Tolerance@{set\+Translation\+Gain\+Switch\+Tolerance}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Translation\+Gain\+Switch\+Tolerance()}{setTranslationGainSwitchTolerance()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Translation\+Gain\+Switch\+Tolerance (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+x\+\_\+tol = {\ttfamily 30.0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 642 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a4a3ab24e71fed8052b04a9775cc86764}\label{classVisualServoingServer_a4a3ab24e71fed8052b04a9775cc86764}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!set\+Visual\+Servo\+Control@{set\+Visual\+Servo\+Control}}
+\index{set\+Visual\+Servo\+Control@{set\+Visual\+Servo\+Control}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{set\+Visual\+Servo\+Control()}{setVisualServoControl()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::set\+Visual\+Servo\+Control (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{control }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 550 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_adcc6db0a6cf857c4bd44d495ec445954}\label{classVisualServoingServer_adcc6db0a6cf857c4bd44d495ec445954}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!std\+Vector\+Of\+Vectors\+To\+Vector@{std\+Vector\+Of\+Vectors\+To\+Vector}}
+\index{std\+Vector\+Of\+Vectors\+To\+Vector@{std\+Vector\+Of\+Vectors\+To\+Vector}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{std\+Vector\+Of\+Vectors\+To\+Vector()}{stdVectorOfVectorsToVector()}}
+{\footnotesize\ttfamily Vector Visual\+Servoing\+Server\+::std\+Vector\+Of\+Vectors\+To\+Vector (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&}]{vectors }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2863 of file Visual\+Servoing\+Server.\+cpp.
+
+
+
+Referenced by y\+Error\+Verbose().
+
+\mbox{\Hypertarget{classVisualServoingServer_ac8d5b33c4ae61707e121c5154a973ab8}\label{classVisualServoingServer_ac8d5b33c4ae61707e121c5154a973ab8}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!stop\+\_\+controller@{stop\+\_\+controller}}
+\index{stop\+\_\+controller@{stop\+\_\+controller}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{stop\+\_\+controller()}{stop\_controller()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::stop\+\_\+controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Ask for an immediate stop of the visual servoing controller. 
+
+\mbox{[}wait for reply\mbox{]} \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_ac8909c1f4d5eb4cd1ab010fb3dcd7efb}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1232 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_ae5e4ac8d334374f2de259a530781443b}\label{classVisualServoingServer_ae5e4ac8d334374f2de259a530781443b}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!stop\+\_\+facilities@{stop\+\_\+facilities}}
+\index{stop\+\_\+facilities@{stop\+\_\+facilities}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{stop\+\_\+facilities()}{stop\_facilities()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::stop\+\_\+facilities (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Stop and disconnect support modules and connections used for visual servoing. 
+
+This method must be called when visual servoing is no longer needed or a new visual servoing task need to be initialized. \begin{DoxyNote}{Note}
+This method also stops the recursive Bayesian estimation filter. Thus it is suggested to call this method every time visual servoing has been completed/interrupted to have the filter stopped and initialized again during the next init call. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a777cc1a83b3c0ae3dd86e36a0298970e}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1139 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a4a21e5698a1d3b8db7c82772252bd215}\label{classVisualServoingServer_a4a21e5698a1d3b8db7c82772252bd215}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!stop\+Controller@{stop\+Controller}}
+\index{stop\+Controller@{stop\+Controller}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{stop\+Controller()}{stopController()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::stop\+Controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 613 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a0cd7a77750df9c1faaf1a18be6305de9}\label{classVisualServoingServer_a0cd7a77750df9c1faaf1a18be6305de9}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!stop\+Facilities@{stop\+Facilities}}
+\index{stop\+Facilities@{stop\+Facilities}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{stop\+Facilities()}{stopFacilities()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::stop\+Facilities (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 402 of file Visual\+Servoing\+Server.\+cpp.
+
+
+
+References go\+To\+Goal().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classVisualServoingServer_a0cd7a77750df9c1faaf1a18be6305de9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualServoingServer_a1c5018056e6a7db492cc6b1418f8d1e5}\label{classVisualServoingServer_a1c5018056e6a7db492cc6b1418f8d1e5}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!stored\+\_\+go\+\_\+to\+\_\+goal@{stored\+\_\+go\+\_\+to\+\_\+goal}}
+\index{stored\+\_\+go\+\_\+to\+\_\+goal@{stored\+\_\+go\+\_\+to\+\_\+goal}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{stored\+\_\+go\+\_\+to\+\_\+goal()}{stored\_go\_to\_goal()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::stored\+\_\+go\+\_\+to\+\_\+goal (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{label }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Set the robot visual servoing goal. 
+
+The goals are stored on an external file and are referenced by a unique label. 
+\begin{DoxyParams}{Parameters}
+{\em label} & a label referring to one of the available goals; the string shall be one of the available modes returned by the get\+\_\+info() method. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true upon success, false otherwise. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_aa751cf35650259ae7cff331c9d19c694}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1093 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_aded37e0e0111c40fe5f869b16bb1f799}\label{classVisualServoingServer_aded37e0e0111c40fe5f869b16bb1f799}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!stored\+\_\+init@{stored\+\_\+init}}
+\index{stored\+\_\+init@{stored\+\_\+init}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{stored\+\_\+init()}{stored\_init()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::stored\+\_\+init (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{label }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Initialize the robot to an initial position. 
+
+The initial positions are stored on an external file and are referenced by a unique label. 
+\begin{DoxyParams}{Parameters}
+{\em label} & a label referring to one of the available initial positions; the string shall be one of the available modes returned by the get\+\_\+info() method. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true upon success, false otherwise. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_a20ff1561b87126c9b852eacd5ea59d26}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1087 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a6d6ec7fee5b76d8a59d75a626b1bd11b}\label{classVisualServoingServer_a6d6ec7fee5b76d8a59d75a626b1bd11b}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!stored\+Go\+To\+Goal@{stored\+Go\+To\+Goal}}
+\index{stored\+Go\+To\+Goal@{stored\+Go\+To\+Goal}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{stored\+Go\+To\+Goal()}{storedGoToGoal()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::stored\+Go\+To\+Goal (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{label }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 846 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_abf97ec3877e208f4e889a094298a1e1a}\label{classVisualServoingServer_abf97ec3877e208f4e889a094298a1e1a}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!stored\+Init@{stored\+Init}}
+\index{stored\+Init@{stored\+Init}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{stored\+Init()}{storedInit()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::stored\+Init (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{label }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 718 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_aa8673d3ac18d4aa4be94e8354ef0bad5}\label{classVisualServoingServer_aa8673d3ac18d4aa4be94e8354ef0bad5}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!thread\+Init@{thread\+Init}}
+\index{thread\+Init@{thread\+Init}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{thread\+Init()}{threadInit()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::thread\+Init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 992 of file Visual\+Servoing\+Server.\+cpp.
+
+
+
+References backproc\+\_\+\+Update\+Visual\+Servoing\+Paramters().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classVisualServoingServer_aa8673d3ac18d4aa4be94e8354ef0bad5_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualServoingServer_a65744a18718c014e19f882dc1052a517}\label{classVisualServoingServer_a65744a18718c014e19f882dc1052a517}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!thread\+Release@{thread\+Release}}
+\index{thread\+Release@{thread\+Release}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{thread\+Release()}{threadRelease()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::thread\+Release (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 1057 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a509750822f0f1e0db26d54288f8eb1fd}\label{classVisualServoingServer_a509750822f0f1e0db26d54288f8eb1fd}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!unset\+Torso\+D\+OF@{unset\+Torso\+D\+OF}}
+\index{unset\+Torso\+D\+OF@{unset\+Torso\+D\+OF}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{unset\+Torso\+D\+O\+F()}{unsetTorsoDOF()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::unset\+Torso\+D\+OF (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 2514 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_afcd501bb1d5070e8a0735f422a4c9ac0}\label{classVisualServoingServer_afcd501bb1d5070e8a0735f422a4c9ac0}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!wait\+\_\+visual\+\_\+servoing\+\_\+done@{wait\+\_\+visual\+\_\+servoing\+\_\+done}}
+\index{wait\+\_\+visual\+\_\+servoing\+\_\+done@{wait\+\_\+visual\+\_\+servoing\+\_\+done}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{wait\+\_\+visual\+\_\+servoing\+\_\+done()}{wait\_visual\_servoing\_done()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::wait\+\_\+visual\+\_\+servoing\+\_\+done (\begin{DoxyParamCaption}\item[{const double}]{period,  }\item[{const double}]{timeout }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Wait until visual servoing reaches the goal. 
+
+\mbox{[}wait for reply\mbox{]} 
+\begin{DoxyParams}{Parameters}
+{\em period} & the check time period \mbox{[}s\mbox{]}. \\
+\hline
+{\em timeout} & the check expiration time \mbox{[}s\mbox{]}. If timeout $<$= 0 (as by default) the check will be performed without time limitation. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true for success, false for failure and timeout expired. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The tolerance to which the goal is considered achieved can be set with the method \hyperlink{classVisualServoingServer_ad632db85663df2f8c7ca5c27eaacfd71}{set\+Go\+To\+Goal\+Tolerance()}. 
+
+Default values\+: period 0.\+1 \mbox{[}s\mbox{]}, timeout 0.\+0 \mbox{[}s\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualServoingIDL_aa9c9a265e56b0f85c297d2b7d3c8d9c3}{Visual\+Servoing\+I\+DL}.
+
+
+
+Definition at line 1226 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a3b462062db0cdcf3c8777469376bb5b6}\label{classVisualServoingServer_a3b462062db0cdcf3c8777469376bb5b6}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!wait\+Visual\+Servoing\+Done@{wait\+Visual\+Servoing\+Done}}
+\index{wait\+Visual\+Servoing\+Done@{wait\+Visual\+Servoing\+Done}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{wait\+Visual\+Servoing\+Done()}{waitVisualServoingDone()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::wait\+Visual\+Servoing\+Done (\begin{DoxyParamCaption}\item[{const double}]{period = {\ttfamily 0.1},  }\item[{const double}]{timeout = {\ttfamily 0.0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 601 of file Visual\+Servoing\+Server.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingServer_a8eb3cf6c73a515f6f435f01327d37bd1}\label{classVisualServoingServer_a8eb3cf6c73a515f6f435f01327d37bd1}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!y\+Error\+Verbose@{y\+Error\+Verbose}}
+\index{y\+Error\+Verbose@{y\+Error\+Verbose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{y\+Error\+Verbose()}{yErrorVerbose()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::y\+Error\+Verbose (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{str }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 300 of file Visual\+Servoing\+Server.\+h.
+
+
+
+References std\+Vector\+Of\+Vectors\+To\+Vector().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classVisualServoingServer_a8eb3cf6c73a515f6f435f01327d37bd1_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualServoingServer_a6b16f76335ebbd9e4ba9e5ddb67cf883}\label{classVisualServoingServer_a6b16f76335ebbd9e4ba9e5ddb67cf883}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!y\+Info\+Verbose@{y\+Info\+Verbose}}
+\index{y\+Info\+Verbose@{y\+Info\+Verbose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{y\+Info\+Verbose()}{yInfoVerbose()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::y\+Info\+Verbose (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{str }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 298 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a570985820c386689a9507066a016b839}\label{classVisualServoingServer_a570985820c386689a9507066a016b839}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!y\+Warning\+Verbose@{y\+Warning\+Verbose}}
+\index{y\+Warning\+Verbose@{y\+Warning\+Verbose}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{y\+Warning\+Verbose()}{yWarningVerbose()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Server\+::y\+Warning\+Verbose (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{str }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 299 of file Visual\+Servoing\+Server.\+h.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classVisualServoingServer_a85d6a488bf20eaeb155677a80f731614}\label{classVisualServoingServer_a85d6a488bf20eaeb155677a80f731614}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!ctx\+\_\+local\+\_\+cart\+\_\+@{ctx\+\_\+local\+\_\+cart\+\_\+}}
+\index{ctx\+\_\+local\+\_\+cart\+\_\+@{ctx\+\_\+local\+\_\+cart\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{ctx\+\_\+local\+\_\+cart\+\_\+}{ctx\_local\_cart\_}}
+{\footnotesize\ttfamily int Visual\+Servoing\+Server\+::ctx\+\_\+local\+\_\+cart\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 229 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a815f9069588f590419cd8645afd3f017}\label{classVisualServoingServer_a815f9069588f590419cd8645afd3f017}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!ctx\+\_\+remote\+\_\+cart\+\_\+@{ctx\+\_\+remote\+\_\+cart\+\_\+}}
+\index{ctx\+\_\+remote\+\_\+cart\+\_\+@{ctx\+\_\+remote\+\_\+cart\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{ctx\+\_\+remote\+\_\+cart\+\_\+}{ctx\_remote\_cart\_}}
+{\footnotesize\ttfamily int Visual\+Servoing\+Server\+::ctx\+\_\+remote\+\_\+cart\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 230 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a5da42a79826f631e1e40b723e3620c0a}\label{classVisualServoingServer_a5da42a79826f631e1e40b723e3620c0a}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!gaze\+\_\+driver\+\_\+@{gaze\+\_\+driver\+\_\+}}
+\index{gaze\+\_\+driver\+\_\+@{gaze\+\_\+driver\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{gaze\+\_\+driver\+\_\+}{gaze\_driver\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+Poly\+Driver Visual\+Servoing\+Server\+::gaze\+\_\+driver\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 187 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_aadfea10f7ca8a2e745c4091d2a1b7c46}\label{classVisualServoingServer_aadfea10f7ca8a2e745c4091d2a1b7c46}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!goal\+\_\+pose\+\_\+@{goal\+\_\+pose\+\_\+}}
+\index{goal\+\_\+pose\+\_\+@{goal\+\_\+pose\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{goal\+\_\+pose\+\_\+}{goal\_pose\_}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Vector Visual\+Servoing\+Server\+::goal\+\_\+pose\+\_\+ = yarp\+::math\+::zeros(7)\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 214 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a36243aeb865e36c5e91d3cd3375b9f29}\label{classVisualServoingServer_a36243aeb865e36c5e91d3cd3375b9f29}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!is\+\_\+stopping\+\_\+backproc\+\_\+update\+\_\+vs\+\_\+params@{is\+\_\+stopping\+\_\+backproc\+\_\+update\+\_\+vs\+\_\+params}}
+\index{is\+\_\+stopping\+\_\+backproc\+\_\+update\+\_\+vs\+\_\+params@{is\+\_\+stopping\+\_\+backproc\+\_\+update\+\_\+vs\+\_\+params}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{is\+\_\+stopping\+\_\+backproc\+\_\+update\+\_\+vs\+\_\+params}{is\_stopping\_backproc\_update\_vs\_params}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::is\+\_\+stopping\+\_\+backproc\+\_\+update\+\_\+vs\+\_\+params = true\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 288 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ac884095733af31af336373edbe09eae3}\label{classVisualServoingServer_ac884095733af31af336373edbe09eae3}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!itf\+\_\+gaze\+\_\+@{itf\+\_\+gaze\+\_\+}}
+\index{itf\+\_\+gaze\+\_\+@{itf\+\_\+gaze\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{itf\+\_\+gaze\+\_\+}{itf\_gaze\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+I\+Gaze\+Control$\ast$ Visual\+Servoing\+Server\+::itf\+\_\+gaze\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 188 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a62c8f5c6ba2d62db4754d94984b98632}\label{classVisualServoingServer_a62c8f5c6ba2d62db4754d94984b98632}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!itf\+\_\+rightarm\+\_\+cart\+\_\+@{itf\+\_\+rightarm\+\_\+cart\+\_\+}}
+\index{itf\+\_\+rightarm\+\_\+cart\+\_\+@{itf\+\_\+rightarm\+\_\+cart\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{itf\+\_\+rightarm\+\_\+cart\+\_\+}{itf\_rightarm\_cart\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+I\+Cartesian\+Control$\ast$ Visual\+Servoing\+Server\+::itf\+\_\+rightarm\+\_\+cart\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 185 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a3eaf0fc5ef519ebb94fc89f3a1e490a2}\label{classVisualServoingServer_a3eaf0fc5ef519ebb94fc89f3a1e490a2}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!K\+\_\+angle\+\_\+tol\+\_\+@{K\+\_\+angle\+\_\+tol\+\_\+}}
+\index{K\+\_\+angle\+\_\+tol\+\_\+@{K\+\_\+angle\+\_\+tol\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{K\+\_\+angle\+\_\+tol\+\_\+}{K\_angle\_tol\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::\+K\+\_\+angle\+\_\+tol\+\_\+ = 3.\+0 $\ast$ M\+\_\+\+PI / 180.\+0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 201 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a5a7eaa18a77566e129a325e556691e24}\label{classVisualServoingServer_a5a7eaa18a77566e129a325e556691e24}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!K\+\_\+o\+\_\+@{K\+\_\+o\+\_\+}}
+\index{K\+\_\+o\+\_\+@{K\+\_\+o\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{K\+\_\+o\+\_\+}{K\_o\_}}
+{\footnotesize\ttfamily std\+::array$<$double, 2$>$ Visual\+Servoing\+Server\+::\+K\+\_\+o\+\_\+ = \{\{3.\+5, 0.\+5\}\}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 194 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a19e92e42912ae3f4d784d80465ed55b1}\label{classVisualServoingServer_a19e92e42912ae3f4d784d80465ed55b1}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!K\+\_\+o\+\_\+hysteresis\+\_\+@{K\+\_\+o\+\_\+hysteresis\+\_\+}}
+\index{K\+\_\+o\+\_\+hysteresis\+\_\+@{K\+\_\+o\+\_\+hysteresis\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{K\+\_\+o\+\_\+hysteresis\+\_\+}{K\_o\_hysteresis\_}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::\+K\+\_\+o\+\_\+hysteresis\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 203 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ab372aee55fa6ffb7d87d0f9103ea3266}\label{classVisualServoingServer_ab372aee55fa6ffb7d87d0f9103ea3266}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!K\+\_\+o\+\_\+tol\+\_\+@{K\+\_\+o\+\_\+tol\+\_\+}}
+\index{K\+\_\+o\+\_\+tol\+\_\+@{K\+\_\+o\+\_\+tol\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{K\+\_\+o\+\_\+tol\+\_\+}{K\_o\_tol\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::\+K\+\_\+o\+\_\+tol\+\_\+ = 10.\+0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 198 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ab1c7e6dbab2608694d520e849da043f8}\label{classVisualServoingServer_ab1c7e6dbab2608694d520e849da043f8}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!K\+\_\+orientation\+\_\+tol\+\_\+@{K\+\_\+orientation\+\_\+tol\+\_\+}}
+\index{K\+\_\+orientation\+\_\+tol\+\_\+@{K\+\_\+orientation\+\_\+tol\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{K\+\_\+orientation\+\_\+tol\+\_\+}{K\_orientation\_tol\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::\+K\+\_\+orientation\+\_\+tol\+\_\+ = 9.\+0 $\ast$ M\+\_\+\+PI / 180.\+0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 200 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a4fdd46d1c8be0e8eb8b28af84cfe8a6b}\label{classVisualServoingServer_a4fdd46d1c8be0e8eb8b28af84cfe8a6b}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!K\+\_\+pose\+\_\+hysteresis\+\_\+@{K\+\_\+pose\+\_\+hysteresis\+\_\+}}
+\index{K\+\_\+pose\+\_\+hysteresis\+\_\+@{K\+\_\+pose\+\_\+hysteresis\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{K\+\_\+pose\+\_\+hysteresis\+\_\+}{K\_pose\_hysteresis\_}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::\+K\+\_\+pose\+\_\+hysteresis\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 204 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_aaef2ff3c3853c7a73bc620225f824e4e}\label{classVisualServoingServer_aaef2ff3c3853c7a73bc620225f824e4e}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!K\+\_\+position\+\_\+tol\+\_\+@{K\+\_\+position\+\_\+tol\+\_\+}}
+\index{K\+\_\+position\+\_\+tol\+\_\+@{K\+\_\+position\+\_\+tol\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{K\+\_\+position\+\_\+tol\+\_\+}{K\_position\_tol\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::\+K\+\_\+position\+\_\+tol\+\_\+ = 0.\+03\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 199 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a6153b1e315817cf41cb36b7deca83be7}\label{classVisualServoingServer_a6153b1e315817cf41cb36b7deca83be7}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!K\+\_\+x\+\_\+@{K\+\_\+x\+\_\+}}
+\index{K\+\_\+x\+\_\+@{K\+\_\+x\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{K\+\_\+x\+\_\+}{K\_x\_}}
+{\footnotesize\ttfamily std\+::array$<$double, 2$>$ Visual\+Servoing\+Server\+::\+K\+\_\+x\+\_\+ = \{\{0.\+5, 0.\+25\}\}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 193 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a8b8f0cda1bb882c1783db88b720b5597}\label{classVisualServoingServer_a8b8f0cda1bb882c1783db88b720b5597}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!K\+\_\+x\+\_\+hysteresis\+\_\+@{K\+\_\+x\+\_\+hysteresis\+\_\+}}
+\index{K\+\_\+x\+\_\+hysteresis\+\_\+@{K\+\_\+x\+\_\+hysteresis\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{K\+\_\+x\+\_\+hysteresis\+\_\+}{K\_x\_hysteresis\_}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::\+K\+\_\+x\+\_\+hysteresis\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 202 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_aa59bfed390207a42a4a05dd1fe720f6b}\label{classVisualServoingServer_aa59bfed390207a42a4a05dd1fe720f6b}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!K\+\_\+x\+\_\+tol\+\_\+@{K\+\_\+x\+\_\+tol\+\_\+}}
+\index{K\+\_\+x\+\_\+tol\+\_\+@{K\+\_\+x\+\_\+tol\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{K\+\_\+x\+\_\+tol\+\_\+}{K\_x\_tol\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::\+K\+\_\+x\+\_\+tol\+\_\+ = 10.\+0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 197 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_afbf7be0f4c935dcbcd8a23b07b7972ba}\label{classVisualServoingServer_afbf7be0f4c935dcbcd8a23b07b7972ba}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!l\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+@{l\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+}}
+\index{l\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+@{l\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{l\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+}{l\_H\_eye\_to\_r\_}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Matrix Visual\+Servoing\+Server\+::l\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+ = yarp\+::math\+::zeros(4, 4)\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 216 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a43b53260b0903efb5479becf664f33ae}\label{classVisualServoingServer_a43b53260b0903efb5479becf664f33ae}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+@{l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}}
+\index{l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+@{l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}{l\_H\_r\_to\_cam\_}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Matrix Visual\+Servoing\+Server\+::l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+ = yarp\+::math\+::zeros(4, 4)\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 218 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a19525066e8d98f781f28600ff526ce68}\label{classVisualServoingServer_a19525066e8d98f781f28600ff526ce68}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!l\+\_\+proj\+\_\+@{l\+\_\+proj\+\_\+}}
+\index{l\+\_\+proj\+\_\+@{l\+\_\+proj\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{l\+\_\+proj\+\_\+}{l\_proj\_}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Matrix Visual\+Servoing\+Server\+::l\+\_\+proj\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 211 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a3f7efc9e5a4bbb030a4dd81030643398}\label{classVisualServoingServer_a3f7efc9e5a4bbb030a4dd81030643398}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!l\+\_\+px\+\_\+goal\+\_\+@{l\+\_\+px\+\_\+goal\+\_\+}}
+\index{l\+\_\+px\+\_\+goal\+\_\+@{l\+\_\+px\+\_\+goal\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{l\+\_\+px\+\_\+goal\+\_\+}{l\_px\_goal\_}}
+{\footnotesize\ttfamily std\+::vector$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::l\+\_\+px\+\_\+goal\+\_\+ = std\+::vector$<$yarp\+::sig\+::\+Vector$>$(4)\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 226 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a2fb091edd86b425b79b36c968a0929e1}\label{classVisualServoingServer_a2fb091edd86b425b79b36c968a0929e1}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!max\+\_\+o\+\_\+dot\+\_\+@{max\+\_\+o\+\_\+dot\+\_\+}}
+\index{max\+\_\+o\+\_\+dot\+\_\+@{max\+\_\+o\+\_\+dot\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{max\+\_\+o\+\_\+dot\+\_\+}{max\_o\_dot\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::max\+\_\+o\+\_\+dot\+\_\+ = 10.\+0 $\ast$ M\+\_\+\+PI / 180.\+0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 196 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a82df6acf27455af727ce31758856ee48}\label{classVisualServoingServer_a82df6acf27455af727ce31758856ee48}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!max\+\_\+x\+\_\+dot\+\_\+@{max\+\_\+x\+\_\+dot\+\_\+}}
+\index{max\+\_\+x\+\_\+dot\+\_\+@{max\+\_\+x\+\_\+dot\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{max\+\_\+x\+\_\+dot\+\_\+}{max\_x\_dot\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::max\+\_\+x\+\_\+dot\+\_\+ = 0.\+035\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 195 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a379f8205d854495f481bbaa37825dfcb}\label{classVisualServoingServer_a379f8205d854495f481bbaa37825dfcb}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!mtx\+\_\+\+H\+\_\+eye\+\_\+cam\+\_\+@{mtx\+\_\+\+H\+\_\+eye\+\_\+cam\+\_\+}}
+\index{mtx\+\_\+\+H\+\_\+eye\+\_\+cam\+\_\+@{mtx\+\_\+\+H\+\_\+eye\+\_\+cam\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{mtx\+\_\+\+H\+\_\+eye\+\_\+cam\+\_\+}{mtx\_H\_eye\_cam\_}}
+{\footnotesize\ttfamily std\+::mutex Visual\+Servoing\+Server\+::mtx\+\_\+\+H\+\_\+eye\+\_\+cam\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 222 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a63758b38bb0069515d047449aafc9597}\label{classVisualServoingServer_a63758b38bb0069515d047449aafc9597}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!mtx\+\_\+px\+\_\+des\+\_\+@{mtx\+\_\+px\+\_\+des\+\_\+}}
+\index{mtx\+\_\+px\+\_\+des\+\_\+@{mtx\+\_\+px\+\_\+des\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{mtx\+\_\+px\+\_\+des\+\_\+}{mtx\_px\_des\_}}
+{\footnotesize\ttfamily std\+::mutex Visual\+Servoing\+Server\+::mtx\+\_\+px\+\_\+des\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 221 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_af6b808cf1ef56df5fb432196335e1ceb}\label{classVisualServoingServer_af6b808cf1ef56df5fb432196335e1ceb}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!op\+\_\+mode\+\_\+@{op\+\_\+mode\+\_\+}}
+\index{op\+\_\+mode\+\_\+@{op\+\_\+mode\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{op\+\_\+mode\+\_\+}{op\_mode\_}}
+{\footnotesize\ttfamily \hyperlink{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915}{Operating\+Mode} Visual\+Servoing\+Server\+::op\+\_\+mode\+\_\+ = \hyperlink{classVisualServoingServer_ab4ac95327e1829713374ca3cd0dec915a2d5f8ae9328c6535be72ed28bff47560}{Operating\+Mode\+::pose}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 182 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a46d59d98a68e0a88b810835c447241f6}\label{classVisualServoingServer_a46d59d98a68e0a88b810835c447241f6}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+click\+\_\+left\+\_\+@{port\+\_\+click\+\_\+left\+\_\+}}
+\index{port\+\_\+click\+\_\+left\+\_\+@{port\+\_\+click\+\_\+left\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+click\+\_\+left\+\_\+}{port\_click\_left\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::os\+::\+Bottle$>$ Visual\+Servoing\+Server\+::port\+\_\+click\+\_\+left\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 237 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a67701a55fce8ed1301417ecda99eff06}\label{classVisualServoingServer_a67701a55fce8ed1301417ecda99eff06}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+click\+\_\+right\+\_\+@{port\+\_\+click\+\_\+right\+\_\+}}
+\index{port\+\_\+click\+\_\+right\+\_\+@{port\+\_\+click\+\_\+right\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+click\+\_\+right\+\_\+}{port\_click\_right\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::os\+::\+Bottle$>$ Visual\+Servoing\+Server\+::port\+\_\+click\+\_\+right\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 241 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ac4fad3f3691ad57d8a1f693e573f75be}\label{classVisualServoingServer_ac4fad3f3691ad57d8a1f693e573f75be}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+goal\+\_\+px\+\_\+l\+\_\+@{port\+\_\+goal\+\_\+px\+\_\+l\+\_\+}}
+\index{port\+\_\+goal\+\_\+px\+\_\+l\+\_\+@{port\+\_\+goal\+\_\+px\+\_\+l\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+goal\+\_\+px\+\_\+l\+\_\+}{port\_goal\_px\_l\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+goal\+\_\+px\+\_\+l\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 310 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ad06d05e912dbba4c1ded31ae6e0e3004}\label{classVisualServoingServer_ad06d05e912dbba4c1ded31ae6e0e3004}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+goal\+\_\+px\+\_\+r\+\_\+@{port\+\_\+goal\+\_\+px\+\_\+r\+\_\+}}
+\index{port\+\_\+goal\+\_\+px\+\_\+r\+\_\+@{port\+\_\+goal\+\_\+px\+\_\+r\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+goal\+\_\+px\+\_\+r\+\_\+}{port\_goal\_px\_r\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+goal\+\_\+px\+\_\+r\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 311 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a0561904e7a2d8f680812f042eec3b2d8}\label{classVisualServoingServer_a0561904e7a2d8f680812f042eec3b2d8}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+image\+\_\+left\+\_\+in\+\_\+@{port\+\_\+image\+\_\+left\+\_\+in\+\_\+}}
+\index{port\+\_\+image\+\_\+left\+\_\+in\+\_\+@{port\+\_\+image\+\_\+left\+\_\+in\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+image\+\_\+left\+\_\+in\+\_\+}{port\_image\_left\_in\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Image\+Of$<$yarp\+::sig\+::\+Pixel\+Rgb$>$ $>$ Visual\+Servoing\+Server\+::port\+\_\+image\+\_\+left\+\_\+in\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 235 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ac8e9e8c8e3c0a412bd1dd464b58931bd}\label{classVisualServoingServer_ac8e9e8c8e3c0a412bd1dd464b58931bd}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+image\+\_\+left\+\_\+out\+\_\+@{port\+\_\+image\+\_\+left\+\_\+out\+\_\+}}
+\index{port\+\_\+image\+\_\+left\+\_\+out\+\_\+@{port\+\_\+image\+\_\+left\+\_\+out\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+image\+\_\+left\+\_\+out\+\_\+}{port\_image\_left\_out\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Image\+Of$<$yarp\+::sig\+::\+Pixel\+Rgb$>$ $>$ Visual\+Servoing\+Server\+::port\+\_\+image\+\_\+left\+\_\+out\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 236 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a776855ca4deb47cf1c739bde2e07bc8e}\label{classVisualServoingServer_a776855ca4deb47cf1c739bde2e07bc8e}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+image\+\_\+right\+\_\+in\+\_\+@{port\+\_\+image\+\_\+right\+\_\+in\+\_\+}}
+\index{port\+\_\+image\+\_\+right\+\_\+in\+\_\+@{port\+\_\+image\+\_\+right\+\_\+in\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+image\+\_\+right\+\_\+in\+\_\+}{port\_image\_right\_in\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Image\+Of$<$yarp\+::sig\+::\+Pixel\+Rgb$>$ $>$ Visual\+Servoing\+Server\+::port\+\_\+image\+\_\+right\+\_\+in\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 239 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ab5c7a20d3e8545331970517c75d79f2a}\label{classVisualServoingServer_ab5c7a20d3e8545331970517c75d79f2a}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+image\+\_\+right\+\_\+out\+\_\+@{port\+\_\+image\+\_\+right\+\_\+out\+\_\+}}
+\index{port\+\_\+image\+\_\+right\+\_\+out\+\_\+@{port\+\_\+image\+\_\+right\+\_\+out\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+image\+\_\+right\+\_\+out\+\_\+}{port\_image\_right\_out\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Image\+Of$<$yarp\+::sig\+::\+Pixel\+Rgb$>$ $>$ Visual\+Servoing\+Server\+::port\+\_\+image\+\_\+right\+\_\+out\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 240 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a5c6969762a136abeb5de050637e6fbc7}\label{classVisualServoingServer_a5c6969762a136abeb5de050637e6fbc7}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+kin\+\_\+px\+\_\+l\+\_\+@{port\+\_\+kin\+\_\+px\+\_\+l\+\_\+}}
+\index{port\+\_\+kin\+\_\+px\+\_\+l\+\_\+@{port\+\_\+kin\+\_\+px\+\_\+l\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+kin\+\_\+px\+\_\+l\+\_\+}{port\_kin\_px\_l\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+kin\+\_\+px\+\_\+l\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 307 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a0a681791d720678229a3365a5bb0bfd6}\label{classVisualServoingServer_a0a681791d720678229a3365a5bb0bfd6}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+kin\+\_\+px\+\_\+r\+\_\+@{port\+\_\+kin\+\_\+px\+\_\+r\+\_\+}}
+\index{port\+\_\+kin\+\_\+px\+\_\+r\+\_\+@{port\+\_\+kin\+\_\+px\+\_\+r\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+kin\+\_\+px\+\_\+r\+\_\+}{port\_kin\_px\_r\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+kin\+\_\+px\+\_\+r\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 308 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a31db93e3ee0db64e8681d762428b85a9}\label{classVisualServoingServer_a31db93e3ee0db64e8681d762428b85a9}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+pose\+\_\+avg\+\_\+@{port\+\_\+pose\+\_\+avg\+\_\+}}
+\index{port\+\_\+pose\+\_\+avg\+\_\+@{port\+\_\+pose\+\_\+avg\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+pose\+\_\+avg\+\_\+}{port\_pose\_avg\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+pose\+\_\+avg\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 313 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a73e57c16019ed76e14e92a600f1e761b}\label{classVisualServoingServer_a73e57c16019ed76e14e92a600f1e761b}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+pose\+\_\+goal\+\_\+@{port\+\_\+pose\+\_\+goal\+\_\+}}
+\index{port\+\_\+pose\+\_\+goal\+\_\+@{port\+\_\+pose\+\_\+goal\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+pose\+\_\+goal\+\_\+}{port\_pose\_goal\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+pose\+\_\+goal\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 315 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a0f4787672f7b6dea128d688aff2056fc}\label{classVisualServoingServer_a0f4787672f7b6dea128d688aff2056fc}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+pose\+\_\+kin\+\_\+@{port\+\_\+pose\+\_\+kin\+\_\+}}
+\index{port\+\_\+pose\+\_\+kin\+\_\+@{port\+\_\+pose\+\_\+kin\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+pose\+\_\+kin\+\_\+}{port\_pose\_kin\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+pose\+\_\+kin\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 314 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a4c250786d095b0e8a8f5546b2976a669}\label{classVisualServoingServer_a4c250786d095b0e8a8f5546b2976a669}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+pose\+\_\+left\+\_\+in\+\_\+@{port\+\_\+pose\+\_\+left\+\_\+in\+\_\+}}
+\index{port\+\_\+pose\+\_\+left\+\_\+in\+\_\+@{port\+\_\+pose\+\_\+left\+\_\+in\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+pose\+\_\+left\+\_\+in\+\_\+}{port\_pose\_left\_in\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+pose\+\_\+left\+\_\+in\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 232 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_aa72393af28f4b424eeb2966962cbd319}\label{classVisualServoingServer_aa72393af28f4b424eeb2966962cbd319}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+pose\+\_\+px\+\_\+l\+\_\+@{port\+\_\+pose\+\_\+px\+\_\+l\+\_\+}}
+\index{port\+\_\+pose\+\_\+px\+\_\+l\+\_\+@{port\+\_\+pose\+\_\+px\+\_\+l\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+pose\+\_\+px\+\_\+l\+\_\+}{port\_pose\_px\_l\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+pose\+\_\+px\+\_\+l\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 304 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ab068de8542a539175a18d698e5b2289f}\label{classVisualServoingServer_ab068de8542a539175a18d698e5b2289f}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+pose\+\_\+px\+\_\+r\+\_\+@{port\+\_\+pose\+\_\+px\+\_\+r\+\_\+}}
+\index{port\+\_\+pose\+\_\+px\+\_\+r\+\_\+@{port\+\_\+pose\+\_\+px\+\_\+r\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+pose\+\_\+px\+\_\+r\+\_\+}{port\_pose\_px\_r\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+pose\+\_\+px\+\_\+r\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 305 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a708ab93d60ae60ae28fbe7a9f1bffe29}\label{classVisualServoingServer_a708ab93d60ae60ae28fbe7a9f1bffe29}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+pose\+\_\+right\+\_\+in\+\_\+@{port\+\_\+pose\+\_\+right\+\_\+in\+\_\+}}
+\index{port\+\_\+pose\+\_\+right\+\_\+in\+\_\+@{port\+\_\+pose\+\_\+right\+\_\+in\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+pose\+\_\+right\+\_\+in\+\_\+}{port\_pose\_right\_in\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::port\+\_\+pose\+\_\+right\+\_\+in\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 233 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_af10ae1004d335193ab8bd23821a6007f}\label{classVisualServoingServer_af10ae1004d335193ab8bd23821a6007f}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+rpc\+\_\+command\+\_\+@{port\+\_\+rpc\+\_\+command\+\_\+}}
+\index{port\+\_\+rpc\+\_\+command\+\_\+@{port\+\_\+rpc\+\_\+command\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+rpc\+\_\+command\+\_\+}{port\_rpc\_command\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Port Visual\+Servoing\+Server\+::port\+\_\+rpc\+\_\+command\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 243 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a3835afd8ec4c21b2c1d217f7d68a71bb}\label{classVisualServoingServer_a3835afd8ec4c21b2c1d217f7d68a71bb}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+rpc\+\_\+tracker\+\_\+left\+\_\+@{port\+\_\+rpc\+\_\+tracker\+\_\+left\+\_\+}}
+\index{port\+\_\+rpc\+\_\+tracker\+\_\+left\+\_\+@{port\+\_\+rpc\+\_\+tracker\+\_\+left\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+rpc\+\_\+tracker\+\_\+left\+\_\+}{port\_rpc\_tracker\_left\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Rpc\+Client Visual\+Servoing\+Server\+::port\+\_\+rpc\+\_\+tracker\+\_\+left\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 244 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a36df02520e7cc2814d8404e05a42409b}\label{classVisualServoingServer_a36df02520e7cc2814d8404e05a42409b}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!port\+\_\+rpc\+\_\+tracker\+\_\+right\+\_\+@{port\+\_\+rpc\+\_\+tracker\+\_\+right\+\_\+}}
+\index{port\+\_\+rpc\+\_\+tracker\+\_\+right\+\_\+@{port\+\_\+rpc\+\_\+tracker\+\_\+right\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{port\+\_\+rpc\+\_\+tracker\+\_\+right\+\_\+}{port\_rpc\_tracker\_right\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Rpc\+Client Visual\+Servoing\+Server\+::port\+\_\+rpc\+\_\+tracker\+\_\+right\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 245 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a26d45260d6b8e1e17c57bf339890c124}\label{classVisualServoingServer_a26d45260d6b8e1e17c57bf339890c124}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!px\+\_\+des\+\_\+@{px\+\_\+des\+\_\+}}
+\index{px\+\_\+des\+\_\+@{px\+\_\+des\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{px\+\_\+des\+\_\+}{px\_des\_}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Vector Visual\+Servoing\+Server\+::px\+\_\+des\+\_\+ = yarp\+::math\+::zeros(16)\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 215 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a5de06681532722dae98703c4d3e60ba1}\label{classVisualServoingServer_a5de06681532722dae98703c4d3e60ba1}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!r\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+@{r\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+}}
+\index{r\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+@{r\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{r\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+}{r\_H\_eye\_to\_r\_}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Matrix Visual\+Servoing\+Server\+::r\+\_\+\+H\+\_\+eye\+\_\+to\+\_\+r\+\_\+ = yarp\+::math\+::zeros(4, 4)\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 217 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a82bdf1e87c5f65bbbea97655a78fceb6}\label{classVisualServoingServer_a82bdf1e87c5f65bbbea97655a78fceb6}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+@{r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}}
+\index{r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+@{r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}{r\_H\_r\_to\_cam\_}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Matrix Visual\+Servoing\+Server\+::r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+ = yarp\+::math\+::zeros(4, 4)\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 219 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a5bd4d326f2247a39065747e937246677}\label{classVisualServoingServer_a5bd4d326f2247a39065747e937246677}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!r\+\_\+proj\+\_\+@{r\+\_\+proj\+\_\+}}
+\index{r\+\_\+proj\+\_\+@{r\+\_\+proj\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{r\+\_\+proj\+\_\+}{r\_proj\_}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Matrix Visual\+Servoing\+Server\+::r\+\_\+proj\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 212 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a831ffb606b1ff70d0475b645441f469d}\label{classVisualServoingServer_a831ffb606b1ff70d0475b645441f469d}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!r\+\_\+px\+\_\+goal\+\_\+@{r\+\_\+px\+\_\+goal\+\_\+}}
+\index{r\+\_\+px\+\_\+goal\+\_\+@{r\+\_\+px\+\_\+goal\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{r\+\_\+px\+\_\+goal\+\_\+}{r\_px\_goal\_}}
+{\footnotesize\ttfamily std\+::vector$<$yarp\+::sig\+::\+Vector$>$ Visual\+Servoing\+Server\+::r\+\_\+px\+\_\+goal\+\_\+ = std\+::vector$<$yarp\+::sig\+::\+Vector$>$(4)\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 227 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a46e47b0abc5b52fbba314cf9c2ce0df5}\label{classVisualServoingServer_a46e47b0abc5b52fbba314cf9c2ce0df5}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!rightarm\+\_\+cartesian\+\_\+driver\+\_\+@{rightarm\+\_\+cartesian\+\_\+driver\+\_\+}}
+\index{rightarm\+\_\+cartesian\+\_\+driver\+\_\+@{rightarm\+\_\+cartesian\+\_\+driver\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{rightarm\+\_\+cartesian\+\_\+driver\+\_\+}{rightarm\_cartesian\_driver\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+Poly\+Driver Visual\+Servoing\+Server\+::rightarm\+\_\+cartesian\+\_\+driver\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 184 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_adb8cccbe6de08ec4b686d2eca8a99dfd}\label{classVisualServoingServer_adb8cccbe6de08ec4b686d2eca8a99dfd}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!robot\+\_\+name\+\_\+@{robot\+\_\+name\+\_\+}}
+\index{robot\+\_\+name\+\_\+@{robot\+\_\+name\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{robot\+\_\+name\+\_\+}{robot\_name\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Visual\+Servoing\+Server\+::robot\+\_\+name\+\_\+ = \char`\"{}icub\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 179 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ad847ce0f5480013481f037bc554ae96e}\label{classVisualServoingServer_ad847ce0f5480013481f037bc554ae96e}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!sim\+\_\+@{sim\+\_\+}}
+\index{sim\+\_\+@{sim\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{sim\+\_\+}{sim\_}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::sim\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 178 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a01078c56ef8966f186d5cbf22c8c1c0c}\label{classVisualServoingServer_a01078c56ef8966f186d5cbf22c8c1c0c}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!thr\+\_\+background\+\_\+update\+\_\+params\+\_\+@{thr\+\_\+background\+\_\+update\+\_\+params\+\_\+}}
+\index{thr\+\_\+background\+\_\+update\+\_\+params\+\_\+@{thr\+\_\+background\+\_\+update\+\_\+params\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{thr\+\_\+background\+\_\+update\+\_\+params\+\_\+}{thr\_background\_update\_params\_}}
+{\footnotesize\ttfamily std\+::thread$\ast$ Visual\+Servoing\+Server\+::thr\+\_\+background\+\_\+update\+\_\+params\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 224 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a8a39a62f89dc07cbfbdc91441ad71975}\label{classVisualServoingServer_a8a39a62f89dc07cbfbdc91441ad71975}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!tol\+\_\+angle\+\_\+@{tol\+\_\+angle\+\_\+}}
+\index{tol\+\_\+angle\+\_\+@{tol\+\_\+angle\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{tol\+\_\+angle\+\_\+}{tol\_angle\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::tol\+\_\+angle\+\_\+ = 1.\+0 $\ast$ M\+\_\+\+PI / 180.\+0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 208 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a2ebbd8cf0f5bf0968bb574fbadb681e8}\label{classVisualServoingServer_a2ebbd8cf0f5bf0968bb574fbadb681e8}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!tol\+\_\+orientation\+\_\+@{tol\+\_\+orientation\+\_\+}}
+\index{tol\+\_\+orientation\+\_\+@{tol\+\_\+orientation\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{tol\+\_\+orientation\+\_\+}{tol\_orientation\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::tol\+\_\+orientation\+\_\+ = 3.\+0 $\ast$ M\+\_\+\+PI / 180.\+0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 207 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ab2cc91975c9a3f949a99fd6737a2b3bd}\label{classVisualServoingServer_ab2cc91975c9a3f949a99fd6737a2b3bd}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!tol\+\_\+position\+\_\+@{tol\+\_\+position\+\_\+}}
+\index{tol\+\_\+position\+\_\+@{tol\+\_\+position\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{tol\+\_\+position\+\_\+}{tol\_position\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::tol\+\_\+position\+\_\+ = 0.\+01\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 206 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a74ac88af1fee404c750afb59fad98fc6}\label{classVisualServoingServer_a74ac88af1fee404c750afb59fad98fc6}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!tol\+\_\+px\+\_\+@{tol\+\_\+px\+\_\+}}
+\index{tol\+\_\+px\+\_\+@{tol\+\_\+px\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{tol\+\_\+px\+\_\+}{tol\_px\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::tol\+\_\+px\+\_\+ = 1.\+0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 205 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ac397cdbba97a35d454ab2974db0c5005}\label{classVisualServoingServer_ac397cdbba97a35d454ab2974db0c5005}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!traj\+\_\+time\+\_\+@{traj\+\_\+time\+\_\+}}
+\index{traj\+\_\+time\+\_\+@{traj\+\_\+time\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{traj\+\_\+time\+\_\+}{traj\_time\_}}
+{\footnotesize\ttfamily double Visual\+Servoing\+Server\+::traj\+\_\+time\+\_\+ = 1.\+0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 209 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a48bcc91d15c80f7b3b248fa205e8e3de}\label{classVisualServoingServer_a48bcc91d15c80f7b3b248fa205e8e3de}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!Ts\+\_\+@{Ts\+\_\+}}
+\index{Ts\+\_\+@{Ts\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{Ts\+\_\+}{Ts\_}}
+{\footnotesize\ttfamily const double Visual\+Servoing\+Server\+::\+Ts\+\_\+ = 0.\+1\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 192 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_a559b6106818be3b9c48352b614e658c7}\label{classVisualServoingServer_a559b6106818be3b9c48352b614e658c7}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!verbosity\+\_\+@{verbosity\+\_\+}}
+\index{verbosity\+\_\+@{verbosity\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{verbosity\+\_\+}{verbosity\_}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::verbosity\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 177 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_ac8da8eea9620e8cce4ba2502bb1ec86a}\label{classVisualServoingServer_ac8da8eea9620e8cce4ba2502bb1ec86a}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!vs\+\_\+control\+\_\+@{vs\+\_\+control\+\_\+}}
+\index{vs\+\_\+control\+\_\+@{vs\+\_\+control\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{vs\+\_\+control\+\_\+}{vs\_control\_}}
+{\footnotesize\ttfamily \hyperlink{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3}{Visual\+Servo\+Control} Visual\+Servoing\+Server\+::vs\+\_\+control\+\_\+ = \hyperlink{classVisualServoingServer_ad7f000a91f0fc3423b86f2d2a584c4d3a8c5f04f9df63b44bea9b7edcb4dd1038}{Visual\+Servo\+Control\+::decoupled}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 181 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_aeb48fa3b045d9fb074b03ea9d8441972}\label{classVisualServoingServer_aeb48fa3b045d9fb074b03ea9d8441972}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!vs\+\_\+control\+\_\+running\+\_\+@{vs\+\_\+control\+\_\+running\+\_\+}}
+\index{vs\+\_\+control\+\_\+running\+\_\+@{vs\+\_\+control\+\_\+running\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{vs\+\_\+control\+\_\+running\+\_\+}{vs\_control\_running\_}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::vs\+\_\+control\+\_\+running\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 190 of file Visual\+Servoing\+Server.\+h.
+
+\mbox{\Hypertarget{classVisualServoingServer_aae9c2aa802fa83d8b77b5094af94fa38}\label{classVisualServoingServer_aae9c2aa802fa83d8b77b5094af94fa38}} 
+\index{Visual\+Servoing\+Server@{Visual\+Servoing\+Server}!vs\+\_\+goal\+\_\+reached\+\_\+@{vs\+\_\+goal\+\_\+reached\+\_\+}}
+\index{vs\+\_\+goal\+\_\+reached\+\_\+@{vs\+\_\+goal\+\_\+reached\+\_\+}!Visual\+Servoing\+Server@{Visual\+Servoing\+Server}}
+\subsubsection{\texorpdfstring{vs\+\_\+goal\+\_\+reached\+\_\+}{vs\_goal\_reached\_}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Server\+::vs\+\_\+goal\+\_\+reached\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 191 of file Visual\+Servoing\+Server.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/visualservoing/visualservoingserver/include/\hyperlink{VisualServoingServer_8h}{Visual\+Servoing\+Server.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/visualservoing/visualservoingserver/src/\hyperlink{VisualServoingServer_8cpp}{Visual\+Servoing\+Server.\+cpp}\end{DoxyCompactItemize}

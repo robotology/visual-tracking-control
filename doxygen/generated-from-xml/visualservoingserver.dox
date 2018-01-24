@@ -1,0 +1,52 @@
+
+  /**
+  *
+  * @ingroup icub-module 
+  * \defgroup visualservoingserver visualservoingserver
+  * iCub device (plugin, server) for visual servoing.
+  * Version: 0.6.0.0
+  * \author  Claudio Fantacci claudio.fantacci@gmail.com
+  * \n
+  * \copyright BSD 3-clause "New" or "Revised" License
+  * \section intro_sec Description
+  *
+  
+    An image-based visual servoing controller for iCub.
+
+    This is the device (YARP plugin) that controls and command iCub.
+    
+  * \section parameters_sec Parameters     
+  
+  *- -- verbosity : enable device verbose output log.
+  *- -- robot : mandatory, specify the robot name (e.g., iCub)
+  *- -- simulate : enable a dry-run controller where the control low is simulated and the robot does not move.
+  * \section inputports_sec Input Ports
+  * 
+  *- /visualservoing/cam_left/img:i [Image]  [default carrier:mcast]: Input image from the left camera.
+  *
+  
+  *- /visualservoing/cam_right/img:i [Image]  [default carrier:mcast]: Input image from the right camera.
+  *
+  
+  * \section outputports_sec Output Ports
+  * 
+  *- /visualservoing/cam_left/img:o [Image]  [default carrier:tcp]: Output image showing the status of the visual servo controller from the left camera viewpoint.
+  *
+  
+  *- /visualservoing/cam_right/img:o [Image]  [default carrier:tcp]: Output image showing the status of the visual servo controller from the right camera viewpoint.
+  *
+  
+  *
+  * \section services_sec Services
+  * 
+  *- /visualservoing/cmd:i
+  *  [rpc-server]: 
+  * Command port to control the visual servoing server
+  * . This service is described in VisualServoingIDL (VisualServoingIDL.thrift)
+  * 
+  *
+  * 
+  *
+  *
+  **/
+

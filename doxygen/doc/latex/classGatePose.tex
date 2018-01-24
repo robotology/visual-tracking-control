@@ -1,0 +1,263 @@
+\hypertarget{classGatePose}{}\section{Gate\+Pose Class Reference}
+\label{classGatePose}\index{Gate\+Pose@{Gate\+Pose}}
+
+
+{\ttfamily \#include $<$Gate\+Pose.\+h$>$}
+
+
+
+Inheritance diagram for Gate\+Pose\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=258pt]{classGatePose__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classGatePose_a27001df58131fc1431f1a3d768698494}{Gate\+Pose} (std\+::unique\+\_\+ptr$<$ P\+F\+Visual\+Correction $>$ visual\+\_\+correction, const double gate\+\_\+x, const double gate\+\_\+y, const double gate\+\_\+z, const double gate\+\_\+rotation, const double gate\+\_\+aperture) noexcept
+\item 
+\hyperlink{classGatePose_a27e224f41699efe5949e2fb876b1d9ee}{Gate\+Pose} (std\+::unique\+\_\+ptr$<$ P\+F\+Visual\+Correction $>$ visual\+\_\+correction) noexcept
+\item 
+\hyperlink{classGatePose_acea85773116a379f108b7c53152d9420}{$\sim$\+Gate\+Pose} () noexcept
+\item 
+void \hyperlink{classGatePose_a00607a4325dcfb7a02bda7490b65d25c}{innovation} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&pred\+\_\+states, cv\+::\+Input\+Array measurements, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ innovations) override
+\item 
+double \hyperlink{classGatePose_a939c575d5d59c8b0f3ab528edd368c0d}{likelihood} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&innovations) override
+\item 
+bfl\+::\+Visual\+Observation\+Model \& \hyperlink{classGatePose_aa47f9242f039b8752675db5594350a28}{get\+Visual\+Observation\+Model} () override
+\item 
+void \hyperlink{classGatePose_a18ba358c801ae1a246dbee2f9780c698}{set\+Visual\+Observation\+Model} (std\+::unique\+\_\+ptr$<$ bfl\+::\+Visual\+Observation\+Model $>$ visual\+\_\+observation\+\_\+model) override
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classGatePose_a91d395abe75dc7772116f50219dc19ae}{correct\+Step} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&pred\+\_\+states, const Eigen\+::\+Ref$<$ const Eigen\+::\+Vector\+Xf $>$ \&pred\+\_\+weights, cv\+::\+Input\+Array measurements, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ cor\+\_\+states, Eigen\+::\+Ref$<$ Eigen\+::\+Vector\+Xf $>$ cor\+\_\+weights) override
+\item 
+virtual Eigen\+::\+Vector\+Xd \hyperlink{classGatePose_aed9235df850c3ca930f9e43276bf4f62}{read\+Pose} ()=0
+\item 
+bool \hyperlink{classGatePose_a880273787b1b3542e1e7971954ac118d}{is\+Inside\+Ellipsoid} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Vector\+Xf $>$ \&state)
+\item 
+bool \hyperlink{classGatePose_a6d188756ed5dcc56c311a2aafc9d1acd}{is\+Within\+Rotation} (float rot\+\_\+angle)
+\item 
+bool \hyperlink{classGatePose_ad2e8708b3ed5a8252bdec1494f199fda}{is\+Inside\+Cone} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Vector\+Xf $>$ \&state)
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{classGatePose_a702b2c10eb1d86b9a0ac139b3f894310}{gate\+\_\+x\+\_\+}
+\item 
+double \hyperlink{classGatePose_a844864ec9133c4c2081b3682ca243cac}{gate\+\_\+y\+\_\+}
+\item 
+double \hyperlink{classGatePose_a1ff2edfa464cfe7efc8c1da43f59de21}{gate\+\_\+z\+\_\+}
+\item 
+double \hyperlink{classGatePose_ac5e580554426053ea164e00fbe41f775}{gate\+\_\+aperture\+\_\+}
+\item 
+double \hyperlink{classGatePose_a98dd62845368c46900f7cf0dcac358e5}{gate\+\_\+rotation\+\_\+}
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classGatePose_affa53c9f133bf1dd59de8880317cf3cd}{ee\+\_\+pose\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 10 of file Gate\+Pose.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classGatePose_a27001df58131fc1431f1a3d768698494}\label{classGatePose_a27001df58131fc1431f1a3d768698494}} 
+\index{Gate\+Pose@{Gate\+Pose}!Gate\+Pose@{Gate\+Pose}}
+\index{Gate\+Pose@{Gate\+Pose}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{Gate\+Pose()}{GatePose()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Gate\+Pose\+::\+Gate\+Pose (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ P\+F\+Visual\+Correction $>$}]{visual\+\_\+correction,  }\item[{const double}]{gate\+\_\+x,  }\item[{const double}]{gate\+\_\+y,  }\item[{const double}]{gate\+\_\+z,  }\item[{const double}]{gate\+\_\+rotation,  }\item[{const double}]{gate\+\_\+aperture }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 10 of file Gate\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classGatePose_a27e224f41699efe5949e2fb876b1d9ee}\label{classGatePose_a27e224f41699efe5949e2fb876b1d9ee}} 
+\index{Gate\+Pose@{Gate\+Pose}!Gate\+Pose@{Gate\+Pose}}
+\index{Gate\+Pose@{Gate\+Pose}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{Gate\+Pose()}{GatePose()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Gate\+Pose\+::\+Gate\+Pose (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ P\+F\+Visual\+Correction $>$}]{visual\+\_\+correction }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 23 of file Gate\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classGatePose_acea85773116a379f108b7c53152d9420}\label{classGatePose_acea85773116a379f108b7c53152d9420}} 
+\index{Gate\+Pose@{Gate\+Pose}!````~Gate\+Pose@{$\sim$\+Gate\+Pose}}
+\index{````~Gate\+Pose@{$\sim$\+Gate\+Pose}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{$\sim$\+Gate\+Pose()}{~GatePose()}}
+{\footnotesize\ttfamily Gate\+Pose\+::$\sim$\+Gate\+Pose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 27 of file Gate\+Pose.\+cpp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classGatePose_a91d395abe75dc7772116f50219dc19ae}\label{classGatePose_a91d395abe75dc7772116f50219dc19ae}} 
+\index{Gate\+Pose@{Gate\+Pose}!correct\+Step@{correct\+Step}}
+\index{correct\+Step@{correct\+Step}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{correct\+Step()}{correctStep()}}
+{\footnotesize\ttfamily void Gate\+Pose\+::correct\+Step (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{pred\+\_\+states,  }\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Vector\+Xf $>$ \&}]{pred\+\_\+weights,  }\item[{cv\+::\+Input\+Array}]{measurements,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{cor\+\_\+states,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Vector\+Xf $>$}]{cor\+\_\+weights }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 54 of file Gate\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classGatePose_aa47f9242f039b8752675db5594350a28}\label{classGatePose_aa47f9242f039b8752675db5594350a28}} 
+\index{Gate\+Pose@{Gate\+Pose}!get\+Visual\+Observation\+Model@{get\+Visual\+Observation\+Model}}
+\index{get\+Visual\+Observation\+Model@{get\+Visual\+Observation\+Model}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{get\+Visual\+Observation\+Model()}{getVisualObservationModel()}}
+{\footnotesize\ttfamily Visual\+Observation\+Model \& Gate\+Pose\+::get\+Visual\+Observation\+Model (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 42 of file Gate\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classGatePose_a00607a4325dcfb7a02bda7490b65d25c}\label{classGatePose_a00607a4325dcfb7a02bda7490b65d25c}} 
+\index{Gate\+Pose@{Gate\+Pose}!innovation@{innovation}}
+\index{innovation@{innovation}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{innovation()}{innovation()}}
+{\footnotesize\ttfamily void Gate\+Pose\+::innovation (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{pred\+\_\+states,  }\item[{cv\+::\+Input\+Array}]{measurements,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{innovations }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 30 of file Gate\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classGatePose_ad2e8708b3ed5a8252bdec1494f199fda}\label{classGatePose_ad2e8708b3ed5a8252bdec1494f199fda}} 
+\index{Gate\+Pose@{Gate\+Pose}!is\+Inside\+Cone@{is\+Inside\+Cone}}
+\index{is\+Inside\+Cone@{is\+Inside\+Cone}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{is\+Inside\+Cone()}{isInsideCone()}}
+{\footnotesize\ttfamily bool Gate\+Pose\+::is\+Inside\+Cone (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Vector\+Xf $>$ \&}]{state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 88 of file Gate\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classGatePose_a880273787b1b3542e1e7971954ac118d}\label{classGatePose_a880273787b1b3542e1e7971954ac118d}} 
+\index{Gate\+Pose@{Gate\+Pose}!is\+Inside\+Ellipsoid@{is\+Inside\+Ellipsoid}}
+\index{is\+Inside\+Ellipsoid@{is\+Inside\+Ellipsoid}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{is\+Inside\+Ellipsoid()}{isInsideEllipsoid()}}
+{\footnotesize\ttfamily bool Gate\+Pose\+::is\+Inside\+Ellipsoid (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Vector\+Xf $>$ \&}]{state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 72 of file Gate\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classGatePose_a6d188756ed5dcc56c311a2aafc9d1acd}\label{classGatePose_a6d188756ed5dcc56c311a2aafc9d1acd}} 
+\index{Gate\+Pose@{Gate\+Pose}!is\+Within\+Rotation@{is\+Within\+Rotation}}
+\index{is\+Within\+Rotation@{is\+Within\+Rotation}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{is\+Within\+Rotation()}{isWithinRotation()}}
+{\footnotesize\ttfamily bool Gate\+Pose\+::is\+Within\+Rotation (\begin{DoxyParamCaption}\item[{float}]{rot\+\_\+angle }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 80 of file Gate\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classGatePose_a939c575d5d59c8b0f3ab528edd368c0d}\label{classGatePose_a939c575d5d59c8b0f3ab528edd368c0d}} 
+\index{Gate\+Pose@{Gate\+Pose}!likelihood@{likelihood}}
+\index{likelihood@{likelihood}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{likelihood()}{likelihood()}}
+{\footnotesize\ttfamily double Gate\+Pose\+::likelihood (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{innovations }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 36 of file Gate\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classGatePose_aed9235df850c3ca930f9e43276bf4f62}\label{classGatePose_aed9235df850c3ca930f9e43276bf4f62}} 
+\index{Gate\+Pose@{Gate\+Pose}!read\+Pose@{read\+Pose}}
+\index{read\+Pose@{read\+Pose}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{read\+Pose()}{readPose()}}
+{\footnotesize\ttfamily virtual Eigen\+::\+Vector\+Xd Gate\+Pose\+::read\+Pose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [pure virtual]}}
+
+
+
+Implemented in \hyperlink{classiCubGatePose_aff1494edcf8f17803788f954ba0b443b}{i\+Cub\+Gate\+Pose}, and \hyperlink{classPlayGatePose_a863afa00ea83395e7f2ceffd26242106}{Play\+Gate\+Pose}.
+
+\mbox{\Hypertarget{classGatePose_a18ba358c801ae1a246dbee2f9780c698}\label{classGatePose_a18ba358c801ae1a246dbee2f9780c698}} 
+\index{Gate\+Pose@{Gate\+Pose}!set\+Visual\+Observation\+Model@{set\+Visual\+Observation\+Model}}
+\index{set\+Visual\+Observation\+Model@{set\+Visual\+Observation\+Model}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{set\+Visual\+Observation\+Model()}{setVisualObservationModel()}}
+{\footnotesize\ttfamily void Gate\+Pose\+::set\+Visual\+Observation\+Model (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ bfl\+::\+Visual\+Observation\+Model $>$}]{visual\+\_\+observation\+\_\+model }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 48 of file Gate\+Pose.\+cpp.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classGatePose_affa53c9f133bf1dd59de8880317cf3cd}\label{classGatePose_affa53c9f133bf1dd59de8880317cf3cd}} 
+\index{Gate\+Pose@{Gate\+Pose}!ee\+\_\+pose\+\_\+@{ee\+\_\+pose\+\_\+}}
+\index{ee\+\_\+pose\+\_\+@{ee\+\_\+pose\+\_\+}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{ee\+\_\+pose\+\_\+}{ee\_pose\_}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd Gate\+Pose\+::ee\+\_\+pose\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 49 of file Gate\+Pose.\+h.
+
+\mbox{\Hypertarget{classGatePose_ac5e580554426053ea164e00fbe41f775}\label{classGatePose_ac5e580554426053ea164e00fbe41f775}} 
+\index{Gate\+Pose@{Gate\+Pose}!gate\+\_\+aperture\+\_\+@{gate\+\_\+aperture\+\_\+}}
+\index{gate\+\_\+aperture\+\_\+@{gate\+\_\+aperture\+\_\+}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{gate\+\_\+aperture\+\_\+}{gate\_aperture\_}}
+{\footnotesize\ttfamily double Gate\+Pose\+::gate\+\_\+aperture\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 46 of file Gate\+Pose.\+h.
+
+\mbox{\Hypertarget{classGatePose_a98dd62845368c46900f7cf0dcac358e5}\label{classGatePose_a98dd62845368c46900f7cf0dcac358e5}} 
+\index{Gate\+Pose@{Gate\+Pose}!gate\+\_\+rotation\+\_\+@{gate\+\_\+rotation\+\_\+}}
+\index{gate\+\_\+rotation\+\_\+@{gate\+\_\+rotation\+\_\+}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{gate\+\_\+rotation\+\_\+}{gate\_rotation\_}}
+{\footnotesize\ttfamily double Gate\+Pose\+::gate\+\_\+rotation\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 47 of file Gate\+Pose.\+h.
+
+\mbox{\Hypertarget{classGatePose_a702b2c10eb1d86b9a0ac139b3f894310}\label{classGatePose_a702b2c10eb1d86b9a0ac139b3f894310}} 
+\index{Gate\+Pose@{Gate\+Pose}!gate\+\_\+x\+\_\+@{gate\+\_\+x\+\_\+}}
+\index{gate\+\_\+x\+\_\+@{gate\+\_\+x\+\_\+}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{gate\+\_\+x\+\_\+}{gate\_x\_}}
+{\footnotesize\ttfamily double Gate\+Pose\+::gate\+\_\+x\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 43 of file Gate\+Pose.\+h.
+
+\mbox{\Hypertarget{classGatePose_a844864ec9133c4c2081b3682ca243cac}\label{classGatePose_a844864ec9133c4c2081b3682ca243cac}} 
+\index{Gate\+Pose@{Gate\+Pose}!gate\+\_\+y\+\_\+@{gate\+\_\+y\+\_\+}}
+\index{gate\+\_\+y\+\_\+@{gate\+\_\+y\+\_\+}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{gate\+\_\+y\+\_\+}{gate\_y\_}}
+{\footnotesize\ttfamily double Gate\+Pose\+::gate\+\_\+y\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 44 of file Gate\+Pose.\+h.
+
+\mbox{\Hypertarget{classGatePose_a1ff2edfa464cfe7efc8c1da43f59de21}\label{classGatePose_a1ff2edfa464cfe7efc8c1da43f59de21}} 
+\index{Gate\+Pose@{Gate\+Pose}!gate\+\_\+z\+\_\+@{gate\+\_\+z\+\_\+}}
+\index{gate\+\_\+z\+\_\+@{gate\+\_\+z\+\_\+}!Gate\+Pose@{Gate\+Pose}}
+\subsubsection{\texorpdfstring{gate\+\_\+z\+\_\+}{gate\_z\_}}
+{\footnotesize\ttfamily double Gate\+Pose\+::gate\+\_\+z\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 45 of file Gate\+Pose.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/include/\hyperlink{GatePose_8h}{Gate\+Pose.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/src/\hyperlink{GatePose_8cpp}{Gate\+Pose.\+cpp}\end{DoxyCompactItemize}

@@ -1,0 +1,50 @@
+\hypertarget{group__hand-tracking}{}\section{hand-\/tracking}
+\label{group__hand-tracking}\index{hand-\/tracking@{hand-\/tracking}}
+
+
+A visual end-\/effector tracker using a 3D model-\/aided particle filter.  
+
+
+A visual end-\/effector tracker using a 3D model-\/aided particle filter. 
+
+Version\+: 0.\+6.\+0.\+0 \begin{DoxyAuthor}{Author}
+Claudio Fantacci \href{mailto:claudio.fantacci@iit.it}{\tt claudio.\+fantacci@iit.\+it} ~\newline
+ 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+B\+SD 3-\/clause \char`\"{}\+New\char`\"{} or \char`\"{}\+Revised\char`\"{} License 
+\end{DoxyCopyright}
+\hypertarget{group__visualservoingserver_intro_sec}{}\subsection{Description}\label{group__visualservoingserver_intro_sec}
+This module run a recursive Bayesian filter, a particle filter, to track the robot\textquotesingle{}s end-\/effector.
+
+For each particle filter recursion
+
+1) we render, for each particle, an image of the 3D mesh model of the end-\/effector as it would appear from the robotâs viewpoints (likewise in augmented reality contexts);
+
+2) we then use this state representation to directly estimate the 6D pose (position and orientation) of the end-\/effector in the robot operative space using 2D image descriptors.
+
+In particular, we use H\+OG to compare the rendered images with the robotâs camera images and, as a result, the particles which are more likely to represent the end-\/effector will have higher weight.\hypertarget{group__visualservoingserver_parameters_sec}{}\subsection{Parameters}\label{group__visualservoingserver_parameters_sec}
+
+\begin{DoxyItemize}
+\item -- play \+: use stored data played with yarpdataplayer.
+\item -- camsel \+: left or right to slect the corresponding i\+Cub eye. 
+\end{DoxyItemize}\hypertarget{group__visualservoingserver_inputports_sec}{}\subsection{Input Ports}\label{group__visualservoingserver_inputports_sec}
+
+\begin{DoxyItemize}
+\item /hand-\/tracking/\+\_\+camsel\+\_\+/img\+:i \mbox{[}Image\mbox{]} \mbox{[}default carrier\+:mcast\mbox{]}\+: Input image from the camera.
+\item /hand-\/tracking/\+Initi\+Cub\+Arm/cam/\+\_\+camsel\+\_\+/torso\+:i \mbox{[}Bottle\mbox{]} \mbox{[}default carrier\+:tcp\mbox{]}\+: Read torso encorder values.
+\item /hand-\/tracking/\+Initi\+Cub\+Arm/cam/\+\_\+camsel\+\_\+/right\+\_\+arm\+:i \mbox{[}Bottle\mbox{]} \mbox{[}default carrier\+:tcp\mbox{]}\+: Read right arm encorder values.
+\item /hand-\/tracking/\+Visual\+Proprioception/\+\_\+camsel\+\_\+/head\+:i \mbox{[}Bottle\mbox{]} \mbox{[}default carrier\+:tcp\mbox{]}\+: Read neck and eyes encorder values.
+\item /hand-\/tracking/\+Visual\+Proprioception/\+\_\+camsel\+\_\+/right\+\_\+arm\+:i \mbox{[}Bottle\mbox{]} \mbox{[}default carrier\+:tcp\mbox{]}\+: Read right arm encorder values.
+\item /hand-\/tracking/\+Visual\+Proprioception/\+\_\+camsel\+\_\+/torso\+:i \mbox{[}Bottle\mbox{]} \mbox{[}default carrier\+:tcp\mbox{]}\+: Read torso encorder values.
+\item /hand-\/tracking/\+Resampling\+With\+Prior/\+Initi\+Cub\+Arm/cam/\+\_\+camsel\+\_\+/torso\+:i \mbox{[}Bottle\mbox{]} \mbox{[}default carrier\+:tcp\mbox{]}\+: Read torso encorder values.
+\item /hand-\/tracking/\+Resampling\+With\+Prior/\+Initi\+Cub\+Arm/cam/\+\_\+camsel\+\_\+/right\+\_\+arm\+:i \mbox{[}Bottle\mbox{]} \mbox{[}default carrier\+:tcp\mbox{]}\+: Read right arm encorder values.
+\end{DoxyItemize}\hypertarget{group__visualservoingserver_outputports_sec}{}\subsection{Output Ports}\label{group__visualservoingserver_outputports_sec}
+
+\begin{DoxyItemize}
+\item /hand-\/tracking/\+\_\+camsel\+\_\+/result/estimates\+:o \mbox{[}Bottle\mbox{]} \mbox{[}default carrier\+:tcp\mbox{]}\+: Pose estimates of the right end-\/effector of i\+Cub.
+\end{DoxyItemize}\hypertarget{group__visualservoingserver_services_sec}{}\subsection{Services}\label{group__visualservoingserver_services_sec}
+
+\begin{DoxyItemize}
+\item /hand-\/tracking/\+\_\+camsel\+\_\+/cmd\+:i \mbox{[}rpc-\/server\mbox{]}\+: Command port to control the 3D model-\/aided S\+IS particle filter. . This service is described in \hyperlink{classVisualSISParticleFilterIDL}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL} (Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L.\+thrift) 
+\end{DoxyItemize}

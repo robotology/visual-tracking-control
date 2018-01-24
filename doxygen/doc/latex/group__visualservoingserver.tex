@@ -1,0 +1,40 @@
+\hypertarget{group__visualservoingserver}{}\section{visualservoingserver}
+\label{group__visualservoingserver}\index{visualservoingserver@{visualservoingserver}}
+
+
+i\+Cub device (plugin, server) for visual servoing.  
+
+
+i\+Cub device (plugin, server) for visual servoing. 
+
+Version\+: 0.\+6.\+0.\+0 \begin{DoxyAuthor}{Author}
+Claudio Fantacci \href{mailto:claudio.fantacci@gmail.com}{\tt claudio.\+fantacci@gmail.\+com} ~\newline
+ 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+B\+SD 3-\/clause \char`\"{}\+New\char`\"{} or \char`\"{}\+Revised\char`\"{} License 
+\end{DoxyCopyright}
+\hypertarget{group__visualservoingserver_intro_sec}{}\subsection{Description}\label{group__visualservoingserver_intro_sec}
+An image-\/based visual servoing controller for i\+Cub.
+
+This is the device (Y\+A\+RP plugin) that controls and command i\+Cub.\hypertarget{group__visualservoingserver_parameters_sec}{}\subsection{Parameters}\label{group__visualservoingserver_parameters_sec}
+
+\begin{DoxyItemize}
+\item -- verbosity \+: enable device verbose output log.
+\item -- robot \+: mandatory, specify the robot name (e.\+g., i\+Cub)
+\item -- simulate \+: enable a dry-\/run controller where the control low is simulated and the robot does not move. 
+\end{DoxyItemize}\hypertarget{group__visualservoingserver_inputports_sec}{}\subsection{Input Ports}\label{group__visualservoingserver_inputports_sec}
+
+\begin{DoxyItemize}
+\item /visualservoing/cam\+\_\+left/img\+:i \mbox{[}Image\mbox{]} \mbox{[}default carrier\+:mcast\mbox{]}\+: Input image from the left camera.
+\item /visualservoing/cam\+\_\+right/img\+:i \mbox{[}Image\mbox{]} \mbox{[}default carrier\+:mcast\mbox{]}\+: Input image from the right camera.
+\end{DoxyItemize}\hypertarget{group__visualservoingserver_outputports_sec}{}\subsection{Output Ports}\label{group__visualservoingserver_outputports_sec}
+
+\begin{DoxyItemize}
+\item /visualservoing/cam\+\_\+left/img\+:o \mbox{[}Image\mbox{]} \mbox{[}default carrier\+:tcp\mbox{]}\+: Output image showing the status of the visual servo controller from the left camera viewpoint.
+\item /visualservoing/cam\+\_\+right/img\+:o \mbox{[}Image\mbox{]} \mbox{[}default carrier\+:tcp\mbox{]}\+: Output image showing the status of the visual servo controller from the right camera viewpoint.
+\end{DoxyItemize}\hypertarget{group__visualservoingserver_services_sec}{}\subsection{Services}\label{group__visualservoingserver_services_sec}
+
+\begin{DoxyItemize}
+\item /visualservoing/cmd\+:i \mbox{[}rpc-\/server\mbox{]}\+: Command port to control the visual servoing server . This service is described in \hyperlink{classVisualServoingIDL}{Visual\+Servoing\+I\+DL} (Visual\+Servoing\+I\+D\+L.\+thrift) 
+\end{DoxyItemize}

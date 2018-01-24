@@ -1,0 +1,159 @@
+\hypertarget{classInitiCubArm}{}\section{Initi\+Cub\+Arm Class Reference}
+\label{classInitiCubArm}\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+
+
+{\ttfamily \#include $<$Initi\+Cub\+Arm.\+h$>$}
+
+
+
+Inheritance diagram for Initi\+Cub\+Arm\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=164pt]{classInitiCubArm__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classInitiCubArm_aa59e8d0c6da59fcde27daec16e560cbf}{Initi\+Cub\+Arm} (const yarp\+::os\+::\+Const\+String \&port\+\_\+prefix, const yarp\+::os\+::\+Const\+String \&cam\+\_\+sel, const yarp\+::os\+::\+Const\+String \&laterality) noexcept
+\item 
+\hyperlink{classInitiCubArm_affa3e5d97a2f24f3e3fd2030a0dd5dbc}{Initi\+Cub\+Arm} (const yarp\+::os\+::\+Const\+String \&cam\+\_\+sel, const yarp\+::os\+::\+Const\+String \&laterality) noexcept
+\item 
+\hyperlink{classInitiCubArm_a337d96e7aecbd9235b3734c2aa317429}{$\sim$\+Initi\+Cub\+Arm} () noexcept
+\item 
+void \hyperlink{classInitiCubArm_a6f28c13828b5b90366b1105aef5820e3}{initialize} (Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ state, Eigen\+::\+Ref$<$ Eigen\+::\+Vector\+Xf $>$ weight) override
+\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classInitiCubArm_a9e4667c1412ed80a44307fad5e553598}{read\+Torso} ()
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classInitiCubArm_a1dc997322826f47da11f6c247f86e063}{read\+Root\+To\+EE} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+i\+Cub\+::i\+Kin\+::i\+Cub\+Arm \hyperlink{classInitiCubArm_ae91a23c5ca3112d9a18561844ac0413b}{icub\+\_\+kin\+\_\+arm\+\_\+}
+\item 
+i\+Cub\+::i\+Kin\+::i\+Cub\+Finger \hyperlink{classInitiCubArm_a6fb2f21dcfe50b9d28bb58bc90c93f36}{icub\+\_\+kin\+\_\+finger\+\_\+} \mbox{[}3\mbox{]}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::os\+::\+Bottle $>$ \hyperlink{classInitiCubArm_a1587e14242e40ec6cefaecfd1d88aff4}{port\+\_\+torso\+\_\+enc\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::os\+::\+Bottle $>$ \hyperlink{classInitiCubArm_a0eb264a33270c599c0621b2148096516}{port\+\_\+arm\+\_\+enc\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 12 of file Initi\+Cub\+Arm.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classInitiCubArm_aa59e8d0c6da59fcde27daec16e560cbf}\label{classInitiCubArm_aa59e8d0c6da59fcde27daec16e560cbf}} 
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\subsubsection{\texorpdfstring{Initi\+Cub\+Arm()}{InitiCubArm()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Initi\+Cub\+Arm\+::\+Initi\+Cub\+Arm (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{port\+\_\+prefix,  }\item[{const yarp\+::os\+::\+Const\+String \&}]{cam\+\_\+sel,  }\item[{const yarp\+::os\+::\+Const\+String \&}]{laterality }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\mbox{\Hypertarget{classInitiCubArm_affa3e5d97a2f24f3e3fd2030a0dd5dbc}\label{classInitiCubArm_affa3e5d97a2f24f3e3fd2030a0dd5dbc}} 
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\subsubsection{\texorpdfstring{Initi\+Cub\+Arm()}{InitiCubArm()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Initi\+Cub\+Arm\+::\+Initi\+Cub\+Arm (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{cam\+\_\+sel,  }\item[{const yarp\+::os\+::\+Const\+String \&}]{laterality }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\mbox{\Hypertarget{classInitiCubArm_a337d96e7aecbd9235b3734c2aa317429}\label{classInitiCubArm_a337d96e7aecbd9235b3734c2aa317429}} 
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!````~Initi\+Cub\+Arm@{$\sim$\+Initi\+Cub\+Arm}}
+\index{````~Initi\+Cub\+Arm@{$\sim$\+Initi\+Cub\+Arm}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\subsubsection{\texorpdfstring{$\sim$\+Initi\+Cub\+Arm()}{~InitiCubArm()}}
+{\footnotesize\ttfamily Initi\+Cub\+Arm\+::$\sim$\+Initi\+Cub\+Arm (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 34 of file Initi\+Cub\+Arm.\+cpp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classInitiCubArm_a6f28c13828b5b90366b1105aef5820e3}\label{classInitiCubArm_a6f28c13828b5b90366b1105aef5820e3}} 
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!initialize@{initialize}}
+\index{initialize@{initialize}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\subsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily void Initi\+Cub\+Arm\+::initialize (\begin{DoxyParamCaption}\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{state,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Vector\+Xf $>$}]{weight }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 41 of file Initi\+Cub\+Arm.\+cpp.
+
+\mbox{\Hypertarget{classInitiCubArm_a1dc997322826f47da11f6c247f86e063}\label{classInitiCubArm_a1dc997322826f47da11f6c247f86e063}} 
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!read\+Root\+To\+EE@{read\+Root\+To\+EE}}
+\index{read\+Root\+To\+EE@{read\+Root\+To\+EE}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\subsubsection{\texorpdfstring{read\+Root\+To\+E\+E()}{readRootToEE()}}
+{\footnotesize\ttfamily Vector Initi\+Cub\+Arm\+::read\+Root\+To\+EE (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 68 of file Initi\+Cub\+Arm.\+cpp.
+
+\mbox{\Hypertarget{classInitiCubArm_a9e4667c1412ed80a44307fad5e553598}\label{classInitiCubArm_a9e4667c1412ed80a44307fad5e553598}} 
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!read\+Torso@{read\+Torso}}
+\index{read\+Torso@{read\+Torso}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\subsubsection{\texorpdfstring{read\+Torso()}{readTorso()}}
+{\footnotesize\ttfamily Vector Initi\+Cub\+Arm\+::read\+Torso (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 54 of file Initi\+Cub\+Arm.\+cpp.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classInitiCubArm_ae91a23c5ca3112d9a18561844ac0413b}\label{classInitiCubArm_ae91a23c5ca3112d9a18561844ac0413b}} 
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!icub\+\_\+kin\+\_\+arm\+\_\+@{icub\+\_\+kin\+\_\+arm\+\_\+}}
+\index{icub\+\_\+kin\+\_\+arm\+\_\+@{icub\+\_\+kin\+\_\+arm\+\_\+}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\subsubsection{\texorpdfstring{icub\+\_\+kin\+\_\+arm\+\_\+}{icub\_kin\_arm\_}}
+{\footnotesize\ttfamily i\+Cub\+::i\+Kin\+::i\+Cub\+Arm Initi\+Cub\+Arm\+::icub\+\_\+kin\+\_\+arm\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 24 of file Initi\+Cub\+Arm.\+h.
+
+\mbox{\Hypertarget{classInitiCubArm_a6fb2f21dcfe50b9d28bb58bc90c93f36}\label{classInitiCubArm_a6fb2f21dcfe50b9d28bb58bc90c93f36}} 
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!icub\+\_\+kin\+\_\+finger\+\_\+@{icub\+\_\+kin\+\_\+finger\+\_\+}}
+\index{icub\+\_\+kin\+\_\+finger\+\_\+@{icub\+\_\+kin\+\_\+finger\+\_\+}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\subsubsection{\texorpdfstring{icub\+\_\+kin\+\_\+finger\+\_\+}{icub\_kin\_finger\_}}
+{\footnotesize\ttfamily i\+Cub\+::i\+Kin\+::i\+Cub\+Finger Initi\+Cub\+Arm\+::icub\+\_\+kin\+\_\+finger\+\_\+\mbox{[}3\mbox{]}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 25 of file Initi\+Cub\+Arm.\+h.
+
+\mbox{\Hypertarget{classInitiCubArm_a0eb264a33270c599c0621b2148096516}\label{classInitiCubArm_a0eb264a33270c599c0621b2148096516}} 
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!port\+\_\+arm\+\_\+enc\+\_\+@{port\+\_\+arm\+\_\+enc\+\_\+}}
+\index{port\+\_\+arm\+\_\+enc\+\_\+@{port\+\_\+arm\+\_\+enc\+\_\+}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\subsubsection{\texorpdfstring{port\+\_\+arm\+\_\+enc\+\_\+}{port\_arm\_enc\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::os\+::\+Bottle$>$ Initi\+Cub\+Arm\+::port\+\_\+arm\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 27 of file Initi\+Cub\+Arm.\+h.
+
+\mbox{\Hypertarget{classInitiCubArm_a1587e14242e40ec6cefaecfd1d88aff4}\label{classInitiCubArm_a1587e14242e40ec6cefaecfd1d88aff4}} 
+\index{Initi\+Cub\+Arm@{Initi\+Cub\+Arm}!port\+\_\+torso\+\_\+enc\+\_\+@{port\+\_\+torso\+\_\+enc\+\_\+}}
+\index{port\+\_\+torso\+\_\+enc\+\_\+@{port\+\_\+torso\+\_\+enc\+\_\+}!Initi\+Cub\+Arm@{Initi\+Cub\+Arm}}
+\subsubsection{\texorpdfstring{port\+\_\+torso\+\_\+enc\+\_\+}{port\_torso\_enc\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::os\+::\+Bottle$>$ Initi\+Cub\+Arm\+::port\+\_\+torso\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 26 of file Initi\+Cub\+Arm.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/include/\hyperlink{InitiCubArm_8h}{Initi\+Cub\+Arm.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/src/\hyperlink{InitiCubArm_8cpp}{Initi\+Cub\+Arm.\+cpp}\end{DoxyCompactItemize}

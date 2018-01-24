@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+
+<module>
+    <name>visualservoingclient</name>
+    <doxygen-group>icub-module</doxygen-group>
+    <description>iCub device (plugin, client) for visual servoing.</description>
+    <copypolicy>BSD 3-clause "New" or "Revised" License</copypolicy>
+    <version> 0.6.0.0</version>
+
+    <description-long>
+    An image-based visual servoing controller for iCub.
+
+    This is the device (YARP plugin) that sends command to the visualservoingserver device.
+    </description-long>
+
+    <arguments>
+        <param default="false" desc="enable device verbose output log."> verbosity </param>
+        <param default="" desc="mandatory, specify a local port name to be used to connect to the server."> local </param>
+        <param default="" desc="mandatory, the port name of the server."> remote </param>
+    </arguments>
+
+    <authors>
+        <author email="claudio.fantacci@gmail.com"> Claudio Fantacci </author>
+    </authors>
+
+    <services>
+        <server>
+            <type>VisualServoingIDL</type>
+            <idl>VisualServoingIDL.thrift</idl>
+            <port>/_local_/cmd:i</port>
+            <description>Command port to send commands to the visual servoing server</description>
+        </server>
+    </services>
+</module>

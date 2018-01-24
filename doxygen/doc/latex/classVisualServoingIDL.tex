@@ -1,0 +1,689 @@
+\hypertarget{classVisualServoingIDL}{}\section{Visual\+Servoing\+I\+DL Class Reference}
+\label{classVisualServoingIDL}\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+
+
+\hyperlink{classVisualServoingIDL}{Visual\+Servoing\+I\+DL} I\+DL Interface to Server\+Visual\+Servoing functionalities.  
+
+
+
+
+{\ttfamily \#include $<$Visual\+Servoing\+I\+D\+L.\+h$>$}
+
+
+
+Inheritance diagram for Visual\+Servoing\+I\+DL\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classVisualServoingIDL__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classVisualServoingIDL_adff6d75dfaede0453d02b6f017e9e977}{Visual\+Servoing\+I\+DL} ()
+\item 
+virtual bool \hyperlink{classVisualServoingIDL_aae4ee4c07b50956396fd59bbb00fd9c7}{init\+\_\+facilities} (const bool use\+\_\+direct\+\_\+kin)
+\begin{DoxyCompactList}\small\item\em Initialize support modules and connections to perform a visual servoing task. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a23929f03db99f80426a859cdad68e48c}{reset\+\_\+facilities} ()
+\begin{DoxyCompactList}\small\item\em Reset support modules and connections to perform the current initialized visual servoing task. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a777cc1a83b3c0ae3dd86e36a0298970e}{stop\+\_\+facilities} ()
+\begin{DoxyCompactList}\small\item\em Stop and disconnect support modules and connections used for visual servoing. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a75929f915651161c43ed032e9f69a361}{go\+\_\+to\+\_\+px\+\_\+goal} (const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&vec\+\_\+px\+\_\+l, const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&vec\+\_\+px\+\_\+r)
+\begin{DoxyCompactList}\small\item\em Set the goal points on both left and right camera image plane and start visual servoing. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a697368ff5a1b3f16069d1d10f25ca888}{go\+\_\+to\+\_\+pose\+\_\+goal} (const std\+::vector$<$ double $>$ \&vec\+\_\+x, const std\+::vector$<$ double $>$ \&vec\+\_\+o)
+\begin{DoxyCompactList}\small\item\em Set the goal point (3D for the position + 4D axis-\/angle for the orientation) and start visual servoing. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_acf88e08e442c512452efe69f103f8f12}{set\+\_\+modality} (const std\+::string \&mode)
+\begin{DoxyCompactList}\small\item\em Set visual servoing operating mode between\+: \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a3db9d27ad8982f561f44a644897c8a9e}{set\+\_\+visual\+\_\+servo\+\_\+control} (const std\+::string \&control)
+\begin{DoxyCompactList}\small\item\em Set visual servo control law between\+: \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a9b84b61f0d80d9c931e1947a5e86c761}{set\+\_\+control\+\_\+point} (const std\+::string \&point)
+\begin{DoxyCompactList}\small\item\em Set the point controlled during visual servoing. \end{DoxyCompactList}\item 
+virtual std\+::vector$<$ std\+::string $>$ \hyperlink{classVisualServoingIDL_a9654ec3984d53b41f50e0d70b2991203}{get\+\_\+visual\+\_\+servoing\+\_\+info} ()
+\begin{DoxyCompactList}\small\item\em Return useful information for visual servoing. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_aa465471a7300861c1f991f08eb257694}{set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance} (const double tol)
+\begin{DoxyCompactList}\small\item\em Set visual servoing goal tolerance. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a6426bda1341487c0dbb1f6a048a45deb}{check\+\_\+visual\+\_\+servoing\+\_\+controller} ()
+\begin{DoxyCompactList}\small\item\em Check once whether the visual servoing controller is running or not. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_aa9c9a265e56b0f85c297d2b7d3c8d9c3}{wait\+\_\+visual\+\_\+servoing\+\_\+done} (const double period, const double timeout)
+\begin{DoxyCompactList}\small\item\em Wait until visual servoing reaches the goal. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_ac8909c1f4d5eb4cd1ab010fb3dcd7efb}{stop\+\_\+controller} ()
+\begin{DoxyCompactList}\small\item\em Ask for an immediate stop of the visual servoing controller. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a49034ed3c3d7b150ea0edb984217af31}{set\+\_\+translation\+\_\+gain} (const double K\+\_\+x\+\_\+1, const double K\+\_\+x\+\_\+2)
+\begin{DoxyCompactList}\small\item\em Set the translation gains of the visual servoing control algorithm. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_af928c1409ad82c6b5fa1aff93ef9d0c4}{set\+\_\+max\+\_\+translation\+\_\+velocity} (const double max\+\_\+x\+\_\+dot)
+\begin{DoxyCompactList}\small\item\em Set the maximum translation velocity of the visual servoing control algorithm (same for each axis). \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_ad7800969fdb9a88cce5e59552fca8b1f}{set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance} (const double K\+\_\+x\+\_\+tol)
+\begin{DoxyCompactList}\small\item\em Set the tolerance, in pixels, at which the translation control law swithces its gain value. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a63069a57bf0a190f0d76b5c0eba694fb}{set\+\_\+orientation\+\_\+gain} (const double K\+\_\+o\+\_\+1, const double K\+\_\+o\+\_\+2)
+\begin{DoxyCompactList}\small\item\em Set the orientation gains of the visual servoing control algorithm. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_ad2495422c8f1dda27b85db96c42a7042}{set\+\_\+max\+\_\+orientation\+\_\+velocity} (const double max\+\_\+o\+\_\+dot)
+\begin{DoxyCompactList}\small\item\em Set the maximum angular velocity of the axis-\/angle velocity vector of the visual servoing control algorithm. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_acaf4ad7fa8a2443d4719e3f56b8d72b0}{set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance} (const double K\+\_\+o\+\_\+tol)
+\begin{DoxyCompactList}\small\item\em Set the tolerance, in pixels, at which the orientation control law swithces its gain value. \end{DoxyCompactList}\item 
+virtual std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{classVisualServoingIDL_a175b2d3fb77000e0012c7a8d16e9a379}{get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose} (const std\+::vector$<$ double $>$ \&x, const std\+::vector$<$ double $>$ \&o)
+\begin{DoxyCompactList}\small\item\em Helper function\+: extract four Cartesian points lying on the plane defined by the frame o in the position x relative to the robot base frame. \end{DoxyCompactList}\item 
+virtual std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{classVisualServoingIDL_afb359486a7e42bfda3ddf66a2e518e90}{get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose} (const std\+::vector$<$ double $>$ \&x, const std\+::vector$<$ double $>$ \&o, const std\+::string \&cam)
+\begin{DoxyCompactList}\small\item\em Helper function\+: extract four 2D pixel points lying on the plane defined by the frame o in the position x relative to the robot base frame. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a3d5503e1d4bb2b25a11cbd5357b3013b}{quit} ()
+\begin{DoxyCompactList}\small\item\em Gently close the visual servoing device, deallocating resources. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a20ff1561b87126c9b852eacd5ea59d26}{stored\+\_\+init} (const std\+::string \&label)
+\begin{DoxyCompactList}\small\item\em Initialize the robot to an initial position. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_aa751cf35650259ae7cff331c9d19c694}{stored\+\_\+go\+\_\+to\+\_\+goal} (const std\+::string \&label)
+\begin{DoxyCompactList}\small\item\em Set the robot visual servoing goal. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_aff8af7d3ebe68f5fbfa7197eb7115723}{get\+\_\+goal\+\_\+from\+\_\+sfm} ()
+\begin{DoxyCompactList}\small\item\em Get goal point from S\+FM module. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualServoingIDL_a97106bf829447896de03680d78b960a5}{read} (yarp\+::os\+::\+Connection\+Reader \&connection) override
+\item 
+virtual std\+::vector$<$ std\+::string $>$ \hyperlink{classVisualServoingIDL_a99974ef8858179f14e2762c2d7bf4ed5}{help} (const std\+::string \&function\+Name=\char`\"{}-\/-\/all\char`\"{})
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classVisualServoingIDL}{Visual\+Servoing\+I\+DL} I\+DL Interface to Server\+Visual\+Servoing functionalities. 
+
+Definition at line 17 of file Visual\+Servoing\+I\+D\+L.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classVisualServoingIDL_adff6d75dfaede0453d02b6f017e9e977}\label{classVisualServoingIDL_adff6d75dfaede0453d02b6f017e9e977}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{Visual\+Servoing\+I\+D\+L()}{VisualServoingIDL()}}
+{\footnotesize\ttfamily Visual\+Servoing\+I\+D\+L\+::\+Visual\+Servoing\+I\+DL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classVisualServoingIDL_a6426bda1341487c0dbb1f6a048a45deb}\label{classVisualServoingIDL_a6426bda1341487c0dbb1f6a048a45deb}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!check\+\_\+visual\+\_\+servoing\+\_\+controller@{check\+\_\+visual\+\_\+servoing\+\_\+controller}}
+\index{check\+\_\+visual\+\_\+servoing\+\_\+controller@{check\+\_\+visual\+\_\+servoing\+\_\+controller}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{check\+\_\+visual\+\_\+servoing\+\_\+controller()}{check\_visual\_servoing\_controller()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::check\+\_\+visual\+\_\+servoing\+\_\+controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Check once whether the visual servoing controller is running or not. 
+
+\begin{DoxyReturn}{Returns}
+true/false on it is running/not running. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The visual servoing controller may be terminated due to many different reasons, not strictly related to reaching the goal. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a17a9b2913815c52b5a1bd2fd84d9f18e}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a175b2d3fb77000e0012c7a8d16e9a379}\label{classVisualServoingIDL_a175b2d3fb77000e0012c7a8d16e9a379}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose@{get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose}}
+\index{get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose@{get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose()}{get\_3D\_goal\_positions\_from\_3D\_pose()}}
+{\footnotesize\ttfamily virtual std\+::vector$<$std\+::vector$<$double$>$ $>$ Visual\+Servoing\+I\+D\+L\+::get\+\_\+3\+D\+\_\+goal\+\_\+positions\+\_\+from\+\_\+3\+D\+\_\+pose (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ double $>$ \&}]{x,  }\item[{const std\+::vector$<$ double $>$ \&}]{o }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Helper function\+: extract four Cartesian points lying on the plane defined by the frame o in the position x relative to the robot base frame. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & a 3D vector which is filled with the actual position (x, y, z) \mbox{[}m\mbox{]}. \\
+\hline
+{\em o} & a 4D vector which is filled with the actual orientation using axis-\/angle representation (xa, ya, za) and (theta) \mbox{[}rad\mbox{]}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+on success\+: a collection of four Cartesian points (position only) extracted from the plane defined by x and o; on failure\+: an empty list. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+It is always suggested to check whether the returned list is empty or not and to take proper counter actions. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a542e0a6bf6158563a601740363911474}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_aff8af7d3ebe68f5fbfa7197eb7115723}\label{classVisualServoingIDL_aff8af7d3ebe68f5fbfa7197eb7115723}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!get\+\_\+goal\+\_\+from\+\_\+sfm@{get\+\_\+goal\+\_\+from\+\_\+sfm}}
+\index{get\+\_\+goal\+\_\+from\+\_\+sfm@{get\+\_\+goal\+\_\+from\+\_\+sfm}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{get\+\_\+goal\+\_\+from\+\_\+sfm()}{get\_goal\_from\_sfm()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::get\+\_\+goal\+\_\+from\+\_\+sfm (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Get goal point from S\+FM module. 
+
+The point is taken by clicking on a dedicated \textquotesingle{}yarpview\textquotesingle{} G\+UI and the orientation is hard-\/coded. \begin{DoxyNote}{Note}
+This service is experimental and should be used with care. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true upon success, false otherwise. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a3b0e5078c2f32493a2ef31ea32450d80}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_afb359486a7e42bfda3ddf66a2e518e90}\label{classVisualServoingIDL_afb359486a7e42bfda3ddf66a2e518e90}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose@{get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose}}
+\index{get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose@{get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose()}{get\_goal\_pixels\_from\_3D\_pose()}}
+{\footnotesize\ttfamily virtual std\+::vector$<$std\+::vector$<$double$>$ $>$ Visual\+Servoing\+I\+D\+L\+::get\+\_\+goal\+\_\+pixels\+\_\+from\+\_\+3\+D\+\_\+pose (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ double $>$ \&}]{x,  }\item[{const std\+::vector$<$ double $>$ \&}]{o,  }\item[{const std\+::string \&}]{cam }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Helper function\+: extract four 2D pixel points lying on the plane defined by the frame o in the position x relative to the robot base frame. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & a 3D vector which is filled with the actual position (x, y, z) \mbox{[}m\mbox{]}. \\
+\hline
+{\em o} & a 4D vector which is filled with the actual orientation using axis-\/angle representation (xa, ya, za) and (theta) \mbox{[}m\mbox{]}/\mbox{[}rad\mbox{]}. \\
+\hline
+{\em cam} & either \char`\"{}left\char`\"{} or \char`\"{}right\char`\"{} to select left or right camera. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+on success\+: a collection of three (u, v) pixel points extracted from the plane defined by x and o; on failure\+: an empty list. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+It is always suggested to check whether the returned list is empty or not and to take proper counter actions. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_aaa84d7964120ee1056f422dc2d5eb070}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a9654ec3984d53b41f50e0d70b2991203}\label{classVisualServoingIDL_a9654ec3984d53b41f50e0d70b2991203}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!get\+\_\+visual\+\_\+servoing\+\_\+info@{get\+\_\+visual\+\_\+servoing\+\_\+info}}
+\index{get\+\_\+visual\+\_\+servoing\+\_\+info@{get\+\_\+visual\+\_\+servoing\+\_\+info}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{get\+\_\+visual\+\_\+servoing\+\_\+info()}{get\_visual\_servoing\_info()}}
+{\footnotesize\ttfamily virtual std\+::vector$<$std\+::string$>$ Visual\+Servoing\+I\+D\+L\+::get\+\_\+visual\+\_\+servoing\+\_\+info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Return useful information for visual servoing. 
+
+\begin{DoxyReturn}{Returns}
+All the visual servoing information. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_af085e2c5d4c4cfe940b3564b4ba69af6}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a697368ff5a1b3f16069d1d10f25ca888}\label{classVisualServoingIDL_a697368ff5a1b3f16069d1d10f25ca888}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!go\+\_\+to\+\_\+pose\+\_\+goal@{go\+\_\+to\+\_\+pose\+\_\+goal}}
+\index{go\+\_\+to\+\_\+pose\+\_\+goal@{go\+\_\+to\+\_\+pose\+\_\+goal}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{go\+\_\+to\+\_\+pose\+\_\+goal()}{go\_to\_pose\_goal()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::go\+\_\+to\+\_\+pose\+\_\+goal (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ double $>$ \&}]{vec\+\_\+x,  }\item[{const std\+::vector$<$ double $>$ \&}]{vec\+\_\+o }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the goal point (3D for the position + 4D axis-\/angle for the orientation) and start visual servoing. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vec\+\_\+x} & a 3D vector which contains the (x, y, z) Cartesian coordinates of the goal. \\
+\hline
+{\em vec\+\_\+o} & a 4D vector which contains the (x, y, z) axis and theta angle of rotation of the goal. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+By invoking this method, the visual servoing goal will be reached in position and orientation together with two parallel tasks. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a77f26ac40c67d7a9b7e4ad7840532681}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a75929f915651161c43ed032e9f69a361}\label{classVisualServoingIDL_a75929f915651161c43ed032e9f69a361}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!go\+\_\+to\+\_\+px\+\_\+goal@{go\+\_\+to\+\_\+px\+\_\+goal}}
+\index{go\+\_\+to\+\_\+px\+\_\+goal@{go\+\_\+to\+\_\+px\+\_\+goal}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{go\+\_\+to\+\_\+px\+\_\+goal()}{go\_to\_px\_goal()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::go\+\_\+to\+\_\+px\+\_\+goal (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&}]{vec\+\_\+px\+\_\+l,  }\item[{const std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \&}]{vec\+\_\+px\+\_\+r }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the goal points on both left and right camera image plane and start visual servoing. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vec\+\_\+px\+\_\+l} & a collection of four 2D vectors which contains the (u, v) coordinates of the pixels within the left image plane. \\
+\hline
+{\em vec\+\_\+px\+\_\+r} & a collection of four 2D vectors which contains the (u, v) coordinates of the pixels within the right image plane. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+By invoking this method, the visual servoing goal will be reached in orientation first, then in position. This is because there may not be a feasible position solution for every possible orientation. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classVisualServoingIDL_a99974ef8858179f14e2762c2d7bf4ed5}\label{classVisualServoingIDL_a99974ef8858179f14e2762c2d7bf4ed5}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!help@{help}}
+\index{help@{help}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{help()}{help()}}
+{\footnotesize\ttfamily virtual std\+::vector$<$std\+::string$>$ Visual\+Servoing\+I\+D\+L\+::help (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{function\+Name = {\ttfamily \char`\"{}-\/-\/all\char`\"{}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+\mbox{\Hypertarget{classVisualServoingIDL_aae4ee4c07b50956396fd59bbb00fd9c7}\label{classVisualServoingIDL_aae4ee4c07b50956396fd59bbb00fd9c7}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!init\+\_\+facilities@{init\+\_\+facilities}}
+\index{init\+\_\+facilities@{init\+\_\+facilities}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{init\+\_\+facilities()}{init\_facilities()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::init\+\_\+facilities (\begin{DoxyParamCaption}\item[{const bool}]{use\+\_\+direct\+\_\+kin }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Initialize support modules and connections to perform a visual servoing task. 
+
+This method must be called before any other visual servoing methods. Returns upon successful or failure setup. 
+\begin{DoxyParams}{Parameters}
+{\em use\+\_\+direct\+\_\+kin} & instruct the visual servoing control to either use direct kinematic or an estimated/refined pose of the end-\/effector. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Default value\+: false. There usually is an error in the robot direct kinematics that should be compensated to perform precise visual servoing. To this end, a recursive Bayesian estimation filter is used to compensate for this error. Such filter is initialized during initialization execution. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_ad3668e0fc8818f9d2827bbc50087d353}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a3d5503e1d4bb2b25a11cbd5357b3013b}\label{classVisualServoingIDL_a3d5503e1d4bb2b25a11cbd5357b3013b}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!quit@{quit}}
+\index{quit@{quit}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{quit()}{quit()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::quit (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Gently close the visual servoing device, deallocating resources. 
+
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_ac438c7abfb838df458f85e250ead3222}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a97106bf829447896de03680d78b960a5}\label{classVisualServoingIDL_a97106bf829447896de03680d78b960a5}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!read@{read}}
+\index{read@{read}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::read (\begin{DoxyParamCaption}\item[{yarp\+::os\+::\+Connection\+Reader \&}]{connection }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+\mbox{\Hypertarget{classVisualServoingIDL_a23929f03db99f80426a859cdad68e48c}\label{classVisualServoingIDL_a23929f03db99f80426a859cdad68e48c}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!reset\+\_\+facilities@{reset\+\_\+facilities}}
+\index{reset\+\_\+facilities@{reset\+\_\+facilities}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{reset\+\_\+facilities()}{reset\_facilities()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::reset\+\_\+facilities (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reset support modules and connections to perform the current initialized visual servoing task. 
+
+Returns upon successful or failure setup. \begin{DoxyNote}{Note}
+This method also resets the recursive Bayesian estimation filter. It may happen that the recursive Bayesian filter does not provide satisfactory pose estimation or diverges. Thus this method can be used to reset the filter. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_ae397fa9823f425fccf2837122629383f}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a9b84b61f0d80d9c931e1947a5e86c761}\label{classVisualServoingIDL_a9b84b61f0d80d9c931e1947a5e86c761}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!set\+\_\+control\+\_\+point@{set\+\_\+control\+\_\+point}}
+\index{set\+\_\+control\+\_\+point@{set\+\_\+control\+\_\+point}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+control\+\_\+point()}{set\_control\_point()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::set\+\_\+control\+\_\+point (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{point }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the point controlled during visual servoing. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em point} & label of the point to control. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The points available to control are identified by a distinct, unique label. Such labels can are stored in the bottle returned by the get\+Info() method. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a4a20a08fec9cfa4765e1245cfce5f9a8}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_aa465471a7300861c1f991f08eb257694}\label{classVisualServoingIDL_aa465471a7300861c1f991f08eb257694}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance@{set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance}}
+\index{set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance@{set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance()}{set\_go\_to\_goal\_tolerance()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::set\+\_\+go\+\_\+to\+\_\+goal\+\_\+tolerance (\begin{DoxyParamCaption}\item[{const double}]{tol }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set visual servoing goal tolerance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tol} & the tolerance in pixel. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Default value\+: 15.\+0 \mbox{[}pixel\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a0efdb8edb2e4b91dc3168b5051b27f56}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_ad2495422c8f1dda27b85db96c42a7042}\label{classVisualServoingIDL_ad2495422c8f1dda27b85db96c42a7042}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!set\+\_\+max\+\_\+orientation\+\_\+velocity@{set\+\_\+max\+\_\+orientation\+\_\+velocity}}
+\index{set\+\_\+max\+\_\+orientation\+\_\+velocity@{set\+\_\+max\+\_\+orientation\+\_\+velocity}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+max\+\_\+orientation\+\_\+velocity()}{set\_max\_orientation\_velocity()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::set\+\_\+max\+\_\+orientation\+\_\+velocity (\begin{DoxyParamCaption}\item[{const double}]{max\+\_\+o\+\_\+dot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the maximum angular velocity of the axis-\/angle velocity vector of the visual servoing control algorithm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em max\+\_\+x\+\_\+dot} & the maximum allowed angular velocity \mbox{[}rad/s\mbox{]}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Default value\+: 5 $\ast$ (PI / 180.\+0) \mbox{[}rad/s\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_aa3226ef2de2c1743e67788d1bff60679}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_af928c1409ad82c6b5fa1aff93ef9d0c4}\label{classVisualServoingIDL_af928c1409ad82c6b5fa1aff93ef9d0c4}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!set\+\_\+max\+\_\+translation\+\_\+velocity@{set\+\_\+max\+\_\+translation\+\_\+velocity}}
+\index{set\+\_\+max\+\_\+translation\+\_\+velocity@{set\+\_\+max\+\_\+translation\+\_\+velocity}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+max\+\_\+translation\+\_\+velocity()}{set\_max\_translation\_velocity()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::set\+\_\+max\+\_\+translation\+\_\+velocity (\begin{DoxyParamCaption}\item[{const double}]{max\+\_\+x\+\_\+dot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the maximum translation velocity of the visual servoing control algorithm (same for each axis). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em max\+\_\+x\+\_\+dot} & the maximum allowed velocity for x, y, z coordinates \mbox{[}m/s\mbox{]}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Default value\+: max\+\_\+x\+\_\+dot = 0.\+025 \mbox{[}m/s\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a393d1a1d1a7a68fc2098a7c7e8724cc9}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_acf88e08e442c512452efe69f103f8f12}\label{classVisualServoingIDL_acf88e08e442c512452efe69f103f8f12}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!set\+\_\+modality@{set\+\_\+modality}}
+\index{set\+\_\+modality@{set\+\_\+modality}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+modality()}{set\_modality()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::set\+\_\+modality (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{mode }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set visual servoing operating mode between\+: 
+
+
+\begin{DoxyEnumerate}
+\item \textquotesingle{}position\textquotesingle{}\+: position-\/only visual servo control;
+\item \textquotesingle{}orientation\textquotesingle{}\+: orientation-\/only visual servo control;
+\item \textquotesingle{}pose\textquotesingle{}\+: position + orientation visual servo control. 
+\begin{DoxyParams}{Parameters}
+{\em mode} & a label referring to one of the three operating mode, i.\+e. \textquotesingle{}position\textquotesingle{}, \textquotesingle{}orientation\textquotesingle{} or \textquotesingle{}pose\textquotesingle{}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+\end{DoxyEnumerate}
+
+Reimplemented in \hyperlink{classVisualServoingServer_a6d9ec4489caebf0a52b2e5ee149aeb6d}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a63069a57bf0a190f0d76b5c0eba694fb}\label{classVisualServoingIDL_a63069a57bf0a190f0d76b5c0eba694fb}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!set\+\_\+orientation\+\_\+gain@{set\+\_\+orientation\+\_\+gain}}
+\index{set\+\_\+orientation\+\_\+gain@{set\+\_\+orientation\+\_\+gain}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+orientation\+\_\+gain()}{set\_orientation\_gain()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::set\+\_\+orientation\+\_\+gain (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+o\+\_\+1,  }\item[{const double}]{K\+\_\+o\+\_\+2 }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the orientation gains of the visual servoing control algorithm. 
+
+The two values are used, respectively, when the end-\/effector is far away from and close to the goal. \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Warning\+: higher values of the gain corresponds to higher orientation velocities and oscillation about the goal. 
+
+Default values\+: K\+\_\+o\+\_\+1 = 1.\+5, K\+\_\+o\+\_\+2 = 0.\+375. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a19bdb0b44a8b556bad599dc03fca5f3f}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_acaf4ad7fa8a2443d4719e3f56b8d72b0}\label{classVisualServoingIDL_acaf4ad7fa8a2443d4719e3f56b8d72b0}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance@{set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance}}
+\index{set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance@{set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance()}{set\_orientation\_gain\_switch\_tolerance()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::set\+\_\+orientation\+\_\+gain\+\_\+switch\+\_\+tolerance (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+o\+\_\+tol }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the tolerance, in pixels, at which the orientation control law swithces its gain value. 
+
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Default value\+: K\+\_\+o\+\_\+tol = 30.\+0 \mbox{[}pixel\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a7d8c034f8a133f13ba9b4060ebcaf4bb}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a49034ed3c3d7b150ea0edb984217af31}\label{classVisualServoingIDL_a49034ed3c3d7b150ea0edb984217af31}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!set\+\_\+translation\+\_\+gain@{set\+\_\+translation\+\_\+gain}}
+\index{set\+\_\+translation\+\_\+gain@{set\+\_\+translation\+\_\+gain}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+translation\+\_\+gain()}{set\_translation\_gain()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::set\+\_\+translation\+\_\+gain (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+x\+\_\+1,  }\item[{const double}]{K\+\_\+x\+\_\+2 }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the translation gains of the visual servoing control algorithm. 
+
+The two values are used, respectively, when the end-\/effector is far away from and close to the goal. \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Warning\+: higher values of the gain corresponds to higher translation velocities and oscillation about the goal. 
+
+Default values\+: K\+\_\+x\+\_\+1 = 1.\+0, K\+\_\+x\+\_\+2 = 0.\+25. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a66324b38d90efb1e68cdfff9fd969487}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_ad7800969fdb9a88cce5e59552fca8b1f}\label{classVisualServoingIDL_ad7800969fdb9a88cce5e59552fca8b1f}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance@{set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance}}
+\index{set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance@{set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance()}{set\_translation\_gain\_switch\_tolerance()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::set\+\_\+translation\+\_\+gain\+\_\+switch\+\_\+tolerance (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+x\+\_\+tol }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the tolerance, in pixels, at which the translation control law swithces its gain value. 
+
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Default value\+: K\+\_\+x\+\_\+tol = 30.\+0 \mbox{[}pixel\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a280690a55037cfaaacd39ca95470a507}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a3db9d27ad8982f561f44a644897c8a9e}\label{classVisualServoingIDL_a3db9d27ad8982f561f44a644897c8a9e}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!set\+\_\+visual\+\_\+servo\+\_\+control@{set\+\_\+visual\+\_\+servo\+\_\+control}}
+\index{set\+\_\+visual\+\_\+servo\+\_\+control@{set\+\_\+visual\+\_\+servo\+\_\+control}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+visual\+\_\+servo\+\_\+control()}{set\_visual\_servo\_control()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::set\+\_\+visual\+\_\+servo\+\_\+control (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{control }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set visual servo control law between\+: 
+
+
+\begin{DoxyEnumerate}
+\item \textquotesingle{}decoupled\textquotesingle{}\+: image-\/based visual servoing with decoupled position and orientation control law, the control law was proposed in \mbox{[}1\mbox{]};
+\item \textquotesingle{}robust\textquotesingle{}\+: image-\/based visual servoing with averaged image Jacobians, the control law was proposed in \mbox{[}2\mbox{]}; 
+\begin{DoxyParams}{Parameters}
+{\em mode} & a label referring to one of the three visual servo controls, i.\+e. \textquotesingle{}position\textquotesingle{}, \textquotesingle{}orientation\textquotesingle{} or \textquotesingle{}pose\textquotesingle{}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+\mbox{[}1\mbox{]} C. Fantacci, G. Vezzani, U. Pattacini, V. Tikhanoff and L. Natale, \char`\"{}\+Precise markerless visual servoing on unknown objects for
+      humanoid robot platforms\char`\"{}, to appear. \mbox{[}2\mbox{]} E. Malis, “\+Improving vision-\/based control using efficient second-\/order minimization techniques”, I\+E\+EE I\+C\+RA, vol. 2, p. 1843–1848, 2004. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+\end{DoxyEnumerate}
+
+Reimplemented in \hyperlink{classVisualServoingServer_a2f28e67b1dd44d9afba4a79fd89f4bc8}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_ac8909c1f4d5eb4cd1ab010fb3dcd7efb}\label{classVisualServoingIDL_ac8909c1f4d5eb4cd1ab010fb3dcd7efb}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!stop\+\_\+controller@{stop\+\_\+controller}}
+\index{stop\+\_\+controller@{stop\+\_\+controller}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{stop\+\_\+controller()}{stop\_controller()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::stop\+\_\+controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Ask for an immediate stop of the visual servoing controller. 
+
+\mbox{[}wait for reply\mbox{]} \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_ac8d5b33c4ae61707e121c5154a973ab8}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a777cc1a83b3c0ae3dd86e36a0298970e}\label{classVisualServoingIDL_a777cc1a83b3c0ae3dd86e36a0298970e}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!stop\+\_\+facilities@{stop\+\_\+facilities}}
+\index{stop\+\_\+facilities@{stop\+\_\+facilities}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{stop\+\_\+facilities()}{stop\_facilities()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::stop\+\_\+facilities (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Stop and disconnect support modules and connections used for visual servoing. 
+
+This method must be called when visual servoing is no longer needed or a new visual servoing task need to be initialized. \begin{DoxyNote}{Note}
+This method also stops the recursive Bayesian estimation filter. Thus it is suggested to call this method every time visual servoing has been completed/interrupted to have the filter stopped and initialized again during the next init call. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_ae5e4ac8d334374f2de259a530781443b}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_aa751cf35650259ae7cff331c9d19c694}\label{classVisualServoingIDL_aa751cf35650259ae7cff331c9d19c694}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!stored\+\_\+go\+\_\+to\+\_\+goal@{stored\+\_\+go\+\_\+to\+\_\+goal}}
+\index{stored\+\_\+go\+\_\+to\+\_\+goal@{stored\+\_\+go\+\_\+to\+\_\+goal}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{stored\+\_\+go\+\_\+to\+\_\+goal()}{stored\_go\_to\_goal()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::stored\+\_\+go\+\_\+to\+\_\+goal (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{label }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Set the robot visual servoing goal. 
+
+The goals are stored on an external file and are referenced by a unique label. 
+\begin{DoxyParams}{Parameters}
+{\em label} & a label referring to one of the available goals; the string shall be one of the available modes returned by the get\+\_\+info() method. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true upon success, false otherwise. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_a1c5018056e6a7db492cc6b1418f8d1e5}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_a20ff1561b87126c9b852eacd5ea59d26}\label{classVisualServoingIDL_a20ff1561b87126c9b852eacd5ea59d26}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!stored\+\_\+init@{stored\+\_\+init}}
+\index{stored\+\_\+init@{stored\+\_\+init}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{stored\+\_\+init()}{stored\_init()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::stored\+\_\+init (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{label }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Initialize the robot to an initial position. 
+
+The initial positions are stored on an external file and are referenced by a unique label. 
+\begin{DoxyParams}{Parameters}
+{\em label} & a label referring to one of the available initial positions; the string shall be one of the available modes returned by the get\+\_\+info() method. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true upon success, false otherwise. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_aded37e0e0111c40fe5f869b16bb1f799}{Visual\+Servoing\+Server}.
+
+\mbox{\Hypertarget{classVisualServoingIDL_aa9c9a265e56b0f85c297d2b7d3c8d9c3}\label{classVisualServoingIDL_aa9c9a265e56b0f85c297d2b7d3c8d9c3}} 
+\index{Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}!wait\+\_\+visual\+\_\+servoing\+\_\+done@{wait\+\_\+visual\+\_\+servoing\+\_\+done}}
+\index{wait\+\_\+visual\+\_\+servoing\+\_\+done@{wait\+\_\+visual\+\_\+servoing\+\_\+done}!Visual\+Servoing\+I\+DL@{Visual\+Servoing\+I\+DL}}
+\subsubsection{\texorpdfstring{wait\+\_\+visual\+\_\+servoing\+\_\+done()}{wait\_visual\_servoing\_done()}}
+{\footnotesize\ttfamily virtual bool Visual\+Servoing\+I\+D\+L\+::wait\+\_\+visual\+\_\+servoing\+\_\+done (\begin{DoxyParamCaption}\item[{const double}]{period,  }\item[{const double}]{timeout }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Wait until visual servoing reaches the goal. 
+
+\mbox{[}wait for reply\mbox{]} 
+\begin{DoxyParams}{Parameters}
+{\em period} & the check time period \mbox{[}s\mbox{]}. \\
+\hline
+{\em timeout} & the check expiration time \mbox{[}s\mbox{]}. If timeout $<$= 0 (as by default) the check will be performed without time limitation. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true for success, false for failure and timeout expired. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The tolerance to which the goal is considered achieved can be set with the method set\+Go\+To\+Goal\+Tolerance(). 
+
+Default values\+: period 0.\+1 \mbox{[}s\mbox{]}, timeout 0.\+0 \mbox{[}s\mbox{]}. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualServoingServer_afcd501bb1d5070e8a0735f422a4c9ac0}{Visual\+Servoing\+Server}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+idl\+\_\+dox/\hyperlink{VisualServoingIDL_8h}{Visual\+Servoing\+I\+D\+L.\+h}\end{DoxyCompactItemize}

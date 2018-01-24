@@ -1,0 +1,259 @@
+\hypertarget{classVisualSISParticleFilterIDL}{}\section{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL Class Reference}
+\label{classVisualSISParticleFilterIDL}\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+
+
+\hyperlink{classVisualSISParticleFilterIDL}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL} I\+DL Interface to Visual\+S\+I\+R\+Particle\+Filter options.  
+
+
+
+
+{\ttfamily \#include $<$Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L.\+h$>$}
+
+
+
+Inheritance diagram for Visual\+S\+I\+S\+Particle\+Filter\+I\+DL\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{classVisualSISParticleFilterIDL__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classVisualSISParticleFilterIDL_ae295be0ced0b306a7b2a27e4b5e4df60}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL} ()
+\item 
+virtual bool \hyperlink{classVisualSISParticleFilterIDL_a6a8c16192597ea78617f10691b07df08}{run\+\_\+filter} ()
+\begin{DoxyCompactList}\small\item\em Initialize and run the visual S\+IR particle filter. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualSISParticleFilterIDL_ad6047accd0fe743bdbd158cb9b6fc11b}{reset\+\_\+filter} ()
+\begin{DoxyCompactList}\small\item\em Reset the visual S\+IR particle filter. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualSISParticleFilterIDL_a8a30501c75b4c7152a2abff96a950b63}{stop\+\_\+filter} ()
+\begin{DoxyCompactList}\small\item\em Stop and reset the S\+IR particle filter. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualSISParticleFilterIDL_a09d343c25082f2056546c6e95d397eaf}{skip\+\_\+step} (const std\+::string \&what\+\_\+step, const bool status)
+\begin{DoxyCompactList}\small\item\em Enable/\+Disable skipping the filtering step specified in what\+\_\+step. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualSISParticleFilterIDL_a4fee3e1fbc6676767f99c8b552434709}{use\+\_\+analogs} (const bool status)
+\begin{DoxyCompactList}\small\item\em Use/\+Don\textquotesingle{}t use the analog values from the right hand to correct the finger poses. \end{DoxyCompactList}\item 
+virtual std\+::vector$<$ std\+::string $>$ \hyperlink{classVisualSISParticleFilterIDL_a0721bc76b2d5848908a39e3a9c9740c0}{get\+\_\+info} ()
+\begin{DoxyCompactList}\small\item\em Get information about recursive Bayesian filter, like it\textquotesingle{}s status, the available methods, and the current one in use, to extract the state estimate from the particle set. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualSISParticleFilterIDL_ac5f296082bd83e1ee1b74e9af16e856a}{set\+\_\+estimates\+\_\+extraction\+\_\+method} (const std\+::string \&method)
+\begin{DoxyCompactList}\small\item\em Change the current method to extract the state estimates from the particle set. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualSISParticleFilterIDL_a40d91826291e2bae76f4545254307577}{set\+\_\+mobile\+\_\+average\+\_\+window} (const int16\+\_\+t window=20)
+\begin{DoxyCompactList}\small\item\em Change the window size of mobile averages for estimates extraction. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualSISParticleFilterIDL_a3f02a3df0d3dd545a6c62dc3a9f002b4}{quit} ()
+\begin{DoxyCompactList}\small\item\em Gently close the application, deallocating resources. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classVisualSISParticleFilterIDL_aade5ce77926faff0e94ffbf77f20c2c0}{read} (yarp\+::os\+::\+Connection\+Reader \&connection) override
+\item 
+virtual std\+::vector$<$ std\+::string $>$ \hyperlink{classVisualSISParticleFilterIDL_a3253f4dbc55e47183c04eb2e1054733c}{help} (const std\+::string \&function\+Name=\char`\"{}-\/-\/all\char`\"{})
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classVisualSISParticleFilterIDL}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL} I\+DL Interface to Visual\+S\+I\+R\+Particle\+Filter options. 
+
+Definition at line 17 of file Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_ae295be0ced0b306a7b2a27e4b5e4df60}\label{classVisualSISParticleFilterIDL_ae295be0ced0b306a7b2a27e4b5e4df60}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L()}{VisualSISParticleFilterIDL()}}
+{\footnotesize\ttfamily Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::\+Visual\+S\+I\+S\+Particle\+Filter\+I\+DL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_a0721bc76b2d5848908a39e3a9c9740c0}\label{classVisualSISParticleFilterIDL_a0721bc76b2d5848908a39e3a9c9740c0}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!get\+\_\+info@{get\+\_\+info}}
+\index{get\+\_\+info@{get\+\_\+info}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{get\+\_\+info()}{get\_info()}}
+{\footnotesize\ttfamily virtual std\+::vector$<$std\+::string$>$ Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::get\+\_\+info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Get information about recursive Bayesian filter, like it\textquotesingle{}s status, the available methods, and the current one in use, to extract the state estimate from the particle set. 
+
+\begin{DoxyReturn}{Returns}
+a string with all the available information, \textquotesingle{}none\textquotesingle{} otherwise 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualSIS_af1ecb78ecc8c9838c05b7d29c5a9f83a}{Visual\+S\+IS}.
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_a3253f4dbc55e47183c04eb2e1054733c}\label{classVisualSISParticleFilterIDL_a3253f4dbc55e47183c04eb2e1054733c}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!help@{help}}
+\index{help@{help}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{help()}{help()}}
+{\footnotesize\ttfamily virtual std\+::vector$<$std\+::string$>$ Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::help (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{function\+Name = {\ttfamily \char`\"{}-\/-\/all\char`\"{}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_a3f02a3df0d3dd545a6c62dc3a9f002b4}\label{classVisualSISParticleFilterIDL_a3f02a3df0d3dd545a6c62dc3a9f002b4}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!quit@{quit}}
+\index{quit@{quit}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{quit()}{quit()}}
+{\footnotesize\ttfamily virtual bool Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::quit (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Gently close the application, deallocating resources. 
+
+
+
+Reimplemented in \hyperlink{classVisualSIS_abff835a326f38e95187148d9401d5170}{Visual\+S\+IS}.
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_aade5ce77926faff0e94ffbf77f20c2c0}\label{classVisualSISParticleFilterIDL_aade5ce77926faff0e94ffbf77f20c2c0}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!read@{read}}
+\index{read@{read}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily virtual bool Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::read (\begin{DoxyParamCaption}\item[{yarp\+::os\+::\+Connection\+Reader \&}]{connection }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_ad6047accd0fe743bdbd158cb9b6fc11b}\label{classVisualSISParticleFilterIDL_ad6047accd0fe743bdbd158cb9b6fc11b}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!reset\+\_\+filter@{reset\+\_\+filter}}
+\index{reset\+\_\+filter@{reset\+\_\+filter}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{reset\+\_\+filter()}{reset\_filter()}}
+{\footnotesize\ttfamily virtual bool Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::reset\+\_\+filter (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reset the visual S\+IR particle filter. 
+
+Returns upon successful or failure reset. \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualSIS_a974ca828135835ccb4a2c3b7635b2aea}{Visual\+S\+IS}.
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_a6a8c16192597ea78617f10691b07df08}\label{classVisualSISParticleFilterIDL_a6a8c16192597ea78617f10691b07df08}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!run\+\_\+filter@{run\+\_\+filter}}
+\index{run\+\_\+filter@{run\+\_\+filter}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{run\+\_\+filter()}{run\_filter()}}
+{\footnotesize\ttfamily virtual bool Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::run\+\_\+filter (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Initialize and run the visual S\+IR particle filter. 
+
+Returns upon successful or failure setup. \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualSIS_aa8ad54a90c9f1f6ca673d8d61721b7be}{Visual\+S\+IS}.
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_ac5f296082bd83e1ee1b74e9af16e856a}\label{classVisualSISParticleFilterIDL_ac5f296082bd83e1ee1b74e9af16e856a}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!set\+\_\+estimates\+\_\+extraction\+\_\+method@{set\+\_\+estimates\+\_\+extraction\+\_\+method}}
+\index{set\+\_\+estimates\+\_\+extraction\+\_\+method@{set\+\_\+estimates\+\_\+extraction\+\_\+method}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+estimates\+\_\+extraction\+\_\+method()}{set\_estimates\_extraction\_method()}}
+{\footnotesize\ttfamily virtual bool Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::set\+\_\+estimates\+\_\+extraction\+\_\+method (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{method }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Change the current method to extract the state estimates from the particle set. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em status} & a string with the state estimate extraction method to use; the string shall be one of the available methods returned by the \hyperlink{classVisualSISParticleFilterIDL_a0721bc76b2d5848908a39e3a9c9740c0}{get\+\_\+info()} method. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true method changed successfully, false otherwise. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualSIS_ab45998859ed6c115eb0a8446f94c764e}{Visual\+S\+IS}.
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_a40d91826291e2bae76f4545254307577}\label{classVisualSISParticleFilterIDL_a40d91826291e2bae76f4545254307577}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!set\+\_\+mobile\+\_\+average\+\_\+window@{set\+\_\+mobile\+\_\+average\+\_\+window}}
+\index{set\+\_\+mobile\+\_\+average\+\_\+window@{set\+\_\+mobile\+\_\+average\+\_\+window}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{set\+\_\+mobile\+\_\+average\+\_\+window()}{set\_mobile\_average\_window()}}
+{\footnotesize\ttfamily virtual bool Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::set\+\_\+mobile\+\_\+average\+\_\+window (\begin{DoxyParamCaption}\item[{const int16\+\_\+t}]{window = {\ttfamily 20} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Change the window size of mobile averages for estimates extraction. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em window} & specifies the mobile window size. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true window size changed successfully, false otherwise. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The default value is 20. Minimum value is 2. Maximum value is 90. 
+\end{DoxyNote}
+
+
+Reimplemented in \hyperlink{classVisualSIS_a08aa7928cccabd93a1907cb540863cda}{Visual\+S\+IS}.
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_a09d343c25082f2056546c6e95d397eaf}\label{classVisualSISParticleFilterIDL_a09d343c25082f2056546c6e95d397eaf}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!skip\+\_\+step@{skip\+\_\+step}}
+\index{skip\+\_\+step@{skip\+\_\+step}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{skip\+\_\+step()}{skip\_step()}}
+{\footnotesize\ttfamily virtual bool Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::skip\+\_\+step (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{what\+\_\+step,  }\item[{const bool}]{status }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Enable/\+Disable skipping the filtering step specified in what\+\_\+step. 
+
+what\+\_\+step can be one of the following\+: 1) prediction\+: skips the whole prediction step 2) state\+: skips the prediction step related to the state transition 3) exogenous\+: skips the prediction step related exogenous inputs 4) correction\+: skips the whole correction step 
+\begin{DoxyParams}{Parameters}
+{\em what\+\_\+step} & the step to skipping \\
+\hline
+{\em status} & enable/disable skipping \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualSIS_ac9905862d7198c5ae80f7e682500c608}{Visual\+S\+IS}.
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_a8a30501c75b4c7152a2abff96a950b63}\label{classVisualSISParticleFilterIDL_a8a30501c75b4c7152a2abff96a950b63}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!stop\+\_\+filter@{stop\+\_\+filter}}
+\index{stop\+\_\+filter@{stop\+\_\+filter}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{stop\+\_\+filter()}{stop\_filter()}}
+{\footnotesize\ttfamily virtual bool Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::stop\+\_\+filter (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Stop and reset the S\+IR particle filter. 
+
+This method must be called when the S\+IR particle filter is no longer needed or a new filtering task need to be initialized. \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualSIS_a8e111a001d0dd201a5f661c9ff226bc1}{Visual\+S\+IS}.
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_a4fee3e1fbc6676767f99c8b552434709}\label{classVisualSISParticleFilterIDL_a4fee3e1fbc6676767f99c8b552434709}} 
+\index{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}!use\+\_\+analogs@{use\+\_\+analogs}}
+\index{use\+\_\+analogs@{use\+\_\+analogs}!Visual\+S\+I\+S\+Particle\+Filter\+I\+DL@{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}}
+\subsubsection{\texorpdfstring{use\+\_\+analogs()}{use\_analogs()}}
+{\footnotesize\ttfamily virtual bool Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::use\+\_\+analogs (\begin{DoxyParamCaption}\item[{const bool}]{status }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Use/\+Don\textquotesingle{}t use the analog values from the right hand to correct the finger poses. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em status} & true/false to use/don\textquotesingle{}t use analog values. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true activation/deactivation success, false otherwise. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classVisualSIS_a703f84794cd66eb82040d2590b62f094}{Visual\+S\+IS}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+idl\+\_\+dox/\hyperlink{VisualSISParticleFilterIDL_8h}{Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L.\+h}\end{DoxyCompactItemize}

@@ -1,0 +1,186 @@
+\hypertarget{classFwdKinModel}{}\section{Fwd\+Kin\+Model Class Reference}
+\label{classFwdKinModel}\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+
+
+{\ttfamily \#include $<$Fwd\+Kin\+Model.\+h$>$}
+
+
+
+Inheritance diagram for Fwd\+Kin\+Model\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{classFwdKinModel__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classFwdKinModel_aff57436563440b831b701b7b9633ab9b}{Fwd\+Kin\+Model} () noexcept
+\item 
+\hyperlink{classFwdKinModel_afb77abf94a9f8b8379b6e71b4ca0f3c1}{$\sim$\+Fwd\+Kin\+Model} () noexcept
+\item 
+void \hyperlink{classFwdKinModel_a9461ff14a1ae8d05169e8f1c7a6237c7}{propagate} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&cur\+\_\+state, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ prop\+\_\+state) override
+\item 
+Eigen\+::\+Matrix\+Xf \hyperlink{classFwdKinModel_ac8ed4e8a52f5ff33cc158c80c6cf083e}{get\+Exogenous\+Matrix} () override
+\item 
+bool \hyperlink{classFwdKinModel_ae5515e8bb1ebc936f67851a796b75fe1}{set\+Property} (const std\+::string \&property) override
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual Eigen\+::\+Vector\+Xd \hyperlink{classFwdKinModel_aaad9ff96f725fc529672e12aed86dc02}{read\+Pose} ()=0
+\item 
+bool \hyperlink{classFwdKinModel_a12b54bd62ba5cf218973c600c66ba39e}{set\+Delta\+Motion} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classFwdKinModel_a2ed7b77ebd710e5debe63b83a34a1645}{initialize\+\_\+delta\+\_\+} = true
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classFwdKinModel_a45262d07057de0c165eae2d425890505}{prev\+\_\+ee\+\_\+pose\+\_\+} = Eigen\+::\+Vector\+Xd\+::\+Zero(7)
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classFwdKinModel_a508ba314e35ba5ce3efb4a48d76e7fa0}{delta\+\_\+hand\+\_\+pose\+\_\+} = Eigen\+::\+Vector\+Xd\+::\+Zero(6)
+\item 
+double \hyperlink{classFwdKinModel_a17b3e7f99cfdfdc9890ff81d1a162e7e}{delta\+\_\+angle\+\_\+} = 0.\+0
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 12 of file Fwd\+Kin\+Model.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFwdKinModel_aff57436563440b831b701b7b9633ab9b}\label{classFwdKinModel_aff57436563440b831b701b7b9633ab9b}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{Fwd\+Kin\+Model()}{FwdKinModel()}}
+{\footnotesize\ttfamily Fwd\+Kin\+Model\+::\+Fwd\+Kin\+Model (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 22 of file Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classFwdKinModel_afb77abf94a9f8b8379b6e71b4ca0f3c1}\label{classFwdKinModel_afb77abf94a9f8b8379b6e71b4ca0f3c1}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!````~Fwd\+Kin\+Model@{$\sim$\+Fwd\+Kin\+Model}}
+\index{````~Fwd\+Kin\+Model@{$\sim$\+Fwd\+Kin\+Model}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{$\sim$\+Fwd\+Kin\+Model()}{~FwdKinModel()}}
+{\footnotesize\ttfamily Fwd\+Kin\+Model\+::$\sim$\+Fwd\+Kin\+Model (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 25 of file Fwd\+Kin\+Model.\+cpp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classFwdKinModel_ac8ed4e8a52f5ff33cc158c80c6cf083e}\label{classFwdKinModel_ac8ed4e8a52f5ff33cc158c80c6cf083e}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!get\+Exogenous\+Matrix@{get\+Exogenous\+Matrix}}
+\index{get\+Exogenous\+Matrix@{get\+Exogenous\+Matrix}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{get\+Exogenous\+Matrix()}{getExogenousMatrix()}}
+{\footnotesize\ttfamily Matrix\+Xf Fwd\+Kin\+Model\+::get\+Exogenous\+Matrix (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 47 of file Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classFwdKinModel_a9461ff14a1ae8d05169e8f1c7a6237c7}\label{classFwdKinModel_a9461ff14a1ae8d05169e8f1c7a6237c7}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!propagate@{propagate}}
+\index{propagate@{propagate}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{propagate()}{propagate()}}
+{\footnotesize\ttfamily void Fwd\+Kin\+Model\+::propagate (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{cur\+\_\+state,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{prop\+\_\+state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 28 of file Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classFwdKinModel_aaad9ff96f725fc529672e12aed86dc02}\label{classFwdKinModel_aaad9ff96f725fc529672e12aed86dc02}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!read\+Pose@{read\+Pose}}
+\index{read\+Pose@{read\+Pose}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{read\+Pose()}{readPose()}}
+{\footnotesize\ttfamily virtual Eigen\+::\+Vector\+Xd Fwd\+Kin\+Model\+::read\+Pose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [pure virtual]}}
+
+
+
+Implemented in \hyperlink{classiCubFwdKinModel_ad549519048e9b54c18af51c6b173b726}{i\+Cub\+Fwd\+Kin\+Model}, and \hyperlink{classPlayFwdKinModel_a282700bc69b26e6ea28cc5048881a599}{Play\+Fwd\+Kin\+Model}.
+
+\mbox{\Hypertarget{classFwdKinModel_a12b54bd62ba5cf218973c600c66ba39e}\label{classFwdKinModel_a12b54bd62ba5cf218973c600c66ba39e}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!set\+Delta\+Motion@{set\+Delta\+Motion}}
+\index{set\+Delta\+Motion@{set\+Delta\+Motion}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{set\+Delta\+Motion()}{setDeltaMotion()}}
+{\footnotesize\ttfamily bool Fwd\+Kin\+Model\+::set\+Delta\+Motion (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 71 of file Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classFwdKinModel_ae5515e8bb1ebc936f67851a796b75fe1}\label{classFwdKinModel_ae5515e8bb1ebc936f67851a796b75fe1}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!set\+Property@{set\+Property}}
+\index{set\+Property@{set\+Property}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{set\+Property()}{setProperty()}}
+{\footnotesize\ttfamily bool Fwd\+Kin\+Model\+::set\+Property (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{property }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 56 of file Fwd\+Kin\+Model.\+cpp.
+
+
+
+Referenced by i\+Cub\+Fwd\+Kin\+Model\+::set\+Property(), and Play\+Fwd\+Kin\+Model\+::set\+Property().
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classFwdKinModel_a17b3e7f99cfdfdc9890ff81d1a162e7e}\label{classFwdKinModel_a17b3e7f99cfdfdc9890ff81d1a162e7e}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!delta\+\_\+angle\+\_\+@{delta\+\_\+angle\+\_\+}}
+\index{delta\+\_\+angle\+\_\+@{delta\+\_\+angle\+\_\+}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{delta\+\_\+angle\+\_\+}{delta\_angle\_}}
+{\footnotesize\ttfamily double Fwd\+Kin\+Model\+::delta\+\_\+angle\+\_\+ = 0.\+0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 34 of file Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classFwdKinModel_a508ba314e35ba5ce3efb4a48d76e7fa0}\label{classFwdKinModel_a508ba314e35ba5ce3efb4a48d76e7fa0}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!delta\+\_\+hand\+\_\+pose\+\_\+@{delta\+\_\+hand\+\_\+pose\+\_\+}}
+\index{delta\+\_\+hand\+\_\+pose\+\_\+@{delta\+\_\+hand\+\_\+pose\+\_\+}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{delta\+\_\+hand\+\_\+pose\+\_\+}{delta\_hand\_pose\_}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd Fwd\+Kin\+Model\+::delta\+\_\+hand\+\_\+pose\+\_\+ = Eigen\+::\+Vector\+Xd\+::\+Zero(6)\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 33 of file Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classFwdKinModel_a2ed7b77ebd710e5debe63b83a34a1645}\label{classFwdKinModel_a2ed7b77ebd710e5debe63b83a34a1645}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!initialize\+\_\+delta\+\_\+@{initialize\+\_\+delta\+\_\+}}
+\index{initialize\+\_\+delta\+\_\+@{initialize\+\_\+delta\+\_\+}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{initialize\+\_\+delta\+\_\+}{initialize\_delta\_}}
+{\footnotesize\ttfamily bool Fwd\+Kin\+Model\+::initialize\+\_\+delta\+\_\+ = true\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 28 of file Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classFwdKinModel_a45262d07057de0c165eae2d425890505}\label{classFwdKinModel_a45262d07057de0c165eae2d425890505}} 
+\index{Fwd\+Kin\+Model@{Fwd\+Kin\+Model}!prev\+\_\+ee\+\_\+pose\+\_\+@{prev\+\_\+ee\+\_\+pose\+\_\+}}
+\index{prev\+\_\+ee\+\_\+pose\+\_\+@{prev\+\_\+ee\+\_\+pose\+\_\+}!Fwd\+Kin\+Model@{Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{prev\+\_\+ee\+\_\+pose\+\_\+}{prev\_ee\_pose\_}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd Fwd\+Kin\+Model\+::prev\+\_\+ee\+\_\+pose\+\_\+ = Eigen\+::\+Vector\+Xd\+::\+Zero(7)\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 32 of file Fwd\+Kin\+Model.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/include/\hyperlink{FwdKinModel_8h}{Fwd\+Kin\+Model.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/src/\hyperlink{FwdKinModel_8cpp}{Fwd\+Kin\+Model.\+cpp}\end{DoxyCompactItemize}

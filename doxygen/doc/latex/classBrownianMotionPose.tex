@@ -1,0 +1,475 @@
+\hypertarget{classBrownianMotionPose}{}\section{Brownian\+Motion\+Pose Class Reference}
+\label{classBrownianMotionPose}\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+
+
+{\ttfamily \#include $<$Brownian\+Motion\+Pose.\+h$>$}
+
+
+
+Inheritance diagram for Brownian\+Motion\+Pose\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{classBrownianMotionPose__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classBrownianMotionPose_afb57354af3029be488d8416733fbc876}{Brownian\+Motion\+Pose} (const float q\+\_\+xy, const float q\+\_\+z, const float theta, const float cone\+\_\+angle, const unsigned int seed) noexcept
+\item 
+\hyperlink{classBrownianMotionPose_a033bba640c6452cf0c092abdfa255476}{Brownian\+Motion\+Pose} (const float q\+\_\+xy, const float q\+\_\+z, const float theta, const float cone\+\_\+angle) noexcept
+\item 
+\hyperlink{classBrownianMotionPose_a042a889f5458b823f067ec600c0ef7b1}{Brownian\+Motion\+Pose} () noexcept
+\item 
+\hyperlink{classBrownianMotionPose_a0230a822152e6c3f4bc500f86d226b67}{Brownian\+Motion\+Pose} (const \hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \&bm)
+\item 
+\hyperlink{classBrownianMotionPose_a5a434f3a0793dd49ea9c4337263636cc}{Brownian\+Motion\+Pose} (\hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \&\&bm) noexcept
+\item 
+\hyperlink{classBrownianMotionPose_a12688413184c0b6d757061113a3270db}{$\sim$\+Brownian\+Motion\+Pose} () noexcept
+\item 
+\hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \& \hyperlink{classBrownianMotionPose_af57c473922affe4baee38cffe47980d4}{operator=} (const \hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \&bm)
+\item 
+\hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \& \hyperlink{classBrownianMotionPose_a7777bea70e539e180c4748e1e0d50f6e}{operator=} (\hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \&\&bm) noexcept
+\item 
+void \hyperlink{classBrownianMotionPose_ac598d506c496740d111ff9ceb4a97459}{propagate} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&cur\+\_\+state, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ prop\+\_\+state) override
+\item 
+void \hyperlink{classBrownianMotionPose_ab1587dfdc83f92d0def84de227d90ddb}{motion} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&cur\+\_\+state, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ mot\+\_\+state) override
+\item 
+Eigen\+::\+Matrix\+Xf \hyperlink{classBrownianMotionPose_a51407ee62d9e384af89c88c5b21c82df}{get\+Noise\+Sample} (const int num) override
+\item 
+Eigen\+::\+Matrix\+Xf \hyperlink{classBrownianMotionPose_a9b008d4c1b94154a9997454d74eaef88}{get\+Noise\+Covariance\+Matrix} () override
+\item 
+bool \hyperlink{classBrownianMotionPose_a22ec27f2c6b1c7899a331bbb9390c468}{set\+Property} (const std\+::string \&property) override
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classBrownianMotionPose_ad5da23c2e31dd9522115ae925a35e66e}{add\+Axisangle\+Disturbance} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&disturbance\+\_\+vec, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ current\+\_\+vec)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+float \hyperlink{classBrownianMotionPose_ac457166961355c8073b93e616ec80741}{q\+\_\+xy\+\_\+}
+\item 
+float \hyperlink{classBrownianMotionPose_ac5c6eb8bc9bbd4a2e2fb4a70d89c3c8d}{q\+\_\+z\+\_\+}
+\item 
+float \hyperlink{classBrownianMotionPose_a708069c13925ecb0d11a58519948bf1b}{theta\+\_\+}
+\item 
+float \hyperlink{classBrownianMotionPose_af1034131a88f7af082bc57eb22d036d5}{cone\+\_\+angle\+\_\+}
+\item 
+Eigen\+::\+Vector4f \hyperlink{classBrownianMotionPose_a9b58ff8fe85e0fda78a48e4df3fccce0}{cone\+\_\+dir\+\_\+}
+\item 
+std\+::mt19937\+\_\+64 \hyperlink{classBrownianMotionPose_adf2ae882f026fc526fc29e065bd94162}{generator\+\_\+}
+\item 
+std\+::normal\+\_\+distribution$<$ float $>$ \hyperlink{classBrownianMotionPose_aa9e8e055568eef783491b424ceb54c37}{distribution\+\_\+pos\+\_\+xy\+\_\+}
+\item 
+std\+::normal\+\_\+distribution$<$ float $>$ \hyperlink{classBrownianMotionPose_af6c2e7851b82a082e2a5e6885ba93dea}{distribution\+\_\+pos\+\_\+z\+\_\+}
+\item 
+std\+::normal\+\_\+distribution$<$ float $>$ \hyperlink{classBrownianMotionPose_afc3109f6d9c6b677f4720fb87a2ea51b}{distribution\+\_\+theta\+\_\+}
+\item 
+std\+::uniform\+\_\+real\+\_\+distribution$<$ float $>$ \hyperlink{classBrownianMotionPose_ad63f33718f94018f88908bb0d661a4e1}{distribution\+\_\+cone\+\_\+}
+\item 
+std\+::function$<$ float()$>$ \hyperlink{classBrownianMotionPose_a3b9538edc2fe02b6ec1621b8f65d47d9}{gaussian\+\_\+random\+\_\+pos\+\_\+xy\+\_\+}
+\item 
+std\+::function$<$ float()$>$ \hyperlink{classBrownianMotionPose_ab1115a94b9b81cb8aa746327086d72ca}{gaussian\+\_\+random\+\_\+pos\+\_\+z\+\_\+}
+\item 
+std\+::function$<$ float()$>$ \hyperlink{classBrownianMotionPose_ab4b2cafbf5d974432290016236946356}{gaussian\+\_\+random\+\_\+theta\+\_\+}
+\item 
+std\+::function$<$ float()$>$ \hyperlink{classBrownianMotionPose_a7381aa317a5f4b3fe5420d9b67a09b48}{gaussian\+\_\+random\+\_\+cone\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 10 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classBrownianMotionPose_afb57354af3029be488d8416733fbc876}\label{classBrownianMotionPose_afb57354af3029be488d8416733fbc876}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{Brownian\+Motion\+Pose()}{BrownianMotionPose()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily Brownian\+Motion\+Pose\+::\+Brownian\+Motion\+Pose (\begin{DoxyParamCaption}\item[{const float}]{q\+\_\+xy,  }\item[{const float}]{q\+\_\+z,  }\item[{const float}]{theta,  }\item[{const float}]{cone\+\_\+angle,  }\item[{const unsigned int}]{seed }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 10 of file Brownian\+Motion\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classBrownianMotionPose_a033bba640c6452cf0c092abdfa255476}\label{classBrownianMotionPose_a033bba640c6452cf0c092abdfa255476}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{Brownian\+Motion\+Pose()}{BrownianMotionPose()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily Brownian\+Motion\+Pose\+::\+Brownian\+Motion\+Pose (\begin{DoxyParamCaption}\item[{const float}]{q\+\_\+xy,  }\item[{const float}]{q\+\_\+z,  }\item[{const float}]{theta,  }\item[{const float}]{cone\+\_\+angle }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 27 of file Brownian\+Motion\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classBrownianMotionPose_a042a889f5458b823f067ec600c0ef7b1}\label{classBrownianMotionPose_a042a889f5458b823f067ec600c0ef7b1}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{Brownian\+Motion\+Pose()}{BrownianMotionPose()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily Brownian\+Motion\+Pose\+::\+Brownian\+Motion\+Pose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 31 of file Brownian\+Motion\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classBrownianMotionPose_a0230a822152e6c3f4bc500f86d226b67}\label{classBrownianMotionPose_a0230a822152e6c3f4bc500f86d226b67}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{Brownian\+Motion\+Pose()}{BrownianMotionPose()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily Brownian\+Motion\+Pose\+::\+Brownian\+Motion\+Pose (\begin{DoxyParamCaption}\item[{const \hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \&}]{bm }\end{DoxyParamCaption})}
+
+
+
+Definition at line 35 of file Brownian\+Motion\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classBrownianMotionPose_a5a434f3a0793dd49ea9c4337263636cc}\label{classBrownianMotionPose_a5a434f3a0793dd49ea9c4337263636cc}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{Brownian\+Motion\+Pose()}{BrownianMotionPose()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily Brownian\+Motion\+Pose\+::\+Brownian\+Motion\+Pose (\begin{DoxyParamCaption}\item[{\hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \&\&}]{bm }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 52 of file Brownian\+Motion\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classBrownianMotionPose_a12688413184c0b6d757061113a3270db}\label{classBrownianMotionPose_a12688413184c0b6d757061113a3270db}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!````~Brownian\+Motion\+Pose@{$\sim$\+Brownian\+Motion\+Pose}}
+\index{````~Brownian\+Motion\+Pose@{$\sim$\+Brownian\+Motion\+Pose}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{$\sim$\+Brownian\+Motion\+Pose()}{~BrownianMotionPose()}}
+{\footnotesize\ttfamily Brownian\+Motion\+Pose\+::$\sim$\+Brownian\+Motion\+Pose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 74 of file Brownian\+Motion\+Pose.\+cpp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classBrownianMotionPose_ad5da23c2e31dd9522115ae925a35e66e}\label{classBrownianMotionPose_ad5da23c2e31dd9522115ae925a35e66e}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!add\+Axisangle\+Disturbance@{add\+Axisangle\+Disturbance}}
+\index{add\+Axisangle\+Disturbance@{add\+Axisangle\+Disturbance}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{add\+Axisangle\+Disturbance()}{addAxisangleDisturbance()}}
+{\footnotesize\ttfamily void Brownian\+Motion\+Pose\+::add\+Axisangle\+Disturbance (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{disturbance\+\_\+vec,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{current\+\_\+vec }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 163 of file Brownian\+Motion\+Pose.\+cpp.
+
+
+
+Referenced by motion().
+
+\mbox{\Hypertarget{classBrownianMotionPose_a9b008d4c1b94154a9997454d74eaef88}\label{classBrownianMotionPose_a9b008d4c1b94154a9997454d74eaef88}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!get\+Noise\+Covariance\+Matrix@{get\+Noise\+Covariance\+Matrix}}
+\index{get\+Noise\+Covariance\+Matrix@{get\+Noise\+Covariance\+Matrix}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{get\+Noise\+Covariance\+Matrix()}{getNoiseCovarianceMatrix()}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix\+Xf Brownian\+Motion\+Pose\+::get\+Noise\+Covariance\+Matrix (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}}
+
+
+
+Definition at line 35 of file Brownian\+Motion\+Pose.\+h.
+
+\mbox{\Hypertarget{classBrownianMotionPose_a51407ee62d9e384af89c88c5b21c82df}\label{classBrownianMotionPose_a51407ee62d9e384af89c88c5b21c82df}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!get\+Noise\+Sample@{get\+Noise\+Sample}}
+\index{get\+Noise\+Sample@{get\+Noise\+Sample}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{get\+Noise\+Sample()}{getNoiseSample()}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix\+Xf Brownian\+Motion\+Pose\+::get\+Noise\+Sample (\begin{DoxyParamCaption}\item[{const int}]{num }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 131 of file Brownian\+Motion\+Pose.\+cpp.
+
+
+
+References cone\+\_\+angle\+\_\+, gaussian\+\_\+random\+\_\+cone\+\_\+, gaussian\+\_\+random\+\_\+pos\+\_\+xy\+\_\+, gaussian\+\_\+random\+\_\+pos\+\_\+z\+\_\+, and gaussian\+\_\+random\+\_\+theta\+\_\+.
+
+
+
+Referenced by motion().
+
+\mbox{\Hypertarget{classBrownianMotionPose_ab1587dfdc83f92d0def84de227d90ddb}\label{classBrownianMotionPose_ab1587dfdc83f92d0def84de227d90ddb}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!motion@{motion}}
+\index{motion@{motion}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{motion()}{motion()}}
+{\footnotesize\ttfamily void Brownian\+Motion\+Pose\+::motion (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{cur\+\_\+state,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{mot\+\_\+state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 119 of file Brownian\+Motion\+Pose.\+cpp.
+
+
+
+References add\+Axisangle\+Disturbance(), get\+Noise\+Sample(), and propagate().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classBrownianMotionPose_ab1587dfdc83f92d0def84de227d90ddb_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classBrownianMotionPose_af57c473922affe4baee38cffe47980d4}\label{classBrownianMotionPose_af57c473922affe4baee38cffe47980d4}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!operator=@{operator=}}
+\index{operator=@{operator=}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \& Brownian\+Motion\+Pose\+::operator= (\begin{DoxyParamCaption}\item[{const \hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \&}]{bm }\end{DoxyParamCaption})}
+
+
+
+Definition at line 77 of file Brownian\+Motion\+Pose.\+cpp.
+
+\mbox{\Hypertarget{classBrownianMotionPose_a7777bea70e539e180c4748e1e0d50f6e}\label{classBrownianMotionPose_a7777bea70e539e180c4748e1e0d50f6e}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!operator=@{operator=}}
+\index{operator=@{operator=}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \& Brownian\+Motion\+Pose\+::operator= (\begin{DoxyParamCaption}\item[{\hyperlink{classBrownianMotionPose}{Brownian\+Motion\+Pose} \&\&}]{bm }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 86 of file Brownian\+Motion\+Pose.\+cpp.
+
+
+
+References cone\+\_\+angle\+\_\+, cone\+\_\+dir\+\_\+, distribution\+\_\+cone\+\_\+, distribution\+\_\+pos\+\_\+xy\+\_\+, distribution\+\_\+pos\+\_\+z\+\_\+, distribution\+\_\+theta\+\_\+, gaussian\+\_\+random\+\_\+cone\+\_\+, gaussian\+\_\+random\+\_\+pos\+\_\+xy\+\_\+, gaussian\+\_\+random\+\_\+pos\+\_\+z\+\_\+, gaussian\+\_\+random\+\_\+theta\+\_\+, generator\+\_\+, q\+\_\+xy\+\_\+, q\+\_\+z\+\_\+, and theta\+\_\+.
+
+\mbox{\Hypertarget{classBrownianMotionPose_ac598d506c496740d111ff9ceb4a97459}\label{classBrownianMotionPose_ac598d506c496740d111ff9ceb4a97459}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!propagate@{propagate}}
+\index{propagate@{propagate}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{propagate()}{propagate()}}
+{\footnotesize\ttfamily void Brownian\+Motion\+Pose\+::propagate (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{cur\+\_\+state,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{prop\+\_\+state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 113 of file Brownian\+Motion\+Pose.\+cpp.
+
+
+
+Referenced by motion().
+
+\mbox{\Hypertarget{classBrownianMotionPose_a22ec27f2c6b1c7899a331bbb9390c468}\label{classBrownianMotionPose_a22ec27f2c6b1c7899a331bbb9390c468}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!set\+Property@{set\+Property}}
+\index{set\+Property@{set\+Property}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{set\+Property()}{setProperty()}}
+{\footnotesize\ttfamily bool Brownian\+Motion\+Pose\+::set\+Property (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{property }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}}
+
+
+
+Definition at line 37 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+References q\+\_\+xy\+\_\+.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classBrownianMotionPose_af1034131a88f7af082bc57eb22d036d5}\label{classBrownianMotionPose_af1034131a88f7af082bc57eb22d036d5}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!cone\+\_\+angle\+\_\+@{cone\+\_\+angle\+\_\+}}
+\index{cone\+\_\+angle\+\_\+@{cone\+\_\+angle\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{cone\+\_\+angle\+\_\+}{cone\_angle\_}}
+{\footnotesize\ttfamily float Brownian\+Motion\+Pose\+::cone\+\_\+angle\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 43 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by get\+Noise\+Sample(), and operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_a9b58ff8fe85e0fda78a48e4df3fccce0}\label{classBrownianMotionPose_a9b58ff8fe85e0fda78a48e4df3fccce0}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!cone\+\_\+dir\+\_\+@{cone\+\_\+dir\+\_\+}}
+\index{cone\+\_\+dir\+\_\+@{cone\+\_\+dir\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{cone\+\_\+dir\+\_\+}{cone\_dir\_}}
+{\footnotesize\ttfamily Eigen\+::\+Vector4f Brownian\+Motion\+Pose\+::cone\+\_\+dir\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 45 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_ad63f33718f94018f88908bb0d661a4e1}\label{classBrownianMotionPose_ad63f33718f94018f88908bb0d661a4e1}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!distribution\+\_\+cone\+\_\+@{distribution\+\_\+cone\+\_\+}}
+\index{distribution\+\_\+cone\+\_\+@{distribution\+\_\+cone\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{distribution\+\_\+cone\+\_\+}{distribution\_cone\_}}
+{\footnotesize\ttfamily std\+::uniform\+\_\+real\+\_\+distribution$<$float$>$ Brownian\+Motion\+Pose\+::distribution\+\_\+cone\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 51 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_aa9e8e055568eef783491b424ceb54c37}\label{classBrownianMotionPose_aa9e8e055568eef783491b424ceb54c37}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!distribution\+\_\+pos\+\_\+xy\+\_\+@{distribution\+\_\+pos\+\_\+xy\+\_\+}}
+\index{distribution\+\_\+pos\+\_\+xy\+\_\+@{distribution\+\_\+pos\+\_\+xy\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{distribution\+\_\+pos\+\_\+xy\+\_\+}{distribution\_pos\_xy\_}}
+{\footnotesize\ttfamily std\+::normal\+\_\+distribution$<$float$>$ Brownian\+Motion\+Pose\+::distribution\+\_\+pos\+\_\+xy\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 48 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_af6c2e7851b82a082e2a5e6885ba93dea}\label{classBrownianMotionPose_af6c2e7851b82a082e2a5e6885ba93dea}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!distribution\+\_\+pos\+\_\+z\+\_\+@{distribution\+\_\+pos\+\_\+z\+\_\+}}
+\index{distribution\+\_\+pos\+\_\+z\+\_\+@{distribution\+\_\+pos\+\_\+z\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{distribution\+\_\+pos\+\_\+z\+\_\+}{distribution\_pos\_z\_}}
+{\footnotesize\ttfamily std\+::normal\+\_\+distribution$<$float$>$ Brownian\+Motion\+Pose\+::distribution\+\_\+pos\+\_\+z\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 49 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_afc3109f6d9c6b677f4720fb87a2ea51b}\label{classBrownianMotionPose_afc3109f6d9c6b677f4720fb87a2ea51b}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!distribution\+\_\+theta\+\_\+@{distribution\+\_\+theta\+\_\+}}
+\index{distribution\+\_\+theta\+\_\+@{distribution\+\_\+theta\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{distribution\+\_\+theta\+\_\+}{distribution\_theta\_}}
+{\footnotesize\ttfamily std\+::normal\+\_\+distribution$<$float$>$ Brownian\+Motion\+Pose\+::distribution\+\_\+theta\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 50 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_a7381aa317a5f4b3fe5420d9b67a09b48}\label{classBrownianMotionPose_a7381aa317a5f4b3fe5420d9b67a09b48}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!gaussian\+\_\+random\+\_\+cone\+\_\+@{gaussian\+\_\+random\+\_\+cone\+\_\+}}
+\index{gaussian\+\_\+random\+\_\+cone\+\_\+@{gaussian\+\_\+random\+\_\+cone\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{gaussian\+\_\+random\+\_\+cone\+\_\+}{gaussian\_random\_cone\_}}
+{\footnotesize\ttfamily std\+::function$<$float()$>$ Brownian\+Motion\+Pose\+::gaussian\+\_\+random\+\_\+cone\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 55 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by get\+Noise\+Sample(), and operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_a3b9538edc2fe02b6ec1621b8f65d47d9}\label{classBrownianMotionPose_a3b9538edc2fe02b6ec1621b8f65d47d9}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!gaussian\+\_\+random\+\_\+pos\+\_\+xy\+\_\+@{gaussian\+\_\+random\+\_\+pos\+\_\+xy\+\_\+}}
+\index{gaussian\+\_\+random\+\_\+pos\+\_\+xy\+\_\+@{gaussian\+\_\+random\+\_\+pos\+\_\+xy\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{gaussian\+\_\+random\+\_\+pos\+\_\+xy\+\_\+}{gaussian\_random\_pos\_xy\_}}
+{\footnotesize\ttfamily std\+::function$<$float()$>$ Brownian\+Motion\+Pose\+::gaussian\+\_\+random\+\_\+pos\+\_\+xy\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 52 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by get\+Noise\+Sample(), and operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_ab1115a94b9b81cb8aa746327086d72ca}\label{classBrownianMotionPose_ab1115a94b9b81cb8aa746327086d72ca}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!gaussian\+\_\+random\+\_\+pos\+\_\+z\+\_\+@{gaussian\+\_\+random\+\_\+pos\+\_\+z\+\_\+}}
+\index{gaussian\+\_\+random\+\_\+pos\+\_\+z\+\_\+@{gaussian\+\_\+random\+\_\+pos\+\_\+z\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{gaussian\+\_\+random\+\_\+pos\+\_\+z\+\_\+}{gaussian\_random\_pos\_z\_}}
+{\footnotesize\ttfamily std\+::function$<$float()$>$ Brownian\+Motion\+Pose\+::gaussian\+\_\+random\+\_\+pos\+\_\+z\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 53 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by get\+Noise\+Sample(), and operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_ab4b2cafbf5d974432290016236946356}\label{classBrownianMotionPose_ab4b2cafbf5d974432290016236946356}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!gaussian\+\_\+random\+\_\+theta\+\_\+@{gaussian\+\_\+random\+\_\+theta\+\_\+}}
+\index{gaussian\+\_\+random\+\_\+theta\+\_\+@{gaussian\+\_\+random\+\_\+theta\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{gaussian\+\_\+random\+\_\+theta\+\_\+}{gaussian\_random\_theta\_}}
+{\footnotesize\ttfamily std\+::function$<$float()$>$ Brownian\+Motion\+Pose\+::gaussian\+\_\+random\+\_\+theta\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 54 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by get\+Noise\+Sample(), and operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_adf2ae882f026fc526fc29e065bd94162}\label{classBrownianMotionPose_adf2ae882f026fc526fc29e065bd94162}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!generator\+\_\+@{generator\+\_\+}}
+\index{generator\+\_\+@{generator\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{generator\+\_\+}{generator\_}}
+{\footnotesize\ttfamily std\+::mt19937\+\_\+64 Brownian\+Motion\+Pose\+::generator\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 47 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_ac457166961355c8073b93e616ec80741}\label{classBrownianMotionPose_ac457166961355c8073b93e616ec80741}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!q\+\_\+xy\+\_\+@{q\+\_\+xy\+\_\+}}
+\index{q\+\_\+xy\+\_\+@{q\+\_\+xy\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{q\+\_\+xy\+\_\+}{q\_xy\_}}
+{\footnotesize\ttfamily float Brownian\+Motion\+Pose\+::q\+\_\+xy\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 37 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by operator=(), and set\+Property().
+
+\mbox{\Hypertarget{classBrownianMotionPose_ac5c6eb8bc9bbd4a2e2fb4a70d89c3c8d}\label{classBrownianMotionPose_ac5c6eb8bc9bbd4a2e2fb4a70d89c3c8d}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!q\+\_\+z\+\_\+@{q\+\_\+z\+\_\+}}
+\index{q\+\_\+z\+\_\+@{q\+\_\+z\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{q\+\_\+z\+\_\+}{q\_z\_}}
+{\footnotesize\ttfamily float Brownian\+Motion\+Pose\+::q\+\_\+z\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 41 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by operator=().
+
+\mbox{\Hypertarget{classBrownianMotionPose_a708069c13925ecb0d11a58519948bf1b}\label{classBrownianMotionPose_a708069c13925ecb0d11a58519948bf1b}} 
+\index{Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}!theta\+\_\+@{theta\+\_\+}}
+\index{theta\+\_\+@{theta\+\_\+}!Brownian\+Motion\+Pose@{Brownian\+Motion\+Pose}}
+\subsubsection{\texorpdfstring{theta\+\_\+}{theta\_}}
+{\footnotesize\ttfamily float Brownian\+Motion\+Pose\+::theta\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 42 of file Brownian\+Motion\+Pose.\+h.
+
+
+
+Referenced by operator=().
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/include/\hyperlink{BrownianMotionPose_8h}{Brownian\+Motion\+Pose.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/src/\hyperlink{BrownianMotionPose_8cpp}{Brownian\+Motion\+Pose.\+cpp}\end{DoxyCompactItemize}

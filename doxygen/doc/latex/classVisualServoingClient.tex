@@ -1,0 +1,487 @@
+\hypertarget{classVisualServoingClient}{}\section{Visual\+Servoing\+Client Class Reference}
+\label{classVisualServoingClient}\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+
+
+{\ttfamily \#include $<$Visual\+Servoing\+Client.\+h$>$}
+
+
+
+Inheritance diagram for Visual\+Servoing\+Client\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classVisualServoingClient__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classVisualServoingClient_a8656f6464b80d6a5815232c90bb0f9f7}{Visual\+Servoing\+Client} ()
+\item 
+\hyperlink{classVisualServoingClient_ab9d97c68e33a3d3aa5bad80921efd45a}{$\sim$\+Visual\+Servoing\+Client} ()
+\item 
+bool \hyperlink{classVisualServoingClient_ad898a60edcd6dae0b2083db81bf08962}{open} (yarp\+::os\+::\+Searchable \&config) override
+\item 
+bool \hyperlink{classVisualServoingClient_ac6f08779b3efcb1d5a1b7dc1720c1d6c}{close} () override
+\item 
+bool \hyperlink{classVisualServoingClient_ae6a66fcc21b354cef0aba9ca6a6192fb}{init\+Facilities} (const bool use\+\_\+direct\+\_\+kin) override
+\item 
+bool \hyperlink{classVisualServoingClient_a9e0fe7d6cb6cee09c0fb9ed3903a66be}{reset\+Facilities} () override
+\item 
+bool \hyperlink{classVisualServoingClient_a6086c261684ff994d4daf31a1a7ffd0f}{stop\+Facilities} () override
+\item 
+bool \hyperlink{classVisualServoingClient_aa83b1b0be446896611b7c7675d716905}{go\+To\+Goal} (const yarp\+::sig\+::\+Vector \&vec\+\_\+x, const yarp\+::sig\+::\+Vector \&vec\+\_\+o) override
+\item 
+bool \hyperlink{classVisualServoingClient_a986e0195e3e855f9c613af0bcd43e6e2}{go\+To\+Goal} (const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&vec\+\_\+px\+\_\+l, const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&vec\+\_\+px\+\_\+r) override
+\item 
+bool \hyperlink{classVisualServoingClient_a4b8e26dc7c8afa9b343947894ff214aa}{set\+Modality} (const std\+::string \&mode) override
+\item 
+bool \hyperlink{classVisualServoingClient_a056ec60c6b8a144708d8aeda34344111}{set\+Visual\+Servo\+Control} (const std\+::string \&control) override
+\item 
+bool \hyperlink{classVisualServoingClient_ae9ea048d67f2a92b9be08d737e6622a3}{set\+Control\+Point} (const yarp\+::os\+::\+Const\+String \&point) override
+\item 
+bool \hyperlink{classVisualServoingClient_a4c416452594f40ef8c752b77b79c136f}{get\+Visual\+Servoing\+Info} (yarp\+::os\+::\+Bottle \&info) override
+\item 
+bool \hyperlink{classVisualServoingClient_a64ac96092017671a9ffc8498fb10e5fa}{set\+Go\+To\+Goal\+Tolerance} (const double tol=15.\+0) override
+\item 
+bool \hyperlink{classVisualServoingClient_a833cf672981b3a422a0ac41b2845a6c1}{check\+Visual\+Servoing\+Controller} () override
+\item 
+bool \hyperlink{classVisualServoingClient_aee7dc8c7897bf2ecaf417e9126fd640e}{wait\+Visual\+Servoing\+Done} (const double period=0.\+1, const double timeout=0.\+0) override
+\item 
+bool \hyperlink{classVisualServoingClient_aad4f96122bd48b7e8aa08673bde3031b}{stop\+Controller} () override
+\item 
+bool \hyperlink{classVisualServoingClient_a0ed003d4d4905c72a5cb05e5a8224916}{set\+Translation\+Gain} (const double K\+\_\+x\+\_\+1=1.\+0, const double K\+\_\+x\+\_\+2=0.\+25) override
+\item 
+bool \hyperlink{classVisualServoingClient_acf12ca40f4a4070f8c6ed36b21c0e9e4}{set\+Max\+Translation\+Velocity} (const double max\+\_\+x\+\_\+dot) override
+\item 
+bool \hyperlink{classVisualServoingClient_a1b8a1af7306d708a56766d69af1a3086}{set\+Translation\+Gain\+Switch\+Tolerance} (const double K\+\_\+x\+\_\+tol=30.\+0) override
+\item 
+bool \hyperlink{classVisualServoingClient_a3df91c530a6aec77e9fd6d418ba3efaf}{set\+Orientation\+Gain} (const double K\+\_\+o\+\_\+1=1.\+5, const double K\+\_\+o\+\_\+2=0.\+375) override
+\item 
+bool \hyperlink{classVisualServoingClient_a0caa332fbb62645312593b053d62d02c}{set\+Max\+Orientation\+Velocity} (const double max\+\_\+o\+\_\+dot) override
+\item 
+bool \hyperlink{classVisualServoingClient_acaa5865c6709780f9c6ea6d31687ac2e}{set\+Orientation\+Gain\+Switch\+Tolerance} (const double K\+\_\+o\+\_\+tol=30.\+0) override
+\item 
+std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingClient_a23fb8539faf13002caa40123dce709a1}{get3\+D\+Goal\+Positions\+From3\+D\+Pose} (const yarp\+::sig\+::\+Vector \&x, const yarp\+::sig\+::\+Vector \&o) override
+\item 
+std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualServoingClient_aa9ede5b1061b05533ac1c8cc7c52183c}{get\+Goal\+Pixels\+From3\+D\+Pose} (const yarp\+::sig\+::\+Vector \&x, const yarp\+::sig\+::\+Vector \&o, const Cam\+Sel \&cam) override
+\item 
+bool \hyperlink{classVisualServoingClient_a0b7df161daebc8c947c8a29ad7e309ef}{stored\+Init} (const std\+::string \&label) override
+\item 
+bool \hyperlink{classVisualServoingClient_af1070526a82d7e99bb0dba8a34bc68cf}{stored\+Go\+To\+Goal} (const std\+::string \&label) override
+\item 
+bool \hyperlink{classVisualServoingClient_ab5c9cf7eb3967b9f28e298ac58f7bb86}{go\+To\+S\+F\+M\+Goal} () override
+\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classVisualServoingClient_a1a6aee4324f230185356960adc22ecfc}{y\+Info\+Verbose} (const yarp\+::os\+::\+Const\+String \&str) const
+\item 
+void \hyperlink{classVisualServoingClient_ab9c5c456032851ef0bec5b97980a97f8}{y\+Warning\+Verbose} (const yarp\+::os\+::\+Const\+String \&str) const
+\item 
+void \hyperlink{classVisualServoingClient_a0977c43fb682f6eefa6ad90850a98ff4}{y\+Error\+Verbose} (const yarp\+::os\+::\+Const\+String \&str) const
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classVisualServoingClient_a8c18353c2a7f838ce75b5a426b5b4c21}{verbosity\+\_\+} = false
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classVisualServoingClient_a0b485c388dfe357bd5b504bc87449ff5}{local\+\_\+} = \char`\"{}\char`\"{}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classVisualServoingClient_ad2d718343d5fec7dd28c2eff9fd5d481}{remote\+\_\+} = \char`\"{}\char`\"{}
+\item 
+\hyperlink{classVisualServoingIDL}{Visual\+Servoing\+I\+DL} \hyperlink{classVisualServoingClient_a13c52256db8c843064c7c7ad4fc38e13}{visualservoing\+\_\+control}
+\item 
+yarp\+::os\+::\+Port \hyperlink{classVisualServoingClient_ae1f44cd6e0759f1d32d581f9d9ea8137}{port\+\_\+rpc\+\_\+command\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 19 of file Visual\+Servoing\+Client.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classVisualServoingClient_a8656f6464b80d6a5815232c90bb0f9f7}\label{classVisualServoingClient_a8656f6464b80d6a5815232c90bb0f9f7}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{Visual\+Servoing\+Client()}{VisualServoingClient()}}
+{\footnotesize\ttfamily Visual\+Servoing\+Client\+::\+Visual\+Servoing\+Client (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 21 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_ab9d97c68e33a3d3aa5bad80921efd45a}\label{classVisualServoingClient_ab9d97c68e33a3d3aa5bad80921efd45a}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!````~Visual\+Servoing\+Client@{$\sim$\+Visual\+Servoing\+Client}}
+\index{````~Visual\+Servoing\+Client@{$\sim$\+Visual\+Servoing\+Client}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{$\sim$\+Visual\+Servoing\+Client()}{~VisualServoingClient()}}
+{\footnotesize\ttfamily Visual\+Servoing\+Client\+::$\sim$\+Visual\+Servoing\+Client (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 28 of file Visual\+Servoing\+Client.\+cpp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classVisualServoingClient_a833cf672981b3a422a0ac41b2845a6c1}\label{classVisualServoingClient_a833cf672981b3a422a0ac41b2845a6c1}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!check\+Visual\+Servoing\+Controller@{check\+Visual\+Servoing\+Controller}}
+\index{check\+Visual\+Servoing\+Controller@{check\+Visual\+Servoing\+Controller}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{check\+Visual\+Servoing\+Controller()}{checkVisualServoingController()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::check\+Visual\+Servoing\+Controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 201 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_ac6f08779b3efcb1d5a1b7dc1720c1d6c}\label{classVisualServoingClient_ac6f08779b3efcb1d5a1b7dc1720c1d6c}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!close@{close}}
+\index{close@{close}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::close (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 88 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a23fb8539faf13002caa40123dce709a1}\label{classVisualServoingClient_a23fb8539faf13002caa40123dce709a1}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!get3\+D\+Goal\+Positions\+From3\+D\+Pose@{get3\+D\+Goal\+Positions\+From3\+D\+Pose}}
+\index{get3\+D\+Goal\+Positions\+From3\+D\+Pose@{get3\+D\+Goal\+Positions\+From3\+D\+Pose}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{get3\+D\+Goal\+Positions\+From3\+D\+Pose()}{get3DGoalPositionsFrom3DPose()}}
+{\footnotesize\ttfamily std\+::vector$<$ Vector $>$ Visual\+Servoing\+Client\+::get3\+D\+Goal\+Positions\+From3\+D\+Pose (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{x,  }\item[{const yarp\+::sig\+::\+Vector \&}]{o }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 255 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_aa9ede5b1061b05533ac1c8cc7c52183c}\label{classVisualServoingClient_aa9ede5b1061b05533ac1c8cc7c52183c}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!get\+Goal\+Pixels\+From3\+D\+Pose@{get\+Goal\+Pixels\+From3\+D\+Pose}}
+\index{get\+Goal\+Pixels\+From3\+D\+Pose@{get\+Goal\+Pixels\+From3\+D\+Pose}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{get\+Goal\+Pixels\+From3\+D\+Pose()}{getGoalPixelsFrom3DPose()}}
+{\footnotesize\ttfamily std\+::vector$<$ Vector $>$ Visual\+Servoing\+Client\+::get\+Goal\+Pixels\+From3\+D\+Pose (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{x,  }\item[{const yarp\+::sig\+::\+Vector \&}]{o,  }\item[{const Cam\+Sel \&}]{cam }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 271 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a4c416452594f40ef8c752b77b79c136f}\label{classVisualServoingClient_a4c416452594f40ef8c752b77b79c136f}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!get\+Visual\+Servoing\+Info@{get\+Visual\+Servoing\+Info}}
+\index{get\+Visual\+Servoing\+Info@{get\+Visual\+Servoing\+Info}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{get\+Visual\+Servoing\+Info()}{getVisualServoingInfo()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::get\+Visual\+Servoing\+Info (\begin{DoxyParamCaption}\item[{yarp\+::os\+::\+Bottle \&}]{info }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 187 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_aa83b1b0be446896611b7c7675d716905}\label{classVisualServoingClient_aa83b1b0be446896611b7c7675d716905}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!go\+To\+Goal@{go\+To\+Goal}}
+\index{go\+To\+Goal@{go\+To\+Goal}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{go\+To\+Goal()}{goToGoal()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::go\+To\+Goal (\begin{DoxyParamCaption}\item[{const yarp\+::sig\+::\+Vector \&}]{vec\+\_\+x,  }\item[{const yarp\+::sig\+::\+Vector \&}]{vec\+\_\+o }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Referenced by stop\+Facilities().
+
+\mbox{\Hypertarget{classVisualServoingClient_a986e0195e3e855f9c613af0bcd43e6e2}\label{classVisualServoingClient_a986e0195e3e855f9c613af0bcd43e6e2}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!go\+To\+Goal@{go\+To\+Goal}}
+\index{go\+To\+Goal@{go\+To\+Goal}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{go\+To\+Goal()}{goToGoal()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::go\+To\+Goal (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&}]{vec\+\_\+px\+\_\+l,  }\item[{const std\+::vector$<$ yarp\+::sig\+::\+Vector $>$ \&}]{vec\+\_\+px\+\_\+r }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+\mbox{\Hypertarget{classVisualServoingClient_ab5c9cf7eb3967b9f28e298ac58f7bb86}\label{classVisualServoingClient_ab5c9cf7eb3967b9f28e298ac58f7bb86}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!go\+To\+S\+F\+M\+Goal@{go\+To\+S\+F\+M\+Goal}}
+\index{go\+To\+S\+F\+M\+Goal@{go\+To\+S\+F\+M\+Goal}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{go\+To\+S\+F\+M\+Goal()}{goToSFMGoal()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::go\+To\+S\+F\+M\+Goal (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 299 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_ae6a66fcc21b354cef0aba9ca6a6192fb}\label{classVisualServoingClient_ae6a66fcc21b354cef0aba9ca6a6192fb}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!init\+Facilities@{init\+Facilities}}
+\index{init\+Facilities@{init\+Facilities}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{init\+Facilities()}{initFacilities()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::init\+Facilities (\begin{DoxyParamCaption}\item[{const bool}]{use\+\_\+direct\+\_\+kin }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 111 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_ad898a60edcd6dae0b2083db81bf08962}\label{classVisualServoingClient_ad898a60edcd6dae0b2083db81bf08962}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!open@{open}}
+\index{open@{open}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{open()}{open()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::open (\begin{DoxyParamCaption}\item[{yarp\+::os\+::\+Searchable \&}]{config }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 36 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a9e0fe7d6cb6cee09c0fb9ed3903a66be}\label{classVisualServoingClient_a9e0fe7d6cb6cee09c0fb9ed3903a66be}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!reset\+Facilities@{reset\+Facilities}}
+\index{reset\+Facilities@{reset\+Facilities}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{reset\+Facilities()}{resetFacilities()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::reset\+Facilities (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 117 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_ae9ea048d67f2a92b9be08d737e6622a3}\label{classVisualServoingClient_ae9ea048d67f2a92b9be08d737e6622a3}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!set\+Control\+Point@{set\+Control\+Point}}
+\index{set\+Control\+Point@{set\+Control\+Point}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{set\+Control\+Point()}{setControlPoint()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::set\+Control\+Point (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{point }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 179 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a64ac96092017671a9ffc8498fb10e5fa}\label{classVisualServoingClient_a64ac96092017671a9ffc8498fb10e5fa}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!set\+Go\+To\+Goal\+Tolerance@{set\+Go\+To\+Goal\+Tolerance}}
+\index{set\+Go\+To\+Goal\+Tolerance@{set\+Go\+To\+Goal\+Tolerance}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{set\+Go\+To\+Goal\+Tolerance()}{setGoToGoalTolerance()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::set\+Go\+To\+Goal\+Tolerance (\begin{DoxyParamCaption}\item[{const double}]{tol = {\ttfamily 15.0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 195 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a0caa332fbb62645312593b053d62d02c}\label{classVisualServoingClient_a0caa332fbb62645312593b053d62d02c}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!set\+Max\+Orientation\+Velocity@{set\+Max\+Orientation\+Velocity}}
+\index{set\+Max\+Orientation\+Velocity@{set\+Max\+Orientation\+Velocity}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{set\+Max\+Orientation\+Velocity()}{setMaxOrientationVelocity()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::set\+Max\+Orientation\+Velocity (\begin{DoxyParamCaption}\item[{const double}]{max\+\_\+o\+\_\+dot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 243 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_acf12ca40f4a4070f8c6ed36b21c0e9e4}\label{classVisualServoingClient_acf12ca40f4a4070f8c6ed36b21c0e9e4}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!set\+Max\+Translation\+Velocity@{set\+Max\+Translation\+Velocity}}
+\index{set\+Max\+Translation\+Velocity@{set\+Max\+Translation\+Velocity}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{set\+Max\+Translation\+Velocity()}{setMaxTranslationVelocity()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::set\+Max\+Translation\+Velocity (\begin{DoxyParamCaption}\item[{const double}]{max\+\_\+x\+\_\+dot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 225 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a4b8e26dc7c8afa9b343947894ff214aa}\label{classVisualServoingClient_a4b8e26dc7c8afa9b343947894ff214aa}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!set\+Modality@{set\+Modality}}
+\index{set\+Modality@{set\+Modality}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{set\+Modality()}{setModality()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::set\+Modality (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{mode }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 167 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a3df91c530a6aec77e9fd6d418ba3efaf}\label{classVisualServoingClient_a3df91c530a6aec77e9fd6d418ba3efaf}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!set\+Orientation\+Gain@{set\+Orientation\+Gain}}
+\index{set\+Orientation\+Gain@{set\+Orientation\+Gain}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{set\+Orientation\+Gain()}{setOrientationGain()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::set\+Orientation\+Gain (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+o\+\_\+1 = {\ttfamily 1.5},  }\item[{const double}]{K\+\_\+o\+\_\+2 = {\ttfamily 0.375} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 237 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_acaa5865c6709780f9c6ea6d31687ac2e}\label{classVisualServoingClient_acaa5865c6709780f9c6ea6d31687ac2e}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!set\+Orientation\+Gain\+Switch\+Tolerance@{set\+Orientation\+Gain\+Switch\+Tolerance}}
+\index{set\+Orientation\+Gain\+Switch\+Tolerance@{set\+Orientation\+Gain\+Switch\+Tolerance}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{set\+Orientation\+Gain\+Switch\+Tolerance()}{setOrientationGainSwitchTolerance()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::set\+Orientation\+Gain\+Switch\+Tolerance (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+o\+\_\+tol = {\ttfamily 30.0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 249 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a0ed003d4d4905c72a5cb05e5a8224916}\label{classVisualServoingClient_a0ed003d4d4905c72a5cb05e5a8224916}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!set\+Translation\+Gain@{set\+Translation\+Gain}}
+\index{set\+Translation\+Gain@{set\+Translation\+Gain}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{set\+Translation\+Gain()}{setTranslationGain()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::set\+Translation\+Gain (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+x\+\_\+1 = {\ttfamily 1.0},  }\item[{const double}]{K\+\_\+x\+\_\+2 = {\ttfamily 0.25} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 219 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a1b8a1af7306d708a56766d69af1a3086}\label{classVisualServoingClient_a1b8a1af7306d708a56766d69af1a3086}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!set\+Translation\+Gain\+Switch\+Tolerance@{set\+Translation\+Gain\+Switch\+Tolerance}}
+\index{set\+Translation\+Gain\+Switch\+Tolerance@{set\+Translation\+Gain\+Switch\+Tolerance}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{set\+Translation\+Gain\+Switch\+Tolerance()}{setTranslationGainSwitchTolerance()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::set\+Translation\+Gain\+Switch\+Tolerance (\begin{DoxyParamCaption}\item[{const double}]{K\+\_\+x\+\_\+tol = {\ttfamily 30.0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 231 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a056ec60c6b8a144708d8aeda34344111}\label{classVisualServoingClient_a056ec60c6b8a144708d8aeda34344111}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!set\+Visual\+Servo\+Control@{set\+Visual\+Servo\+Control}}
+\index{set\+Visual\+Servo\+Control@{set\+Visual\+Servo\+Control}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{set\+Visual\+Servo\+Control()}{setVisualServoControl()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::set\+Visual\+Servo\+Control (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{control }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 173 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_aad4f96122bd48b7e8aa08673bde3031b}\label{classVisualServoingClient_aad4f96122bd48b7e8aa08673bde3031b}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!stop\+Controller@{stop\+Controller}}
+\index{stop\+Controller@{stop\+Controller}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{stop\+Controller()}{stopController()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::stop\+Controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 213 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a6086c261684ff994d4daf31a1a7ffd0f}\label{classVisualServoingClient_a6086c261684ff994d4daf31a1a7ffd0f}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!stop\+Facilities@{stop\+Facilities}}
+\index{stop\+Facilities@{stop\+Facilities}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{stop\+Facilities()}{stopFacilities()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::stop\+Facilities (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 123 of file Visual\+Servoing\+Client.\+cpp.
+
+
+
+References go\+To\+Goal().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{classVisualServoingClient_a6086c261684ff994d4daf31a1a7ffd0f_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualServoingClient_af1070526a82d7e99bb0dba8a34bc68cf}\label{classVisualServoingClient_af1070526a82d7e99bb0dba8a34bc68cf}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!stored\+Go\+To\+Goal@{stored\+Go\+To\+Goal}}
+\index{stored\+Go\+To\+Goal@{stored\+Go\+To\+Goal}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{stored\+Go\+To\+Goal()}{storedGoToGoal()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::stored\+Go\+To\+Goal (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{label }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 293 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a0b7df161daebc8c947c8a29ad7e309ef}\label{classVisualServoingClient_a0b7df161daebc8c947c8a29ad7e309ef}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!stored\+Init@{stored\+Init}}
+\index{stored\+Init@{stored\+Init}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{stored\+Init()}{storedInit()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::stored\+Init (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{label }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 287 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_aee7dc8c7897bf2ecaf417e9126fd640e}\label{classVisualServoingClient_aee7dc8c7897bf2ecaf417e9126fd640e}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!wait\+Visual\+Servoing\+Done@{wait\+Visual\+Servoing\+Done}}
+\index{wait\+Visual\+Servoing\+Done@{wait\+Visual\+Servoing\+Done}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{wait\+Visual\+Servoing\+Done()}{waitVisualServoingDone()}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::wait\+Visual\+Servoing\+Done (\begin{DoxyParamCaption}\item[{const double}]{period = {\ttfamily 0.1},  }\item[{const double}]{timeout = {\ttfamily 0.0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 207 of file Visual\+Servoing\+Client.\+cpp.
+
+\mbox{\Hypertarget{classVisualServoingClient_a0977c43fb682f6eefa6ad90850a98ff4}\label{classVisualServoingClient_a0977c43fb682f6eefa6ad90850a98ff4}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!y\+Error\+Verbose@{y\+Error\+Verbose}}
+\index{y\+Error\+Verbose@{y\+Error\+Verbose}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{y\+Error\+Verbose()}{yErrorVerbose()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Client\+::y\+Error\+Verbose (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{str }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 95 of file Visual\+Servoing\+Client.\+h.
+
+\mbox{\Hypertarget{classVisualServoingClient_a1a6aee4324f230185356960adc22ecfc}\label{classVisualServoingClient_a1a6aee4324f230185356960adc22ecfc}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!y\+Info\+Verbose@{y\+Info\+Verbose}}
+\index{y\+Info\+Verbose@{y\+Info\+Verbose}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{y\+Info\+Verbose()}{yInfoVerbose()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Client\+::y\+Info\+Verbose (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{str }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 93 of file Visual\+Servoing\+Client.\+h.
+
+\mbox{\Hypertarget{classVisualServoingClient_ab9c5c456032851ef0bec5b97980a97f8}\label{classVisualServoingClient_ab9c5c456032851ef0bec5b97980a97f8}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!y\+Warning\+Verbose@{y\+Warning\+Verbose}}
+\index{y\+Warning\+Verbose@{y\+Warning\+Verbose}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{y\+Warning\+Verbose()}{yWarningVerbose()}}
+{\footnotesize\ttfamily void Visual\+Servoing\+Client\+::y\+Warning\+Verbose (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{str }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 94 of file Visual\+Servoing\+Client.\+h.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classVisualServoingClient_a0b485c388dfe357bd5b504bc87449ff5}\label{classVisualServoingClient_a0b485c388dfe357bd5b504bc87449ff5}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!local\+\_\+@{local\+\_\+}}
+\index{local\+\_\+@{local\+\_\+}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{local\+\_\+}{local\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Visual\+Servoing\+Client\+::local\+\_\+ = \char`\"{}\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 87 of file Visual\+Servoing\+Client.\+h.
+
+\mbox{\Hypertarget{classVisualServoingClient_ae1f44cd6e0759f1d32d581f9d9ea8137}\label{classVisualServoingClient_ae1f44cd6e0759f1d32d581f9d9ea8137}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!port\+\_\+rpc\+\_\+command\+\_\+@{port\+\_\+rpc\+\_\+command\+\_\+}}
+\index{port\+\_\+rpc\+\_\+command\+\_\+@{port\+\_\+rpc\+\_\+command\+\_\+}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{port\+\_\+rpc\+\_\+command\+\_\+}{port\_rpc\_command\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Port Visual\+Servoing\+Client\+::port\+\_\+rpc\+\_\+command\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 91 of file Visual\+Servoing\+Client.\+h.
+
+\mbox{\Hypertarget{classVisualServoingClient_ad2d718343d5fec7dd28c2eff9fd5d481}\label{classVisualServoingClient_ad2d718343d5fec7dd28c2eff9fd5d481}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!remote\+\_\+@{remote\+\_\+}}
+\index{remote\+\_\+@{remote\+\_\+}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{remote\+\_\+}{remote\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Visual\+Servoing\+Client\+::remote\+\_\+ = \char`\"{}\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 88 of file Visual\+Servoing\+Client.\+h.
+
+\mbox{\Hypertarget{classVisualServoingClient_a8c18353c2a7f838ce75b5a426b5b4c21}\label{classVisualServoingClient_a8c18353c2a7f838ce75b5a426b5b4c21}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!verbosity\+\_\+@{verbosity\+\_\+}}
+\index{verbosity\+\_\+@{verbosity\+\_\+}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{verbosity\+\_\+}{verbosity\_}}
+{\footnotesize\ttfamily bool Visual\+Servoing\+Client\+::verbosity\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 86 of file Visual\+Servoing\+Client.\+h.
+
+\mbox{\Hypertarget{classVisualServoingClient_a13c52256db8c843064c7c7ad4fc38e13}\label{classVisualServoingClient_a13c52256db8c843064c7c7ad4fc38e13}} 
+\index{Visual\+Servoing\+Client@{Visual\+Servoing\+Client}!visualservoing\+\_\+control@{visualservoing\+\_\+control}}
+\index{visualservoing\+\_\+control@{visualservoing\+\_\+control}!Visual\+Servoing\+Client@{Visual\+Servoing\+Client}}
+\subsubsection{\texorpdfstring{visualservoing\+\_\+control}{visualservoing\_control}}
+{\footnotesize\ttfamily \hyperlink{classVisualServoingIDL}{Visual\+Servoing\+I\+DL} Visual\+Servoing\+Client\+::visualservoing\+\_\+control\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 90 of file Visual\+Servoing\+Client.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/visualservoing/visualservoingclient/include/\hyperlink{VisualServoingClient_8h}{Visual\+Servoing\+Client.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/visualservoing/visualservoingclient/src/\hyperlink{VisualServoingClient_8cpp}{Visual\+Servoing\+Client.\+cpp}\end{DoxyCompactItemize}

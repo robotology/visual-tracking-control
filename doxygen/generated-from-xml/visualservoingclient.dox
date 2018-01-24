@@ -1,0 +1,40 @@
+
+  /**
+  *
+  * @ingroup icub-module 
+  * \defgroup visualservoingclient visualservoingclient
+  * iCub device (plugin, client) for visual servoing.
+  * Version: 0.6.0.0
+  * \author  Claudio Fantacci claudio.fantacci@gmail.com
+  * \n
+  * \copyright BSD 3-clause "New" or "Revised" License
+  * \section intro_sec Description
+  *
+  
+    An image-based visual servoing controller for iCub.
+
+    This is the device (YARP plugin) that sends command to the visualservoingserver device.
+    
+  * \section parameters_sec Parameters     
+  
+  *- -- verbosity : enable device verbose output log.
+  *- -- local : mandatory, specify a local port name to be used to connect to the server.
+  *- -- remote : mandatory, the port name of the server.
+  * \section inputports_sec Input Ports
+  * 
+  * \section outputports_sec Output Ports
+  * 
+  *
+  * \section services_sec Services
+  * 
+  *- /_local_/cmd:i
+  *  [rpc-server]: 
+  * Command port to send commands to the visual servoing server
+  * . This service is described in VisualServoingIDL (VisualServoingIDL.thrift)
+  * 
+  *
+  * 
+  *
+  *
+  **/
+

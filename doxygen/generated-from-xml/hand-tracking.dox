@@ -1,0 +1,72 @@
+
+  /**
+  *
+  * @ingroup icub-module 
+  * \defgroup hand-tracking hand-tracking
+  * A visual end-effector tracker using a 3D model-aided particle filter.
+  * Version: 0.6.0.0
+  * \author  Claudio Fantacci claudio.fantacci@iit.it
+  * \n
+  * \copyright BSD 3-clause "New" or "Revised" License
+  * \section intro_sec Description
+  *
+  
+    This module run a recursive Bayesian filter, a particle filter, to track the robot's end-effector.
+
+    For each particle filter recursion
+
+    1) we render, for each particle, an image of the 3D mesh model of the end-effector as it would appear from the robotâs viewpoints (likewise in augmented reality contexts);
+
+    2) we then use this state representation to directly estimate the 6D pose (position and orientation) of the end-effector in the robot operative space using 2D image descriptors.
+
+    In particular, we use HOG to compare the rendered images with the robotâs camera images and, as a result, the particles which are more likely to represent the end-effector will have higher weight.
+    
+  * \section parameters_sec Parameters     
+  
+  *- -- play : use stored data played with yarpdataplayer.
+  *- -- camsel : left or right to slect the corresponding iCub eye.
+  * \section inputports_sec Input Ports
+  * 
+  *- /hand-tracking/_camsel_/img:i [Image]  [default carrier:mcast]: Input image from the camera.
+  *
+  
+  *- /hand-tracking/InitiCubArm/cam/_camsel_/torso:i [Bottle]  [default carrier:tcp]: Read torso encorder values.
+  *
+  
+  *- /hand-tracking/InitiCubArm/cam/_camsel_/right_arm:i [Bottle]  [default carrier:tcp]: Read right arm encorder values.
+  *
+  
+  *- /hand-tracking/VisualProprioception/_camsel_/head:i [Bottle]  [default carrier:tcp]: Read neck and eyes encorder values.
+  *
+  
+  *- /hand-tracking/VisualProprioception/_camsel_/right_arm:i [Bottle]  [default carrier:tcp]: Read right arm encorder values.
+  *
+  
+  *- /hand-tracking/VisualProprioception/_camsel_/torso:i [Bottle]  [default carrier:tcp]: Read torso encorder values.
+  *
+  
+  *- /hand-tracking/ResamplingWithPrior/InitiCubArm/cam/_camsel_/torso:i [Bottle]  [default carrier:tcp]: Read torso encorder values.
+  *
+  
+  *- /hand-tracking/ResamplingWithPrior/InitiCubArm/cam/_camsel_/right_arm:i [Bottle]  [default carrier:tcp]: Read right arm encorder values.
+  *
+  
+  * \section outputports_sec Output Ports
+  * 
+  *- /hand-tracking/_camsel_/result/estimates:o [Bottle]  [default carrier:tcp]: Pose estimates of the right end-effector of iCub.
+  *
+  
+  *
+  * \section services_sec Services
+  * 
+  *- /hand-tracking/_camsel_/cmd:i
+  *  [rpc-server]: 
+  * Command port to control the 3D model-aided SIS particle filter.
+  * . This service is described in VisualSISParticleFilterIDL (VisualSISParticleFilterIDL.thrift)
+  * 
+  *
+  * 
+  *
+  *
+  **/
+

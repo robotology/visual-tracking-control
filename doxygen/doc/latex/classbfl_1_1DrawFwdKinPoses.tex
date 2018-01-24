@@ -1,0 +1,179 @@
+\hypertarget{classbfl_1_1DrawFwdKinPoses}{}\section{bfl\+:\+:Draw\+Fwd\+Kin\+Poses Class Reference}
+\label{classbfl_1_1DrawFwdKinPoses}\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+
+
+{\ttfamily \#include $<$Draw\+Fwd\+Kin\+Poses.\+h$>$}
+
+
+
+Inheritance diagram for bfl\+:\+:Draw\+Fwd\+Kin\+Poses\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{classbfl_1_1DrawFwdKinPoses__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classbfl_1_1DrawFwdKinPoses_a76ac04c55f02309c5724c22694a591c9}{Draw\+Fwd\+Kin\+Poses} () noexcept
+\item 
+\hyperlink{classbfl_1_1DrawFwdKinPoses_a558686870e99ef9941d9e709a80ecfcc}{Draw\+Fwd\+Kin\+Poses} (\hyperlink{classbfl_1_1DrawFwdKinPoses}{Draw\+Fwd\+Kin\+Poses} \&\&pf\+\_\+prediction) noexcept
+\item 
+\hyperlink{classbfl_1_1DrawFwdKinPoses_a8c9122942a30efa9e4c31704293d4932}{$\sim$\+Draw\+Fwd\+Kin\+Poses} () noexcept
+\item 
+\hyperlink{classbfl_1_1DrawFwdKinPoses}{Draw\+Fwd\+Kin\+Poses} \& \hyperlink{classbfl_1_1DrawFwdKinPoses_af3c60f95018e80c15816c0e7ec4b75c7}{operator=} (\hyperlink{classbfl_1_1DrawFwdKinPoses}{Draw\+Fwd\+Kin\+Poses} \&\&pf\+\_\+prediction) noexcept
+\item 
+State\+Model \& \hyperlink{classbfl_1_1DrawFwdKinPoses_a3273b9ac31c6a5cec5a3d76a498b82b8}{get\+State\+Model} () override
+\item 
+void \hyperlink{classbfl_1_1DrawFwdKinPoses_ad416d76778dd76e0b16c07cd7fb30b7b}{set\+State\+Model} (std\+::unique\+\_\+ptr$<$ State\+Model $>$ state\+\_\+model) override
+\item 
+Exogenous\+Model \& \hyperlink{classbfl_1_1DrawFwdKinPoses_a97ad3a63a71ca40e193d0d18e5faf539}{get\+Exogenous\+Model} () override
+\item 
+void \hyperlink{classbfl_1_1DrawFwdKinPoses_ad42f7b9870d3f38faa439acc0bd793c7}{set\+Exogenous\+Model} (std\+::unique\+\_\+ptr$<$ Exogenous\+Model $>$ exogenous\+\_\+model) override
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classbfl_1_1DrawFwdKinPoses_a2b2766e81769769fb299f31f644d1761}{predict\+Step} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&prev\+\_\+states, const Eigen\+::\+Ref$<$ const Eigen\+::\+Vector\+Xf $>$ \&prev\+\_\+weights, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ pred\+\_\+states, Eigen\+::\+Ref$<$ Eigen\+::\+Vector\+Xf $>$ pred\+\_\+weights) override
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unique\+\_\+ptr$<$ State\+Model $>$ \hyperlink{classbfl_1_1DrawFwdKinPoses_afcd1bf7246acdc971075b8ba63f8986a}{state\+\_\+model\+\_\+}
+\item 
+std\+::unique\+\_\+ptr$<$ Exogenous\+Model $>$ \hyperlink{classbfl_1_1DrawFwdKinPoses_af5fcf31aeb103a36830fc8363039540b}{exogenous\+\_\+model\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 15 of file Draw\+Fwd\+Kin\+Poses.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_a76ac04c55f02309c5724c22694a591c9}\label{classbfl_1_1DrawFwdKinPoses_a76ac04c55f02309c5724c22694a591c9}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!Draw\+Fwd\+Kin\+Poses@{Draw\+Fwd\+Kin\+Poses}}
+\index{Draw\+Fwd\+Kin\+Poses@{Draw\+Fwd\+Kin\+Poses}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{Draw\+Fwd\+Kin\+Poses()}{DrawFwdKinPoses()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Draw\+Fwd\+Kin\+Poses\+::\+Draw\+Fwd\+Kin\+Poses (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 9 of file Draw\+Fwd\+Kin\+Poses.\+cpp.
+
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_a558686870e99ef9941d9e709a80ecfcc}\label{classbfl_1_1DrawFwdKinPoses_a558686870e99ef9941d9e709a80ecfcc}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!Draw\+Fwd\+Kin\+Poses@{Draw\+Fwd\+Kin\+Poses}}
+\index{Draw\+Fwd\+Kin\+Poses@{Draw\+Fwd\+Kin\+Poses}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{Draw\+Fwd\+Kin\+Poses()}{DrawFwdKinPoses()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Draw\+Fwd\+Kin\+Poses\+::\+Draw\+Fwd\+Kin\+Poses (\begin{DoxyParamCaption}\item[{\hyperlink{classbfl_1_1DrawFwdKinPoses}{Draw\+Fwd\+Kin\+Poses} \&\&}]{pf\+\_\+prediction }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 15 of file Draw\+Fwd\+Kin\+Poses.\+cpp.
+
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_a8c9122942a30efa9e4c31704293d4932}\label{classbfl_1_1DrawFwdKinPoses_a8c9122942a30efa9e4c31704293d4932}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!````~Draw\+Fwd\+Kin\+Poses@{$\sim$\+Draw\+Fwd\+Kin\+Poses}}
+\index{````~Draw\+Fwd\+Kin\+Poses@{$\sim$\+Draw\+Fwd\+Kin\+Poses}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{$\sim$\+Draw\+Fwd\+Kin\+Poses()}{~DrawFwdKinPoses()}}
+{\footnotesize\ttfamily Draw\+Fwd\+Kin\+Poses\+::$\sim$\+Draw\+Fwd\+Kin\+Poses (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 12 of file Draw\+Fwd\+Kin\+Poses.\+cpp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_a97ad3a63a71ca40e193d0d18e5faf539}\label{classbfl_1_1DrawFwdKinPoses_a97ad3a63a71ca40e193d0d18e5faf539}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!get\+Exogenous\+Model@{get\+Exogenous\+Model}}
+\index{get\+Exogenous\+Model@{get\+Exogenous\+Model}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{get\+Exogenous\+Model()}{getExogenousModel()}}
+{\footnotesize\ttfamily Exogenous\+Model \& Draw\+Fwd\+Kin\+Poses\+::get\+Exogenous\+Model (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 42 of file Draw\+Fwd\+Kin\+Poses.\+cpp.
+
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_a3273b9ac31c6a5cec5a3d76a498b82b8}\label{classbfl_1_1DrawFwdKinPoses_a3273b9ac31c6a5cec5a3d76a498b82b8}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!get\+State\+Model@{get\+State\+Model}}
+\index{get\+State\+Model@{get\+State\+Model}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{get\+State\+Model()}{getStateModel()}}
+{\footnotesize\ttfamily State\+Model \& Draw\+Fwd\+Kin\+Poses\+::get\+State\+Model (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 30 of file Draw\+Fwd\+Kin\+Poses.\+cpp.
+
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_af3c60f95018e80c15816c0e7ec4b75c7}\label{classbfl_1_1DrawFwdKinPoses_af3c60f95018e80c15816c0e7ec4b75c7}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!operator=@{operator=}}
+\index{operator=@{operator=}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \hyperlink{classbfl_1_1DrawFwdKinPoses}{Draw\+Fwd\+Kin\+Poses} \& Draw\+Fwd\+Kin\+Poses\+::operator= (\begin{DoxyParamCaption}\item[{\hyperlink{classbfl_1_1DrawFwdKinPoses}{Draw\+Fwd\+Kin\+Poses} \&\&}]{pf\+\_\+prediction }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 20 of file Draw\+Fwd\+Kin\+Poses.\+cpp.
+
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_a2b2766e81769769fb299f31f644d1761}\label{classbfl_1_1DrawFwdKinPoses_a2b2766e81769769fb299f31f644d1761}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!predict\+Step@{predict\+Step}}
+\index{predict\+Step@{predict\+Step}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{predict\+Step()}{predictStep()}}
+{\footnotesize\ttfamily void Draw\+Fwd\+Kin\+Poses\+::predict\+Step (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{prev\+\_\+states,  }\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Vector\+Xf $>$ \&}]{prev\+\_\+weights,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{pred\+\_\+states,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Vector\+Xf $>$}]{pred\+\_\+weights }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 54 of file Draw\+Fwd\+Kin\+Poses.\+cpp.
+
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_ad42f7b9870d3f38faa439acc0bd793c7}\label{classbfl_1_1DrawFwdKinPoses_ad42f7b9870d3f38faa439acc0bd793c7}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!set\+Exogenous\+Model@{set\+Exogenous\+Model}}
+\index{set\+Exogenous\+Model@{set\+Exogenous\+Model}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{set\+Exogenous\+Model()}{setExogenousModel()}}
+{\footnotesize\ttfamily void Draw\+Fwd\+Kin\+Poses\+::set\+Exogenous\+Model (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ Exogenous\+Model $>$}]{exogenous\+\_\+model }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 48 of file Draw\+Fwd\+Kin\+Poses.\+cpp.
+
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_ad416d76778dd76e0b16c07cd7fb30b7b}\label{classbfl_1_1DrawFwdKinPoses_ad416d76778dd76e0b16c07cd7fb30b7b}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!set\+State\+Model@{set\+State\+Model}}
+\index{set\+State\+Model@{set\+State\+Model}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{set\+State\+Model()}{setStateModel()}}
+{\footnotesize\ttfamily void Draw\+Fwd\+Kin\+Poses\+::set\+State\+Model (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ State\+Model $>$}]{state\+\_\+model }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 36 of file Draw\+Fwd\+Kin\+Poses.\+cpp.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_af5fcf31aeb103a36830fc8363039540b}\label{classbfl_1_1DrawFwdKinPoses_af5fcf31aeb103a36830fc8363039540b}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!exogenous\+\_\+model\+\_\+@{exogenous\+\_\+model\+\_\+}}
+\index{exogenous\+\_\+model\+\_\+@{exogenous\+\_\+model\+\_\+}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{exogenous\+\_\+model\+\_\+}{exogenous\_model\_}}
+{\footnotesize\ttfamily std\+::unique\+\_\+ptr$<$Exogenous\+Model$>$ bfl\+::\+Draw\+Fwd\+Kin\+Poses\+::exogenous\+\_\+model\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 41 of file Draw\+Fwd\+Kin\+Poses.\+h.
+
+\mbox{\Hypertarget{classbfl_1_1DrawFwdKinPoses_afcd1bf7246acdc971075b8ba63f8986a}\label{classbfl_1_1DrawFwdKinPoses_afcd1bf7246acdc971075b8ba63f8986a}} 
+\index{bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}!state\+\_\+model\+\_\+@{state\+\_\+model\+\_\+}}
+\index{state\+\_\+model\+\_\+@{state\+\_\+model\+\_\+}!bfl\+::\+Draw\+Fwd\+Kin\+Poses@{bfl\+::\+Draw\+Fwd\+Kin\+Poses}}
+\subsubsection{\texorpdfstring{state\+\_\+model\+\_\+}{state\_model\_}}
+{\footnotesize\ttfamily std\+::unique\+\_\+ptr$<$State\+Model$>$ bfl\+::\+Draw\+Fwd\+Kin\+Poses\+::state\+\_\+model\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 39 of file Draw\+Fwd\+Kin\+Poses.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/include/\hyperlink{DrawFwdKinPoses_8h}{Draw\+Fwd\+Kin\+Poses.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/src/\hyperlink{DrawFwdKinPoses_8cpp}{Draw\+Fwd\+Kin\+Poses.\+cpp}\end{DoxyCompactItemize}

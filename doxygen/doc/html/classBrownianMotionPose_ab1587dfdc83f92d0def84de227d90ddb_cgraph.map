@@ -1,0 +1,5 @@
+<map id="BrownianMotionPose::motion" name="BrownianMotionPose::motion">
+<area shape="rect" id="node2" href="$classBrownianMotionPose.html#ad5da23c2e31dd9522115ae925a35e66e" title="BrownianMotionPose\l::addAxisangleDisturbance" alt="" coords="201,5,381,44"/>
+<area shape="rect" id="node3" href="$classBrownianMotionPose.html#a51407ee62d9e384af89c88c5b21c82df" title="BrownianMotionPose\l::getNoiseSample" alt="" coords="217,68,364,107"/>
+<area shape="rect" id="node4" href="$classBrownianMotionPose.html#ac598d506c496740d111ff9ceb4a97459" title="BrownianMotionPose\l::propagate" alt="" coords="217,131,364,169"/>
+</map>

@@ -1,0 +1,386 @@
+\hypertarget{classiCubFwdKinModel}{}\section{i\+Cub\+Fwd\+Kin\+Model Class Reference}
+\label{classiCubFwdKinModel}\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+
+
+{\ttfamily \#include $<$i\+Cub\+Fwd\+Kin\+Model.\+h$>$}
+
+
+
+Inheritance diagram for i\+Cub\+Fwd\+Kin\+Model\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=189pt]{classiCubFwdKinModel__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classiCubFwdKinModel_a97bd690952f48bb7d7994ff3d2d8b2b9}{i\+Cub\+Fwd\+Kin\+Model} (const yarp\+::os\+::\+Const\+String \&robot, const yarp\+::os\+::\+Const\+String \&laterality, const yarp\+::os\+::\+Const\+String \&port\+\_\+prefix)
+\item 
+\hyperlink{classiCubFwdKinModel_a60922638092ac5432739602e6541f9e4}{$\sim$i\+Cub\+Fwd\+Kin\+Model} () noexcept
+\item 
+bool \hyperlink{classiCubFwdKinModel_a2daa3bb3b2c458200dc487ac00929260}{set\+Property} (const std\+::string \&property) override
+\item 
+void \hyperlink{classFwdKinModel_a9461ff14a1ae8d05169e8f1c7a6237c7}{propagate} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&cur\+\_\+state, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ prop\+\_\+state) override
+\item 
+Eigen\+::\+Matrix\+Xf \hyperlink{classFwdKinModel_ac8ed4e8a52f5ff33cc158c80c6cf083e}{get\+Exogenous\+Matrix} () override
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classiCubFwdKinModel_ad549519048e9b54c18af51c6b173b726}{read\+Pose} () override
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classiCubFwdKinModel_a4ed6df084a996223a740a7065e16b799}{read\+Torso} ()
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classiCubFwdKinModel_a638ea7ef68d98f306346684c93934a93}{read\+Root\+To\+EE} ()
+\item 
+bool \hyperlink{classFwdKinModel_a12b54bd62ba5cf218973c600c66ba39e}{set\+Delta\+Motion} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+yarp\+::dev\+::\+Poly\+Driver \hyperlink{classiCubFwdKinModel_a3a07f11e9b770e8fc7c03bff05c52927}{drv\+\_\+arm\+\_\+enc\+\_\+}
+\item 
+yarp\+::dev\+::\+Poly\+Driver \hyperlink{classiCubFwdKinModel_af0ca571291c508a2a058c1ff802e6421}{drv\+\_\+torso\+\_\+enc\+\_\+}
+\item 
+yarp\+::dev\+::\+I\+Encoders $\ast$ \hyperlink{classiCubFwdKinModel_a4478fa4b4f0689d819a19a5cccd69ae2}{itf\+\_\+arm\+\_\+enc\+\_\+}
+\item 
+yarp\+::dev\+::\+I\+Encoders $\ast$ \hyperlink{classiCubFwdKinModel_a2d83dd73bf08f66563e9e33d2c26d16a}{itf\+\_\+torso\+\_\+enc\+\_\+}
+\item 
+i\+Cub\+::i\+Kin\+::i\+Cub\+Arm \hyperlink{classiCubFwdKinModel_a4b92808d2c83eaff8a3bf18dede7001a}{icub\+\_\+kin\+\_\+arm\+\_\+}
+\item 
+bool \hyperlink{classFwdKinModel_a2ed7b77ebd710e5debe63b83a34a1645}{initialize\+\_\+delta\+\_\+} = true
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classiCubFwdKinModel_a3eb6c400ef775a5549aa31fe22fae4c0}{I\+D\+\_\+} = \char`\"{}i\+Cub\+Fwd\+Kin\+Model\char`\"{}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classiCubFwdKinModel_a091abb2a5386537d63a67fbf761a2e8a}{log\+\_\+\+I\+D\+\_\+} = \char`\"{}\mbox{[}\char`\"{} + \hyperlink{classiCubFwdKinModel_a3eb6c400ef775a5549aa31fe22fae4c0}{I\+D\+\_\+} + \char`\"{}\mbox{]}\char`\"{}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classiCubFwdKinModel_ad0fec4635ff934435b24d717cb553014}{robot\+\_\+}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classiCubFwdKinModel_a9894964cecb15d56a55ea1f4610a1cbe}{laterality\+\_\+}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classiCubFwdKinModel_a294f61787264b6a3e9dc1eb9dbc72ed0}{port\+\_\+prefix\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 13 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classiCubFwdKinModel_a97bd690952f48bb7d7994ff3d2d8b2b9}\label{classiCubFwdKinModel_a97bd690952f48bb7d7994ff3d2d8b2b9}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{i\+Cub\+Fwd\+Kin\+Model()}{iCubFwdKinModel()}}
+{\footnotesize\ttfamily i\+Cub\+Fwd\+Kin\+Model\+::i\+Cub\+Fwd\+Kin\+Model (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{robot,  }\item[{const yarp\+::os\+::\+Const\+String \&}]{laterality,  }\item[{const yarp\+::os\+::\+Const\+String \&}]{port\+\_\+prefix }\end{DoxyParamCaption})}
+
+
+
+Definition at line 23 of file i\+Cub\+Fwd\+Kin\+Model.\+cpp.
+
+
+
+References drv\+\_\+arm\+\_\+enc\+\_\+, drv\+\_\+torso\+\_\+enc\+\_\+, icub\+\_\+kin\+\_\+arm\+\_\+, I\+D\+\_\+, itf\+\_\+arm\+\_\+enc\+\_\+, itf\+\_\+torso\+\_\+enc\+\_\+, laterality\+\_\+, log\+\_\+\+I\+D\+\_\+, and robot\+\_\+.
+
+\mbox{\Hypertarget{classiCubFwdKinModel_a60922638092ac5432739602e6541f9e4}\label{classiCubFwdKinModel_a60922638092ac5432739602e6541f9e4}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!````~i\+Cub\+Fwd\+Kin\+Model@{$\sim$i\+Cub\+Fwd\+Kin\+Model}}
+\index{````~i\+Cub\+Fwd\+Kin\+Model@{$\sim$i\+Cub\+Fwd\+Kin\+Model}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{$\sim$i\+Cub\+Fwd\+Kin\+Model()}{~iCubFwdKinModel()}}
+{\footnotesize\ttfamily i\+Cub\+Fwd\+Kin\+Model\+::$\sim$i\+Cub\+Fwd\+Kin\+Model (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 98 of file i\+Cub\+Fwd\+Kin\+Model.\+cpp.
+
+
+
+References drv\+\_\+arm\+\_\+enc\+\_\+, and drv\+\_\+torso\+\_\+enc\+\_\+.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classFwdKinModel_ac8ed4e8a52f5ff33cc158c80c6cf083e}\label{classFwdKinModel_ac8ed4e8a52f5ff33cc158c80c6cf083e}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!get\+Exogenous\+Matrix@{get\+Exogenous\+Matrix}}
+\index{get\+Exogenous\+Matrix@{get\+Exogenous\+Matrix}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{get\+Exogenous\+Matrix()}{getExogenousMatrix()}}
+{\footnotesize\ttfamily Matrix\+Xf Fwd\+Kin\+Model\+::get\+Exogenous\+Matrix (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 47 of file Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classFwdKinModel_a9461ff14a1ae8d05169e8f1c7a6237c7}\label{classFwdKinModel_a9461ff14a1ae8d05169e8f1c7a6237c7}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!propagate@{propagate}}
+\index{propagate@{propagate}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{propagate()}{propagate()}}
+{\footnotesize\ttfamily void Fwd\+Kin\+Model\+::propagate (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{cur\+\_\+state,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{prop\+\_\+state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 28 of file Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classiCubFwdKinModel_ad549519048e9b54c18af51c6b173b726}\label{classiCubFwdKinModel_ad549519048e9b54c18af51c6b173b726}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!read\+Pose@{read\+Pose}}
+\index{read\+Pose@{read\+Pose}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{read\+Pose()}{readPose()}}
+{\footnotesize\ttfamily Vector\+Xd i\+Cub\+Fwd\+Kin\+Model\+::read\+Pose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Implements \hyperlink{classFwdKinModel_aaad9ff96f725fc529672e12aed86dc02}{Fwd\+Kin\+Model}.
+
+
+
+Definition at line 111 of file i\+Cub\+Fwd\+Kin\+Model.\+cpp.
+
+
+
+References icub\+\_\+kin\+\_\+arm\+\_\+, and read\+Root\+To\+E\+E().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classiCubFwdKinModel_ad549519048e9b54c18af51c6b173b726_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classiCubFwdKinModel_a638ea7ef68d98f306346684c93934a93}\label{classiCubFwdKinModel_a638ea7ef68d98f306346684c93934a93}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!read\+Root\+To\+EE@{read\+Root\+To\+EE}}
+\index{read\+Root\+To\+EE@{read\+Root\+To\+EE}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{read\+Root\+To\+E\+E()}{readRootToEE()}}
+{\footnotesize\ttfamily Vector i\+Cub\+Fwd\+Kin\+Model\+::read\+Root\+To\+EE (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 133 of file i\+Cub\+Fwd\+Kin\+Model.\+cpp.
+
+
+
+References itf\+\_\+arm\+\_\+enc\+\_\+, and read\+Torso().
+
+
+
+Referenced by read\+Pose().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classiCubFwdKinModel_a638ea7ef68d98f306346684c93934a93_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classiCubFwdKinModel_a4ed6df084a996223a740a7065e16b799}\label{classiCubFwdKinModel_a4ed6df084a996223a740a7065e16b799}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!read\+Torso@{read\+Torso}}
+\index{read\+Torso@{read\+Torso}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{read\+Torso()}{readTorso()}}
+{\footnotesize\ttfamily Vector i\+Cub\+Fwd\+Kin\+Model\+::read\+Torso (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 119 of file i\+Cub\+Fwd\+Kin\+Model.\+cpp.
+
+
+
+References itf\+\_\+torso\+\_\+enc\+\_\+.
+
+
+
+Referenced by read\+Root\+To\+E\+E().
+
+\mbox{\Hypertarget{classFwdKinModel_a12b54bd62ba5cf218973c600c66ba39e}\label{classFwdKinModel_a12b54bd62ba5cf218973c600c66ba39e}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!set\+Delta\+Motion@{set\+Delta\+Motion}}
+\index{set\+Delta\+Motion@{set\+Delta\+Motion}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{set\+Delta\+Motion()}{setDeltaMotion()}}
+{\footnotesize\ttfamily bool Fwd\+Kin\+Model\+::set\+Delta\+Motion (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 71 of file Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classiCubFwdKinModel_a2daa3bb3b2c458200dc487ac00929260}\label{classiCubFwdKinModel_a2daa3bb3b2c458200dc487ac00929260}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!set\+Property@{set\+Property}}
+\index{set\+Property@{set\+Property}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{set\+Property()}{setProperty()}}
+{\footnotesize\ttfamily bool i\+Cub\+Fwd\+Kin\+Model\+::set\+Property (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{property }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 105 of file i\+Cub\+Fwd\+Kin\+Model.\+cpp.
+
+
+
+References Fwd\+Kin\+Model\+::set\+Property().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classiCubFwdKinModel_a2daa3bb3b2c458200dc487ac00929260_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classiCubFwdKinModel_a3a07f11e9b770e8fc7c03bff05c52927}\label{classiCubFwdKinModel_a3a07f11e9b770e8fc7c03bff05c52927}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!drv\+\_\+arm\+\_\+enc\+\_\+@{drv\+\_\+arm\+\_\+enc\+\_\+}}
+\index{drv\+\_\+arm\+\_\+enc\+\_\+@{drv\+\_\+arm\+\_\+enc\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{drv\+\_\+arm\+\_\+enc\+\_\+}{drv\_arm\_enc\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+Poly\+Driver i\+Cub\+Fwd\+Kin\+Model\+::drv\+\_\+arm\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 29 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+
+
+Referenced by i\+Cub\+Fwd\+Kin\+Model(), and $\sim$i\+Cub\+Fwd\+Kin\+Model().
+
+\mbox{\Hypertarget{classiCubFwdKinModel_af0ca571291c508a2a058c1ff802e6421}\label{classiCubFwdKinModel_af0ca571291c508a2a058c1ff802e6421}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!drv\+\_\+torso\+\_\+enc\+\_\+@{drv\+\_\+torso\+\_\+enc\+\_\+}}
+\index{drv\+\_\+torso\+\_\+enc\+\_\+@{drv\+\_\+torso\+\_\+enc\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{drv\+\_\+torso\+\_\+enc\+\_\+}{drv\_torso\_enc\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+Poly\+Driver i\+Cub\+Fwd\+Kin\+Model\+::drv\+\_\+torso\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 30 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+
+
+Referenced by i\+Cub\+Fwd\+Kin\+Model(), and $\sim$i\+Cub\+Fwd\+Kin\+Model().
+
+\mbox{\Hypertarget{classiCubFwdKinModel_a4b92808d2c83eaff8a3bf18dede7001a}\label{classiCubFwdKinModel_a4b92808d2c83eaff8a3bf18dede7001a}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!icub\+\_\+kin\+\_\+arm\+\_\+@{icub\+\_\+kin\+\_\+arm\+\_\+}}
+\index{icub\+\_\+kin\+\_\+arm\+\_\+@{icub\+\_\+kin\+\_\+arm\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{icub\+\_\+kin\+\_\+arm\+\_\+}{icub\_kin\_arm\_}}
+{\footnotesize\ttfamily i\+Cub\+::i\+Kin\+::i\+Cub\+Arm i\+Cub\+Fwd\+Kin\+Model\+::icub\+\_\+kin\+\_\+arm\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 33 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+
+
+Referenced by i\+Cub\+Fwd\+Kin\+Model(), and read\+Pose().
+
+\mbox{\Hypertarget{classiCubFwdKinModel_a3eb6c400ef775a5549aa31fe22fae4c0}\label{classiCubFwdKinModel_a3eb6c400ef775a5549aa31fe22fae4c0}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!I\+D\+\_\+@{I\+D\+\_\+}}
+\index{I\+D\+\_\+@{I\+D\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{I\+D\+\_\+}{ID\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String i\+Cub\+Fwd\+Kin\+Model\+::\+I\+D\+\_\+ = \char`\"{}i\+Cub\+Fwd\+Kin\+Model\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 36 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+
+
+Referenced by i\+Cub\+Fwd\+Kin\+Model().
+
+\mbox{\Hypertarget{classFwdKinModel_a2ed7b77ebd710e5debe63b83a34a1645}\label{classFwdKinModel_a2ed7b77ebd710e5debe63b83a34a1645}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!initialize\+\_\+delta\+\_\+@{initialize\+\_\+delta\+\_\+}}
+\index{initialize\+\_\+delta\+\_\+@{initialize\+\_\+delta\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{initialize\+\_\+delta\+\_\+}{initialize\_delta\_}}
+{\footnotesize\ttfamily bool Fwd\+Kin\+Model\+::initialize\+\_\+delta\+\_\+ = true\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 28 of file Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classiCubFwdKinModel_a4478fa4b4f0689d819a19a5cccd69ae2}\label{classiCubFwdKinModel_a4478fa4b4f0689d819a19a5cccd69ae2}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!itf\+\_\+arm\+\_\+enc\+\_\+@{itf\+\_\+arm\+\_\+enc\+\_\+}}
+\index{itf\+\_\+arm\+\_\+enc\+\_\+@{itf\+\_\+arm\+\_\+enc\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{itf\+\_\+arm\+\_\+enc\+\_\+}{itf\_arm\_enc\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+I\+Encoders$\ast$ i\+Cub\+Fwd\+Kin\+Model\+::itf\+\_\+arm\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 31 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+
+
+Referenced by i\+Cub\+Fwd\+Kin\+Model(), and read\+Root\+To\+E\+E().
+
+\mbox{\Hypertarget{classiCubFwdKinModel_a2d83dd73bf08f66563e9e33d2c26d16a}\label{classiCubFwdKinModel_a2d83dd73bf08f66563e9e33d2c26d16a}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!itf\+\_\+torso\+\_\+enc\+\_\+@{itf\+\_\+torso\+\_\+enc\+\_\+}}
+\index{itf\+\_\+torso\+\_\+enc\+\_\+@{itf\+\_\+torso\+\_\+enc\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{itf\+\_\+torso\+\_\+enc\+\_\+}{itf\_torso\_enc\_}}
+{\footnotesize\ttfamily yarp\+::dev\+::\+I\+Encoders$\ast$ i\+Cub\+Fwd\+Kin\+Model\+::itf\+\_\+torso\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 32 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+
+
+Referenced by i\+Cub\+Fwd\+Kin\+Model(), and read\+Torso().
+
+\mbox{\Hypertarget{classiCubFwdKinModel_a9894964cecb15d56a55ea1f4610a1cbe}\label{classiCubFwdKinModel_a9894964cecb15d56a55ea1f4610a1cbe}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!laterality\+\_\+@{laterality\+\_\+}}
+\index{laterality\+\_\+@{laterality\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{laterality\+\_\+}{laterality\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String i\+Cub\+Fwd\+Kin\+Model\+::laterality\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 40 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+
+
+Referenced by i\+Cub\+Fwd\+Kin\+Model().
+
+\mbox{\Hypertarget{classiCubFwdKinModel_a091abb2a5386537d63a67fbf761a2e8a}\label{classiCubFwdKinModel_a091abb2a5386537d63a67fbf761a2e8a}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!log\+\_\+\+I\+D\+\_\+@{log\+\_\+\+I\+D\+\_\+}}
+\index{log\+\_\+\+I\+D\+\_\+@{log\+\_\+\+I\+D\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{log\+\_\+\+I\+D\+\_\+}{log\_ID\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String i\+Cub\+Fwd\+Kin\+Model\+::log\+\_\+\+I\+D\+\_\+ = \char`\"{}\mbox{[}\char`\"{} + \hyperlink{classiCubFwdKinModel_a3eb6c400ef775a5549aa31fe22fae4c0}{I\+D\+\_\+} + \char`\"{}\mbox{]}\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 37 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+
+
+Referenced by i\+Cub\+Fwd\+Kin\+Model().
+
+\mbox{\Hypertarget{classiCubFwdKinModel_a294f61787264b6a3e9dc1eb9dbc72ed0}\label{classiCubFwdKinModel_a294f61787264b6a3e9dc1eb9dbc72ed0}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!port\+\_\+prefix\+\_\+@{port\+\_\+prefix\+\_\+}}
+\index{port\+\_\+prefix\+\_\+@{port\+\_\+prefix\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{port\+\_\+prefix\+\_\+}{port\_prefix\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String i\+Cub\+Fwd\+Kin\+Model\+::port\+\_\+prefix\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 41 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classiCubFwdKinModel_ad0fec4635ff934435b24d717cb553014}\label{classiCubFwdKinModel_ad0fec4635ff934435b24d717cb553014}} 
+\index{i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}!robot\+\_\+@{robot\+\_\+}}
+\index{robot\+\_\+@{robot\+\_\+}!i\+Cub\+Fwd\+Kin\+Model@{i\+Cub\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{robot\+\_\+}{robot\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String i\+Cub\+Fwd\+Kin\+Model\+::robot\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 39 of file i\+Cub\+Fwd\+Kin\+Model.\+h.
+
+
+
+Referenced by i\+Cub\+Fwd\+Kin\+Model().
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/include/\hyperlink{iCubFwdKinModel_8h}{i\+Cub\+Fwd\+Kin\+Model.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/src/\hyperlink{iCubFwdKinModel_8cpp}{i\+Cub\+Fwd\+Kin\+Model.\+cpp}\end{DoxyCompactItemize}

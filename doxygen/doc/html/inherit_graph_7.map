@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classVisualServoingClient.html" title="VisualServoingClient" alt="" coords="199,12,343,37"/>
+<area shape="rect" id="node3" href="$classVisualServoingServer.html" title="VisualServoingServer" alt="" coords="196,67,346,92"/>
+<area shape="rect" id="node7" href="$classVisualSIS.html" title="VisualSIS" alt="" coords="406,153,485,179"/>
+<area shape="rect" id="node8" href="$classVisualServoingIDL.html" title="VisualServoingIDL IDL Interface to ServerVisualServoing functionalities. " alt="" coords="5,177,136,203"/>
+<area shape="rect" id="node9" href="$classVisualSISParticleFilterIDL.html" title="VisualSISParticleFilterIDL IDL Interface to VisualSIRParticleFilter options. " alt="" coords="184,177,358,203"/>
+</map>

@@ -1,0 +1,32 @@
+\hypertarget{group__visualservoingclient}{}\section{visualservoingclient}
+\label{group__visualservoingclient}\index{visualservoingclient@{visualservoingclient}}
+
+
+i\+Cub device (plugin, client) for visual servoing.  
+
+
+i\+Cub device (plugin, client) for visual servoing. 
+
+Version\+: 0.\+6.\+0.\+0 \begin{DoxyAuthor}{Author}
+Claudio Fantacci \href{mailto:claudio.fantacci@gmail.com}{\tt claudio.\+fantacci@gmail.\+com} ~\newline
+ 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+B\+SD 3-\/clause \char`\"{}\+New\char`\"{} or \char`\"{}\+Revised\char`\"{} License 
+\end{DoxyCopyright}
+\hypertarget{group__visualservoingserver_intro_sec}{}\subsection{Description}\label{group__visualservoingserver_intro_sec}
+An image-\/based visual servoing controller for i\+Cub.
+
+This is the device (Y\+A\+RP plugin) that sends command to the visualservoingserver device.\hypertarget{group__visualservoingserver_parameters_sec}{}\subsection{Parameters}\label{group__visualservoingserver_parameters_sec}
+
+\begin{DoxyItemize}
+\item -- verbosity \+: enable device verbose output log.
+\item -- local \+: mandatory, specify a local port name to be used to connect to the server.
+\item -- remote \+: mandatory, the port name of the server. 
+\end{DoxyItemize}\hypertarget{group__visualservoingserver_inputports_sec}{}\subsection{Input Ports}\label{group__visualservoingserver_inputports_sec}
+\hypertarget{group__visualservoingserver_outputports_sec}{}\subsection{Output Ports}\label{group__visualservoingserver_outputports_sec}
+\hypertarget{group__visualservoingserver_services_sec}{}\subsection{Services}\label{group__visualservoingserver_services_sec}
+
+\begin{DoxyItemize}
+\item /\+\_\+local\+\_\+/cmd\+:i \mbox{[}rpc-\/server\mbox{]}\+: Command port to send commands to the visual servoing server . This service is described in \hyperlink{classVisualServoingIDL}{Visual\+Servoing\+I\+DL} (Visual\+Servoing\+I\+D\+L.\+thrift) 
+\end{DoxyItemize}

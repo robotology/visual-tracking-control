@@ -1,0 +1,282 @@
+\hypertarget{classPlayFwdKinModel}{}\section{Play\+Fwd\+Kin\+Model Class Reference}
+\label{classPlayFwdKinModel}\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+
+
+{\ttfamily \#include $<$Play\+Fwd\+Kin\+Model.\+h$>$}
+
+
+
+Inheritance diagram for Play\+Fwd\+Kin\+Model\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=189pt]{classPlayFwdKinModel__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classPlayFwdKinModel_aa7dbbe09aed1e7d1a1ac3fc37807f57c}{Play\+Fwd\+Kin\+Model} (const yarp\+::os\+::\+Const\+String \&robot, const yarp\+::os\+::\+Const\+String \&laterality, const yarp\+::os\+::\+Const\+String \&port\+\_\+prefix) noexcept
+\item 
+\hyperlink{classPlayFwdKinModel_a0af36404764e109bedacd8648939ba9c}{$\sim$\+Play\+Fwd\+Kin\+Model} () noexcept
+\item 
+bool \hyperlink{classPlayFwdKinModel_ae7f9432ed4f7069442821dbfa598321d}{set\+Property} (const std\+::string \&property) override
+\item 
+void \hyperlink{classFwdKinModel_a9461ff14a1ae8d05169e8f1c7a6237c7}{propagate} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&cur\+\_\+state, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ prop\+\_\+state) override
+\item 
+Eigen\+::\+Matrix\+Xf \hyperlink{classFwdKinModel_ac8ed4e8a52f5ff33cc158c80c6cf083e}{get\+Exogenous\+Matrix} () override
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classPlayFwdKinModel_a282700bc69b26e6ea28cc5048881a599}{read\+Pose} () override
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classPlayFwdKinModel_a04170578030a5db53f7af45876b11492}{read\+Torso} ()
+\item 
+yarp\+::sig\+::\+Vector \hyperlink{classPlayFwdKinModel_a97e565b16712bb26a41fc78c4d1fca89}{read\+Root\+To\+EE} ()
+\item 
+bool \hyperlink{classFwdKinModel_a12b54bd62ba5cf218973c600c66ba39e}{set\+Delta\+Motion} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::os\+::\+Bottle $>$ \hyperlink{classPlayFwdKinModel_a092cea2f9523b8f303fded1067e2f965}{port\+\_\+torso\+\_\+enc\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::os\+::\+Bottle $>$ \hyperlink{classPlayFwdKinModel_abe0b6fcb827b0c1c0b07ad083eb224e6}{port\+\_\+arm\+\_\+enc\+\_\+}
+\item 
+i\+Cub\+::i\+Kin\+::i\+Cub\+Arm \hyperlink{classPlayFwdKinModel_af6e5c3ce282a1326b7d58e45c68412a9}{icub\+\_\+kin\+\_\+arm\+\_\+}
+\item 
+bool \hyperlink{classFwdKinModel_a2ed7b77ebd710e5debe63b83a34a1645}{initialize\+\_\+delta\+\_\+} = true
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classPlayFwdKinModel_a2e37370f9958d7b77bc1377ede99d554}{I\+D\+\_\+} = \char`\"{}Play\+Fwd\+Kin\+Model\char`\"{}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classPlayFwdKinModel_a8e6132483f92deaed9ad1c529d398673}{log\+\_\+\+I\+D\+\_\+} = \char`\"{}\mbox{[}\char`\"{} + \hyperlink{classPlayFwdKinModel_a2e37370f9958d7b77bc1377ede99d554}{I\+D\+\_\+} + \char`\"{}\mbox{]}\char`\"{}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classPlayFwdKinModel_acb83b9edcd4d111ff6f295f26796351d}{robot\+\_\+}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classPlayFwdKinModel_a9066d4c54a62b989be77ab29a0b65f93}{laterality\+\_\+}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classPlayFwdKinModel_adcde73c93a3e42a6b444db742d9d50af}{port\+\_\+prefix\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 13 of file Play\+Fwd\+Kin\+Model.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classPlayFwdKinModel_aa7dbbe09aed1e7d1a1ac3fc37807f57c}\label{classPlayFwdKinModel_aa7dbbe09aed1e7d1a1ac3fc37807f57c}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{Play\+Fwd\+Kin\+Model()}{PlayFwdKinModel()}}
+{\footnotesize\ttfamily Play\+Fwd\+Kin\+Model\+::\+Play\+Fwd\+Kin\+Model (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{robot,  }\item[{const yarp\+::os\+::\+Const\+String \&}]{laterality,  }\item[{const yarp\+::os\+::\+Const\+String \&}]{port\+\_\+prefix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 23 of file Play\+Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_a0af36404764e109bedacd8648939ba9c}\label{classPlayFwdKinModel_a0af36404764e109bedacd8648939ba9c}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!````~Play\+Fwd\+Kin\+Model@{$\sim$\+Play\+Fwd\+Kin\+Model}}
+\index{````~Play\+Fwd\+Kin\+Model@{$\sim$\+Play\+Fwd\+Kin\+Model}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{$\sim$\+Play\+Fwd\+Kin\+Model()}{~PlayFwdKinModel()}}
+{\footnotesize\ttfamily Play\+Fwd\+Kin\+Model\+::$\sim$\+Play\+Fwd\+Kin\+Model (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 38 of file Play\+Fwd\+Kin\+Model.\+cpp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classFwdKinModel_ac8ed4e8a52f5ff33cc158c80c6cf083e}\label{classFwdKinModel_ac8ed4e8a52f5ff33cc158c80c6cf083e}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!get\+Exogenous\+Matrix@{get\+Exogenous\+Matrix}}
+\index{get\+Exogenous\+Matrix@{get\+Exogenous\+Matrix}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{get\+Exogenous\+Matrix()}{getExogenousMatrix()}}
+{\footnotesize\ttfamily Matrix\+Xf Fwd\+Kin\+Model\+::get\+Exogenous\+Matrix (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 47 of file Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classFwdKinModel_a9461ff14a1ae8d05169e8f1c7a6237c7}\label{classFwdKinModel_a9461ff14a1ae8d05169e8f1c7a6237c7}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!propagate@{propagate}}
+\index{propagate@{propagate}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{propagate()}{propagate()}}
+{\footnotesize\ttfamily void Fwd\+Kin\+Model\+::propagate (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{cur\+\_\+state,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{prop\+\_\+state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 28 of file Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_a282700bc69b26e6ea28cc5048881a599}\label{classPlayFwdKinModel_a282700bc69b26e6ea28cc5048881a599}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!read\+Pose@{read\+Pose}}
+\index{read\+Pose@{read\+Pose}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{read\+Pose()}{readPose()}}
+{\footnotesize\ttfamily Vector\+Xd Play\+Fwd\+Kin\+Model\+::read\+Pose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Implements \hyperlink{classFwdKinModel_aaad9ff96f725fc529672e12aed86dc02}{Fwd\+Kin\+Model}.
+
+
+
+Definition at line 54 of file Play\+Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_a97e565b16712bb26a41fc78c4d1fca89}\label{classPlayFwdKinModel_a97e565b16712bb26a41fc78c4d1fca89}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!read\+Root\+To\+EE@{read\+Root\+To\+EE}}
+\index{read\+Root\+To\+EE@{read\+Root\+To\+EE}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{read\+Root\+To\+E\+E()}{readRootToEE()}}
+{\footnotesize\ttfamily Vector Play\+Fwd\+Kin\+Model\+::read\+Root\+To\+EE (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 75 of file Play\+Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_a04170578030a5db53f7af45876b11492}\label{classPlayFwdKinModel_a04170578030a5db53f7af45876b11492}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!read\+Torso@{read\+Torso}}
+\index{read\+Torso@{read\+Torso}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{read\+Torso()}{readTorso()}}
+{\footnotesize\ttfamily Vector Play\+Fwd\+Kin\+Model\+::read\+Torso (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 61 of file Play\+Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classFwdKinModel_a12b54bd62ba5cf218973c600c66ba39e}\label{classFwdKinModel_a12b54bd62ba5cf218973c600c66ba39e}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!set\+Delta\+Motion@{set\+Delta\+Motion}}
+\index{set\+Delta\+Motion@{set\+Delta\+Motion}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{set\+Delta\+Motion()}{setDeltaMotion()}}
+{\footnotesize\ttfamily bool Fwd\+Kin\+Model\+::set\+Delta\+Motion (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 71 of file Fwd\+Kin\+Model.\+cpp.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_ae7f9432ed4f7069442821dbfa598321d}\label{classPlayFwdKinModel_ae7f9432ed4f7069442821dbfa598321d}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!set\+Property@{set\+Property}}
+\index{set\+Property@{set\+Property}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{set\+Property()}{setProperty()}}
+{\footnotesize\ttfamily bool Play\+Fwd\+Kin\+Model\+::set\+Property (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{property }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 48 of file Play\+Fwd\+Kin\+Model.\+cpp.
+
+
+
+References Fwd\+Kin\+Model\+::set\+Property().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classPlayFwdKinModel_ae7f9432ed4f7069442821dbfa598321d_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classPlayFwdKinModel_af6e5c3ce282a1326b7d58e45c68412a9}\label{classPlayFwdKinModel_af6e5c3ce282a1326b7d58e45c68412a9}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!icub\+\_\+kin\+\_\+arm\+\_\+@{icub\+\_\+kin\+\_\+arm\+\_\+}}
+\index{icub\+\_\+kin\+\_\+arm\+\_\+@{icub\+\_\+kin\+\_\+arm\+\_\+}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{icub\+\_\+kin\+\_\+arm\+\_\+}{icub\_kin\_arm\_}}
+{\footnotesize\ttfamily i\+Cub\+::i\+Kin\+::i\+Cub\+Arm Play\+Fwd\+Kin\+Model\+::icub\+\_\+kin\+\_\+arm\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 31 of file Play\+Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_a2e37370f9958d7b77bc1377ede99d554}\label{classPlayFwdKinModel_a2e37370f9958d7b77bc1377ede99d554}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!I\+D\+\_\+@{I\+D\+\_\+}}
+\index{I\+D\+\_\+@{I\+D\+\_\+}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{I\+D\+\_\+}{ID\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Play\+Fwd\+Kin\+Model\+::\+I\+D\+\_\+ = \char`\"{}Play\+Fwd\+Kin\+Model\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 34 of file Play\+Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classFwdKinModel_a2ed7b77ebd710e5debe63b83a34a1645}\label{classFwdKinModel_a2ed7b77ebd710e5debe63b83a34a1645}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!initialize\+\_\+delta\+\_\+@{initialize\+\_\+delta\+\_\+}}
+\index{initialize\+\_\+delta\+\_\+@{initialize\+\_\+delta\+\_\+}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{initialize\+\_\+delta\+\_\+}{initialize\_delta\_}}
+{\footnotesize\ttfamily bool Fwd\+Kin\+Model\+::initialize\+\_\+delta\+\_\+ = true\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 28 of file Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_a9066d4c54a62b989be77ab29a0b65f93}\label{classPlayFwdKinModel_a9066d4c54a62b989be77ab29a0b65f93}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!laterality\+\_\+@{laterality\+\_\+}}
+\index{laterality\+\_\+@{laterality\+\_\+}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{laterality\+\_\+}{laterality\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Play\+Fwd\+Kin\+Model\+::laterality\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 38 of file Play\+Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_a8e6132483f92deaed9ad1c529d398673}\label{classPlayFwdKinModel_a8e6132483f92deaed9ad1c529d398673}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!log\+\_\+\+I\+D\+\_\+@{log\+\_\+\+I\+D\+\_\+}}
+\index{log\+\_\+\+I\+D\+\_\+@{log\+\_\+\+I\+D\+\_\+}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{log\+\_\+\+I\+D\+\_\+}{log\_ID\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Play\+Fwd\+Kin\+Model\+::log\+\_\+\+I\+D\+\_\+ = \char`\"{}\mbox{[}\char`\"{} + \hyperlink{classPlayFwdKinModel_a2e37370f9958d7b77bc1377ede99d554}{I\+D\+\_\+} + \char`\"{}\mbox{]}\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 35 of file Play\+Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_abe0b6fcb827b0c1c0b07ad083eb224e6}\label{classPlayFwdKinModel_abe0b6fcb827b0c1c0b07ad083eb224e6}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!port\+\_\+arm\+\_\+enc\+\_\+@{port\+\_\+arm\+\_\+enc\+\_\+}}
+\index{port\+\_\+arm\+\_\+enc\+\_\+@{port\+\_\+arm\+\_\+enc\+\_\+}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{port\+\_\+arm\+\_\+enc\+\_\+}{port\_arm\_enc\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::os\+::\+Bottle$>$ Play\+Fwd\+Kin\+Model\+::port\+\_\+arm\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 30 of file Play\+Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_adcde73c93a3e42a6b444db742d9d50af}\label{classPlayFwdKinModel_adcde73c93a3e42a6b444db742d9d50af}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!port\+\_\+prefix\+\_\+@{port\+\_\+prefix\+\_\+}}
+\index{port\+\_\+prefix\+\_\+@{port\+\_\+prefix\+\_\+}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{port\+\_\+prefix\+\_\+}{port\_prefix\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Play\+Fwd\+Kin\+Model\+::port\+\_\+prefix\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 39 of file Play\+Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_a092cea2f9523b8f303fded1067e2f965}\label{classPlayFwdKinModel_a092cea2f9523b8f303fded1067e2f965}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!port\+\_\+torso\+\_\+enc\+\_\+@{port\+\_\+torso\+\_\+enc\+\_\+}}
+\index{port\+\_\+torso\+\_\+enc\+\_\+@{port\+\_\+torso\+\_\+enc\+\_\+}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{port\+\_\+torso\+\_\+enc\+\_\+}{port\_torso\_enc\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::os\+::\+Bottle$>$ Play\+Fwd\+Kin\+Model\+::port\+\_\+torso\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 29 of file Play\+Fwd\+Kin\+Model.\+h.
+
+\mbox{\Hypertarget{classPlayFwdKinModel_acb83b9edcd4d111ff6f295f26796351d}\label{classPlayFwdKinModel_acb83b9edcd4d111ff6f295f26796351d}} 
+\index{Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}!robot\+\_\+@{robot\+\_\+}}
+\index{robot\+\_\+@{robot\+\_\+}!Play\+Fwd\+Kin\+Model@{Play\+Fwd\+Kin\+Model}}
+\subsubsection{\texorpdfstring{robot\+\_\+}{robot\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Play\+Fwd\+Kin\+Model\+::robot\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 37 of file Play\+Fwd\+Kin\+Model.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/include/\hyperlink{PlayFwdKinModel_8h}{Play\+Fwd\+Kin\+Model.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/src/\hyperlink{PlayFwdKinModel_8cpp}{Play\+Fwd\+Kin\+Model.\+cpp}\end{DoxyCompactItemize}

@@ -1,0 +1,287 @@
+\hypertarget{classVisualUpdateParticles}{}\section{Visual\+Update\+Particles Class Reference}
+\label{classVisualUpdateParticles}\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+
+
+{\ttfamily \#include $<$Visual\+Update\+Particles.\+h$>$}
+
+
+
+Inheritance diagram for Visual\+Update\+Particles\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=198pt]{classVisualUpdateParticles__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classVisualUpdateParticles_aa67179b62e91f386402d176975151d48}{Visual\+Update\+Particles} (std\+::unique\+\_\+ptr$<$ \hyperlink{classVisualProprioception}{Visual\+Proprioception} $>$ observation\+\_\+model) noexcept
+\item 
+\hyperlink{classVisualUpdateParticles_ade399f29a375d20c3c707dbab2fb23bb}{Visual\+Update\+Particles} (std\+::unique\+\_\+ptr$<$ \hyperlink{classVisualProprioception}{Visual\+Proprioception} $>$ observation\+\_\+model, const double likelihood\+\_\+gain) noexcept
+\item 
+\hyperlink{classVisualUpdateParticles_a225e07a8873f4ed372b3b12ee4a0f044}{Visual\+Update\+Particles} (std\+::unique\+\_\+ptr$<$ \hyperlink{classVisualProprioception}{Visual\+Proprioception} $>$ observation\+\_\+model, const double likelihood\+\_\+gain, const int num\+\_\+cuda\+\_\+stream) noexcept
+\item 
+\hyperlink{classVisualUpdateParticles_a96097675396400a8f6932e4c867d9f30}{$\sim$\+Visual\+Update\+Particles} () noexcept
+\item 
+void \hyperlink{classVisualUpdateParticles_ac6f27c465111a248314ce93ed630dd75}{innovation} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&pred\+\_\+states, cv\+::\+Input\+Array measurements, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ innovations) override
+\item 
+double \hyperlink{classVisualUpdateParticles_ac8905544d7c082cca2fe52b773023bd7}{likelihood} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&innovations) override
+\item 
+bfl\+::\+Visual\+Observation\+Model \& \hyperlink{classVisualUpdateParticles_a34f3b5665eff632890713db818d1995a}{get\+Visual\+Observation\+Model} () override
+\item 
+void \hyperlink{classVisualUpdateParticles_adced067cb277d138db7f452db1bc01a6}{set\+Visual\+Observation\+Model} (std\+::unique\+\_\+ptr$<$ bfl\+::\+Visual\+Observation\+Model $>$ visual\+\_\+observation\+\_\+model) override
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classVisualUpdateParticles_ac0ed3c0a2ccab6cbc65a5f83fa834483}{correct\+Step} (const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&pred\+\_\+states, const Eigen\+::\+Ref$<$ const Eigen\+::\+Vector\+Xf $>$ \&pred\+\_\+weights, cv\+::\+Input\+Array measurements, Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$ cor\+\_\+states, Eigen\+::\+Ref$<$ Eigen\+::\+Vector\+Xf $>$ cor\+\_\+weights) override
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unique\+\_\+ptr$<$ \hyperlink{classVisualProprioception}{Visual\+Proprioception} $>$ \hyperlink{classVisualUpdateParticles_a7e076390fd3cb9e508d36d65235b179c}{observation\+\_\+model\+\_\+}
+\item 
+double \hyperlink{classVisualUpdateParticles_a3199afdf57b24df7193f3f50b87a252f}{likelihood\+\_\+gain\+\_\+}
+\item 
+cv\+::\+Ptr$<$ cv\+::cuda\+::\+H\+OG $>$ \hyperlink{classVisualUpdateParticles_add09a7f472a034679dfc77726d9cc4c3}{cuda\+\_\+hog\+\_\+}
+\item 
+const int \hyperlink{classVisualUpdateParticles_ace5e836ecda66975c5ec85ea92c305b8}{num\+\_\+cuda\+\_\+stream\+\_\+}
+\item 
+const int \hyperlink{classVisualUpdateParticles_aad9d0aba6b913489a8e63f7008ceeebe}{num\+\_\+img\+\_\+stream\+\_\+}
+\item 
+std\+::vector$<$ cv\+::cuda\+::\+Stream $>$ \hyperlink{classVisualUpdateParticles_af179d2c350a9f93a412200816b79a876}{cuda\+\_\+stream\+\_\+}
+\item 
+std\+::vector$<$ cv\+::\+Mat $>$ \hyperlink{classVisualUpdateParticles_a61bfe2a44d2cad15887f34484321bd93}{hand\+\_\+rendered\+\_\+}
+\item 
+std\+::vector$<$ cv\+::cuda\+::\+Gpu\+Mat $>$ \hyperlink{classVisualUpdateParticles_a885d5094c4a20b386607ee839792ce12}{cuda\+\_\+img\+\_\+}
+\item 
+std\+::vector$<$ cv\+::cuda\+::\+Gpu\+Mat $>$ \hyperlink{classVisualUpdateParticles_acb31efd3272b83b80e55018e577adbfc}{cuda\+\_\+img\+\_\+alpha\+\_\+}
+\item 
+std\+::vector$<$ cv\+::cuda\+::\+Gpu\+Mat $>$ \hyperlink{classVisualUpdateParticles_ae2de27efd67d8c5cfa661d97841aa9ea}{cuda\+\_\+descriptors\+\_\+}
+\item 
+std\+::vector$<$ cv\+::\+Mat $>$ \hyperlink{classVisualUpdateParticles_ac9c29a18fee44cd0bb5be0ff71e2f8d7}{cpu\+\_\+descriptors\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 16 of file Visual\+Update\+Particles.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classVisualUpdateParticles_aa67179b62e91f386402d176975151d48}\label{classVisualUpdateParticles_aa67179b62e91f386402d176975151d48}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{Visual\+Update\+Particles()}{VisualUpdateParticles()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily Visual\+Update\+Particles\+::\+Visual\+Update\+Particles (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ \hyperlink{classVisualProprioception}{Visual\+Proprioception} $>$}]{observation\+\_\+model }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 21 of file Visual\+Update\+Particles.\+cpp.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_ade399f29a375d20c3c707dbab2fb23bb}\label{classVisualUpdateParticles_ade399f29a375d20c3c707dbab2fb23bb}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{Visual\+Update\+Particles()}{VisualUpdateParticles()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily Visual\+Update\+Particles\+::\+Visual\+Update\+Particles (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ \hyperlink{classVisualProprioception}{Visual\+Proprioception} $>$}]{observation\+\_\+model,  }\item[{const double}]{likelihood\+\_\+gain }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 25 of file Visual\+Update\+Particles.\+cpp.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_a225e07a8873f4ed372b3b12ee4a0f044}\label{classVisualUpdateParticles_a225e07a8873f4ed372b3b12ee4a0f044}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{Visual\+Update\+Particles()}{VisualUpdateParticles()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily Visual\+Update\+Particles\+::\+Visual\+Update\+Particles (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ \hyperlink{classVisualProprioception}{Visual\+Proprioception} $>$}]{observation\+\_\+model,  }\item[{const double}]{likelihood\+\_\+gain,  }\item[{const int}]{num\+\_\+cuda\+\_\+stream }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 29 of file Visual\+Update\+Particles.\+cpp.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_a96097675396400a8f6932e4c867d9f30}\label{classVisualUpdateParticles_a96097675396400a8f6932e4c867d9f30}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!````~Visual\+Update\+Particles@{$\sim$\+Visual\+Update\+Particles}}
+\index{````~Visual\+Update\+Particles@{$\sim$\+Visual\+Update\+Particles}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{$\sim$\+Visual\+Update\+Particles()}{~VisualUpdateParticles()}}
+{\footnotesize\ttfamily Visual\+Update\+Particles\+::$\sim$\+Visual\+Update\+Particles (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 60 of file Visual\+Update\+Particles.\+cpp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classVisualUpdateParticles_ac0ed3c0a2ccab6cbc65a5f83fa834483}\label{classVisualUpdateParticles_ac0ed3c0a2ccab6cbc65a5f83fa834483}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!correct\+Step@{correct\+Step}}
+\index{correct\+Step@{correct\+Step}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{correct\+Step()}{correctStep()}}
+{\footnotesize\ttfamily void Visual\+Update\+Particles\+::correct\+Step (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{pred\+\_\+states,  }\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Vector\+Xf $>$ \&}]{pred\+\_\+weights,  }\item[{cv\+::\+Input\+Array}]{measurements,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{cor\+\_\+states,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Vector\+Xf $>$}]{cor\+\_\+weights }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 125 of file Visual\+Update\+Particles.\+cpp.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_a34f3b5665eff632890713db818d1995a}\label{classVisualUpdateParticles_a34f3b5665eff632890713db818d1995a}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!get\+Visual\+Observation\+Model@{get\+Visual\+Observation\+Model}}
+\index{get\+Visual\+Observation\+Model@{get\+Visual\+Observation\+Model}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{get\+Visual\+Observation\+Model()}{getVisualObservationModel()}}
+{\footnotesize\ttfamily bfl\+::\+Visual\+Observation\+Model \& Visual\+Update\+Particles\+::get\+Visual\+Observation\+Model (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 109 of file Visual\+Update\+Particles.\+cpp.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_ac6f27c465111a248314ce93ed630dd75}\label{classVisualUpdateParticles_ac6f27c465111a248314ce93ed630dd75}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!innovation@{innovation}}
+\index{innovation@{innovation}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{innovation()}{innovation()}}
+{\footnotesize\ttfamily void Visual\+Update\+Particles\+::innovation (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{pred\+\_\+states,  }\item[{cv\+::\+Input\+Array}]{measurements,  }\item[{Eigen\+::\+Ref$<$ Eigen\+::\+Matrix\+Xf $>$}]{innovations }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 63 of file Visual\+Update\+Particles.\+cpp.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_ac8905544d7c082cca2fe52b773023bd7}\label{classVisualUpdateParticles_ac8905544d7c082cca2fe52b773023bd7}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!likelihood@{likelihood}}
+\index{likelihood@{likelihood}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{likelihood()}{likelihood()}}
+{\footnotesize\ttfamily double Visual\+Update\+Particles\+::likelihood (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Ref$<$ const Eigen\+::\+Matrix\+Xf $>$ \&}]{innovations }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 103 of file Visual\+Update\+Particles.\+cpp.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_adced067cb277d138db7f452db1bc01a6}\label{classVisualUpdateParticles_adced067cb277d138db7f452db1bc01a6}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!set\+Visual\+Observation\+Model@{set\+Visual\+Observation\+Model}}
+\index{set\+Visual\+Observation\+Model@{set\+Visual\+Observation\+Model}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{set\+Visual\+Observation\+Model()}{setVisualObservationModel()}}
+{\footnotesize\ttfamily void Visual\+Update\+Particles\+::set\+Visual\+Observation\+Model (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ bfl\+::\+Visual\+Observation\+Model $>$}]{visual\+\_\+observation\+\_\+model }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line 115 of file Visual\+Update\+Particles.\+cpp.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classVisualUpdateParticles_ac9c29a18fee44cd0bb5be0ff71e2f8d7}\label{classVisualUpdateParticles_ac9c29a18fee44cd0bb5be0ff71e2f8d7}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!cpu\+\_\+descriptors\+\_\+@{cpu\+\_\+descriptors\+\_\+}}
+\index{cpu\+\_\+descriptors\+\_\+@{cpu\+\_\+descriptors\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{cpu\+\_\+descriptors\+\_\+}{cpu\_descriptors\_}}
+{\footnotesize\ttfamily std\+::vector$<$cv\+::\+Mat$>$ Visual\+Update\+Particles\+::cpu\+\_\+descriptors\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 51 of file Visual\+Update\+Particles.\+h.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_ae2de27efd67d8c5cfa661d97841aa9ea}\label{classVisualUpdateParticles_ae2de27efd67d8c5cfa661d97841aa9ea}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!cuda\+\_\+descriptors\+\_\+@{cuda\+\_\+descriptors\+\_\+}}
+\index{cuda\+\_\+descriptors\+\_\+@{cuda\+\_\+descriptors\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{cuda\+\_\+descriptors\+\_\+}{cuda\_descriptors\_}}
+{\footnotesize\ttfamily std\+::vector$<$cv\+::cuda\+::\+Gpu\+Mat$>$ Visual\+Update\+Particles\+::cuda\+\_\+descriptors\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 50 of file Visual\+Update\+Particles.\+h.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_add09a7f472a034679dfc77726d9cc4c3}\label{classVisualUpdateParticles_add09a7f472a034679dfc77726d9cc4c3}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!cuda\+\_\+hog\+\_\+@{cuda\+\_\+hog\+\_\+}}
+\index{cuda\+\_\+hog\+\_\+@{cuda\+\_\+hog\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{cuda\+\_\+hog\+\_\+}{cuda\_hog\_}}
+{\footnotesize\ttfamily cv\+::\+Ptr$<$cv\+::cuda\+::\+H\+OG$>$ Visual\+Update\+Particles\+::cuda\+\_\+hog\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 42 of file Visual\+Update\+Particles.\+h.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_a885d5094c4a20b386607ee839792ce12}\label{classVisualUpdateParticles_a885d5094c4a20b386607ee839792ce12}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!cuda\+\_\+img\+\_\+@{cuda\+\_\+img\+\_\+}}
+\index{cuda\+\_\+img\+\_\+@{cuda\+\_\+img\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{cuda\+\_\+img\+\_\+}{cuda\_img\_}}
+{\footnotesize\ttfamily std\+::vector$<$cv\+::cuda\+::\+Gpu\+Mat$>$ Visual\+Update\+Particles\+::cuda\+\_\+img\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 48 of file Visual\+Update\+Particles.\+h.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_acb31efd3272b83b80e55018e577adbfc}\label{classVisualUpdateParticles_acb31efd3272b83b80e55018e577adbfc}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!cuda\+\_\+img\+\_\+alpha\+\_\+@{cuda\+\_\+img\+\_\+alpha\+\_\+}}
+\index{cuda\+\_\+img\+\_\+alpha\+\_\+@{cuda\+\_\+img\+\_\+alpha\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{cuda\+\_\+img\+\_\+alpha\+\_\+}{cuda\_img\_alpha\_}}
+{\footnotesize\ttfamily std\+::vector$<$cv\+::cuda\+::\+Gpu\+Mat$>$ Visual\+Update\+Particles\+::cuda\+\_\+img\+\_\+alpha\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 49 of file Visual\+Update\+Particles.\+h.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_af179d2c350a9f93a412200816b79a876}\label{classVisualUpdateParticles_af179d2c350a9f93a412200816b79a876}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!cuda\+\_\+stream\+\_\+@{cuda\+\_\+stream\+\_\+}}
+\index{cuda\+\_\+stream\+\_\+@{cuda\+\_\+stream\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{cuda\+\_\+stream\+\_\+}{cuda\_stream\_}}
+{\footnotesize\ttfamily std\+::vector$<$cv\+::cuda\+::\+Stream$>$ Visual\+Update\+Particles\+::cuda\+\_\+stream\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 46 of file Visual\+Update\+Particles.\+h.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_a61bfe2a44d2cad15887f34484321bd93}\label{classVisualUpdateParticles_a61bfe2a44d2cad15887f34484321bd93}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!hand\+\_\+rendered\+\_\+@{hand\+\_\+rendered\+\_\+}}
+\index{hand\+\_\+rendered\+\_\+@{hand\+\_\+rendered\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{hand\+\_\+rendered\+\_\+}{hand\_rendered\_}}
+{\footnotesize\ttfamily std\+::vector$<$cv\+::\+Mat$>$ Visual\+Update\+Particles\+::hand\+\_\+rendered\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 47 of file Visual\+Update\+Particles.\+h.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_a3199afdf57b24df7193f3f50b87a252f}\label{classVisualUpdateParticles_a3199afdf57b24df7193f3f50b87a252f}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!likelihood\+\_\+gain\+\_\+@{likelihood\+\_\+gain\+\_\+}}
+\index{likelihood\+\_\+gain\+\_\+@{likelihood\+\_\+gain\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{likelihood\+\_\+gain\+\_\+}{likelihood\_gain\_}}
+{\footnotesize\ttfamily double Visual\+Update\+Particles\+::likelihood\+\_\+gain\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 40 of file Visual\+Update\+Particles.\+h.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_ace5e836ecda66975c5ec85ea92c305b8}\label{classVisualUpdateParticles_ace5e836ecda66975c5ec85ea92c305b8}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!num\+\_\+cuda\+\_\+stream\+\_\+@{num\+\_\+cuda\+\_\+stream\+\_\+}}
+\index{num\+\_\+cuda\+\_\+stream\+\_\+@{num\+\_\+cuda\+\_\+stream\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{num\+\_\+cuda\+\_\+stream\+\_\+}{num\_cuda\_stream\_}}
+{\footnotesize\ttfamily const int Visual\+Update\+Particles\+::num\+\_\+cuda\+\_\+stream\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 44 of file Visual\+Update\+Particles.\+h.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_aad9d0aba6b913489a8e63f7008ceeebe}\label{classVisualUpdateParticles_aad9d0aba6b913489a8e63f7008ceeebe}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!num\+\_\+img\+\_\+stream\+\_\+@{num\+\_\+img\+\_\+stream\+\_\+}}
+\index{num\+\_\+img\+\_\+stream\+\_\+@{num\+\_\+img\+\_\+stream\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{num\+\_\+img\+\_\+stream\+\_\+}{num\_img\_stream\_}}
+{\footnotesize\ttfamily const int Visual\+Update\+Particles\+::num\+\_\+img\+\_\+stream\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 45 of file Visual\+Update\+Particles.\+h.
+
+\mbox{\Hypertarget{classVisualUpdateParticles_a7e076390fd3cb9e508d36d65235b179c}\label{classVisualUpdateParticles_a7e076390fd3cb9e508d36d65235b179c}} 
+\index{Visual\+Update\+Particles@{Visual\+Update\+Particles}!observation\+\_\+model\+\_\+@{observation\+\_\+model\+\_\+}}
+\index{observation\+\_\+model\+\_\+@{observation\+\_\+model\+\_\+}!Visual\+Update\+Particles@{Visual\+Update\+Particles}}
+\subsubsection{\texorpdfstring{observation\+\_\+model\+\_\+}{observation\_model\_}}
+{\footnotesize\ttfamily std\+::unique\+\_\+ptr$<$\hyperlink{classVisualProprioception}{Visual\+Proprioception}$>$ Visual\+Update\+Particles\+::observation\+\_\+model\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 39 of file Visual\+Update\+Particles.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/include/\hyperlink{VisualUpdateParticles_8h}{Visual\+Update\+Particles.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/src/\hyperlink{VisualUpdateParticles_8cpp}{Visual\+Update\+Particles.\+cpp}\end{DoxyCompactItemize}

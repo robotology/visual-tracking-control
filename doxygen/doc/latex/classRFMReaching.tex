@@ -1,0 +1,633 @@
+\hypertarget{classRFMReaching}{}\section{R\+F\+M\+Reaching Class Reference}
+\label{classRFMReaching}\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+
+
+Inheritance diagram for R\+F\+M\+Reaching\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=160pt]{classRFMReaching__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classRFMReaching_a25566e4f2eed559101a37f284803f852}{configure} (Resource\+Finder \&rf)
+\item 
+double \hyperlink{classRFMReaching_a25880a55c1cefc2eea1718fca77a9f46}{get\+Period} ()
+\item 
+bool \hyperlink{classRFMReaching_a8bccf7116a170658acf11c2e0facabee}{update\+Module} ()
+\item 
+bool \hyperlink{classRFMReaching_a906ec163b5bfe072e988a91dca689110}{respond} (const Bottle \&command, Bottle \&reply)
+\item 
+bool \hyperlink{classRFMReaching_ac6343eff00e760fe31c56fa76a7e25a0}{interrupt\+Module} ()
+\item 
+bool \hyperlink{classRFMReaching_a96f96942041fc59fd4b5df9ecdb0fa8e}{close} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classRFMReaching_a45bcd979839b78397e680a4abc3443e6}{camsel} \{ \hyperlink{classRFMReaching_a45bcd979839b78397e680a4abc3443e6ad951af6aa586c134d51f4e5aee67e842}{L\+E\+FT} = 0, 
+\hyperlink{classRFMReaching_a45bcd979839b78397e680a4abc3443e6a4a01bc06177ee8717dad83e5222ca7b1}{R\+I\+G\+HT} = 1
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classRFMReaching_a68ed451f26410a3b339d20e94cdcd3a8}{set\+Right\+Arm\+Cartesian\+Controller} ()
+\item 
+bool \hyperlink{classRFMReaching_a63c0db54da18c8357acfb9d55f0e7fad}{set\+Gaze\+Controller} ()
+\item 
+bool \hyperlink{classRFMReaching_a1898344cb04c1ae423bdaaee644b78d0}{set\+Right\+Arm\+Remote\+Controlboard} ()
+\item 
+bool \hyperlink{classRFMReaching_ac4f2875b315b0afc49f0e6cc4735f70f}{set\+Torso\+Remote\+Controlboard} ()
+\item 
+bool \hyperlink{classRFMReaching_af7908ece851513d3df2eaf75f3f45619}{set\+Torso\+D\+OF} ()
+\item 
+bool \hyperlink{classRFMReaching_a33ac59486a536d9334a6992d16433157}{unset\+Torso\+D\+OF} ()
+\item 
+Vector \hyperlink{classRFMReaching_a3a2a0c8cfdfe016a0f35cc359629f1d0}{read\+Torso} ()
+\item 
+Vector \hyperlink{classRFMReaching_a160dd5be2aeca203b1cffcf1ad463de7}{read\+Root\+To\+Fingers} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Port \hyperlink{classRFMReaching_a916c972baaab67718ecada434ff94f98}{handler\+\_\+port\+\_\+}
+\item 
+bool \hyperlink{classRFMReaching_a8ca24ca1df3177f7a2086bffed644d61}{should\+\_\+stop\+\_\+} = false
+\item 
+S\+I\+Skeleton $\ast$ \hyperlink{classRFMReaching_aa63ad603740e3d869fc6224b7b95659b}{l\+\_\+si\+\_\+skel\+\_\+}
+\item 
+S\+I\+Skeleton $\ast$ \hyperlink{classRFMReaching_acbb2d80fdc4ac3222a302dfedf3aaa63}{r\+\_\+si\+\_\+skel\+\_\+}
+\item 
+Buffered\+Port$<$ Vector $>$ \hyperlink{classRFMReaching_a1851e362f374d6c44fedc2116a542e74}{port\+\_\+estimates\+\_\+in\+\_\+}
+\item 
+Buffered\+Port$<$ Image\+Of$<$ Pixel\+Rgb $>$ $>$ \hyperlink{classRFMReaching_a5972764c035d588da84616b3ca766841}{port\+\_\+image\+\_\+left\+\_\+in\+\_\+}
+\item 
+Buffered\+Port$<$ Image\+Of$<$ Pixel\+Rgb $>$ $>$ \hyperlink{classRFMReaching_a6a2e21f8fc0d2b96d4ac19c1c21d035f}{port\+\_\+image\+\_\+left\+\_\+out\+\_\+}
+\item 
+Buffered\+Port$<$ Bottle $>$ \hyperlink{classRFMReaching_ad2d1a565251ab36aab7650b1cf7840ce}{port\+\_\+click\+\_\+left\+\_\+}
+\item 
+Buffered\+Port$<$ Image\+Of$<$ Pixel\+Rgb $>$ $>$ \hyperlink{classRFMReaching_addc0188a22c5ab0555250721e02c6443}{port\+\_\+image\+\_\+right\+\_\+in\+\_\+}
+\item 
+Buffered\+Port$<$ Image\+Of$<$ Pixel\+Rgb $>$ $>$ \hyperlink{classRFMReaching_a76188810982db4710acbbb3c182f071d}{port\+\_\+image\+\_\+right\+\_\+out\+\_\+}
+\item 
+Buffered\+Port$<$ Bottle $>$ \hyperlink{classRFMReaching_a477a969c8c631cc7a468b0eefde2c05d}{port\+\_\+click\+\_\+right\+\_\+}
+\item 
+Buffered\+Port$<$ Bottle $>$ \hyperlink{classRFMReaching_ac9327dcf27ef947eb554d191362c0455}{port\+\_\+px\+\_\+left\+\_\+endeffector}
+\item 
+Buffered\+Port$<$ Bottle $>$ \hyperlink{classRFMReaching_a4ac92144c52def1b2990c0e7ed9f8b0d}{port\+\_\+px\+\_\+right\+\_\+endeffector}
+\item 
+Poly\+Driver \hyperlink{classRFMReaching_add6fb41068a3c05ebae8726873c7d73d}{rightarm\+\_\+cartesian\+\_\+driver\+\_\+}
+\item 
+I\+Cartesian\+Control $\ast$ \hyperlink{classRFMReaching_a5509b0b16426a661e71ae04991cd8553}{itf\+\_\+rightarm\+\_\+cart\+\_\+}
+\item 
+Poly\+Driver \hyperlink{classRFMReaching_ac8b09f0c704214af2cdd587b169b8240}{gaze\+\_\+driver\+\_\+}
+\item 
+I\+Gaze\+Control $\ast$ \hyperlink{classRFMReaching_a9d6ae2ac48ee9c5722b531c780245cf5}{itf\+\_\+gaze\+\_\+}
+\item 
+Poly\+Driver \hyperlink{classRFMReaching_ad7b97fed6938ffdd2e6752f5c9ae490c}{rightarm\+\_\+remote\+\_\+driver\+\_\+}
+\item 
+I\+Encoders $\ast$ \hyperlink{classRFMReaching_a0b9b00bc6c30770b4a12248538427864}{itf\+\_\+rightarm\+\_\+enc\+\_\+}
+\item 
+I\+Control\+Limits $\ast$ \hyperlink{classRFMReaching_ad99a31b38faf963ce1520f0215c3fdf3}{itf\+\_\+fingers\+\_\+lim\+\_\+}
+\item 
+Poly\+Driver \hyperlink{classRFMReaching_a0425996ad8eafc74f58fc8ac3db7fa85}{torso\+\_\+remote\+\_\+driver\+\_\+}
+\item 
+I\+Encoders $\ast$ \hyperlink{classRFMReaching_a67df5b7100117d56d535c2d4dbda72f1}{itf\+\_\+torso\+\_\+enc\+\_\+}
+\item 
+i\+Cub\+Finger \hyperlink{classRFMReaching_a7cc9d6f6b8bf8326e730beb1704cabc9}{icub\+\_\+index\+\_\+}
+\item 
+Matrix \hyperlink{classRFMReaching_a9fa03ef25eb3ad04fc6c86b642ee3e08}{left\+\_\+proj\+\_\+}
+\item 
+Matrix \hyperlink{classRFMReaching_a4f0aaee8537d19e7d347219d15382969}{right\+\_\+proj\+\_\+}
+\item 
+Matrix \hyperlink{classRFMReaching_af11a2468acda87e50de42410d80288b2}{l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}
+\item 
+Matrix \hyperlink{classRFMReaching_a351a3eef4730155f51d05af16b7406bf}{r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}
+\item 
+Matrix \hyperlink{classRFMReaching_a561ebfd0e4f966661b0c27326fec5d94}{px\+\_\+to\+\_\+cartesian\+\_\+}
+\item 
+double \hyperlink{classRFMReaching_ab8b1ebb26099043288c6b6da5fe7ee9b}{traj\+\_\+time\+\_\+} = 2.\+5
+\item 
+Vector \hyperlink{classRFMReaching_a0438d9cd07623917e3dda5eecfa34e0e}{l\+\_\+px\+\_\+goal\+\_\+}
+\item 
+Vector \hyperlink{classRFMReaching_a062be56961b4942fe20dd89d59abcaef}{r\+\_\+px\+\_\+goal\+\_\+}
+\item 
+Vector \hyperlink{classRFMReaching_a6b7de70637791218bdabe94b9613da14}{location\+\_\+}
+\item 
+bool \hyperlink{classRFMReaching_a28c1640ff7f4c85524567355e689ac46}{take\+\_\+estimates\+\_\+} = false
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 33 of file main.\+cpp.
+
+
+
+\subsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{classRFMReaching_a45bcd979839b78397e680a4abc3443e6}\label{classRFMReaching_a45bcd979839b78397e680a4abc3443e6}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!camsel@{camsel}}
+\index{camsel@{camsel}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{camsel}{camsel}}
+{\footnotesize\ttfamily enum \hyperlink{classRFMReaching_a45bcd979839b78397e680a4abc3443e6}{R\+F\+M\+Reaching\+::camsel}\hspace{0.3cm}{\ttfamily [private]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{L\+E\+FT@{L\+E\+FT}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!L\+E\+FT@{L\+E\+FT}}}\mbox{\Hypertarget{classRFMReaching_a45bcd979839b78397e680a4abc3443e6ad951af6aa586c134d51f4e5aee67e842}\label{classRFMReaching_a45bcd979839b78397e680a4abc3443e6ad951af6aa586c134d51f4e5aee67e842}} 
+L\+E\+FT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{R\+I\+G\+HT@{R\+I\+G\+HT}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!R\+I\+G\+HT@{R\+I\+G\+HT}}}\mbox{\Hypertarget{classRFMReaching_a45bcd979839b78397e680a4abc3443e6a4a01bc06177ee8717dad83e5222ca7b1}\label{classRFMReaching_a45bcd979839b78397e680a4abc3443e6a4a01bc06177ee8717dad83e5222ca7b1}} 
+R\+I\+G\+HT&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line 1005 of file main.\+cpp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classRFMReaching_a96f96942041fc59fd4b5df9ecdb0fa8e}\label{classRFMReaching_a96f96942041fc59fd4b5df9ecdb0fa8e}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!close@{close}}
+\index{close@{close}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::close (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 936 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a25566e4f2eed559101a37f284803f852}\label{classRFMReaching_a25566e4f2eed559101a37f284803f852}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!configure@{configure}}
+\index{configure@{configure}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{configure()}{configure()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::configure (\begin{DoxyParamCaption}\item[{Resource\+Finder \&}]{rf }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 36 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a25880a55c1cefc2eea1718fca77a9f46}\label{classRFMReaching_a25880a55c1cefc2eea1718fca77a9f46}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!get\+Period@{get\+Period}}
+\index{get\+Period@{get\+Period}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{get\+Period()}{getPeriod()}}
+{\footnotesize\ttfamily double R\+F\+M\+Reaching\+::get\+Period (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 186 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_ac6343eff00e760fe31c56fa76a7e25a0}\label{classRFMReaching_ac6343eff00e760fe31c56fa76a7e25a0}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!interrupt\+Module@{interrupt\+Module}}
+\index{interrupt\+Module@{interrupt\+Module}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{interrupt\+Module()}{interruptModule()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::interrupt\+Module (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 918 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a160dd5be2aeca203b1cffcf1ad463de7}\label{classRFMReaching_a160dd5be2aeca203b1cffcf1ad463de7}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!read\+Root\+To\+Fingers@{read\+Root\+To\+Fingers}}
+\index{read\+Root\+To\+Fingers@{read\+Root\+To\+Fingers}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{read\+Root\+To\+Fingers()}{readRootToFingers()}}
+{\footnotesize\ttfamily Vector R\+F\+M\+Reaching\+::read\+Root\+To\+Fingers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 1193 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a3a2a0c8cfdfe016a0f35cc359629f1d0}\label{classRFMReaching_a3a2a0c8cfdfe016a0f35cc359629f1d0}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!read\+Torso@{read\+Torso}}
+\index{read\+Torso@{read\+Torso}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{read\+Torso()}{readTorso()}}
+{\footnotesize\ttfamily Vector R\+F\+M\+Reaching\+::read\+Torso (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 1183 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a906ec163b5bfe072e988a91dca689110}\label{classRFMReaching_a906ec163b5bfe072e988a91dca689110}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!respond@{respond}}
+\index{respond@{respond}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{respond()}{respond()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::respond (\begin{DoxyParamCaption}\item[{const Bottle \&}]{command,  }\item[{Bottle \&}]{reply }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 486 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a63c0db54da18c8357acfb9d55f0e7fad}\label{classRFMReaching_a63c0db54da18c8357acfb9d55f0e7fad}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!set\+Gaze\+Controller@{set\+Gaze\+Controller}}
+\index{set\+Gaze\+Controller@{set\+Gaze\+Controller}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{set\+Gaze\+Controller()}{setGazeController()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::set\+Gaze\+Controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 1052 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a68ed451f26410a3b339d20e94cdcd3a8}\label{classRFMReaching_a68ed451f26410a3b339d20e94cdcd3a8}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!set\+Right\+Arm\+Cartesian\+Controller@{set\+Right\+Arm\+Cartesian\+Controller}}
+\index{set\+Right\+Arm\+Cartesian\+Controller@{set\+Right\+Arm\+Cartesian\+Controller}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{set\+Right\+Arm\+Cartesian\+Controller()}{setRightArmCartesianController()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::set\+Right\+Arm\+Cartesian\+Controller (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 1011 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a1898344cb04c1ae423bdaaee644b78d0}\label{classRFMReaching_a1898344cb04c1ae423bdaaee644b78d0}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!set\+Right\+Arm\+Remote\+Controlboard@{set\+Right\+Arm\+Remote\+Controlboard}}
+\index{set\+Right\+Arm\+Remote\+Controlboard@{set\+Right\+Arm\+Remote\+Controlboard}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{set\+Right\+Arm\+Remote\+Controlboard()}{setRightArmRemoteControlboard()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::set\+Right\+Arm\+Remote\+Controlboard (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 1078 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_af7908ece851513d3df2eaf75f3f45619}\label{classRFMReaching_af7908ece851513d3df2eaf75f3f45619}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!set\+Torso\+D\+OF@{set\+Torso\+D\+OF}}
+\index{set\+Torso\+D\+OF@{set\+Torso\+D\+OF}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{set\+Torso\+D\+O\+F()}{setTorsoDOF()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::set\+Torso\+D\+OF (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 1141 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_ac4f2875b315b0afc49f0e6cc4735f70f}\label{classRFMReaching_ac4f2875b315b0afc49f0e6cc4735f70f}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!set\+Torso\+Remote\+Controlboard@{set\+Torso\+Remote\+Controlboard}}
+\index{set\+Torso\+Remote\+Controlboard@{set\+Torso\+Remote\+Controlboard}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{set\+Torso\+Remote\+Controlboard()}{setTorsoRemoteControlboard()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::set\+Torso\+Remote\+Controlboard (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 1113 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a33ac59486a536d9334a6992d16433157}\label{classRFMReaching_a33ac59486a536d9334a6992d16433157}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!unset\+Torso\+D\+OF@{unset\+Torso\+D\+OF}}
+\index{unset\+Torso\+D\+OF@{unset\+Torso\+D\+OF}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{unset\+Torso\+D\+O\+F()}{unsetTorsoDOF()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::unset\+Torso\+D\+OF (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+
+
+Definition at line 1162 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a8bccf7116a170658acf11c2e0facabee}\label{classRFMReaching_a8bccf7116a170658acf11c2e0facabee}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!update\+Module@{update\+Module}}
+\index{update\+Module@{update\+Module}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{update\+Module()}{updateModule()}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::update\+Module (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 189 of file main.\+cpp.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classRFMReaching_ac8b09f0c704214af2cdd587b169b8240}\label{classRFMReaching_ac8b09f0c704214af2cdd587b169b8240}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!gaze\+\_\+driver\+\_\+@{gaze\+\_\+driver\+\_\+}}
+\index{gaze\+\_\+driver\+\_\+@{gaze\+\_\+driver\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{gaze\+\_\+driver\+\_\+}{gaze\_driver\_}}
+{\footnotesize\ttfamily Poly\+Driver R\+F\+M\+Reaching\+::gaze\+\_\+driver\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 981 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a916c972baaab67718ecada434ff94f98}\label{classRFMReaching_a916c972baaab67718ecada434ff94f98}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!handler\+\_\+port\+\_\+@{handler\+\_\+port\+\_\+}}
+\index{handler\+\_\+port\+\_\+@{handler\+\_\+port\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{handler\+\_\+port\+\_\+}{handler\_port\_}}
+{\footnotesize\ttfamily Port R\+F\+M\+Reaching\+::handler\+\_\+port\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 959 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a7cc9d6f6b8bf8326e730beb1704cabc9}\label{classRFMReaching_a7cc9d6f6b8bf8326e730beb1704cabc9}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!icub\+\_\+index\+\_\+@{icub\+\_\+index\+\_\+}}
+\index{icub\+\_\+index\+\_\+@{icub\+\_\+index\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{icub\+\_\+index\+\_\+}{icub\_index\_}}
+{\footnotesize\ttfamily i\+Cub\+Finger R\+F\+M\+Reaching\+::icub\+\_\+index\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 991 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_ad99a31b38faf963ce1520f0215c3fdf3}\label{classRFMReaching_ad99a31b38faf963ce1520f0215c3fdf3}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!itf\+\_\+fingers\+\_\+lim\+\_\+@{itf\+\_\+fingers\+\_\+lim\+\_\+}}
+\index{itf\+\_\+fingers\+\_\+lim\+\_\+@{itf\+\_\+fingers\+\_\+lim\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{itf\+\_\+fingers\+\_\+lim\+\_\+}{itf\_fingers\_lim\_}}
+{\footnotesize\ttfamily I\+Control\+Limits$\ast$ R\+F\+M\+Reaching\+::itf\+\_\+fingers\+\_\+lim\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 986 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a9d6ae2ac48ee9c5722b531c780245cf5}\label{classRFMReaching_a9d6ae2ac48ee9c5722b531c780245cf5}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!itf\+\_\+gaze\+\_\+@{itf\+\_\+gaze\+\_\+}}
+\index{itf\+\_\+gaze\+\_\+@{itf\+\_\+gaze\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{itf\+\_\+gaze\+\_\+}{itf\_gaze\_}}
+{\footnotesize\ttfamily I\+Gaze\+Control$\ast$ R\+F\+M\+Reaching\+::itf\+\_\+gaze\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 982 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a5509b0b16426a661e71ae04991cd8553}\label{classRFMReaching_a5509b0b16426a661e71ae04991cd8553}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!itf\+\_\+rightarm\+\_\+cart\+\_\+@{itf\+\_\+rightarm\+\_\+cart\+\_\+}}
+\index{itf\+\_\+rightarm\+\_\+cart\+\_\+@{itf\+\_\+rightarm\+\_\+cart\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{itf\+\_\+rightarm\+\_\+cart\+\_\+}{itf\_rightarm\_cart\_}}
+{\footnotesize\ttfamily I\+Cartesian\+Control$\ast$ R\+F\+M\+Reaching\+::itf\+\_\+rightarm\+\_\+cart\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 979 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a0b9b00bc6c30770b4a12248538427864}\label{classRFMReaching_a0b9b00bc6c30770b4a12248538427864}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!itf\+\_\+rightarm\+\_\+enc\+\_\+@{itf\+\_\+rightarm\+\_\+enc\+\_\+}}
+\index{itf\+\_\+rightarm\+\_\+enc\+\_\+@{itf\+\_\+rightarm\+\_\+enc\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{itf\+\_\+rightarm\+\_\+enc\+\_\+}{itf\_rightarm\_enc\_}}
+{\footnotesize\ttfamily I\+Encoders$\ast$ R\+F\+M\+Reaching\+::itf\+\_\+rightarm\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 985 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a67df5b7100117d56d535c2d4dbda72f1}\label{classRFMReaching_a67df5b7100117d56d535c2d4dbda72f1}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!itf\+\_\+torso\+\_\+enc\+\_\+@{itf\+\_\+torso\+\_\+enc\+\_\+}}
+\index{itf\+\_\+torso\+\_\+enc\+\_\+@{itf\+\_\+torso\+\_\+enc\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{itf\+\_\+torso\+\_\+enc\+\_\+}{itf\_torso\_enc\_}}
+{\footnotesize\ttfamily I\+Encoders$\ast$ R\+F\+M\+Reaching\+::itf\+\_\+torso\+\_\+enc\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 989 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_af11a2468acda87e50de42410d80288b2}\label{classRFMReaching_af11a2468acda87e50de42410d80288b2}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+@{l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}}
+\index{l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+@{l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}{l\_H\_r\_to\_cam\_}}
+{\footnotesize\ttfamily Matrix R\+F\+M\+Reaching\+::l\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 995 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a0438d9cd07623917e3dda5eecfa34e0e}\label{classRFMReaching_a0438d9cd07623917e3dda5eecfa34e0e}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!l\+\_\+px\+\_\+goal\+\_\+@{l\+\_\+px\+\_\+goal\+\_\+}}
+\index{l\+\_\+px\+\_\+goal\+\_\+@{l\+\_\+px\+\_\+goal\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{l\+\_\+px\+\_\+goal\+\_\+}{l\_px\_goal\_}}
+{\footnotesize\ttfamily Vector R\+F\+M\+Reaching\+::l\+\_\+px\+\_\+goal\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 1000 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_aa63ad603740e3d869fc6224b7b95659b}\label{classRFMReaching_aa63ad603740e3d869fc6224b7b95659b}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!l\+\_\+si\+\_\+skel\+\_\+@{l\+\_\+si\+\_\+skel\+\_\+}}
+\index{l\+\_\+si\+\_\+skel\+\_\+@{l\+\_\+si\+\_\+skel\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{l\+\_\+si\+\_\+skel\+\_\+}{l\_si\_skel\_}}
+{\footnotesize\ttfamily S\+I\+Skeleton$\ast$ R\+F\+M\+Reaching\+::l\+\_\+si\+\_\+skel\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 962 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a9fa03ef25eb3ad04fc6c86b642ee3e08}\label{classRFMReaching_a9fa03ef25eb3ad04fc6c86b642ee3e08}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!left\+\_\+proj\+\_\+@{left\+\_\+proj\+\_\+}}
+\index{left\+\_\+proj\+\_\+@{left\+\_\+proj\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{left\+\_\+proj\+\_\+}{left\_proj\_}}
+{\footnotesize\ttfamily Matrix R\+F\+M\+Reaching\+::left\+\_\+proj\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 993 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a6b7de70637791218bdabe94b9613da14}\label{classRFMReaching_a6b7de70637791218bdabe94b9613da14}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!location\+\_\+@{location\+\_\+}}
+\index{location\+\_\+@{location\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{location\+\_\+}{location\_}}
+{\footnotesize\ttfamily Vector R\+F\+M\+Reaching\+::location\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 1002 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_ad2d1a565251ab36aab7650b1cf7840ce}\label{classRFMReaching_ad2d1a565251ab36aab7650b1cf7840ce}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!port\+\_\+click\+\_\+left\+\_\+@{port\+\_\+click\+\_\+left\+\_\+}}
+\index{port\+\_\+click\+\_\+left\+\_\+@{port\+\_\+click\+\_\+left\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{port\+\_\+click\+\_\+left\+\_\+}{port\_click\_left\_}}
+{\footnotesize\ttfamily Buffered\+Port$<$Bottle$>$ R\+F\+M\+Reaching\+::port\+\_\+click\+\_\+left\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 969 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a477a969c8c631cc7a468b0eefde2c05d}\label{classRFMReaching_a477a969c8c631cc7a468b0eefde2c05d}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!port\+\_\+click\+\_\+right\+\_\+@{port\+\_\+click\+\_\+right\+\_\+}}
+\index{port\+\_\+click\+\_\+right\+\_\+@{port\+\_\+click\+\_\+right\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{port\+\_\+click\+\_\+right\+\_\+}{port\_click\_right\_}}
+{\footnotesize\ttfamily Buffered\+Port$<$Bottle$>$ R\+F\+M\+Reaching\+::port\+\_\+click\+\_\+right\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 973 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a1851e362f374d6c44fedc2116a542e74}\label{classRFMReaching_a1851e362f374d6c44fedc2116a542e74}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!port\+\_\+estimates\+\_\+in\+\_\+@{port\+\_\+estimates\+\_\+in\+\_\+}}
+\index{port\+\_\+estimates\+\_\+in\+\_\+@{port\+\_\+estimates\+\_\+in\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{port\+\_\+estimates\+\_\+in\+\_\+}{port\_estimates\_in\_}}
+{\footnotesize\ttfamily Buffered\+Port$<$Vector$>$ R\+F\+M\+Reaching\+::port\+\_\+estimates\+\_\+in\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 965 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a5972764c035d588da84616b3ca766841}\label{classRFMReaching_a5972764c035d588da84616b3ca766841}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!port\+\_\+image\+\_\+left\+\_\+in\+\_\+@{port\+\_\+image\+\_\+left\+\_\+in\+\_\+}}
+\index{port\+\_\+image\+\_\+left\+\_\+in\+\_\+@{port\+\_\+image\+\_\+left\+\_\+in\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{port\+\_\+image\+\_\+left\+\_\+in\+\_\+}{port\_image\_left\_in\_}}
+{\footnotesize\ttfamily Buffered\+Port$<$Image\+Of$<$Pixel\+Rgb$>$ $>$ R\+F\+M\+Reaching\+::port\+\_\+image\+\_\+left\+\_\+in\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 967 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a6a2e21f8fc0d2b96d4ac19c1c21d035f}\label{classRFMReaching_a6a2e21f8fc0d2b96d4ac19c1c21d035f}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!port\+\_\+image\+\_\+left\+\_\+out\+\_\+@{port\+\_\+image\+\_\+left\+\_\+out\+\_\+}}
+\index{port\+\_\+image\+\_\+left\+\_\+out\+\_\+@{port\+\_\+image\+\_\+left\+\_\+out\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{port\+\_\+image\+\_\+left\+\_\+out\+\_\+}{port\_image\_left\_out\_}}
+{\footnotesize\ttfamily Buffered\+Port$<$Image\+Of$<$Pixel\+Rgb$>$ $>$ R\+F\+M\+Reaching\+::port\+\_\+image\+\_\+left\+\_\+out\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 968 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_addc0188a22c5ab0555250721e02c6443}\label{classRFMReaching_addc0188a22c5ab0555250721e02c6443}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!port\+\_\+image\+\_\+right\+\_\+in\+\_\+@{port\+\_\+image\+\_\+right\+\_\+in\+\_\+}}
+\index{port\+\_\+image\+\_\+right\+\_\+in\+\_\+@{port\+\_\+image\+\_\+right\+\_\+in\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{port\+\_\+image\+\_\+right\+\_\+in\+\_\+}{port\_image\_right\_in\_}}
+{\footnotesize\ttfamily Buffered\+Port$<$Image\+Of$<$Pixel\+Rgb$>$ $>$ R\+F\+M\+Reaching\+::port\+\_\+image\+\_\+right\+\_\+in\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 971 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a76188810982db4710acbbb3c182f071d}\label{classRFMReaching_a76188810982db4710acbbb3c182f071d}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!port\+\_\+image\+\_\+right\+\_\+out\+\_\+@{port\+\_\+image\+\_\+right\+\_\+out\+\_\+}}
+\index{port\+\_\+image\+\_\+right\+\_\+out\+\_\+@{port\+\_\+image\+\_\+right\+\_\+out\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{port\+\_\+image\+\_\+right\+\_\+out\+\_\+}{port\_image\_right\_out\_}}
+{\footnotesize\ttfamily Buffered\+Port$<$Image\+Of$<$Pixel\+Rgb$>$ $>$ R\+F\+M\+Reaching\+::port\+\_\+image\+\_\+right\+\_\+out\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 972 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_ac9327dcf27ef947eb554d191362c0455}\label{classRFMReaching_ac9327dcf27ef947eb554d191362c0455}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!port\+\_\+px\+\_\+left\+\_\+endeffector@{port\+\_\+px\+\_\+left\+\_\+endeffector}}
+\index{port\+\_\+px\+\_\+left\+\_\+endeffector@{port\+\_\+px\+\_\+left\+\_\+endeffector}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{port\+\_\+px\+\_\+left\+\_\+endeffector}{port\_px\_left\_endeffector}}
+{\footnotesize\ttfamily Buffered\+Port$<$Bottle$>$ R\+F\+M\+Reaching\+::port\+\_\+px\+\_\+left\+\_\+endeffector\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 975 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a4ac92144c52def1b2990c0e7ed9f8b0d}\label{classRFMReaching_a4ac92144c52def1b2990c0e7ed9f8b0d}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!port\+\_\+px\+\_\+right\+\_\+endeffector@{port\+\_\+px\+\_\+right\+\_\+endeffector}}
+\index{port\+\_\+px\+\_\+right\+\_\+endeffector@{port\+\_\+px\+\_\+right\+\_\+endeffector}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{port\+\_\+px\+\_\+right\+\_\+endeffector}{port\_px\_right\_endeffector}}
+{\footnotesize\ttfamily Buffered\+Port$<$Bottle$>$ R\+F\+M\+Reaching\+::port\+\_\+px\+\_\+right\+\_\+endeffector\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 976 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a561ebfd0e4f966661b0c27326fec5d94}\label{classRFMReaching_a561ebfd0e4f966661b0c27326fec5d94}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!px\+\_\+to\+\_\+cartesian\+\_\+@{px\+\_\+to\+\_\+cartesian\+\_\+}}
+\index{px\+\_\+to\+\_\+cartesian\+\_\+@{px\+\_\+to\+\_\+cartesian\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{px\+\_\+to\+\_\+cartesian\+\_\+}{px\_to\_cartesian\_}}
+{\footnotesize\ttfamily Matrix R\+F\+M\+Reaching\+::px\+\_\+to\+\_\+cartesian\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 997 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a351a3eef4730155f51d05af16b7406bf}\label{classRFMReaching_a351a3eef4730155f51d05af16b7406bf}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+@{r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}}
+\index{r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+@{r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+}{r\_H\_r\_to\_cam\_}}
+{\footnotesize\ttfamily Matrix R\+F\+M\+Reaching\+::r\+\_\+\+H\+\_\+r\+\_\+to\+\_\+cam\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 996 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a062be56961b4942fe20dd89d59abcaef}\label{classRFMReaching_a062be56961b4942fe20dd89d59abcaef}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!r\+\_\+px\+\_\+goal\+\_\+@{r\+\_\+px\+\_\+goal\+\_\+}}
+\index{r\+\_\+px\+\_\+goal\+\_\+@{r\+\_\+px\+\_\+goal\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{r\+\_\+px\+\_\+goal\+\_\+}{r\_px\_goal\_}}
+{\footnotesize\ttfamily Vector R\+F\+M\+Reaching\+::r\+\_\+px\+\_\+goal\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 1001 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_acbb2d80fdc4ac3222a302dfedf3aaa63}\label{classRFMReaching_acbb2d80fdc4ac3222a302dfedf3aaa63}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!r\+\_\+si\+\_\+skel\+\_\+@{r\+\_\+si\+\_\+skel\+\_\+}}
+\index{r\+\_\+si\+\_\+skel\+\_\+@{r\+\_\+si\+\_\+skel\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{r\+\_\+si\+\_\+skel\+\_\+}{r\_si\_skel\_}}
+{\footnotesize\ttfamily S\+I\+Skeleton$\ast$ R\+F\+M\+Reaching\+::r\+\_\+si\+\_\+skel\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 963 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a4f0aaee8537d19e7d347219d15382969}\label{classRFMReaching_a4f0aaee8537d19e7d347219d15382969}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!right\+\_\+proj\+\_\+@{right\+\_\+proj\+\_\+}}
+\index{right\+\_\+proj\+\_\+@{right\+\_\+proj\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{right\+\_\+proj\+\_\+}{right\_proj\_}}
+{\footnotesize\ttfamily Matrix R\+F\+M\+Reaching\+::right\+\_\+proj\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 994 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_add6fb41068a3c05ebae8726873c7d73d}\label{classRFMReaching_add6fb41068a3c05ebae8726873c7d73d}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!rightarm\+\_\+cartesian\+\_\+driver\+\_\+@{rightarm\+\_\+cartesian\+\_\+driver\+\_\+}}
+\index{rightarm\+\_\+cartesian\+\_\+driver\+\_\+@{rightarm\+\_\+cartesian\+\_\+driver\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{rightarm\+\_\+cartesian\+\_\+driver\+\_\+}{rightarm\_cartesian\_driver\_}}
+{\footnotesize\ttfamily Poly\+Driver R\+F\+M\+Reaching\+::rightarm\+\_\+cartesian\+\_\+driver\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 978 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_ad7b97fed6938ffdd2e6752f5c9ae490c}\label{classRFMReaching_ad7b97fed6938ffdd2e6752f5c9ae490c}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!rightarm\+\_\+remote\+\_\+driver\+\_\+@{rightarm\+\_\+remote\+\_\+driver\+\_\+}}
+\index{rightarm\+\_\+remote\+\_\+driver\+\_\+@{rightarm\+\_\+remote\+\_\+driver\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{rightarm\+\_\+remote\+\_\+driver\+\_\+}{rightarm\_remote\_driver\_}}
+{\footnotesize\ttfamily Poly\+Driver R\+F\+M\+Reaching\+::rightarm\+\_\+remote\+\_\+driver\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 984 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a8ca24ca1df3177f7a2086bffed644d61}\label{classRFMReaching_a8ca24ca1df3177f7a2086bffed644d61}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!should\+\_\+stop\+\_\+@{should\+\_\+stop\+\_\+}}
+\index{should\+\_\+stop\+\_\+@{should\+\_\+stop\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{should\+\_\+stop\+\_\+}{should\_stop\_}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::should\+\_\+stop\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 960 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a28c1640ff7f4c85524567355e689ac46}\label{classRFMReaching_a28c1640ff7f4c85524567355e689ac46}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!take\+\_\+estimates\+\_\+@{take\+\_\+estimates\+\_\+}}
+\index{take\+\_\+estimates\+\_\+@{take\+\_\+estimates\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{take\+\_\+estimates\+\_\+}{take\_estimates\_}}
+{\footnotesize\ttfamily bool R\+F\+M\+Reaching\+::take\+\_\+estimates\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 1003 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_a0425996ad8eafc74f58fc8ac3db7fa85}\label{classRFMReaching_a0425996ad8eafc74f58fc8ac3db7fa85}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!torso\+\_\+remote\+\_\+driver\+\_\+@{torso\+\_\+remote\+\_\+driver\+\_\+}}
+\index{torso\+\_\+remote\+\_\+driver\+\_\+@{torso\+\_\+remote\+\_\+driver\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{torso\+\_\+remote\+\_\+driver\+\_\+}{torso\_remote\_driver\_}}
+{\footnotesize\ttfamily Poly\+Driver R\+F\+M\+Reaching\+::torso\+\_\+remote\+\_\+driver\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 988 of file main.\+cpp.
+
+\mbox{\Hypertarget{classRFMReaching_ab8b1ebb26099043288c6b6da5fe7ee9b}\label{classRFMReaching_ab8b1ebb26099043288c6b6da5fe7ee9b}} 
+\index{R\+F\+M\+Reaching@{R\+F\+M\+Reaching}!traj\+\_\+time\+\_\+@{traj\+\_\+time\+\_\+}}
+\index{traj\+\_\+time\+\_\+@{traj\+\_\+time\+\_\+}!R\+F\+M\+Reaching@{R\+F\+M\+Reaching}}
+\subsubsection{\texorpdfstring{traj\+\_\+time\+\_\+}{traj\_time\_}}
+{\footnotesize\ttfamily double R\+F\+M\+Reaching\+::traj\+\_\+time\+\_\+ = 2.\+5\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 999 of file main.\+cpp.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/reaching/\hyperlink{reaching_2main_8cpp}{main.\+cpp}\end{DoxyCompactItemize}

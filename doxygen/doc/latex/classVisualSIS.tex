@@ -1,0 +1,755 @@
+\hypertarget{classVisualSIS}{}\section{Visual\+S\+IS Class Reference}
+\label{classVisualSIS}\index{Visual\+S\+IS@{Visual\+S\+IS}}
+
+
+{\ttfamily \#include $<$Visual\+S\+I\+S.\+h$>$}
+
+
+
+Inheritance diagram for Visual\+S\+IS\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{classVisualSIS__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classVisualSIS_a9088e9979575b7138557bbb02e81c59c}{Visual\+S\+IS} (const yarp\+::os\+::\+Const\+String \&cam\+\_\+sel, const int img\+\_\+width, const int img\+\_\+height, const int num\+\_\+particles, const double resample\+\_\+ratio)
+\item 
+\hyperlink{classVisualSIS_a9b57f7b419bd86a4528cbe87e6f53a14}{$\sim$\+Visual\+S\+IS} () noexcept
+\item 
+virtual bool \hyperlink{classVisualSISParticleFilterIDL_aade5ce77926faff0e94ffbf77f20c2c0}{read} (yarp\+::os\+::\+Connection\+Reader \&connection) override
+\item 
+virtual std\+::vector$<$ std\+::string $>$ \hyperlink{classVisualSISParticleFilterIDL_a3253f4dbc55e47183c04eb2e1054733c}{help} (const std\+::string \&function\+Name=\char`\"{}-\/-\/all\char`\"{})
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classVisualSIS_a324f4b8554036b0d697423ea7ab865be}{initialization} () override
+\item 
+void \hyperlink{classVisualSIS_a5c1e7ef8000c981db41cad3c6d17a535}{filtering\+Step} () override
+\item 
+void \hyperlink{classVisualSIS_a344387f214c60a62b2d79e7377f92693}{get\+Result} () override
+\item 
+bool \hyperlink{classVisualSIS_af053d8966ebebac8bf8eb8cfce4e4903}{run\+Condition} () override
+\item 
+bool \hyperlink{classVisualSIS_a2a331e2d6285cb48541df86dcc27b2c1}{attach} (yarp\+::os\+::\+Port \&source)
+\item 
+bool \hyperlink{classVisualSIS_aac85d36ec741ed93d1659ddf910f7a03}{set\+Command\+Port} ()
+\item 
+bool \hyperlink{classVisualSIS_aa8ad54a90c9f1f6ca673d8d61721b7be}{run\+\_\+filter} () override
+\begin{DoxyCompactList}\small\item\em Initialize and run the visual S\+IR particle filter. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualSIS_a974ca828135835ccb4a2c3b7635b2aea}{reset\+\_\+filter} () override
+\begin{DoxyCompactList}\small\item\em Reset the visual S\+IR particle filter. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualSIS_a8e111a001d0dd201a5f661c9ff226bc1}{stop\+\_\+filter} () override
+\begin{DoxyCompactList}\small\item\em Stop and reset the S\+IR particle filter. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualSIS_ac9905862d7198c5ae80f7e682500c608}{skip\+\_\+step} (const std\+::string \&what\+\_\+step, const bool status) override
+\begin{DoxyCompactList}\small\item\em Enable/\+Disable skipping the filtering step specified in what\+\_\+step. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualSIS_a703f84794cd66eb82040d2590b62f094}{use\+\_\+analogs} (const bool status) override
+\begin{DoxyCompactList}\small\item\em Use/\+Don\textquotesingle{}t use the analog values from the right hand to correct the finger poses. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::string $>$ \hyperlink{classVisualSIS_af1ecb78ecc8c9838c05b7d29c5a9f83a}{get\+\_\+info} () override
+\begin{DoxyCompactList}\small\item\em Get information about recursive Bayesian filter, like it\textquotesingle{}s status, the available methods, and the current one in use, to extract the state estimate from the particle set. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualSIS_abff835a326f38e95187148d9401d5170}{quit} () override
+\begin{DoxyCompactList}\small\item\em Gently close the application, deallocating resources. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualSIS_ab45998859ed6c115eb0a8446f94c764e}{set\+\_\+estimates\+\_\+extraction\+\_\+method} (const std\+::string \&method) override
+\begin{DoxyCompactList}\small\item\em Change the current method to extract the state estimates from the particle set. \end{DoxyCompactList}\item 
+bool \hyperlink{classVisualSIS_a08aa7928cccabd93a1907cb540863cda}{set\+\_\+mobile\+\_\+average\+\_\+window} (const int16\+\_\+t window) override
+\begin{DoxyCompactList}\small\item\em Change the window size of mobile averages for estimates extraction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+yarp\+::os\+::\+Const\+String \hyperlink{classVisualSIS_a4ba71c5fa28e12504eea098298a28f66}{cam\+\_\+sel\+\_\+}
+\item 
+int \hyperlink{classVisualSIS_a1e168675500d9c8a949e8c2f69be1f5f}{img\+\_\+width\+\_\+}
+\item 
+int \hyperlink{classVisualSIS_aff43a51053f61e07a9803926111b9cc6}{img\+\_\+height\+\_\+}
+\item 
+int \hyperlink{classVisualSIS_af79e137085ec9c4764f5d7f8f0630cb5}{num\+\_\+particles\+\_\+}
+\item 
+unsigned int \hyperlink{classVisualSIS_a030a089e79e98f530082889b6d1d7090}{descriptor\+\_\+length\+\_\+}
+\item 
+double \hyperlink{classVisualSIS_a5e400fe8722793a0cc3a64900b30ff6a}{resample\+\_\+ratio\+\_\+}
+\item 
+const int \hyperlink{classVisualSIS_ae05ef520a7385930b44409f0ff83e99e}{block\+\_\+size\+\_\+} = 16
+\item 
+const int \hyperlink{classVisualSIS_a454d2a632bd8db7379882d61a85414bc}{bin\+\_\+number\+\_\+} = 9
+\item 
+cv\+::\+Ptr$<$ cv\+::cuda\+::\+H\+OG $>$ \hyperlink{classVisualSIS_aebdc06fc72c1e391c69bdcbd19fde848}{cuda\+\_\+hog\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Vector $>$ \hyperlink{classVisualSIS_a844c2f19eef592ce79a3e56ee845b1bb}{port\+\_\+estimates\+\_\+out\+\_\+}
+\item 
+yarp\+::os\+::\+Buffered\+Port$<$ yarp\+::sig\+::\+Image\+Of$<$ yarp\+::sig\+::\+Pixel\+Rgb $>$ $>$ \hyperlink{classVisualSIS_ac45684c34e7413a13b6ed301cd8a7aa1}{port\+\_\+image\+\_\+in\+\_\+}
+\item 
+yarp\+::os\+::\+Port \hyperlink{classVisualSIS_ac08ca49836aaad57b7d5f7240a6d1ca5}{port\+\_\+rpc\+\_\+command\+\_\+}
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Eigen\+::\+Matrix\+Xf \hyperlink{classVisualSIS_accd71e6f7ced897e5b61e3b6c01243d4}{pred\+\_\+particle\+\_\+}
+\item 
+Eigen\+::\+Vector\+Xf \hyperlink{classVisualSIS_aa0251c7dd7c4d13a849b051145dbcc78}{pred\+\_\+weight\+\_\+}
+\item 
+Eigen\+::\+Matrix\+Xf \hyperlink{classVisualSIS_ab2f16295dc79084196a8cb5db6a3696e}{cor\+\_\+particle\+\_\+}
+\item 
+Eigen\+::\+Vector\+Xf \hyperlink{classVisualSIS_a497a31b9417a12005b6253bc100ab476}{cor\+\_\+weight\+\_\+}
+\item 
+bfl\+::\+Estimates\+Extraction \hyperlink{classVisualSIS_a5052345aafc5e7efc7d72f1ccbf0a4ac}{estimate\+\_\+extraction\+\_\+}
+\item 
+bool \hyperlink{classVisualSIS_abe30d9bbca8a9f6fde0140c10451ad05}{init\+\_\+img\+\_\+in\+\_\+} = false
+\item 
+yarp\+::sig\+::\+Image\+Of$<$ yarp\+::sig\+::\+Pixel\+Rgb $>$ \hyperlink{classVisualSIS_adde5e15abd023e42e940a77e4d096ba5}{img\+\_\+in\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 26 of file Visual\+S\+I\+S.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classVisualSIS_a9088e9979575b7138557bbb02e81c59c}\label{classVisualSIS_a9088e9979575b7138557bbb02e81c59c}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!Visual\+S\+IS@{Visual\+S\+IS}}
+\index{Visual\+S\+IS@{Visual\+S\+IS}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{Visual\+S\+I\+S()}{VisualSIS()}}
+{\footnotesize\ttfamily Visual\+S\+I\+S\+::\+Visual\+S\+IS (\begin{DoxyParamCaption}\item[{const yarp\+::os\+::\+Const\+String \&}]{cam\+\_\+sel,  }\item[{const int}]{img\+\_\+width,  }\item[{const int}]{img\+\_\+height,  }\item[{const int}]{num\+\_\+particles,  }\item[{const double}]{resample\+\_\+ratio }\end{DoxyParamCaption})}
+
+
+
+Definition at line 32 of file Visual\+S\+I\+S.\+cpp.
+
+
+
+References bin\+\_\+number\+\_\+, block\+\_\+size\+\_\+, cam\+\_\+sel\+\_\+, cuda\+\_\+hog\+\_\+, descriptor\+\_\+length\+\_\+, img\+\_\+height\+\_\+, img\+\_\+in\+\_\+, img\+\_\+width\+\_\+, port\+\_\+estimates\+\_\+out\+\_\+, port\+\_\+image\+\_\+in\+\_\+, and set\+Command\+Port().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classVisualSIS_a9088e9979575b7138557bbb02e81c59c_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualSIS_a9b57f7b419bd86a4528cbe87e6f53a14}\label{classVisualSIS_a9b57f7b419bd86a4528cbe87e6f53a14}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!````~Visual\+S\+IS@{$\sim$\+Visual\+S\+IS}}
+\index{````~Visual\+S\+IS@{$\sim$\+Visual\+S\+IS}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{$\sim$\+Visual\+S\+I\+S()}{~VisualSIS()}}
+{\footnotesize\ttfamily Visual\+S\+I\+S\+::$\sim$\+Visual\+S\+IS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line 79 of file Visual\+S\+I\+S.\+cpp.
+
+
+
+References port\+\_\+estimates\+\_\+out\+\_\+, and port\+\_\+image\+\_\+in\+\_\+.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classVisualSIS_a2a331e2d6285cb48541df86dcc27b2c1}\label{classVisualSIS_a2a331e2d6285cb48541df86dcc27b2c1}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!attach@{attach}}
+\index{attach@{attach}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{attach()}{attach()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::attach (\begin{DoxyParamCaption}\item[{yarp\+::os\+::\+Port \&}]{source }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 209 of file Visual\+S\+I\+S.\+cpp.
+
+
+
+Referenced by set\+Command\+Port().
+
+\mbox{\Hypertarget{classVisualSIS_a5c1e7ef8000c981db41cad3c6d17a535}\label{classVisualSIS_a5c1e7ef8000c981db41cad3c6d17a535}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!filtering\+Step@{filtering\+Step}}
+\index{filtering\+Step@{filtering\+Step}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{filtering\+Step()}{filteringStep()}}
+{\footnotesize\ttfamily void Visual\+S\+I\+S\+::filtering\+Step (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 86 of file Visual\+S\+I\+S.\+cpp.
+
+
+
+References cor\+\_\+particle\+\_\+, cor\+\_\+weight\+\_\+, cuda\+\_\+hog\+\_\+, descriptor\+\_\+length\+\_\+, estimate\+\_\+extraction\+\_\+, img\+\_\+height\+\_\+, img\+\_\+in\+\_\+, img\+\_\+width\+\_\+, init\+\_\+img\+\_\+in\+\_\+, num\+\_\+particles\+\_\+, port\+\_\+estimates\+\_\+out\+\_\+, port\+\_\+image\+\_\+in\+\_\+, pred\+\_\+particle\+\_\+, pred\+\_\+weight\+\_\+, and resample\+\_\+ratio\+\_\+.
+
+\mbox{\Hypertarget{classVisualSIS_af1ecb78ecc8c9838c05b7d29c5a9f83a}\label{classVisualSIS_af1ecb78ecc8c9838c05b7d29c5a9f83a}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!get\+\_\+info@{get\+\_\+info}}
+\index{get\+\_\+info@{get\+\_\+info}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{get\+\_\+info()}{get\_info()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::string $>$ Visual\+S\+I\+S\+::get\+\_\+info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Get information about recursive Bayesian filter, like it\textquotesingle{}s status, the available methods, and the current one in use, to extract the state estimate from the particle set. 
+
+\begin{DoxyReturn}{Returns}
+a string with all the available information, \textquotesingle{}none\textquotesingle{} otherwise 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualSISParticleFilterIDL_a0721bc76b2d5848908a39e3a9c9740c0}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}.
+
+
+
+Definition at line 273 of file Visual\+S\+I\+S.\+cpp.
+
+
+
+References cam\+\_\+sel\+\_\+, estimate\+\_\+extraction\+\_\+, and num\+\_\+particles\+\_\+.
+
+\mbox{\Hypertarget{classVisualSIS_a344387f214c60a62b2d79e7377f92693}\label{classVisualSIS_a344387f214c60a62b2d79e7377f92693}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!get\+Result@{get\+Result}}
+\index{get\+Result@{get\+Result}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{get\+Result()}{getResult()}}
+{\footnotesize\ttfamily void Visual\+S\+I\+S\+::get\+Result (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 206 of file Visual\+S\+I\+S.\+cpp.
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_a3253f4dbc55e47183c04eb2e1054733c}\label{classVisualSISParticleFilterIDL_a3253f4dbc55e47183c04eb2e1054733c}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!help@{help}}
+\index{help@{help}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{help()}{help()}}
+{\footnotesize\ttfamily virtual std\+::vector$<$std\+::string$>$ Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::help (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{function\+Name = {\ttfamily \char`\"{}-\/-\/all\char`\"{}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classVisualSIS_a324f4b8554036b0d697423ea7ab865be}\label{classVisualSIS_a324f4b8554036b0d697423ea7ab865be}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!initialization@{initialization}}
+\index{initialization@{initialization}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{initialization()}{initialization()}}
+{\footnotesize\ttfamily void Visual\+S\+I\+S\+::initialization (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 61 of file Visual\+S\+I\+S.\+cpp.
+
+
+
+References cor\+\_\+particle\+\_\+, cor\+\_\+weight\+\_\+, estimate\+\_\+extraction\+\_\+, num\+\_\+particles\+\_\+, pred\+\_\+particle\+\_\+, and pred\+\_\+weight\+\_\+.
+
+\mbox{\Hypertarget{classVisualSIS_abff835a326f38e95187148d9401d5170}\label{classVisualSIS_abff835a326f38e95187148d9401d5170}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!quit@{quit}}
+\index{quit@{quit}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{quit()}{quit()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::quit (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Gently close the application, deallocating resources. 
+
+
+
+Reimplemented from \hyperlink{classVisualSISParticleFilterIDL_a3f02a3df0d3dd545a6c62dc3a9f002b4}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}.
+
+
+
+Definition at line 355 of file Visual\+S\+I\+S.\+cpp.
+
+\mbox{\Hypertarget{classVisualSISParticleFilterIDL_aade5ce77926faff0e94ffbf77f20c2c0}\label{classVisualSISParticleFilterIDL_aade5ce77926faff0e94ffbf77f20c2c0}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!read@{read}}
+\index{read@{read}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily virtual bool Visual\+S\+I\+S\+Particle\+Filter\+I\+D\+L\+::read (\begin{DoxyParamCaption}\item[{yarp\+::os\+::\+Connection\+Reader \&}]{connection }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classVisualSIS_a974ca828135835ccb4a2c3b7635b2aea}\label{classVisualSIS_a974ca828135835ccb4a2c3b7635b2aea}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!reset\+\_\+filter@{reset\+\_\+filter}}
+\index{reset\+\_\+filter@{reset\+\_\+filter}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{reset\+\_\+filter()}{reset\_filter()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::reset\+\_\+filter (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reset the visual S\+IR particle filter. 
+
+Returns upon successful or failure reset. \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualSISParticleFilterIDL_ad6047accd0fe743bdbd158cb9b6fc11b}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}.
+
+
+
+Definition at line 242 of file Visual\+S\+I\+S.\+cpp.
+
+\mbox{\Hypertarget{classVisualSIS_aa8ad54a90c9f1f6ca673d8d61721b7be}\label{classVisualSIS_aa8ad54a90c9f1f6ca673d8d61721b7be}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!run\+\_\+filter@{run\+\_\+filter}}
+\index{run\+\_\+filter@{run\+\_\+filter}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{run\+\_\+filter()}{run\_filter()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::run\+\_\+filter (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Initialize and run the visual S\+IR particle filter. 
+
+Returns upon successful or failure setup. \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualSISParticleFilterIDL_a6a8c16192597ea78617f10691b07df08}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}.
+
+
+
+Definition at line 234 of file Visual\+S\+I\+S.\+cpp.
+
+\mbox{\Hypertarget{classVisualSIS_af053d8966ebebac8bf8eb8cfce4e4903}\label{classVisualSIS_af053d8966ebebac8bf8eb8cfce4e4903}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!run\+Condition@{run\+Condition}}
+\index{run\+Condition@{run\+Condition}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{run\+Condition()}{runCondition()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::run\+Condition (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [protected]}}
+
+
+
+Definition at line 44 of file Visual\+S\+I\+S.\+h.
+
+
+
+References cam\+\_\+sel\+\_\+.
+
+\mbox{\Hypertarget{classVisualSIS_ab45998859ed6c115eb0a8446f94c764e}\label{classVisualSIS_ab45998859ed6c115eb0a8446f94c764e}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!set\+\_\+estimates\+\_\+extraction\+\_\+method@{set\+\_\+estimates\+\_\+extraction\+\_\+method}}
+\index{set\+\_\+estimates\+\_\+extraction\+\_\+method@{set\+\_\+estimates\+\_\+extraction\+\_\+method}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{set\+\_\+estimates\+\_\+extraction\+\_\+method()}{set\_estimates\_extraction\_method()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::set\+\_\+estimates\+\_\+extraction\+\_\+method (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{method }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Change the current method to extract the state estimates from the particle set. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em status} & a string with the state estimate extraction method to use; the string shall be one of the available methods returned by the \hyperlink{classVisualSIS_af1ecb78ecc8c9838c05b7d29c5a9f83a}{get\+\_\+info()} method. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true method changed successfully, false otherwise. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualSISParticleFilterIDL_ac5f296082bd83e1ee1b74e9af16e856a}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}.
+
+
+
+Definition at line 291 of file Visual\+S\+I\+S.\+cpp.
+
+
+
+References estimate\+\_\+extraction\+\_\+.
+
+\mbox{\Hypertarget{classVisualSIS_a08aa7928cccabd93a1907cb540863cda}\label{classVisualSIS_a08aa7928cccabd93a1907cb540863cda}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!set\+\_\+mobile\+\_\+average\+\_\+window@{set\+\_\+mobile\+\_\+average\+\_\+window}}
+\index{set\+\_\+mobile\+\_\+average\+\_\+window@{set\+\_\+mobile\+\_\+average\+\_\+window}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{set\+\_\+mobile\+\_\+average\+\_\+window()}{set\_mobile\_average\_window()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::set\+\_\+mobile\+\_\+average\+\_\+window (\begin{DoxyParamCaption}\item[{const int16\+\_\+t}]{window }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Change the window size of mobile averages for estimates extraction. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em window} & specifies the mobile window size. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true window size changed successfully, false otherwise. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The default value is 20. Minimum value is 2. Maximum value is 90. 
+\end{DoxyNote}
+
+
+Reimplemented from \hyperlink{classVisualSISParticleFilterIDL_a40d91826291e2bae76f4545254307577}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}.
+
+
+
+Definition at line 346 of file Visual\+S\+I\+S.\+cpp.
+
+
+
+References estimate\+\_\+extraction\+\_\+.
+
+\mbox{\Hypertarget{classVisualSIS_aac85d36ec741ed93d1659ddf910f7a03}\label{classVisualSIS_aac85d36ec741ed93d1659ddf910f7a03}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!set\+Command\+Port@{set\+Command\+Port}}
+\index{set\+Command\+Port@{set\+Command\+Port}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{set\+Command\+Port()}{setCommandPort()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::set\+Command\+Port (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 215 of file Visual\+S\+I\+S.\+cpp.
+
+
+
+References attach(), cam\+\_\+sel\+\_\+, and port\+\_\+rpc\+\_\+command\+\_\+.
+
+
+
+Referenced by Visual\+S\+I\+S().
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classVisualSIS_aac85d36ec741ed93d1659ddf910f7a03_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classVisualSIS_ac9905862d7198c5ae80f7e682500c608}\label{classVisualSIS_ac9905862d7198c5ae80f7e682500c608}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!skip\+\_\+step@{skip\+\_\+step}}
+\index{skip\+\_\+step@{skip\+\_\+step}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{skip\+\_\+step()}{skip\_step()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::skip\+\_\+step (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{what\+\_\+step,  }\item[{const bool}]{status }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Enable/\+Disable skipping the filtering step specified in what\+\_\+step. 
+
+what\+\_\+step can be one of the following\+: 1) prediction\+: skips the whole prediction step 2) state\+: skips the prediction step related to the state transition 3) exogenous\+: skips the prediction step related exogenous inputs 4) correction\+: skips the whole correction step 
+\begin{DoxyParams}{Parameters}
+{\em what\+\_\+step} & the step to skipping \\
+\hline
+{\em status} & enable/disable skipping \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualSISParticleFilterIDL_a09d343c25082f2056546c6e95d397eaf}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}.
+
+
+
+Definition at line 258 of file Visual\+S\+I\+S.\+cpp.
+
+\mbox{\Hypertarget{classVisualSIS_a8e111a001d0dd201a5f661c9ff226bc1}\label{classVisualSIS_a8e111a001d0dd201a5f661c9ff226bc1}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!stop\+\_\+filter@{stop\+\_\+filter}}
+\index{stop\+\_\+filter@{stop\+\_\+filter}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{stop\+\_\+filter()}{stop\_filter()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::stop\+\_\+filter (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Stop and reset the S\+IR particle filter. 
+
+This method must be called when the S\+IR particle filter is no longer needed or a new filtering task need to be initialized. \begin{DoxyReturn}{Returns}
+true/false on success/failure. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualSISParticleFilterIDL_a8a30501c75b4c7152a2abff96a950b63}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}.
+
+
+
+Definition at line 250 of file Visual\+S\+I\+S.\+cpp.
+
+\mbox{\Hypertarget{classVisualSIS_a703f84794cd66eb82040d2590b62f094}\label{classVisualSIS_a703f84794cd66eb82040d2590b62f094}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!use\+\_\+analogs@{use\+\_\+analogs}}
+\index{use\+\_\+analogs@{use\+\_\+analogs}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{use\+\_\+analogs()}{use\_analogs()}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::use\+\_\+analogs (\begin{DoxyParamCaption}\item[{const bool}]{status }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Use/\+Don\textquotesingle{}t use the analog values from the right hand to correct the finger poses. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em status} & true/false to use/don\textquotesingle{}t use analog values. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true activation/deactivation success, false otherwise. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classVisualSISParticleFilterIDL_a4fee3e1fbc6676767f99c8b552434709}{Visual\+S\+I\+S\+Particle\+Filter\+I\+DL}.
+
+
+
+Definition at line 264 of file Visual\+S\+I\+S.\+cpp.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classVisualSIS_a454d2a632bd8db7379882d61a85414bc}\label{classVisualSIS_a454d2a632bd8db7379882d61a85414bc}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!bin\+\_\+number\+\_\+@{bin\+\_\+number\+\_\+}}
+\index{bin\+\_\+number\+\_\+@{bin\+\_\+number\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{bin\+\_\+number\+\_\+}{bin\_number\_}}
+{\footnotesize\ttfamily const int Visual\+S\+I\+S\+::bin\+\_\+number\+\_\+ = 9\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 55 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by Visual\+S\+I\+S().
+
+\mbox{\Hypertarget{classVisualSIS_ae05ef520a7385930b44409f0ff83e99e}\label{classVisualSIS_ae05ef520a7385930b44409f0ff83e99e}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!block\+\_\+size\+\_\+@{block\+\_\+size\+\_\+}}
+\index{block\+\_\+size\+\_\+@{block\+\_\+size\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{block\+\_\+size\+\_\+}{block\_size\_}}
+{\footnotesize\ttfamily const int Visual\+S\+I\+S\+::block\+\_\+size\+\_\+ = 16\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 54 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by Visual\+S\+I\+S().
+
+\mbox{\Hypertarget{classVisualSIS_a4ba71c5fa28e12504eea098298a28f66}\label{classVisualSIS_a4ba71c5fa28e12504eea098298a28f66}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!cam\+\_\+sel\+\_\+@{cam\+\_\+sel\+\_\+}}
+\index{cam\+\_\+sel\+\_\+@{cam\+\_\+sel\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{cam\+\_\+sel\+\_\+}{cam\_sel\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Const\+String Visual\+S\+I\+S\+::cam\+\_\+sel\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 44 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by get\+\_\+info(), run\+Condition(), set\+Command\+Port(), and Visual\+S\+I\+S().
+
+\mbox{\Hypertarget{classVisualSIS_ab2f16295dc79084196a8cb5db6a3696e}\label{classVisualSIS_ab2f16295dc79084196a8cb5db6a3696e}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!cor\+\_\+particle\+\_\+@{cor\+\_\+particle\+\_\+}}
+\index{cor\+\_\+particle\+\_\+@{cor\+\_\+particle\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{cor\+\_\+particle\+\_\+}{cor\_particle\_}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix\+Xf Visual\+S\+I\+S\+::cor\+\_\+particle\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 92 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), and initialization().
+
+\mbox{\Hypertarget{classVisualSIS_a497a31b9417a12005b6253bc100ab476}\label{classVisualSIS_a497a31b9417a12005b6253bc100ab476}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!cor\+\_\+weight\+\_\+@{cor\+\_\+weight\+\_\+}}
+\index{cor\+\_\+weight\+\_\+@{cor\+\_\+weight\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{cor\+\_\+weight\+\_\+}{cor\_weight\_}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xf Visual\+S\+I\+S\+::cor\+\_\+weight\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 93 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), and initialization().
+
+\mbox{\Hypertarget{classVisualSIS_aebdc06fc72c1e391c69bdcbd19fde848}\label{classVisualSIS_aebdc06fc72c1e391c69bdcbd19fde848}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!cuda\+\_\+hog\+\_\+@{cuda\+\_\+hog\+\_\+}}
+\index{cuda\+\_\+hog\+\_\+@{cuda\+\_\+hog\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{cuda\+\_\+hog\+\_\+}{cuda\_hog\_}}
+{\footnotesize\ttfamily cv\+::\+Ptr$<$cv\+::cuda\+::\+H\+OG$>$ Visual\+S\+I\+S\+::cuda\+\_\+hog\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 57 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), and Visual\+S\+I\+S().
+
+\mbox{\Hypertarget{classVisualSIS_a030a089e79e98f530082889b6d1d7090}\label{classVisualSIS_a030a089e79e98f530082889b6d1d7090}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!descriptor\+\_\+length\+\_\+@{descriptor\+\_\+length\+\_\+}}
+\index{descriptor\+\_\+length\+\_\+@{descriptor\+\_\+length\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{descriptor\+\_\+length\+\_\+}{descriptor\_length\_}}
+{\footnotesize\ttfamily unsigned int Visual\+S\+I\+S\+::descriptor\+\_\+length\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 51 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), and Visual\+S\+I\+S().
+
+\mbox{\Hypertarget{classVisualSIS_a5052345aafc5e7efc7d72f1ccbf0a4ac}\label{classVisualSIS_a5052345aafc5e7efc7d72f1ccbf0a4ac}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!estimate\+\_\+extraction\+\_\+@{estimate\+\_\+extraction\+\_\+}}
+\index{estimate\+\_\+extraction\+\_\+@{estimate\+\_\+extraction\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{estimate\+\_\+extraction\+\_\+}{estimate\_extraction\_}}
+{\footnotesize\ttfamily bfl\+::\+Estimates\+Extraction Visual\+S\+I\+S\+::estimate\+\_\+extraction\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 96 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), get\+\_\+info(), initialization(), set\+\_\+estimates\+\_\+extraction\+\_\+method(), and set\+\_\+mobile\+\_\+average\+\_\+window().
+
+\mbox{\Hypertarget{classVisualSIS_aff43a51053f61e07a9803926111b9cc6}\label{classVisualSIS_aff43a51053f61e07a9803926111b9cc6}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!img\+\_\+height\+\_\+@{img\+\_\+height\+\_\+}}
+\index{img\+\_\+height\+\_\+@{img\+\_\+height\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{img\+\_\+height\+\_\+}{img\_height\_}}
+{\footnotesize\ttfamily int Visual\+S\+I\+S\+::img\+\_\+height\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 49 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), and Visual\+S\+I\+S().
+
+\mbox{\Hypertarget{classVisualSIS_adde5e15abd023e42e940a77e4d096ba5}\label{classVisualSIS_adde5e15abd023e42e940a77e4d096ba5}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!img\+\_\+in\+\_\+@{img\+\_\+in\+\_\+}}
+\index{img\+\_\+in\+\_\+@{img\+\_\+in\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{img\+\_\+in\+\_\+}{img\_in\_}}
+{\footnotesize\ttfamily yarp\+::sig\+::\+Image\+Of$<$yarp\+::sig\+::\+Pixel\+Rgb$>$ Visual\+S\+I\+S\+::img\+\_\+in\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 100 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), and Visual\+S\+I\+S().
+
+\mbox{\Hypertarget{classVisualSIS_a1e168675500d9c8a949e8c2f69be1f5f}\label{classVisualSIS_a1e168675500d9c8a949e8c2f69be1f5f}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!img\+\_\+width\+\_\+@{img\+\_\+width\+\_\+}}
+\index{img\+\_\+width\+\_\+@{img\+\_\+width\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{img\+\_\+width\+\_\+}{img\_width\_}}
+{\footnotesize\ttfamily int Visual\+S\+I\+S\+::img\+\_\+width\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 48 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), and Visual\+S\+I\+S().
+
+\mbox{\Hypertarget{classVisualSIS_abe30d9bbca8a9f6fde0140c10451ad05}\label{classVisualSIS_abe30d9bbca8a9f6fde0140c10451ad05}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!init\+\_\+img\+\_\+in\+\_\+@{init\+\_\+img\+\_\+in\+\_\+}}
+\index{init\+\_\+img\+\_\+in\+\_\+@{init\+\_\+img\+\_\+in\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{init\+\_\+img\+\_\+in\+\_\+}{init\_img\_in\_}}
+{\footnotesize\ttfamily bool Visual\+S\+I\+S\+::init\+\_\+img\+\_\+in\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 99 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step().
+
+\mbox{\Hypertarget{classVisualSIS_af79e137085ec9c4764f5d7f8f0630cb5}\label{classVisualSIS_af79e137085ec9c4764f5d7f8f0630cb5}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!num\+\_\+particles\+\_\+@{num\+\_\+particles\+\_\+}}
+\index{num\+\_\+particles\+\_\+@{num\+\_\+particles\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{num\+\_\+particles\+\_\+}{num\_particles\_}}
+{\footnotesize\ttfamily int Visual\+S\+I\+S\+::num\+\_\+particles\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 50 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), get\+\_\+info(), and initialization().
+
+\mbox{\Hypertarget{classVisualSIS_a844c2f19eef592ce79a3e56ee845b1bb}\label{classVisualSIS_a844c2f19eef592ce79a3e56ee845b1bb}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!port\+\_\+estimates\+\_\+out\+\_\+@{port\+\_\+estimates\+\_\+out\+\_\+}}
+\index{port\+\_\+estimates\+\_\+out\+\_\+@{port\+\_\+estimates\+\_\+out\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{port\+\_\+estimates\+\_\+out\+\_\+}{port\_estimates\_out\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Vector$>$ Visual\+S\+I\+S\+::port\+\_\+estimates\+\_\+out\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 60 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), Visual\+S\+I\+S(), and $\sim$\+Visual\+S\+I\+S().
+
+\mbox{\Hypertarget{classVisualSIS_ac45684c34e7413a13b6ed301cd8a7aa1}\label{classVisualSIS_ac45684c34e7413a13b6ed301cd8a7aa1}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!port\+\_\+image\+\_\+in\+\_\+@{port\+\_\+image\+\_\+in\+\_\+}}
+\index{port\+\_\+image\+\_\+in\+\_\+@{port\+\_\+image\+\_\+in\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{port\+\_\+image\+\_\+in\+\_\+}{port\_image\_in\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Buffered\+Port$<$yarp\+::sig\+::\+Image\+Of$<$yarp\+::sig\+::\+Pixel\+Rgb$>$ $>$ Visual\+S\+I\+S\+::port\+\_\+image\+\_\+in\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 61 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), Visual\+S\+I\+S(), and $\sim$\+Visual\+S\+I\+S().
+
+\mbox{\Hypertarget{classVisualSIS_ac08ca49836aaad57b7d5f7240a6d1ca5}\label{classVisualSIS_ac08ca49836aaad57b7d5f7240a6d1ca5}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!port\+\_\+rpc\+\_\+command\+\_\+@{port\+\_\+rpc\+\_\+command\+\_\+}}
+\index{port\+\_\+rpc\+\_\+command\+\_\+@{port\+\_\+rpc\+\_\+command\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{port\+\_\+rpc\+\_\+command\+\_\+}{port\_rpc\_command\_}}
+{\footnotesize\ttfamily yarp\+::os\+::\+Port Visual\+S\+I\+S\+::port\+\_\+rpc\+\_\+command\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 64 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by set\+Command\+Port().
+
+\mbox{\Hypertarget{classVisualSIS_accd71e6f7ced897e5b61e3b6c01243d4}\label{classVisualSIS_accd71e6f7ced897e5b61e3b6c01243d4}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!pred\+\_\+particle\+\_\+@{pred\+\_\+particle\+\_\+}}
+\index{pred\+\_\+particle\+\_\+@{pred\+\_\+particle\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{pred\+\_\+particle\+\_\+}{pred\_particle\_}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix\+Xf Visual\+S\+I\+S\+::pred\+\_\+particle\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 89 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), and initialization().
+
+\mbox{\Hypertarget{classVisualSIS_aa0251c7dd7c4d13a849b051145dbcc78}\label{classVisualSIS_aa0251c7dd7c4d13a849b051145dbcc78}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!pred\+\_\+weight\+\_\+@{pred\+\_\+weight\+\_\+}}
+\index{pred\+\_\+weight\+\_\+@{pred\+\_\+weight\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{pred\+\_\+weight\+\_\+}{pred\_weight\_}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xf Visual\+S\+I\+S\+::pred\+\_\+weight\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 90 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step(), and initialization().
+
+\mbox{\Hypertarget{classVisualSIS_a5e400fe8722793a0cc3a64900b30ff6a}\label{classVisualSIS_a5e400fe8722793a0cc3a64900b30ff6a}} 
+\index{Visual\+S\+IS@{Visual\+S\+IS}!resample\+\_\+ratio\+\_\+@{resample\+\_\+ratio\+\_\+}}
+\index{resample\+\_\+ratio\+\_\+@{resample\+\_\+ratio\+\_\+}!Visual\+S\+IS@{Visual\+S\+IS}}
+\subsubsection{\texorpdfstring{resample\+\_\+ratio\+\_\+}{resample\_ratio\_}}
+{\footnotesize\ttfamily double Visual\+S\+I\+S\+::resample\+\_\+ratio\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 52 of file Visual\+S\+I\+S.\+h.
+
+
+
+Referenced by filtering\+Step().
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/include/\hyperlink{VisualSIS_8h}{Visual\+S\+I\+S.\+h}\item 
+/\+Users/\+Claudio/\+Git\+Hub/visual-\/tracking-\/control/src/hand-\/tracking/src/\hyperlink{VisualSIS_8cpp}{Visual\+S\+I\+S.\+cpp}\end{DoxyCompactItemize}
