@@ -133,10 +133,14 @@ Eigen::MatrixXf BrownianMotionPose::getNoiseSample(const int num)
     MatrixXf sample(7, num);
 
     /* Position */
-    sample.topRows<2>() = MatrixXf::NullaryExpr(2, num, gaussian_random_pos_xy_);
-    sample.row(2)       = MatrixXf::NullaryExpr(1, num, gaussian_random_pos_z_);
+    for (unsigned int i = 0; i < num; ++i)
+    {
+        sample(0, i) = gaussian_random_pos_xy_();
+        sample(1, i) = gaussian_random_pos_xy_();
+        sample(2, i) = gaussian_random_pos_z_();
+    }
 
-    /* Axis-angle */
+    /* Axis-angle vector */
     /* Generate points on the spherical cap around the north pole [1]. */
     /* [1] http://math.stackexchange.com/a/205589/81266 */
     for(unsigned int i = 0; i < num; ++i)
@@ -146,11 +150,11 @@ Eigen::MatrixXf BrownianMotionPose::getNoiseSample(const int num)
         float x   = sqrt(1 - (z * z)) * cos(phi);
         float y   = sqrt(1 - (z * z)) * sin(phi);
 
-        sample.col(i).middleRows<3>(3) = Vector3f(x, y, z);
+        sample(3, i) = x;
+        sample(4, i) = y;
+        sample(5, i) = z;
+        sample(6, i) = gaussian_random_theta_();
     }
-
-    /* Generate random rotation angle */
-    sample.row(6) = MatrixXf::NullaryExpr(1, num, gaussian_random_theta_);
 
     return sample;
 }
