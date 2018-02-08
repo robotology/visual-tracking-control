@@ -189,8 +189,13 @@ VisualProprioception::VisualProprioception(const bool use_thumb,
     ConstString shader_path = rf.findFileByName("shader_model.vert");
     if (!file_found(shader_path))
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR::DIR\nERROR: shader directory not found!");
-    size_t rfind_slash     = shader_path.rfind("/");
+    size_t rfind_slash = shader_path.rfind("/");
+    if (rfind_slash == std::string::npos)
+        rfind_slash = 0;
     size_t rfind_backslash = shader_path.rfind("\\");
+    if (rfind_backslash == std::string::npos)
+        rfind_slash = 0;
+
     shader_path = shader_path.substr(0, rfind_slash > rfind_backslash ? rfind_slash : rfind_backslash);
 
     try
