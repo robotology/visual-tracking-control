@@ -1,5 +1,5 @@
-#ifndef DRAWFWDKINPOSES_H
-#define DRAWFWDKINPOSES_H
+#ifndef DRAWPARTICLESIMPORTANCETHRESHOLD_H
+#define DRAWPARTICLESIMPORTANCETHRESHOLD_H
 
 #include <memory>
 #include <random>
@@ -8,20 +8,20 @@
 #include <BayesFilters/StateModel.h>
 
 namespace bfl {
-    class DrawFwdKinPoses;
+    class DrawParticlesImportanceThreshold;
 }
 
 
-class bfl::DrawFwdKinPoses : public bfl::PFPrediction
+class bfl::DrawParticlesImportanceThreshold : public bfl::PFPrediction
 {
 public:
-    DrawFwdKinPoses() noexcept;
+    DrawParticlesImportanceThreshold() noexcept;
 
-    DrawFwdKinPoses(DrawFwdKinPoses&& pf_prediction) noexcept;
+    DrawParticlesImportanceThreshold(DrawParticlesImportanceThreshold&& pf_prediction) noexcept;
 
-    ~DrawFwdKinPoses() noexcept;
+    ~DrawParticlesImportanceThreshold() noexcept;
 
-    DrawFwdKinPoses& operator=(DrawFwdKinPoses&& pf_prediction) noexcept;
+    DrawParticlesImportanceThreshold& operator=(DrawParticlesImportanceThreshold&& pf_prediction) noexcept;
 
 
     StateModel& getStateModel() override;
@@ -41,4 +41,4 @@ protected:
     std::unique_ptr<ExogenousModel> exogenous_model_;
 };
 
-#endif /* DRAWFWDKINPOSES_H */
+#endif /* DRAWPARTICLESIMPORTANCETHRESHOLD_H */

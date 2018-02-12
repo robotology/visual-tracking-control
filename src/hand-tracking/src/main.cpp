@@ -13,7 +13,7 @@
 #include <opencv2/core/cuda.hpp>
 
 #include <BrownianMotionPose.h>
-#include <DrawFwdKinPoses.h>
+#include <DrawParticlesImportanceThreshold.h>
 #include <iCubGatePose.h>
 #include <iCubFwdKinModel.h>
 #include <InitiCubArm.h>
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
     }
 
     /* PREDICTION */
-    std::unique_ptr<DrawFwdKinPoses> pf_prediction(new DrawFwdKinPoses());
+    std::unique_ptr<DrawParticlesImportanceThreshold> pf_prediction(new DrawParticlesImportanceThreshold());
     pf_prediction->setStateModel(std::move(brown));
     pf_prediction->setExogenousModel(std::move(robot_motion));
 
