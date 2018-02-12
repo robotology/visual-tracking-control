@@ -162,7 +162,16 @@ int main(int argc, char *argv[])
     }
     else if (paramss["robot"] == "walkman")
     {
-
+        if (paramsd["play"] != 1.0)
+        {
+            std::unique_ptr<PlayiCubFwdKinModel> play_fwdkin(new PlayiCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+            robot_motion = std::move(play_fwdkin);
+        }
+        else
+        {
+            yError() << log_ID << "Pose model method for Walkman is unimplemented.";
+            return EXIT_FAILURE;
+        }
     }
     else
     {
