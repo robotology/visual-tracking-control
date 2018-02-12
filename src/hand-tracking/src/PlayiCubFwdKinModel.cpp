@@ -37,6 +37,7 @@ PlayiCubFwdKinModel::PlayiCubFwdKinModel(const ConstString& robot, const ConstSt
     yInfo() << log_ID_ << "Succesfully initialized.";
 }
 
+
 PlayiCubFwdKinModel::~PlayiCubFwdKinModel() noexcept
 {
     port_torso_enc_.interrupt();
