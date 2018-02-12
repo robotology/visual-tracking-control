@@ -32,6 +32,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/InitiCubArm.h
         include/PlayiCubFwdKinModel.h
         include/PlayGatePose.h
+        include/PlayWalkmanPoseModel.h
         include/VisualProprioception.h
         include/VisualSIS.h
         include/VisualUpdateParticles.h)
@@ -47,6 +48,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/InitiCubArm.cpp
         src/PlayiCubFwdKinModel.cpp
         src/PlayGatePose.cpp
+        src/PlayWalkmanPoseModel.cpp
         src/VisualProprioception.cpp
         src/VisualSIS.cpp
         src/VisualUpdateParticles.cpp)
