@@ -1,7 +1,8 @@
 #ifndef INITICUBARM_H
 #define INITICUBARM_H
 
-#include <BayesFilters/Initialization.h>
+#include <InitPoseParticles.h>
+
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
@@ -9,7 +10,7 @@
 #include <yarp/sig/Vector.h>
 
 
-class InitiCubArm : public bfl::Initialization
+class InitiCubArm : public InitPoseParticles
 {
 public:
     InitiCubArm(const yarp::os::ConstString& port_prefix, const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality) noexcept;
@@ -18,7 +19,8 @@ public:
 
     ~InitiCubArm() noexcept;
 
-    void initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref<Eigen::VectorXf> weight) override;
+protected:
+    Eigen::VectorXd readPose() override;
 
 private:
     iCub::iKin::iCubArm                      icub_kin_arm_;

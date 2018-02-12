@@ -1,17 +1,20 @@
 #include <InitiCubArm.h>
 
 #include <iCub/ctrl/math.h>
+#include <yarp/eigen/Eigen.h>
 
 using namespace Eigen;
 using namespace iCub::iKin;
 using namespace iCub::ctrl;
+using namespace yarp::eigen;
 using namespace yarp::math;
 using namespace yarp::sig;
 using namespace yarp::os;
 
 
 InitiCubArm::InitiCubArm(const ConstString& port_prefix, const ConstString& cam_sel, const ConstString& laterality) noexcept :
-    icub_kin_arm_(iCubArm(laterality + "_v2")), icub_kin_finger_{iCubFinger(laterality + "_thumb"), iCubFinger(laterality + "_index"), iCubFinger(laterality + "_middle")}
+    icub_kin_arm_(iCubArm(laterality + "_v2")),
+    icub_kin_finger_{iCubFinger(laterality + "_thumb"), iCubFinger(laterality + "_index"), iCubFinger(laterality + "_middle")}
 {
     icub_kin_arm_.setAllConstraints(false);
     icub_kin_arm_.releaseLink(0);
@@ -38,16 +41,9 @@ InitiCubArm::~InitiCubArm() noexcept
 }
 
 
-void InitiCubArm::initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref<Eigen::VectorXf> weight)
+VectorXd InitiCubArm::readPose()
 {
-    Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
-
-    Map<VectorXd> init_hand_pose(ee_pose.data(), 7, 1);
-
-    for (int i = 0; i < state.cols(); ++i)
-        state.col(i) = init_hand_pose.cast<float>();
-
-    weight.fill(1.0 / state.cols());
+    return toEigen(readRootToEE());
 }
 
 

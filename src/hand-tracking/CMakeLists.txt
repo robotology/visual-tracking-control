@@ -30,6 +30,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/iCubFwdKinModel.h
         include/iCubGatePose.h
         include/InitiCubArm.h
+        include/InitPoseParticles.h
         include/PlayiCubFwdKinModel.h
         include/PlayGatePose.h
         include/PlayWalkmanPoseModel.h
@@ -46,6 +47,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
         src/InitiCubArm.cpp
+        src/InitPoseParticles.cpp
         src/PlayiCubFwdKinModel.cpp
         src/PlayGatePose.cpp
         src/PlayWalkmanPoseModel.cpp
