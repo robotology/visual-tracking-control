@@ -17,7 +17,9 @@
 #include <iCubGatePose.h>
 #include <iCubFwdKinModel.h>
 #include <InitiCubArm.h>
+#include <InitWalkmanArm.h>
 #include <PlayiCubFwdKinModel.h>
+#include <PlayWalkmanPoseModel.h>
 #include <PlayGatePose.h>
 #include <VisualProprioception.h>
 #include <VisualSIS.h>
@@ -98,11 +100,19 @@ int main(int argc, char *argv[])
     paramsd["prior_ratio"]    = rf.findGroup("RESAMPLING").check("prior_ratio",    Value(0.5)).asDouble();
 
     FilteringParamtersS paramss;
-    paramss["robot"]       = rf.findGroup("PF").check("robot",      Value("icub")).asString();
+    paramss["robot"] = rf.findGroup("PF").check("robot", Value("icub")).asString();
+
+    if (paramss["robot"] != "icub" && paramss["robot"] != "walkman")
+    {
+        yError() << log_ID << "Wrong robot name. Provided: " << paramss["robot"] << ". Can be iCub, Walkman.";
+        return EXIT_FAILURE;
+    }
+
     if (rf.check("cam"))
         paramss["cam_sel"] = rf.find("cam").asString();
     else
-        paramss["cam_sel"] = rf.findGroup("PF").check("cam_sel",    Value("left")).asString();
+        paramss["cam_sel"] = rf.findGroup("PF").check("cam_sel", Value("left")).asString();
+
     paramss["laterality"]  = rf.findGroup("PF").check("laterality", Value("right")).asString();
 
 
@@ -140,7 +150,17 @@ int main(int argc, char *argv[])
 
 
     /* INITIALIZATION */
-    std::unique_ptr<Initialization> init_arm(new InitiCubArm("hand-tracking/InitiCubArm", paramss["cam_sel"], paramss["laterality"]));
+    std::unique_ptr<Initialization> init_arm;
+    if (paramss["robot"] == "icub")
+    {
+        std::unique_ptr<InitiCubArm> init_icub(new InitiCubArm("hand-tracking/InitiCubArm", paramss["cam_sel"], paramss["laterality"]));
+        init_arm = std::move(init_icub);
+    }
+    else if (paramss["robot"] == "walkman")
+    {
+        std::unique_ptr<InitWalkmanArm> init_walkman(new InitWalkmanArm("hand-tracking/InitWalkmanArm", paramss["cam_sel"], paramss["laterality"]));
+        init_arm = std::move(init_walkman);
+    }
 
 
     /* MOTION MODEL */
@@ -156,16 +176,16 @@ int main(int argc, char *argv[])
         }
         else
         {
-            std::unique_ptr<PlayiCubFwdKinModel> play_fwdkin(new PlayiCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
-            robot_motion = std::move(play_fwdkin);
+            std::unique_ptr<PlayiCubFwdKinModel> play_icub_fwdkin(new PlayiCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+            robot_motion = std::move(play_icub_fwdkin);
         }
     }
     else if (paramss["robot"] == "walkman")
     {
         if (paramsd["play"] != 1.0)
         {
-            std::unique_ptr<PlayiCubFwdKinModel> play_fwdkin(new PlayiCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
-            robot_motion = std::move(play_fwdkin);
+            std::unique_ptr<PlayWalkmanPoseModel> play_walkman_pose(new PlayWalkmanPoseModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+            robot_motion = std::move(play_walkman_pose);
         }
         else
         {
@@ -250,7 +270,18 @@ int main(int argc, char *argv[])
     }
     else
     {
-        std::unique_ptr<InitiCubArm> resample_init_arm(new InitiCubArm("hand-tracking/ResamplingWithPrior/InitiCubArm", paramss["cam_sel"], paramss["laterality"]));
+        std::unique_ptr<Initialization> resample_init_arm;
+        if (paramss["robot"] == "icub")
+        {
+            std::unique_ptr<InitiCubArm> resample_init_icub(new InitiCubArm("hand-tracking/ResamplingWithPrior/InitiCubArm", paramss["cam_sel"], paramss["laterality"]));
+            resample_init_arm = std::move(resample_init_icub);
+        }
+        else if (paramss["robot"] == "walkman")
+        {
+            std::unique_ptr<InitWalkmanArm> resample_init_walkman(new InitWalkmanArm("hand-tracking/ResamplingWithPrior/InitWalkmanArm", paramss["cam_sel"], paramss["laterality"]));
+            init_arm = std::move(resample_init_walkman);
+        }
+
         std::unique_ptr<Resampling>  resampling_prior(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
 
         pf_resampling = std::move(resampling_prior);
