@@ -1,4 +1,4 @@
-#include <PlayFwdKinModel.h>
+#include <PlayiCubFwdKinModel.h>
 
 #include <exception>
 #include <functional>
@@ -20,9 +20,11 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-PlayFwdKinModel::PlayFwdKinModel(const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
+PlayiCubFwdKinModel::PlayiCubFwdKinModel(const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
     icub_kin_arm_(iCubArm(laterality+"_v2")),
-    robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
+    robot_(robot),
+    laterality_(laterality),
+    port_prefix_(port_prefix)
 {
     port_arm_enc_.open  ("/hand-tracking/" + ID_ + "/" + port_prefix_ + "/" + laterality_ + "_arm:i");
     port_torso_enc_.open("/hand-tracking/" + ID_ + "/" + port_prefix_ + "/torso:i");
@@ -35,7 +37,7 @@ PlayFwdKinModel::PlayFwdKinModel(const ConstString& robot, const ConstString& la
     yInfo() << log_ID_ << "Succesfully initialized.";
 }
 
-PlayFwdKinModel::~PlayFwdKinModel() noexcept
+PlayiCubFwdKinModel::~PlayiCubFwdKinModel() noexcept
 {
     port_torso_enc_.interrupt();
     port_torso_enc_.close();
@@ -45,20 +47,20 @@ PlayFwdKinModel::~PlayFwdKinModel() noexcept
 }
 
 
-bool PlayFwdKinModel::setProperty(const std::string& property)
+bool PlayiCubFwdKinModel::setProperty(const std::string& property)
 {
-    return FwdKinModel::setProperty(property);
+    return KinPoseModel::setProperty(property);
 }
 
 
-VectorXd PlayFwdKinModel::readPose()
+VectorXd PlayiCubFwdKinModel::readPose()
 {
     Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
     return toEigen(ee_pose);
 }
 
 
-Vector PlayFwdKinModel::readTorso()
+Vector PlayiCubFwdKinModel::readTorso()
 {
     Bottle* b = port_torso_enc_.read(true);
     if (!b) return Vector(3, 0.0);
@@ -72,7 +74,7 @@ Vector PlayFwdKinModel::readTorso()
 }
 
 
-Vector PlayFwdKinModel::readRootToEE()
+Vector PlayiCubFwdKinModel::readRootToEE()
 {
     Bottle* b = port_arm_enc_.read(true);
     if (!b) return Vector(10, 0.0);

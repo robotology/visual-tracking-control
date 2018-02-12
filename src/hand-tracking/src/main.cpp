@@ -17,7 +17,7 @@
 #include <iCubGatePose.h>
 #include <iCubFwdKinModel.h>
 #include <InitiCubArm.h>
-#include <PlayFwdKinModel.h>
+#include <PlayiCubFwdKinModel.h>
 #include <PlayGatePose.h>
 #include <VisualProprioception.h>
 #include <VisualSIS.h>
@@ -146,22 +146,34 @@ int main(int argc, char *argv[])
     /* MOTION MODEL */
     std::unique_ptr<StateModel> brown(new BrownianMotionPose(paramsd["q_xy"], paramsd["q_z"], paramsd["theta"], paramsd["cone_angle"], paramsd["seed"]));
 
-    std::unique_ptr<ExogenousModel> icub_motion;
-    if (paramsd["play"] != 1.0)
+    std::unique_ptr<ExogenousModel> robot_motion;
+    if (paramss["robot"] == "icub")
     {
-        std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
-        icub_motion = std::move(icub_fwdkin);
+        if (paramsd["play"] != 1.0)
+        {
+            std::unique_ptr<iCubFwdKinModel> icub_fwdkin(new iCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+            robot_motion = std::move(icub_fwdkin);
+        }
+        else
+        {
+            std::unique_ptr<PlayiCubFwdKinModel> play_fwdkin(new PlayiCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+            robot_motion = std::move(play_fwdkin);
+        }
+    }
+    else if (paramss["robot"] == "walkman")
+    {
+
     }
     else
     {
-        std::unique_ptr<PlayFwdKinModel> play_fwdkin(new PlayFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
-        icub_motion = std::move(play_fwdkin);
+        yError() << log_ID << "Wrong robot name. Provided: " << paramss["robot"] << ". Can be iCub, Walkman.";
+        return EXIT_FAILURE;
     }
 
     /* PREDICTION */
     std::unique_ptr<DrawFwdKinPoses> pf_prediction(new DrawFwdKinPoses());
     pf_prediction->setStateModel(std::move(brown));
-    pf_prediction->setExogenousModel(std::move(icub_motion));
+    pf_prediction->setExogenousModel(std::move(robot_motion));
 
 
     /* SENSOR MODEL */

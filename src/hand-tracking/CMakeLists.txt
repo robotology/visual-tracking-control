@@ -30,7 +30,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/iCubFwdKinModel.h
         include/iCubGatePose.h
         include/InitiCubArm.h
-        include/PlayFwdKinModel.h
+        include/PlayiCubFwdKinModel.h
         include/PlayGatePose.h
         include/VisualProprioception.h
         include/VisualSIS.h
@@ -45,7 +45,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
         src/InitiCubArm.cpp
-        src/PlayFwdKinModel.cpp
+        src/PlayiCubFwdKinModel.cpp
         src/PlayGatePose.cpp
         src/VisualProprioception.cpp
         src/VisualSIS.cpp
