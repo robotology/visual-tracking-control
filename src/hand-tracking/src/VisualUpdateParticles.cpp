@@ -49,8 +49,8 @@ VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioceptio
         hand_rendered_.emplace_back   (Mat(         Size(img_width_ * ogl_tiles_cols_, img_height_* ogl_tiles_rows_), CV_8UC3));
         cuda_img_.emplace_back        (cuda::GpuMat(Size(img_width_ * ogl_tiles_cols_, img_height_* ogl_tiles_rows_), CV_8UC3));
         cuda_img_alpha_.emplace_back  (cuda::GpuMat(Size(img_width_ * ogl_tiles_cols_, img_height_* ogl_tiles_rows_), CV_8UC4));
-        cuda_descriptors_.emplace_back(cuda::GpuMat(Size(num_img_stream_, feature_dim_),                           CV_32F ));
-        cpu_descriptors_.emplace_back (Mat(         Size(num_img_stream_, feature_dim_),                           CV_32F ));
+        cuda_descriptors_.emplace_back(cuda::GpuMat(Size(num_img_stream_, feature_dim_),                              CV_32F ));
+        cpu_descriptors_.emplace_back (Mat(         Size(num_img_stream_, feature_dim_),                              CV_32F ));
     }
 }
 
