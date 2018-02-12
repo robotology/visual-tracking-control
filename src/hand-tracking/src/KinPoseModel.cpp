@@ -1,4 +1,4 @@
-#include <FwdKinModel.h>
+#include <KinPoseModel.h>
 
 #include <exception>
 #include <iostream>
@@ -19,13 +19,13 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-FwdKinModel::FwdKinModel() noexcept { }
+KinPoseModel::KinPoseModel() noexcept { }
 
 
-FwdKinModel::~FwdKinModel() noexcept { }
+KinPoseModel::~KinPoseModel() noexcept { }
 
 
-void FwdKinModel::propagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> prop_state)
+void KinPoseModel::propagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> prop_state)
 {
     prop_state.topRows<3>() = cur_state.topRows<3>().colwise() + delta_hand_pose_.head<3>().cast<float>();
 
@@ -44,16 +44,16 @@ void FwdKinModel::propagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> 
 }
 
 
-MatrixXf FwdKinModel::getExogenousMatrix()
+MatrixXf KinPoseModel::getExogenousMatrix()
 {
-    std::cerr << "ERROR::PFPREDICTION::SETEXOGENOUSMODEL" << std::endl;
-    std::cerr << "ERROR:\n\tCall to unimplemented base class method.";
+    std::cerr << "ERROR::PFPREDICTION::SETEXOGENOUSMODEL\n";
+    std::cerr << "ERROR:\n\tCall to unimplemented base class method." << std::endl;
 
     return MatrixXf::Zero(1, 1);
 }
 
 
-bool FwdKinModel::setProperty(const std::string& property)
+bool KinPoseModel::setProperty(const std::string& property)
 {
     if (property == "ICFW_DELTA")
         return setDeltaMotion();
@@ -68,7 +68,7 @@ bool FwdKinModel::setProperty(const std::string& property)
 }
 
 
-bool FwdKinModel::setDeltaMotion()
+bool KinPoseModel::setDeltaMotion()
 {
     VectorXd ee_pose = readPose();
 

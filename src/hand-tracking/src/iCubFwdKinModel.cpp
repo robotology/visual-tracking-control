@@ -104,7 +104,7 @@ iCubFwdKinModel::~iCubFwdKinModel() noexcept
 
 bool iCubFwdKinModel::setProperty(const std::string& property)
 {
-    return FwdKinModel::setProperty(property);
+    return KinPoseModel::setProperty(property);
 }
 
 
