@@ -36,7 +36,10 @@ InitiCubArm::InitiCubArm(const ConstString& cam_sel, const ConstString& laterali
 
 InitiCubArm::~InitiCubArm() noexcept
 {
+    port_arm_enc_.interrupt();
     port_arm_enc_.close();
+
+    port_torso_enc_.interrupt();
     port_torso_enc_.close();
 }
 
