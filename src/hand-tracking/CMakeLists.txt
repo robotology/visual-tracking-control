@@ -35,9 +35,11 @@ set(${EXE_TARGET_NAME}_HDR
         include/PlayiCubFwdKinModel.h
         include/PlayGatePose.h
         include/PlayWalkmanPoseModel.h
+        include/VisualiCubProprioception.h
         include/VisualProprioception.h
         include/VisualSIS.h
-        include/VisualUpdateParticles.h)
+        include/VisualUpdateParticles.h
+        include/VisualWalkmanProprioception.h)
 
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
@@ -53,9 +55,11 @@ set(${EXE_TARGET_NAME}_SRC
         src/PlayiCubFwdKinModel.cpp
         src/PlayGatePose.cpp
         src/PlayWalkmanPoseModel.cpp
+        src/VisualiCubProprioception.cpp
         src/VisualProprioception.cpp
         src/VisualSIS.cpp
-        src/VisualUpdateParticles.cpp)
+        src/VisualUpdateParticles.cpp
+        src/VisualWalkmanProprioception.cpp)
 
 set(${EXE_TARGET_NAME}_THRIFT_HDR
         thrift/visualsisparticlefilter.thrift)
