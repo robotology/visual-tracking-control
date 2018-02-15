@@ -26,6 +26,8 @@
 #include <VisualProprioception.h>
 #include <VisualSIS.h>
 #include <VisualUpdateParticles.h>
+#include <WalkmanArmModel.h>
+#include <WalkmanCamera.h>
 
 using namespace bfl;
 using namespace cv;
@@ -199,12 +201,27 @@ int main(int argc, char *argv[])
     std::unique_ptr<MeshModel> mesh_model;
     if (paramss["robot"] == "icub")
     {
-        camera = std::unique_ptr<iCubCamera>(new iCubCamera(paramss["cam_sel"], paramsd["resolution_ratio"], rf.getContext()));
-        mesh_model = std::unique_ptr<iCubArmModel>(new iCubArmModel(paramsd["use_thumb"], paramsd["use_forearm"], paramss["laterality"], rf.getContext()));
+        camera = std::unique_ptr<iCubCamera>(new iCubCamera(paramss["cam_sel"],
+                                                            paramsd["resolution_ratio"],
+                                                            rf.getContext(),
+                                                            "handTracking/iCubCamera/" + paramss["cam_sel"]));
+
+        mesh_model = std::unique_ptr<iCubArmModel>(new iCubArmModel(paramsd["use_thumb"],
+                                                                    paramsd["use_forearm"],
+                                                                    paramss["laterality"],
+                                                                    rf.getContext(),
+                                                                    "handTracking/iCubArmModel"));
     }
     else if (paramss["robot"] == "walkman")
     {
+        camera = std::unique_ptr<WalkmanCamera>(new WalkmanCamera(paramss["cam_sel"],
+                                                                  paramsd["resolution_ratio"],
+                                                                  rf.getContext(),
+                                                                  "handTracking/WalkmanCamera/" + paramss["cam_sel"]));
 
+        mesh_model = std::unique_ptr<WalkmanArmModel>(new WalkmanArmModel(paramss["laterality"],
+                                                                          rf.getContext(),
+                                                                          "handTracking/WalkmanArmModel"));
     }
     else
     {
