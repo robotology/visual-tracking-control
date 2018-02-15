@@ -50,8 +50,8 @@ set(${EXE_TARGET_NAME}_SRC
         src/DrawParticlesImportanceThreshold.cpp
         src/KinPoseModel.cpp
         src/GatePose.cpp
-        src/iCubFwdKinModel.cpp
 		src/iCubCamera.cpp
+        src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
         src/InitiCubArm.cpp
         src/InitPoseParticles.cpp
