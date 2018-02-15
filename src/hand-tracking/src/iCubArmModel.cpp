@@ -124,13 +124,13 @@ iCubArmModel::~iCubArmModel() noexcept
 }
 
 
-std::tuple<bool, SICAD::ModelPathContainer> iCubArmModel::readMeshPaths()
+std::tuple<bool, SICAD::ModelPathContainer> iCubArmModel::getMeshPaths()
 {
     return std::make_tuple(true, model_path_);
 }
 
 
-std::tuple<bool, std::string> iCubArmModel::readShaderPaths()
+std::tuple<bool, std::string> iCubArmModel::getShaderPaths()
 {
     return std::make_tuple(true, shader_path_);
 }

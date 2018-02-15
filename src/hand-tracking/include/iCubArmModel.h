@@ -20,9 +20,9 @@ public:
 
     virtual ~iCubArmModel() noexcept;
 
-    std::tuple<bool, SICAD::ModelPathContainer> readMeshPaths();
+    std::tuple<bool, SICAD::ModelPathContainer> getMeshPaths();
 
-    std::tuple<bool, std::string> readShaderPaths();
+    std::tuple<bool, std::string> getShaderPaths();
 
     std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> getModelPose(const Eigen::Ref<const Eigen::MatrixXf>& cur_states);
 

@@ -118,13 +118,13 @@ iCubCamera::~iCubCamera() noexcept
 }
 
 
-std::tuple<bool, Camera::CameraParameters> iCubCamera::readCameraParameters()
+std::tuple<bool, Camera::CameraParameters> iCubCamera::getCameraParameters()
 {
     return std::make_tuple(true, params_);
 }
 
 
-std::tuple<bool, std::array<double, 3>, std::array<double, 4>> iCubCamera::readCameraPose()
+std::tuple<bool, std::array<double, 3>, std::array<double, 4>> iCubCamera::getCameraPose()
 {
     bool success = false;
     std::array<double, 3> position{ {0, 0, 0} };

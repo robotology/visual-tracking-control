@@ -21,9 +21,9 @@ public:
 
     virtual ~iCubCamera() noexcept;
 
-    std::tuple<bool, CameraParameters> readCameraParameters() override;
+    std::tuple<bool, CameraParameters> getCameraParameters() override;
 
-    std::tuple<bool, std::array<double, 3>, std::array<double, 4>> readCameraPose() override;
+    std::tuple<bool, std::array<double, 3>, std::array<double, 4>> getCameraPose() override;
 
 protected:
     CameraParameters params_;

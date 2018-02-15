@@ -24,9 +24,9 @@ public:
         double cy;
     };
 
-    virtual std::tuple<bool, CameraParameters> readCameraParameters() = 0;
+    virtual std::tuple<bool, CameraParameters> getCameraParameters() = 0;
 
-    virtual std::tuple<bool, std::array<double, 3>, std::array<double, 4>> readCameraPose() = 0;
+    virtual std::tuple<bool, std::array<double, 3>, std::array<double, 4>> getCameraPose() = 0;
 };
 
 #endif /* CAMERA_H */

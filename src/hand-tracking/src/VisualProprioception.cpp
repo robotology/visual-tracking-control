@@ -16,15 +16,15 @@ VisualProprioception::VisualProprioception(const int num_images, std::unique_ptr
 {
     bool success = false;
 
-    std::tie(success, cam_params_) = camera_->readCameraParameters();
+    std::tie(success, cam_params_) = camera_->getCameraParameters();
     if (!success)
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR\nERROR: Could not read camera parameters.");
 
-    std::tie(success, mesh_paths_) = mesh_model_->readMeshPaths();
+    std::tie(success, mesh_paths_) = mesh_model_->getMeshPaths();
     if (!success)
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR\nERROR: Could not find meshe files.");
 
-    std::tie(success, shader_folder_) = mesh_model_->readShaderPaths();
+    std::tie(success, shader_folder_) = mesh_model_->getShaderPaths();
     if (!success)
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR\nERROR: Could not find shader folder.");
 
@@ -49,7 +49,8 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_states, Output
     bool success = false;
     std::vector<Superimpose::ModelPoseContainer> hand_poses;
     
-    std::tie(success, hand_poses) = mesh_model_->getModelPose(cur_states);
+    std::tie(success, hand_poses)     = mesh_model_->getModelPose(cur_states);
+    std::tie(success, cam_x_, cam_o_) = camera_->getCameraPose();
 
     observations.create(cam_params_.height * si_cad_->getTilesRows(), cam_params_.width * si_cad_->getTilesCols(), CV_8UC3);
     Mat hand_ogl = observations.getMat();
