@@ -106,6 +106,18 @@ iCubCamera::iCubCamera(const yarp::os::ConstString& cam_sel, const double resolu
 }
 
 
+iCubCamera::~iCubCamera() noexcept
+{
+    drv_gaze_.close();
+
+    port_head_enc_.interrupt();
+    port_head_enc_.close();
+
+    port_torso_enc_.interrupt();
+    port_torso_enc_.close();
+}
+
+
 std::tuple<bool, Camera::CameraParameters> iCubCamera::readCameraParameters()
 {
     return std::make_tuple(true, params_);

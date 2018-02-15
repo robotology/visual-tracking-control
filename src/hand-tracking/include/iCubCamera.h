@@ -19,7 +19,7 @@ class iCubCamera : public bfl::Camera
 public:
     iCubCamera(const yarp::os::ConstString& cam_sel, const double resolution_ratio, const yarp::os::ConstString& context);
 
-    virtual ~iCubCamera() noexcept { };
+    virtual ~iCubCamera() noexcept;
 
     std::tuple<bool, CameraParameters> readCameraParameters() override;
 
