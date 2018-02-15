@@ -1,5 +1,6 @@
 #include <VisualProprioception.h>
 
+#include <array>
 #include <cmath>
 #include <exception>
 #include <iostream>
@@ -55,7 +56,7 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_states, Output
     observations.create(cam_params_.height * si_cad_->getTilesRows(), cam_params_.width * si_cad_->getTilesCols(), CV_8UC3);
     Mat hand_ogl = observations.getMat();
 
-    si_cad_->superimpose(hand_poses, cam_x_.data, cam_o_.data, hand_ogl);
+    si_cad_->superimpose(hand_poses, cam_x_.data(), cam_o_.data(), hand_ogl);
 }
 
 
