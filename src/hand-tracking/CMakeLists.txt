@@ -34,6 +34,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/InitiCubArm.h
         include/InitPoseParticles.h
         include/InitWalkmanArm.h
+		include/MeshModel.h
         include/PlayiCubFwdKinModel.h
         include/PlayGatePose.h
         include/PlayWalkmanPoseModel.h
