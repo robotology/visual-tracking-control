@@ -24,10 +24,12 @@ include(YarpInstallationHelpers)
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
+		include/Camera.h
         include/DrawParticlesImportanceThreshold.h
         include/KinPoseModel.h
         include/GatePose.h
         include/iCubFwdKinModel.h
+		include/iCubCamera.h
         include/iCubGatePose.h
         include/InitiCubArm.h
         include/InitPoseParticles.h
@@ -48,6 +50,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/KinPoseModel.cpp
         src/GatePose.cpp
         src/iCubFwdKinModel.cpp
+		src/iCubCamera.cpp
         src/iCubGatePose.cpp
         src/InitiCubArm.cpp
         src/InitPoseParticles.cpp
