@@ -29,6 +29,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/KinPoseModel.h
         include/GatePose.h
         include/iCubFwdKinModel.h
+		include/iCubArmModel.h
 		include/iCubCamera.h
         include/iCubGatePose.h
         include/InitiCubArm.h
@@ -50,6 +51,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/DrawParticlesImportanceThreshold.cpp
         src/KinPoseModel.cpp
         src/GatePose.cpp
+		src/iCubArmModel.cpp
 		src/iCubCamera.cpp
         src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
