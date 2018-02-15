@@ -18,7 +18,7 @@ public:
                  const yarp::os::ConstString& laterality,
                  const yarp::os::ConstString& context);
 
-    virtual ~iCubArmModel() noexcept { };
+    virtual ~iCubArmModel() noexcept;
 
     std::tuple<bool, SICAD::ModelPathContainer> readMeshPaths();
 

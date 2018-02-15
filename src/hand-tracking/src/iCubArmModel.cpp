@@ -114,6 +114,16 @@ iCubArmModel::iCubArmModel(const bool use_thumb,
 }
 
 
+iCubArmModel::~iCubArmModel() noexcept
+{
+    port_torso_enc_.interrupt();
+    port_torso_enc_.close();
+
+    port_arm_enc_.interrupt();
+    port_arm_enc_.close();
+}
+
+
 std::tuple<bool, SICAD::ModelPathContainer> iCubArmModel::readMeshPaths()
 {
     return std::make_tuple(true, model_path_);
