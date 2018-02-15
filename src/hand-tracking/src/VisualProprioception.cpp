@@ -9,31 +9,33 @@ using namespace cv;
 using namespace Eigen;
 
 
-VisualProprioception::VisualProprioception(const int num_images)
+VisualProprioception::VisualProprioception(const int num_images, std::unique_ptr<bfl::Camera> camera, std::unique_ptr<bfl::MeshModel> mesh_model) :
+    num_images_(num_images),
+    camera_(std::move(camera)),
+    mesh_model_(std::move(mesh_model))
 {
-    readCameraParameters(width_, height_, fx_, fy_, cx_, cy_);
+    bool success = false;
 
-    readMeshPaths(mesh_paths_);
+    std::tie(success, cam_params_) = camera_->readCameraParameters();
+    if (!success)
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR\nERROR: Could not read camera parameters.");
 
-    readShaderPaths(shader_folder_);
+    std::tie(success, mesh_paths_) = mesh_model_->readMeshPaths();
+    if (!success)
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR\nERROR: Could not find meshe files.");
 
-    cam_x_[0] = 0;
-    cam_x_[1] = 0;
-    cam_x_[2] = 0;
-
-    cam_o_[0] = 0;
-    cam_o_[1] = 0;
-    cam_o_[2] = 0;
-    cam_o_[3] = 0;
+    std::tie(success, shader_folder_) = mesh_model_->readShaderPaths();
+    if (!success)
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR\nERROR: Could not find shader folder.");
 
     try
     {
-        si_cad_ = new SICAD(mesh_paths_,
-                            width_, height_, fx_, fy_, cx_, cy_,
-                            num_images,
-                            {1.0, 0.0, 0.0, static_cast<float>(M_PI)},
-                            shader_folder_,
-                            false);
+        si_cad_ = std::unique_ptr<SICAD>(new SICAD(mesh_paths_,
+                                         cam_params_.width, cam_params_.height, cam_params_.fx, cam_params_.fy, cam_params_.cx, cam_params_.cy,
+                                         num_images,
+                                         {1.0, 0.0, 0.0, static_cast<float>(M_PI)},
+                                         shader_folder_,
+                                         false));
     }
     catch (const std::runtime_error& e)
     {
@@ -42,133 +44,17 @@ VisualProprioception::VisualProprioception(const int num_images)
 }
 
 
-VisualProprioception::~VisualProprioception() noexcept
-{
-    delete si_cad_;
-}
-
-
-VisualProprioception::VisualProprioception(const VisualProprioception& proprio) :
-    mesh_paths_(proprio.mesh_paths_),
-    shader_folder_(proprio.shader_folder_),
-    si_cad_(proprio.si_cad_),
-    width_(proprio.width_),
-    height_(proprio.height_),
-    fx_(proprio.fx_),
-    cx_(proprio.cx_),
-    fy_(proprio.fy_),
-    cy_(proprio.cy_)
-{
-    cam_x_[0] = proprio.cam_x_[0];
-    cam_x_[1] = proprio.cam_x_[1];
-    cam_x_[2] = proprio.cam_x_[2];
-
-    cam_o_[0] = proprio.cam_o_[0];
-    cam_o_[1] = proprio.cam_o_[1];
-    cam_o_[2] = proprio.cam_o_[2];
-    cam_o_[3] = proprio.cam_o_[3];
-}
-
-
-VisualProprioception::VisualProprioception(VisualProprioception&& proprio) noexcept :
-    mesh_paths_(std::move(proprio.mesh_paths_)),
-    shader_folder_(std::move(proprio.shader_folder_)),
-    si_cad_(std::move(proprio.si_cad_)),
-    width_(std::move(proprio.width_)),
-    height_(std::move(proprio.height_)),
-    fx_(std::move(proprio.fx_)),
-    cx_(std::move(proprio.cx_)),
-    fy_(std::move(proprio.fy_)),
-    cy_(std::move(proprio.cy_))
-{
-    cam_x_[0] = proprio.cam_x_[0];
-    cam_x_[1] = proprio.cam_x_[1];
-    cam_x_[2] = proprio.cam_x_[2];
-
-    cam_o_[0] = proprio.cam_o_[0];
-    cam_o_[1] = proprio.cam_o_[1];
-    cam_o_[2] = proprio.cam_o_[2];
-    cam_o_[3] = proprio.cam_o_[3];
-
-    proprio.cam_x_[0] = 0.0;
-    proprio.cam_x_[1] = 0.0;
-    proprio.cam_x_[2] = 0.0;
-
-    proprio.cam_o_[0] = 0.0;
-    proprio.cam_o_[1] = 0.0;
-    proprio.cam_o_[2] = 0.0;
-    proprio.cam_o_[3] = 0.0;
-}
-
-
-VisualProprioception& VisualProprioception::operator=(const VisualProprioception& proprio)
-{
-    width_ = proprio.width_;
-    height_ = proprio.height_;
-
-    fx_ = proprio.fx_;
-    cx_ = proprio.cx_;
-    fy_ = proprio.fy_;
-    cy_ = proprio.cy_;
-
-    mesh_paths_ = proprio.mesh_paths_;
-    si_cad_ = proprio.si_cad_;
-    cam_x_[0] = proprio.cam_x_[0];
-    cam_x_[1] = proprio.cam_x_[1];
-    cam_x_[2] = proprio.cam_x_[2];
-
-    cam_o_[0] = proprio.cam_o_[0];
-    cam_o_[1] = proprio.cam_o_[1];
-    cam_o_[2] = proprio.cam_o_[2];
-    cam_o_[3] = proprio.cam_o_[3];
-
-    return *this;
-}
-
-
-VisualProprioception& VisualProprioception::operator=(VisualProprioception&& proprio) noexcept
-{
-    cam_x_[0] = proprio.cam_x_[0];
-    cam_x_[1] = proprio.cam_x_[1];
-    cam_x_[2] = proprio.cam_x_[2];
-
-    cam_o_[0] = proprio.cam_o_[0];
-    cam_o_[1] = proprio.cam_o_[1];
-    cam_o_[2] = proprio.cam_o_[2];
-    cam_o_[3] = proprio.cam_o_[3];
-
-    width_  = std::move(proprio.width_);
-    height_ = std::move(proprio.height_);
-    fx_     = std::move(proprio.fx_);
-    cx_     = std::move(proprio.cx_);
-    fy_     = std::move(proprio.fy_);
-    cy_     = std::move(proprio.cy_);
-
-    mesh_paths_ = std::move(proprio.mesh_paths_);
-    si_cad_  = std::move(proprio.si_cad_);
-
-    proprio.cam_x_[0] = 0.0;
-    proprio.cam_x_[1] = 0.0;
-    proprio.cam_x_[2] = 0.0;
-
-    proprio.cam_o_[0] = 0.0;
-    proprio.cam_o_[1] = 0.0;
-    proprio.cam_o_[2] = 0.0;
-    proprio.cam_o_[3] = 0.0;
-
-    return *this;
-}
-
-
 void VisualProprioception::observe(const Ref<const MatrixXf>& cur_states, OutputArray observations)
 {
+    bool success = false;
     std::vector<Superimpose::ModelPoseContainer> hand_poses;
-    getModelPose(cur_states, hand_poses);
+    
+    std::tie(success, hand_poses) = mesh_model_->getModelPose(cur_states);
 
-    observations.create(height_ * si_cad_->getTilesRows(), width_ * si_cad_->getTilesCols(), CV_8UC3);
+    observations.create(cam_params_.height * si_cad_->getTilesRows(), cam_params_.width * si_cad_->getTilesCols(), CV_8UC3);
     Mat hand_ogl = observations.getMat();
 
-    si_cad_->superimpose(hand_poses, cam_x_, cam_o_, hand_ogl);
+    si_cad_->superimpose(hand_poses, cam_x_.data, cam_o_.data, hand_ogl);
 }
 
 
@@ -198,35 +84,35 @@ int VisualProprioception::getOGLTilesCols()
 
 unsigned int VisualProprioception::getCamWidth()
 {
-    return width_;
+    return cam_params_.width;
 }
 
 
 unsigned int VisualProprioception::getCamHeight()
 {
-    return height_;
+    return cam_params_.height;
 }
 
 
 float VisualProprioception::getCamFx()
 {
-    return fx_;
+    return cam_params_.fx;
 }
 
 
 float VisualProprioception::getCamFy()
 {
-    return fy_;
+    return cam_params_.fy;
 }
 
 
 float VisualProprioception::getCamCx()
 {
-    return cx_;
+    return cam_params_.cx;
 }
 
 
 float VisualProprioception::getCamCy()
 {
-    return cy_;
+    return cam_params_.cy;
 }

@@ -1,7 +1,12 @@
 #ifndef VISUALPROPRIOCEPTION_H
 #define VISUALPROPRIOCEPTION_H
 
+#include <Camera.h>
+#include <MeshModel.h>
+
+#include <array>
 #include <string>
+#include <memory>
 
 #include <BayesFilters/VisualObservationModel.h>
 #include <opencv2/core/core.hpp>
@@ -11,17 +16,9 @@
 class VisualProprioception : public bfl::VisualObservationModel
 {
 public:
-    VisualProprioception(const int num_images);
+    VisualProprioception(const int num_images, std::unique_ptr<bfl::Camera> camera, std::unique_ptr<bfl::MeshModel> mesh_model);
 
-    VisualProprioception(const VisualProprioception& proprio);
-
-    VisualProprioception(VisualProprioception&& proprio) noexcept;
-
-    virtual ~VisualProprioception() noexcept;
-
-    VisualProprioception& operator=(const VisualProprioception& proprio);
-
-    VisualProprioception& operator=(VisualProprioception&& proprio) noexcept;
+    virtual ~VisualProprioception() noexcept { };
 
     void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_states, cv::OutputArray observations) override;
 
@@ -42,30 +39,19 @@ public:
 protected:
     std::string log_ID_ = "[VisualProprioception]";
 
-    virtual void readCameraParameters(unsigned int& width, unsigned int& height, float& fx, float& fy, float& cx, float& cy) = 0;
+    std::unique_ptr<bfl::Camera>    camera_;
+    std::unique_ptr<bfl::MeshModel> mesh_model_;
 
-    virtual void readMeshPaths(SICAD::ModelPathContainer& mesh_path) = 0;
-
-    virtual void readShaderPaths(std::string& mesh_path) = 0;
-
-    virtual void getModelPose(const Eigen::Ref<const Eigen::MatrixXf>& cur_states, std::vector<Superimpose::ModelPoseContainer>& hand_poses) = 0;
-
+    bfl::Camera::CameraParameters cam_params_;
 
     SICAD::ModelPathContainer mesh_paths_;
     std::string               shader_folder_;
 
-    SICAD*                    si_cad_;
-    
-    unsigned int width_;
-    unsigned int height_;
+    std::unique_ptr<SICAD> si_cad_;
+    const int              num_images_;
 
-    float fx_;
-    float cx_;
-    float fy_;
-    float cy_;
-
-    double cam_x_[3];
-    double cam_o_[4];
+    std::array<double, 3> cam_x_{ {0.0, 0.0, 0.0} };
+    std::array<double, 4> cam_o_{ {0.0, 0.0, 0.0, 0.0} };
 };
 
 #endif /* VISUALPROPRIOCEPTION_H */
