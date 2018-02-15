@@ -142,7 +142,7 @@ std::tuple<bool, std::array<double, 3>, std::array<double, 4>> iCubCamera::readC
     }
     else
     {
-        Vector root_to_eye_enc(8);
+        Vector root_to_eye_enc;
         std::tie(success, root_to_eye_enc) = readRootToEye();
 
         if (success)
