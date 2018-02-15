@@ -42,7 +42,8 @@ set(${EXE_TARGET_NAME}_HDR
         include/VisualProprioception.h
         include/VisualSIS.h
         include/VisualUpdateParticles.h
-        include/VisualWalkmanProprioception.h)
+		include/WalkmanArmModel.h
+		include/WalkmanCamera.h)
 
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
@@ -63,7 +64,8 @@ set(${EXE_TARGET_NAME}_SRC
         src/VisualProprioception.cpp
         src/VisualSIS.cpp
         src/VisualUpdateParticles.cpp
-        src/VisualWalkmanProprioception.cpp)
+		src/WalkmanArmModel.cpp
+		src/WalkmanCamera.cpp)
 
 set(${EXE_TARGET_NAME}_THRIFT_HDR
         thrift/visualsisparticlefilter.thrift)
@@ -145,7 +147,8 @@ set(${EXE_TARGET_NAME}_MESH
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl1.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl2.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl3.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl4.obj)
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl4.obj
+		${CMAKE_CURRENT_SOURCE_DIR}/mesh/walkman_right_arm/soft_hand_open.stl)
 
 add_custom_command(TARGET  ${EXE_TARGET_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_SHADER_VERT} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
