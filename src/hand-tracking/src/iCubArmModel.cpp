@@ -16,7 +16,9 @@ using namespace yarp::sig;
 iCubArmModel::iCubArmModel(const bool use_thumb,
                            const bool use_forearm,
                            const ConstString& laterality,
-                           const ConstString& context) :
+                           const ConstString& context,
+                           const yarp::os::ConstString& port_prefix) :
+    port_prefix_(port_prefix),
     use_thumb_(use_thumb),
     use_forearm_(use_forearm),
     laterality_(laterality),
@@ -30,68 +32,68 @@ iCubArmModel::iCubArmModel(const bool use_thumb,
 
     model_path_["palm"] = rf.findFileByName("r_palm.obj");
     if (!file_found(model_path_["palm"]))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_palm.obj not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_palm.obj not found!");
 
     if (use_thumb)
     {
         model_path_["thumb1"] = rf.findFileByName("r_tl0.obj");
         if (!file_found(model_path_["thumb1"]))
-            throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
+            throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_tl0.obj not found!");
         model_path_["thumb2"] = rf.findFileByName("r_tl1.obj");
         if (!file_found(model_path_["thumb2"]))
-            throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
+            throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_tl1.obj not found!");
         model_path_["thumb3"] = rf.findFileByName("r_tl2.obj");
         if (!file_found(model_path_["thumb3"]))
-            throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
+            throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_tl2.obj not found!");
         model_path_["thumb4"] = rf.findFileByName("r_tl3.obj");
         if (!file_found(model_path_["thumb4"]))
-            throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
+            throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_tl3.obj not found!");
         model_path_["thumb5"] = rf.findFileByName("r_tl4.obj");
         if (!file_found(model_path_["thumb5"]))
-            throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
+            throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_tl4.obj not found!");
     }
 
     model_path_["index0"] = rf.findFileByName("r_indexbase.obj");
     if (!file_found(model_path_["index0"]))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_indexbase.obj not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_indexbase.obj not found!");
     model_path_["index1"] = rf.findFileByName("r_ail0.obj");
     if (!file_found(model_path_["index1"]))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ail0.obj not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ail0.obj not found!");
     model_path_["index2"] = rf.findFileByName("r_ail1.obj");
     if (!file_found(model_path_["index2"]))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ail1.obj not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ail1.obj not found!");
     model_path_["index3"] = rf.findFileByName("r_ail2.obj");
     if (!file_found(model_path_["index3"]))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ail2.obj not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ail2.obj not found!");
     model_path_["index4"] = rf.findFileByName("r_ail3.obj");
     if (!file_found(model_path_["index4"]))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ail3.obj not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ail3.obj not found!");
 
     model_path_["medium0"] = rf.findFileByName("r_ml0.obj");
     if (!file_found(model_path_["medium0"]))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ml0.obj not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ml0.obj not found!");
     model_path_["medium1"] = rf.findFileByName("r_ml1.obj");
     if (!file_found(model_path_["medium1"]))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ml1.obj not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ml1.obj not found!");
     model_path_["medium2"] = rf.findFileByName("r_ml2.obj");
     if (!file_found(model_path_["medium2"]))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ml2.obj not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ml2.obj not found!");
     model_path_["medium3"] = rf.findFileByName("r_ml3.obj");
     if (!file_found(model_path_["medium3"]))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_ml3.obj not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ml3.obj not found!");
 
     if (use_forearm)
     {
         model_path_["forearm"] = rf.findFileByName("r_forearm.obj");
         if (!file_found(model_path_["forearm"]))
-            throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::FILE\nERROR: 3D mesh file r_forearm.obj not found!");
+            throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_forearm.obj not found!");
     }
 
 
     rf.setDefaultContext(context + "/shader");
     shader_path_ = rf.findFileByName("shader_model.vert");
     if (!file_found(shader_path_))
-        throw std::runtime_error("ERROR::VISUALICUBPROPRIOCEPTION::CTOR::DIR\nERROR: shader directory not found!");
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::DIR\nERROR: shader directory not found!");
 
     size_t rfind_slash = shader_path_.rfind("/");
     if (rfind_slash == std::string::npos)
@@ -111,6 +113,9 @@ iCubArmModel::iCubArmModel(const bool use_thumb,
     icub_arm_.releaseLink(0);
     icub_arm_.releaseLink(1);
     icub_arm_.releaseLink(2);
+
+    port_torso_enc_.open("/" + port_prefix + "/torso:i");
+    port_arm_enc_.open("/" + port_prefix + "/" + laterality_ + "_arm:i");
 }
 
 

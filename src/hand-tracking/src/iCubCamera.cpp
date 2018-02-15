@@ -16,10 +16,14 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-iCubCamera::iCubCamera(const yarp::os::ConstString& cam_sel, const double resolution_ratio, const yarp::os::ConstString& context) :
+iCubCamera::iCubCamera(const yarp::os::ConstString& cam_sel,
+                       const double resolution_ratio,
+                       const yarp::os::ConstString& context,
+                       const yarp::os::ConstString& port_prefix) :
     cam_sel_(cam_sel),
     resolution_ratio_(resolution_ratio),
-    context_(context)
+    context_(context),
+    port_prefix_(port_prefix)
 {
     ResourceFinder rf;
 
@@ -68,7 +72,7 @@ iCubCamera::iCubCamera(const yarp::os::ConstString& cam_sel, const double resolu
             cam_cy     = fallback_intrinsic->get(5).asDouble();
         }
         else
-            throw std::runtime_error("ERROR::ICUBHEAD::CTOR\nERROR: No camera intrinsic parameters could be found.");
+            throw std::runtime_error("ERROR::ICUBCAMERA::CTOR\nERROR: No camera intrinsic parameters could be found.");
 
         icub_kin_eye_ = iCubEye(cam_sel_ + "_v2");
         icub_kin_eye_.setAllConstraints(false);
@@ -76,8 +80,8 @@ iCubCamera::iCubCamera(const yarp::os::ConstString& cam_sel, const double resolu
         icub_kin_eye_.releaseLink(1);
         icub_kin_eye_.releaseLink(2);
 
-        port_head_enc_.open("/hand-tracking/iCubCamera/" + cam_sel_ + "/head:i");
-        port_torso_enc_.open("/hand-tracking/iCubCamera/" + cam_sel_ + "/torso:i");
+        port_head_enc_.open("/" + port_prefix_ + "/head:i");
+        port_torso_enc_.open("/" + port_prefix_ + "/torso:i");
     }
 
     yInfo() << log_ID_ << "Found camera information:";
@@ -103,6 +107,10 @@ iCubCamera::iCubCamera(const yarp::os::ConstString& cam_sel, const double resolu
     yInfo() << log_ID_ << " - cx:"     << params_.cx;
     yInfo() << log_ID_ << " - fy:"     << params_.fy;
     yInfo() << log_ID_ << " - cy:"     << params_.cy;
+
+
+    port_head_enc_.open("/" + port_prefix_ + "/head:i");
+    port_torso_enc_.open("/" + port_prefix_ + "/torso:i");
 }
 
 
@@ -180,7 +188,7 @@ bool iCubCamera::openGazeController()
 {
     Property opt_gaze;
     opt_gaze.put("device", "gazecontrollerclient");
-    opt_gaze.put("local", "/hand-tracking/iCubCamera/" + cam_sel_ + "/gaze:i");
+    opt_gaze.put("local", "/" + port_prefix_ + "/gaze:i");
     opt_gaze.put("remote", "/iKinGazeCtrl");
 
     if (drv_gaze_.open(opt_gaze))

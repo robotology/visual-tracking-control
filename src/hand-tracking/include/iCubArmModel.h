@@ -16,7 +16,8 @@ public:
     iCubArmModel(const bool use_thumb,
                  const bool use_forearm,
                  const yarp::os::ConstString& laterality,
-                 const yarp::os::ConstString& context);
+                 const yarp::os::ConstString& context,
+                 const yarp::os::ConstString& port_prefix);
 
     virtual ~iCubArmModel() noexcept;
 
@@ -36,7 +37,8 @@ protected:
     bool setArmJoints(const yarp::sig::Vector& q);
 
 private:
-    std::string log_ID_ = "[iCubArmModel]";
+    const yarp::os::ConstString log_ID_ = "[iCubArmModel]";
+    yarp::os::ConstString port_prefix_ = "iCubArmModel";
 
     const bool use_thumb_;
     const bool use_forearm_;
