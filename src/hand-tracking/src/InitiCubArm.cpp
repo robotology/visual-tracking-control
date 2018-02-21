@@ -43,7 +43,7 @@ InitiCubArm::~InitiCubArm() noexcept
 
 VectorXd InitiCubArm::readPose()
 {
-    return toEigen(readRootToEE());
+    return toEigen(icub_kin_arm_.EndEffPose(readRootToEE() * CTRL_DEG2RAD));
 }
 
 
