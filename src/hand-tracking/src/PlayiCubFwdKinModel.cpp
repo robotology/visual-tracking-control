@@ -26,8 +26,8 @@ PlayiCubFwdKinModel::PlayiCubFwdKinModel(const ConstString& robot, const ConstSt
     laterality_(laterality),
     port_prefix_(port_prefix)
 {
-    port_arm_enc_.open  ("/hand-tracking/" + ID_ + "/" + port_prefix_ + "/" + laterality_ + "_arm:i");
-    port_torso_enc_.open("/hand-tracking/" + ID_ + "/" + port_prefix_ + "/torso:i");
+    port_arm_enc_.open  ("/" + port_prefix_ + "/" + laterality_ + "_arm:i");
+    port_torso_enc_.open("/" + port_prefix_ + "/torso:i");
 
     icub_kin_arm_.setAllConstraints(false);
     icub_kin_arm_.releaseLink(0);

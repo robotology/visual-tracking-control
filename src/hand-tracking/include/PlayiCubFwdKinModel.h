@@ -31,12 +31,11 @@ protected:
     iCub::iKin::iCubArm                      icub_kin_arm_;
 
 private:
-    yarp::os::ConstString ID_     = "PlayiCubFwdKinModel";
-    yarp::os::ConstString log_ID_ = "[" + ID_ + "]";
+    const yarp::os::ConstString log_ID_ = "[PlayiCubFwdKinModel]";
+    yarp::os::ConstString port_prefix_ = "PlayiCubFwdKinModel";
 
     yarp::os::ConstString robot_;
     yarp::os::ConstString laterality_;
-    yarp::os::ConstString port_prefix_;
 };
 
 #endif /* PLAYICUBFWDKINMODEL_H */
