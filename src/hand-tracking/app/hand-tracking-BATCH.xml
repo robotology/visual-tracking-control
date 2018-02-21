@@ -183,4 +183,18 @@
         <protocol>tcp</protocol>
     </connection>
 
+
+    <!-- Visualization via iCubProprioception -->
+    <connection>
+      <from>/hand-tracking/left/result/estimates:o</from>
+      <to>/iCubProprioception/ExtCADSuperimposer/cam/left/hand/right_pose:i</to>
+      <protocol>tcp</protocol>
+    </connection>
+
+    <connection>
+      <from>/hand-tracking/right/result/estimates:o</from>
+      <to>/iCubProprioception/ExtCADSuperimposer/cam/right/hand/right_pose:i</to>
+      <protocol>tcp</protocol>
+    </connection>
+  
 </application>
