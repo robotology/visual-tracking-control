@@ -170,16 +170,19 @@ int main(int argc, char *argv[])
     if (paramss["robot"] == "icub")
     {
         if (paramsd["play"] != 1.0)
-            robot_motion = std::unique_ptr<iCubFwdKinModel>(new iCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+            robot_motion = std::unique_ptr<iCubFwdKinModel>(new iCubFwdKinModel(paramss["robot"], paramss["laterality"],
+                                                                                "handTracking/iCubFwdKinModel/" + paramss["cam_sel"]));
         else
         {
-            robot_motion = std::unique_ptr<PlayiCubFwdKinModel>(new PlayiCubFwdKinModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+            robot_motion = std::unique_ptr<PlayiCubFwdKinModel>(new PlayiCubFwdKinModel(paramss["robot"], paramss["laterality"],
+                                                                                        "handTracking/PlayiCubFwdKinModel/" + paramss["cam_sel"]));
         }
     }
     else if (paramss["robot"] == "walkman")
     {
         if (paramsd["play"] != 1.0)
-            robot_motion = std::unique_ptr<PlayWalkmanPoseModel>(new PlayWalkmanPoseModel(paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+            robot_motion = std::unique_ptr<PlayWalkmanPoseModel>(new PlayWalkmanPoseModel(paramss["robot"], paramss["laterality"],
+                                                                                          "handTracking/PlayWalkmanPoseModel/" + paramss["cam_sel"]));
         else
         {
             yError() << log_ID << "Pose model method for Walkman is unimplemented.";
@@ -206,24 +209,24 @@ int main(int argc, char *argv[])
         camera = std::unique_ptr<iCubCamera>(new iCubCamera(paramss["cam_sel"],
                                                             paramsd["resolution_ratio"],
                                                             rf.getContext(),
-                                                            "handTracking/iCubCamera/" + paramss["cam_sel"]));
+                                                            "handTracking/VisualProprioception/iCubCamera/" + paramss["cam_sel"]));
 
         mesh_model = std::unique_ptr<iCubArmModel>(new iCubArmModel(paramsd["use_thumb"],
                                                                     paramsd["use_forearm"],
                                                                     paramss["laterality"],
                                                                     rf.getContext(),
-                                                                    "handTracking/iCubArmModel"));
+                                                                    "handTracking/VisualProprioception/iCubArmModel/" + paramss["cam_sel"]));
     }
     else if (paramss["robot"] == "walkman")
     {
         camera = std::unique_ptr<WalkmanCamera>(new WalkmanCamera(paramss["cam_sel"],
                                                                   paramsd["resolution_ratio"],
                                                                   rf.getContext(),
-                                                                  "handTracking/WalkmanCamera/" + paramss["cam_sel"]));
+                                                                  "handTracking/VisualProprioception/WalkmanCamera/" + paramss["cam_sel"]));
 
         mesh_model = std::unique_ptr<WalkmanArmModel>(new WalkmanArmModel(paramss["laterality"],
                                                                           rf.getContext(),
-                                                                          "handTracking/WalkmanArmModel"));
+                                                                          "handTracking/VisualProprioception/WalkmanArmModel/" + paramss["cam_sel"]));
     }
     else
     {
@@ -262,12 +265,14 @@ int main(int argc, char *argv[])
             vpf_correction = std::unique_ptr<iCubGatePose>(new iCubGatePose(std::move(vpf_update_particles),
                                                                             paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
                                                                             paramsd["gate_aperture"], paramsd["gate_rotation"],
-                                                                            paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+                                                                            paramss["robot"], paramss["laterality"],
+                                                                            "handTracking/iCubGatePose/" + paramss["cam_sel"]));
         else
             vpf_correction = std::unique_ptr<PlayGatePose>(new PlayGatePose(std::move(vpf_update_particles),
                                                                             paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
                                                                             paramsd["gate_aperture"], paramsd["gate_rotation"],
-                                                                            paramss["robot"], paramss["laterality"], paramss["cam_sel"]));
+                                                                            paramss["robot"], paramss["laterality"],
+                                                                            "handTracking/PlayGatePose/" + paramss["cam_sel"]));
     }
     else
         vpf_correction = std::move(vpf_update_particles);
@@ -282,9 +287,11 @@ int main(int argc, char *argv[])
         std::unique_ptr<Initialization> resample_init_arm;
 
         if (paramss["robot"] == "icub")
-            resample_init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm("hand-tracking/ResamplingWithPrior/InitiCubArm", paramss["cam_sel"], paramss["laterality"]));
+            resample_init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["cam_sel"], paramss["laterality"],
+                                                                             "handTracking/ResamplingWithPrior/InitiCubArm/" + paramss["cam_sel"]));
         else if (paramss["robot"] == "walkman")
-            resample_init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm("hand-tracking/ResamplingWithPrior/InitWalkmanArm", paramss["cam_sel"], paramss["laterality"]));
+            resample_init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["cam_sel"], paramss["laterality"],
+                                                                                   "handTracking/ResamplingWithPrior/InitWalkmanArm/" + paramss["cam_sel"]));
 
         pf_resampling = std::unique_ptr<Resampling>(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
     }
