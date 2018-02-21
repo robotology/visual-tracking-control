@@ -33,8 +33,8 @@ PlayGatePose::PlayGatePose(std::unique_ptr<PFVisualCorrection> visual_correction
     icub_kin_arm_.releaseLink(2);
 
 
-    port_arm_enc_.open  ("/hand-tracking/" + ID_ + "/" + port_prefix_ + "/" + laterality_ + "_arm:i");
-    port_torso_enc_.open("/hand-tracking/" + ID_ + "/" + port_prefix_ + "/torso:i");
+    port_arm_enc_.open  ("/" + port_prefix_ + "/" + laterality_ + "_arm:i");
+    port_torso_enc_.open("/" + port_prefix_ + "/torso:i");
 
 
     yInfo() << log_ID_ << "Succesfully initialized.";
