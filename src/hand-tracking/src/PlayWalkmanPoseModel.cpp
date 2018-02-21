@@ -25,7 +25,7 @@ PlayWalkmanPoseModel::PlayWalkmanPoseModel(const ConstString& robot, const Const
     laterality_(laterality),
     port_prefix_(port_prefix)
 {
-    port_arm_pose_.open  ("/hand-tracking/" + ID_ + "/" + port_prefix_ + "/" + laterality_ + "_arm:i");
+    port_arm_pose_.open  ("/" + port_prefix_ + "/" + laterality_ + "_arm:i");
 
     yInfo() << log_ID_ << "Succesfully initialized.";
 }

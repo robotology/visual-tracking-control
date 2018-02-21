@@ -27,12 +27,11 @@ protected:
     yarp::os::BufferedPort<yarp::os::Bottle> port_arm_pose_;
 
 private:
-    yarp::os::ConstString ID_     = "PlayWalkmanPoseModel";
-    yarp::os::ConstString log_ID_ = "[" + ID_ + "]";
+    const yarp::os::ConstString log_ID_ = "[PlayWalkmanPoseModel]";
+    yarp::os::ConstString port_prefix_ = "PlayWalkmanPoseModel";
 
     yarp::os::ConstString robot_;
     yarp::os::ConstString laterality_;
-    yarp::os::ConstString port_prefix_;
 };
 
 #endif /* PLAYWALKMANPOSEMODEL_H */
