@@ -45,7 +45,7 @@ iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& la
             yError() << log_ID_ << "Cannot get " + laterality_ + " arm encoder interface!";
 
             drv_arm_enc_.close();
-            throw std::runtime_error("ERROR::" + ID_ + "::CTOR::INTERFACE\nERROR: cannot get " + laterality_ + " arm encoder interface!");
+            throw std::runtime_error("ERROR::ICUBFWDKINMODEL::CTOR::INTERFACE\nERROR: cannot get " + laterality_ + " arm encoder interface!");
         }
 
         yInfo() << log_ID_ << "Succesfully got " + laterality_ + " arm encoder interface.";
@@ -54,7 +54,7 @@ iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& la
     {
         yError() << log_ID_ << "Cannot open " + laterality_ + " arm remote_controlboard!";
 
-        throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open " + laterality_ + " arm remote_controlboard!");
+        throw std::runtime_error("ERROR::ICUBFWDKINMODEL::CTOR::DRIVER\nERROR: cannot open " + laterality_ + " arm remote_controlboard!");
     }
 
     icub_kin_arm_.setAllConstraints(false);
@@ -81,7 +81,7 @@ iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& la
             yError() << log_ID_ << "Cannot get torso encoder interface!";
 
             drv_torso_enc_.close();
-            throw std::runtime_error("ERROR::" + ID_ + "::CTOR::INTERFACE\nERROR: cannot get torso encoder interface!");
+            throw std::runtime_error("ERROR::ICUBFWDKINMODEL::CTOR::INTERFACE\nERROR: cannot get torso encoder interface!");
         }
 
         yInfo() << log_ID_ << "Succesfully got torso encoder interface.";
@@ -90,7 +90,7 @@ iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& la
     {
         yError() << log_ID_ << "Cannot open torso remote_controlboard!";
 
-        throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open torso remote_controlboard!");
+        throw std::runtime_error("ERROR::ICUBFWDKINMODEL::CTOR::DRIVER\nERROR: cannot open torso remote_controlboard!");
     }
 
     yInfo() << log_ID_ << "Succesfully initialized.";
