@@ -33,7 +33,9 @@ using yarp::sig::PixelRgb;
 VisualSIS::VisualSIS(const yarp::os::ConstString& cam_sel,
                      const int img_width, const int img_height,
                      const int num_particles,
-                     const double resample_ratio) :
+                     const double resample_ratio,
+                     const ConstString& port_prefix) :
+    port_prefix_(port_prefix),
     cam_sel_(cam_sel),
     img_width_(img_width),
     img_height_(img_height),
@@ -49,8 +51,8 @@ VisualSIS::VisualSIS(const yarp::os::ConstString& cam_sel,
     cuda_hog_->setWinStride(Size(img_width_, img_height_));
 
 
-    port_image_in_.open     ("/hand-tracking/" + cam_sel_ + "/img:i");
-    port_estimates_out_.open("/hand-tracking/" + cam_sel_ + "/result/estimates:o");
+    port_image_in_.open     ("/" + port_prefix_ + "/img:i");
+    port_estimates_out_.open("/" + port_prefix_ + "/estimates:o");
 
     img_in_.resize(320, 240);
     img_in_.zero();
@@ -216,7 +218,7 @@ bool VisualSIS::attach(yarp::os::Port &source)
 bool VisualSIS::setCommandPort()
 {
     std::cout << "Opening RPC command port." << std::endl;
-    if (!port_rpc_command_.open("/hand-tracking/" + cam_sel_ + "/cmd:i"))
+    if (!port_rpc_command_.open("/" + port_prefix_ + "/cmd:i"))
     {
         std::cerr << "Cannot open the RPC command port." << std::endl;
         return false;

@@ -292,7 +292,8 @@ int main(int argc, char *argv[])
     VisualSIS vsis_pf(paramss["cam_sel"],
                       paramsd["cam_width"], paramsd["cam_height"],
                       paramsd["num_particles"],
-                      paramsd["resample_ratio"]);
+                      paramsd["resample_ratio"],
+                      "handTracking/VisualSIS/" + paramss["cam_sel"]);
     vsis_pf.setInitialization(std::move(init_arm));
     vsis_pf.setPrediction(std::move(pf_prediction));
     vsis_pf.setCorrection(std::move(vpf_correction));
