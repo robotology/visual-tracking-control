@@ -13,8 +13,9 @@ using namespace yarp::os;
 
 
 InitWalkmanArm::InitWalkmanArm(const ConstString& port_prefix, const ConstString& cam_sel, const ConstString& laterality) noexcept
+    port_prefix_(port_prefix)
 {
-    port_arm_pose_.open("/" + port_prefix + "/cam/" + cam_sel + "/" + laterality + "_arm:i");
+    port_arm_pose_.open("/" + port_prefix_ + "/" + laterality + "_arm:i");
 }
 
 

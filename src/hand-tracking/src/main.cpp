@@ -158,7 +158,8 @@ int main(int argc, char *argv[])
     if (paramss["robot"] == "icub")
         init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm("hand-tracking/InitiCubArm", paramss["cam_sel"], paramss["laterality"]));
     else if (paramss["robot"] == "walkman")
-        init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm("hand-tracking/InitWalkmanArm", paramss["cam_sel"], paramss["laterality"]));
+        init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["cam_sel"], paramss["laterality"],
+                                                   "handTracking/InitWalkmanArm/" + paramss["cam_sel"]));
 
 
     /* MOTION MODEL */
