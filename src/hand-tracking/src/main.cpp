@@ -120,11 +120,10 @@ int main(int argc, char *argv[])
     paramss["laterality"]  = rf.findGroup("PF").check("laterality", Value("right")).asString();
 
 
-    yInfo() << log_ID << "Running with:";
-    yInfo() << log_ID << " - robot:"         << paramss["robot"];
-    yInfo() << log_ID << " - cam_sel:"       << paramss["cam_sel"];
-    yInfo() << log_ID << " - laterality:"    << paramss["laterality"];
-
+    yInfo() << log_ID << "General PF parameters:";
+    yInfo() << log_ID << " - robot:"          << paramss["robot"];
+    yInfo() << log_ID << " - cam_sel:"        << paramss["cam_sel"];
+    yInfo() << log_ID << " - laterality:"     << paramss["laterality"];
     yInfo() << log_ID << " - num_particles:"  << paramsd["num_particles"];
     yInfo() << log_ID << " - gpu_count:"      << paramsd["gpu_count"];
     yInfo() << log_ID << " - num_images:"     << paramsd["num_images"];
@@ -132,25 +131,38 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - gate_pose:"      << paramsd["gate_pose"];
     yInfo() << log_ID << " - play:"           << (paramsd["play"] == 1.0 ? "true" : "false");
 
+    yInfo() << log_ID << "Motion modle parameters:";
     yInfo() << log_ID << " - q_xy:"       << paramsd["q_xy"];
     yInfo() << log_ID << " - q_z:"        << paramsd["q_z"];
     yInfo() << log_ID << " - theta:"      << paramsd["theta"];
     yInfo() << log_ID << " - cone_angle:" << paramsd["cone_angle"];
     yInfo() << log_ID << " - seed:"       << paramsd["seed"];
 
+    yInfo() << log_ID << "Sensor model parameters:";
     yInfo() << log_ID << " - use_thumb:"   << paramsd["use_thumb"];
     yInfo() << log_ID << " - use_forearm:" << paramsd["use_forearm"];
 
+    yInfo() << log_ID << "Correction parameters:";
     yInfo() << log_ID << " - likelihood_gain:" << paramsd["likelihood_gain"];
 
+    yInfo() << log_ID << "Resampling parameters:";
     yInfo() << log_ID << " - resample_ratio:" << paramsd["resample_ratio"];
-    yInfo() << log_ID << " - prior_ratio:"    << paramsd["prior_ratio"];
+    
+    if (paramsd["resample_prior"] == 1.0)
+    {
+        yInfo() << log_ID << "Resampling with prior parameters:";
+        yInfo() << log_ID << " - prior_ratio:" << paramsd["prior_ratio"];
+    }
 
-    yInfo() << log_ID << " - gate_x:"        << paramsd["gate_x"];
-    yInfo() << log_ID << " - gate_y:"        << paramsd["gate_y"];
-    yInfo() << log_ID << " - gate_z:"        << paramsd["gate_z"];
-    yInfo() << log_ID << " - gate_aperture:" << paramsd["gate_aperture"];
-    yInfo() << log_ID << " - gate_rotation:" << paramsd["gate_rotation"];
+    if (paramsd["gate_pose"] == 1.0)
+    {
+        yInfo() << log_ID << "Pose gating parameters:";
+        yInfo() << log_ID << " - gate_x:"        << paramsd["gate_x"];
+        yInfo() << log_ID << " - gate_y:"        << paramsd["gate_y"];
+        yInfo() << log_ID << " - gate_z:"        << paramsd["gate_z"];
+        yInfo() << log_ID << " - gate_aperture:" << paramsd["gate_aperture"];
+        yInfo() << log_ID << " - gate_rotation:" << paramsd["gate_rotation"];
+    }
 
 
     /* INITIALIZATION */

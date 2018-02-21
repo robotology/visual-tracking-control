@@ -20,12 +20,16 @@ PlayGatePose::PlayGatePose(std::unique_ptr<PFVisualCorrection> visual_correction
                            const double gate_x, const double gate_y, const double gate_z,
                            const double gate_rotation,
                            const double gate_aperture,
-                           const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
+                           const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality,
+                           const yarp::os::ConstString& port_prefix) noexcept :
     GatePose(std::move(visual_correction),
              gate_x, gate_y, gate_z,
              gate_rotation,
              gate_aperture),
-    icub_kin_arm_(iCubArm(laterality + "_v2")), robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
+    port_prefix_(port_prefix),
+    icub_kin_arm_(iCubArm(laterality + "_v2")),
+    robot_(robot),
+    laterality_(laterality)
 {
     icub_kin_arm_.setAllConstraints(false);
     icub_kin_arm_.releaseLink(0);
@@ -42,7 +46,8 @@ PlayGatePose::PlayGatePose(std::unique_ptr<PFVisualCorrection> visual_correction
 
 
 PlayGatePose::PlayGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
-                           const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept :
+                           const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality,
+                           const yarp::os::ConstString& port_prefix) noexcept :
     PlayGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30, robot, laterality, port_prefix) { }
 
 

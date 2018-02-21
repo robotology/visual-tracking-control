@@ -17,10 +17,12 @@ public:
                  const double gate_x, const double gate_y, const double gate_z,
                  const double gate_aperture,
                  const double gate_rotation,
-                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality,
+                 const yarp::os::ConstString& port_prefix) noexcept;
 
     PlayGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
-                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality,
+                 const yarp::os::ConstString& port_prefix) noexcept;
 
     /* Destructor */
     ~PlayGatePose() noexcept override;

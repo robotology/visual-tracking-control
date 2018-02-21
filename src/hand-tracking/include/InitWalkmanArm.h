@@ -12,7 +12,8 @@
 class InitWalkmanArm : public InitPoseParticles
 {
 public:
-    InitWalkmanArm(const yarp::os::ConstString& port_prefix, const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality) noexcept;
+    InitWalkmanArm(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality,
+                   const yarp::os::ConstString& port_prefix) noexcept;
 
     InitWalkmanArm(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality) noexcept;
 

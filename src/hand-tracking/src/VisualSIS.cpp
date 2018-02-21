@@ -30,7 +30,7 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIS::VisualSIS(const yarp::os::ConstString& cam_sel,
+VisualSIS::VisualSIS(const ConstString& cam_sel,
                      const int img_width, const int img_height,
                      const int num_particles,
                      const double resample_ratio,
