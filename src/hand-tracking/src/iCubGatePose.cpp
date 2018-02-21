@@ -35,7 +35,7 @@ iCubGatePose::iCubGatePose(std::unique_ptr<PFVisualCorrection> visual_correction
 
     Property opt_arm_enc;
     opt_arm_enc.put("device", "remote_controlboard");
-    opt_arm_enc.put("local",  "/hand-tracking/" + ID_ + "/" + port_prefix + "/control_" + laterality_ + "_arm");
+    opt_arm_enc.put("local",  "/" + port_prefix_ + "/control_" + laterality_ + "_arm");
     opt_arm_enc.put("remote", "/" + robot_ + "/" + laterality_ + "_arm");
 
     yInfo() << log_ID_ << "Opening " + laterality_ + " arm remote_controlboard driver...";
@@ -66,7 +66,7 @@ iCubGatePose::iCubGatePose(std::unique_ptr<PFVisualCorrection> visual_correction
 
     Property opt_torso_enc;
     opt_torso_enc.put("device", "remote_controlboard");
-    opt_torso_enc.put("local",  "/hand-tracking/" + ID_ + "/" + port_prefix + "/control_torso");
+    opt_torso_enc.put("local",  "/" + port_prefix_ + "/control_torso");
     opt_torso_enc.put("remote", "/" + robot_ + "/torso");
 
     yInfo() << log_ID_ << "Opening torso remote_controlboard driver...";

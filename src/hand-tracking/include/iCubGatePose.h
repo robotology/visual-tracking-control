@@ -39,12 +39,11 @@ protected:
     yarp::sig::Vector readTorso();
 
 private:
-    const yarp::os::ConstString ID_     = "iCubGatePose";
-    const yarp::os::ConstString log_ID_ = "[" + ID_ + "]";
+    const yarp::os::ConstString log_ID_ = "[iCubGatePose]";
+    yarp::os::ConstString port_prefix_ = "iCubGatePose";
 
     yarp::os::ConstString robot_;
     yarp::os::ConstString laterality_;
-    yarp::os::ConstString port_prefix_;
 };
 
 #endif /* ICUBGATEPOSE_H */
