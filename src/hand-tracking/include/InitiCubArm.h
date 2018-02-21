@@ -13,7 +13,8 @@
 class InitiCubArm : public InitPoseParticles
 {
 public:
-    InitiCubArm(const yarp::os::ConstString& port_prefix, const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality) noexcept;
+    InitiCubArm(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality,
+                const yarp::os::ConstString& port_prefix) noexcept;
 
     InitiCubArm(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality) noexcept;
 
@@ -23,8 +24,10 @@ protected:
     Eigen::VectorXd readPose() override;
 
 private:
+    const yarp::os::ConstString  log_ID_ = "[InitiCubArm]";
+    yarp::os::ConstString port_prefix_;
+
     iCub::iKin::iCubArm                      icub_kin_arm_;
-    iCub::iKin::iCubFinger                   icub_kin_finger_[3];
     yarp::os::BufferedPort<yarp::os::Bottle> port_torso_enc_;
     yarp::os::BufferedPort<yarp::os::Bottle> port_arm_enc_;
 

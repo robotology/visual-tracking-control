@@ -12,21 +12,18 @@ using namespace yarp::sig;
 using namespace yarp::os;
 
 
-InitiCubArm::InitiCubArm(const ConstString& port_prefix, const ConstString& cam_sel, const ConstString& laterality) noexcept :
-    icub_kin_arm_(iCubArm(laterality + "_v2")),
-    icub_kin_finger_{iCubFinger(laterality + "_thumb"), iCubFinger(laterality + "_index"), iCubFinger(laterality + "_middle")}
+InitiCubArm::InitiCubArm(const ConstString& cam_sel, const ConstString& laterality,
+                         const ConstString& port_prefix) noexcept :
+    port_prefix_(port_prefix),
+    icub_kin_arm_(iCubArm(laterality + "_v2"))
 {
     icub_kin_arm_.setAllConstraints(false);
     icub_kin_arm_.releaseLink(0);
     icub_kin_arm_.releaseLink(1);
     icub_kin_arm_.releaseLink(2);
 
-    icub_kin_finger_[0].setAllConstraints(false);
-    icub_kin_finger_[1].setAllConstraints(false);
-    icub_kin_finger_[2].setAllConstraints(false);
-
-    port_arm_enc_.open  ("/" + port_prefix + "/cam/" + cam_sel + "/" + laterality + "_arm:i");
-    port_torso_enc_.open("/" + port_prefix + "/cam/" + cam_sel + "/torso:i");
+    port_arm_enc_.open  ("/" + port_prefix_ + "/" + laterality + "_arm:i");
+    port_torso_enc_.open("/" + port_prefix_ + "/torso:i");
 }
 
 
