@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+<application>
+
+  <!-- GENERIC INFORMATION -->
+  <name>hand-tracking-Walkman-BATCH</name>
+  <description>Offline visual hand tracking for the Walkman robot using a 3D model-aided particle filter</description>
+  <version>0.5.0.0</version>
+
+  <authors>
+    <author email="claudio.fantacci@iit.it">Claudio Fantacci</author>
+  </authors>
+
+
+  <!-- REQUIRED MODULES -->
+  <module>
+    <name>hand-tracking</name>
+    <parameters>--robot walkman --play --cam left</parameters>
+    <node>localhost</node>
+  </module>
+
+  <!--module>
+    <name>hand-tracking</name>
+    <parameters>--robot walkman --play --cam right</parameters>
+    <node>localhost</node>
+  </module-->
+
+  <module>
+    <name>yarpdataplayer</name>
+    <node>localhost</node>
+  </module>
+
+  <module>
+    <name>yarpview</name>
+    <node>localhost</node>
+  </module>
+
+
+  <!-- REQUIRED CONNECTIONS -->
+  <!-- Particle filter connections -->
+  <connection>
+    <from>/rosImg2yarpImg/img:o</from>
+    <to>/handTracking/VisualSIS/left/img:i</to>
+    <protocol>mcast</protocol>
+  </connection>
+
+  <!--connection>
+    <from>/rosImg2yarpImg/img:o</from>
+    <to>/handTracking/VisualSIS/left/img:i</to>
+    <protocol>mcast</protocol>
+  </connection-->
+
+  <!-- Initialitazion connections -->
+  <connection>
+    <from>/tf2yarp/transform:W_T_rHand:o</from>
+    <to>/handTracking/InitWalkmanArm/left/right_arm:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!--connection>
+    <from>/tf2yarp/transform:W_T_rHand:o</from>
+    <to>/handTracking/InitWalkmanArm/right/right_arm:i</to>
+    <protocol>tcp</protocol>
+  </connection-->
+
+  <!-- Motion model connections -->
+  <connection>
+    <from>/tf2yarp/transform:W_T_rHand:o</from>
+    <to>/handTracking/PlayWalkmanPoseModel/left/right_arm:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!--connection>
+    <from>/tf2yarp/transform:W_T_rHand:o</from>
+    <to>/handTracking/PlayWalkmanPoseModel/right/right_arm:i</to>
+    <protocol>tcp</protocol>
+  </connection-->
+
+  <!-- VisualProprioception connections -->
+  <connection>
+    <from>/tf2yarp/transform:W_T_lCamera:o</from>
+    <to>/handTracking/VisualProprioception/WalkmanCamera/left/camera_pose:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!--connection>
+    <from>/tf2yarp/transform:W_T_rCamera:o</from>
+    <to>/handTracking/VisualProprioception/WalkmanCamera/right/camera_pose:i</to>
+    <protocol>tcp</protocol>
+  </connection-->
+
+  <!-- ResamplingWithPrior connections -->
+  <connection>
+    <from>/tf2yarp/transform:W_T_rHand:o</from>
+    <to>/handTracking/ResamplingWithPrior/InitWalkmanArm/left/right_arm:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!--connection>
+    <from>/tf2yarp/transform:W_T_rHand:o</from>
+    <to>/handTracking/ResamplingWithPrior/InitWalkmanArm/left/right_arm:i</to>
+    <protocol>tcp</protocol>
+  </connection-->
+
+
+  <!-- Visualization via yarpview -->
+  <connection>
+    <from>/handTracking/VisualSIS/left/img:o</from>
+    <to>/yarpview/img:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+</application>
