@@ -17,6 +17,9 @@
 #include <yarp/math/Math.h>
 #include <yarp/os/Time.h>
 
+#include <SuperimposeMesh/SICAD.h>
+#include <VisualProprioception.h>
+
 using namespace bfl;
 using namespace cv;
 using namespace Eigen;
@@ -56,6 +59,8 @@ VisualSIS::VisualSIS(const ConstString& cam_sel,
 
     img_in_.resize(320, 240);
     img_in_.zero();
+
+    port_image_out_.open("/" + port_prefix_ + "/img:o");
 
     setCommandPort();
 }
@@ -201,6 +206,21 @@ void VisualSIS::filteringStep()
         estimates_out.resize(7);
         toEigen(estimates_out) = out_particle.cast<double>();
         port_estimates_out_.write();
+
+        /* STATE ESTIMATE OUTPUT */
+        Superimpose::ModelPoseContainer hand_pose;
+        Superimpose::ModelPose          pose;
+        ImageOf<PixelRgb>& img_out = port_image_out_.prepare();
+
+        pose.assign(out_particle.data(), out_particle.data() + 3);
+        pose.insert(pose.end(), out_particle.data() + 3, out_particle.data() + 7);
+        hand_pose.emplace("palm", pose);
+
+        dynamic_cast<VisualProprioception*>(&correction_->getVisualObservationModel())->superimpose(hand_pose, measurement);
+
+        img_out.setExternal(measurement.ptr(), img_width_, img_height_);
+
+        port_image_out_.write();
         /* ********** */
     }
 }

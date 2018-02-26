@@ -102,6 +102,9 @@ private:
 
     bool init_img_in_ = false;
     yarp::sig::ImageOf<yarp::sig::PixelRgb> img_in_;
+
+    /* Add to debug Walkman */
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_;
 };
 
 #endif /* VISUALSIS_H */

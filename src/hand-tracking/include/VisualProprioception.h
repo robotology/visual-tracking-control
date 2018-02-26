@@ -36,6 +36,9 @@ public:
     float getCamCx();
     float getCamCy();
 
+    /* For debugging walkman */
+    void superimpose(const Superimpose::ModelPoseContainer& obj2pos_map, cv::Mat& img);
+
 protected:
     std::string log_ID_ = "[VisualProprioception]";
 

@@ -118,3 +118,15 @@ float VisualProprioception::getCamCy()
 {
     return cam_params_.cy;
 }
+
+
+void VisualProprioception::superimpose(const Superimpose::ModelPoseContainer& obj2pos_map, Mat& img)
+{
+    si_cad_->setBackgroundOpt(true);
+    si_cad_->setWireframeOpt(true);
+
+    si_cad_->superimpose(obj2pos_map, cam_x_.data(), cam_o_.data(), img);
+
+    si_cad_->setBackgroundOpt(false);
+    si_cad_->setWireframeOpt(false);
+}
