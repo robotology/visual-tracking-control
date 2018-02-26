@@ -57,7 +57,7 @@ VisualSIS::VisualSIS(const ConstString& cam_sel,
     port_image_in_.open     ("/" + port_prefix_ + "/img:i");
     port_estimates_out_.open("/" + port_prefix_ + "/estimates:o");
 
-    img_in_.resize(320, 240);
+    img_in_.resize(img_width_, img_height_);
     img_in_.zero();
 
     port_image_out_.open("/" + port_prefix_ + "/img:o");
