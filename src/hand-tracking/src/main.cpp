@@ -104,7 +104,10 @@ int main(int argc, char *argv[])
     paramsd["prior_ratio"]    = rf.findGroup("RESAMPLING").check("prior_ratio",    Value(0.5)).asDouble();
 
     FilteringParamtersS paramss;
-    paramss["robot"] = rf.findGroup("PF").check("robot", Value("icub")).asString();
+    if (rf.check("robot"))
+        paramss["robot"] = rf.find("robot").asString();
+    else
+        paramss["robot"] = rf.findGroup("PF").check("robot", Value("icub")).asString();
 
     if (paramss["robot"] != "icub" && paramss["robot"] != "walkman")
     {
@@ -193,13 +196,13 @@ int main(int argc, char *argv[])
     else if (paramss["robot"] == "walkman")
     {
         if (paramsd["play"] != 1.0)
-            robot_motion = std::unique_ptr<PlayWalkmanPoseModel>(new PlayWalkmanPoseModel(paramss["robot"], paramss["laterality"],
-                                                                                          "handTracking/PlayWalkmanPoseModel/" + paramss["cam_sel"]));
-        else
         {
             yError() << log_ID << "Pose model method for Walkman is unimplemented.";
             return EXIT_FAILURE;
         }
+        else
+            robot_motion = std::unique_ptr<PlayWalkmanPoseModel>(new PlayWalkmanPoseModel(paramss["robot"], paramss["laterality"],
+                                                                                          "handTracking/PlayWalkmanPoseModel/" + paramss["cam_sel"]));
     }
     else
     {
