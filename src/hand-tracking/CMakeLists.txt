@@ -16,7 +16,7 @@ if(NOT BayesFilters_FOUND)
     find_package(SuperimposeMesh 0.9.104.0 REQUIRED)
 endif()
 
-LIST(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
+list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
                               ${ICUB_MODULE_PATH})
 
 include(YarpInstallationHelpers)
