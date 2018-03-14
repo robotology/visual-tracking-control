@@ -49,7 +49,7 @@ void VisualProprioception::observe(const Ref<const MatrixXf>& cur_states, Output
 {
     bool success = false;
     std::vector<Superimpose::ModelPoseContainer> hand_poses;
-    
+
     std::tie(success, hand_poses)     = mesh_model_->getModelPose(cur_states);
     std::tie(success, cam_x_, cam_o_) = camera_->getCameraPose();
 

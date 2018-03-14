@@ -216,7 +216,7 @@ void VisualSIS::filteringStep()
         pose.insert(pose.end(), out_particle.data() + 3, out_particle.data() + 7);
         hand_pose.emplace("palm", pose);
 
-        dynamic_cast<VisualProprioception*>(&correction_->getVisualObservationModel())->superimpose(hand_pose, measurement);
+        dynamic_cast<VisualProprioception*>(&dynamic_cast<VisualUpdateParticles*>(correction_.get())->getVisualObservationModel())->superimpose(hand_pose, measurement);
 
         img_out.setExternal(measurement.ptr(), img_width_, img_height_);
 
