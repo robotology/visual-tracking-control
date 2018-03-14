@@ -39,18 +39,6 @@ double GatePose::likelihood(const Ref<const MatrixXf>& innovations)
 }
 
 
-VisualObservationModel& GatePose::getVisualObservationModel()
-{
-    return PFVisualCorrectionDecorator::getVisualObservationModel();
-}
-
-
-void GatePose::setVisualObservationModel(std::unique_ptr<VisualObservationModel> visual_observation_model)
-{
-    PFVisualCorrectionDecorator::setVisualObservationModel(std::move(visual_observation_model));
-}
-
-
 void GatePose::correctStep(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
                            Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
 {

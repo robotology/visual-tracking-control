@@ -127,16 +127,6 @@ bfl::VisualObservationModel& VisualUpdateParticles::getVisualObservationModel()
 }
 
 
-void VisualUpdateParticles::setVisualObservationModel(std::unique_ptr<VisualObservationModel> visual_observation_model)
-{
-    throw std::runtime_error("ERROR::VISUALUPDATEPARTICLES::SETVISUALOBSERVATIONMODEL\nERROR:\n\tClass under development. Do not invoke this method.");
-
-    VisualObservationModel* tmp_observation_model = visual_observation_model.release();
-
-    observation_model_ = std::unique_ptr<VisualProprioception>(dynamic_cast<VisualProprioception*>(tmp_observation_model));
-}
-
-
 void VisualUpdateParticles::correctStep(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
                                         Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
 {

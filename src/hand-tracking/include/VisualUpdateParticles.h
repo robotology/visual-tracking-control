@@ -27,9 +27,7 @@ public:
 
     double likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovations) override;
 
-    bfl::VisualObservationModel& getVisualObservationModel() override;
-
-    void setVisualObservationModel(std::unique_ptr<bfl::VisualObservationModel> visual_observation_model) override;
+    bfl::VisualObservationModel& getVisualObservationModel();
 
 protected:
     void correctStep(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, const Eigen::Ref<const Eigen::VectorXf>& pred_weights, cv::InputArray measurements,

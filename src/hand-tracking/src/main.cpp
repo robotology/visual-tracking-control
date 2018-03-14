@@ -194,6 +194,10 @@ int main(int argc, char *argv[])
 
     if (paramsd["gate_pose"] == 1.0)
     {
+        std::cerr << "GatePose is disabled due to a change in the interface!" << std::endl;
+
+        return EXIT_FAILURE;
+
         if (paramsd["play"] != 1.0)
         {
             std::unique_ptr<iCubGatePose> icub_gate_pose(new iCubGatePose(std::move(vpf_update_particles),
