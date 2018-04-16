@@ -9,7 +9,7 @@ The suite includes:
 
 The output of the hand-tracking application can be visualized by means of the [iCubProprioception](https://github.com/claudiofantacci/iCubProprioception) module. iCubProprioception provides an augmented-reality application which superimposes the 3D model of the end-effector onto the camera images, using the estimated pose provided by hand-tracking.
 
-[![visual-tracking-control home](https://img.shields.io/badge/Visual%20Tracking%20Control-Home%20%26%20Doc-E0C57F.svg?style=flat-square)](https://robotology.github.io/visual-tracking-control/doxygen/doc/html/index.html)
+[![visual-tracking-control home](https://img.shields.io/badge/Visual%20Tracking%20Control-Home%20%26%20Doc-E0C57F.svg?style=flat-square)](https://robotology.github.io/visual-tracking-control/doxygen/doc/html/index.html) [![ZenHub](https://img.shields.io/badge/Shipping_faster_with-ZenHub-blue.svg?style=flat-square)](https://zenhub.com)
 
 
 # Overview
