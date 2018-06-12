@@ -1,6 +1,6 @@
 set(EXE_TARGET_NAME reaching)
 
-find_package(glew            REQUIRED)
+find_package(glew            REQUIRED CONFIG)
 find_package(ICUB            REQUIRED)
 find_package(OpenCV          REQUIRED)
 find_package(SuperimposeMesh REQUIRED)
@@ -17,16 +17,20 @@ set(${EXE_TARGET_NAME}_SRC
 
 add_executable(${EXE_TARGET_NAME} ${${EXE_TARGET_NAME}_SRC})
 
-target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                                                      ${ICUB_INCLUDE_DIRS}
-                                                      ${YARP_INCLUDE_DIRS})
+target_include_directories(${EXE_TARGET_NAME}
+                           PRIVATE
+                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                               ${ICUB_INCLUDE_DIRS}
+                               ${YARP_INCLUDE_DIRS})
 
-target_link_libraries(${EXE_TARGET_NAME} ctrlLib
-                                         ${ICUB_LIBRARIES}
-                                         iKin
-                                         ${OpenCV_LIBS}
-                                         SuperimposeMesh::SuperimposeMesh
-                                         ${YARP_LIBRARIES})
+target_link_libraries(${EXE_TARGET_NAME}
+                      PRIVATE
+                          ctrlLib
+                          ${ICUB_LIBRARIES}
+                          iKin
+                          ${OpenCV_LIBS}
+                          SuperimposeMesh::SuperimposeMesh
+                          ${YARP_LIBRARIES})
 
 set(${EXE_TARGET_NAME}_APP
         ${PROJECT_SOURCE_DIR}/app/reaching.xml
