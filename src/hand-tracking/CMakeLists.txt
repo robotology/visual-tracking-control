@@ -5,11 +5,13 @@ find_package(Eigen3 REQUIRED CONFIG)
 find_package(ICUB   REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(YARP   REQUIRED)
+
 find_package(BayesFilters 0.7.0.0 QUIET)
 if(NOT BayesFilters_FOUND)
     message(STATUS "Did not found required master release of BayesFilters. Looking for devel version.")
     find_package(BayesFilters 0.7.100.0 REQUIRED)
 endif()
+
 find_package(SuperimposeMesh 0.9.4.0 QUIET)
 if(NOT SuperimposeMesh_FOUND)
     message(STATUS "Did not found required master release of SuperimposeMesh. Looking for devel version.")
@@ -82,6 +84,16 @@ target_include_directories(${EXE_TARGET_NAME}
                                ${ICUB_INCLUDE_DIRS}
                                ${YARP_INCLUDE_DIRS})
 
+target_link_libraries(${EXE_TARGET_NAME}
+                      PRIVATE
+                          BayesFilters::BayesFilters
+                          ctrlLib
+                          Eigen3::Eigen
+                          ${ICUB_LIBRARIES}
+                          iKin
+                          ${OpenCV_LIBS}
+                          SuperimposeMesh::SuperimposeMesh
+                          ${YARP_LIBRARIES})
 if(UNIX AND NOT APPLE)
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set(THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -89,26 +101,21 @@ if(UNIX AND NOT APPLE)
 
     target_link_libraries(${EXE_TARGET_NAME}
                           PRIVATE
-                              BayesFilters::BayesFilters
-                              ctrlLib
-                              Eigen3::Eigen
-                              ${ICUB_LIBRARIES}
-                              iKin
-                              ${OpenCV_LIBS}
-                              SuperimposeMesh::SuperimposeMesh
-                              Threads::Threads
-                              ${YARP_LIBRARIES})
+                              Threads::Threads)
+endif()
+
+if(DEFINED OpenCV_CUDA_VERSION)
+    message(STATUS "Found OpenCV with CUDA compiled modules.")
+    message(STATUS "Set macro HANDTRACKING_USE_OPENCV_CUDA = 1.")
+    target_compile_definitions(${EXE_TARGET_NAME}
+                               PRIVATE
+                                   HANDTRACKING_USE_OPENCV_CUDA=1)
 else()
-    target_link_libraries(${EXE_TARGET_NAME}
-                          PRIVATE
-                              BayesFilters::BayesFilters
-                              ctrlLib
-                              Eigen3::Eigen
-                              ${ICUB_LIBRARIES}
-                              iKin
-                              ${OpenCV_LIBS}
-                              SuperimposeMesh::SuperimposeMesh
-                              ${YARP_LIBRARIES})
+    message(STATUS "Found no OpenCV CUDA compiled modules.")
+    message(STATUS "Set macro HANDTRACKING_USE_OPENCV_CUDA = 0.")
+    target_compile_definitions(${EXE_TARGET_NAME}
+                               PRIVATE
+                                   HANDTRACKING_USE_OPENCV_CUDA=0)
 endif()
 
 
