@@ -2,7 +2,6 @@
 #include <VisualUpdateParticles.h>
 
 #include <exception>
-#include <iostream>
 #include <utility>
 
 #include <Eigen/Dense>
@@ -15,6 +14,7 @@
 #include <opencv2/cudawarping.hpp>
 #include <yarp/eigen/Eigen.h>
 #include <yarp/math/Math.h>
+#include <yarp/os/LogStream.h>
 #include <yarp/os/Time.h>
 
 #include <SuperimposeMesh/SICAD.h>
@@ -33,11 +33,11 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIS::VisualSIS(const ConstString& cam_sel,
+VisualSIS::VisualSIS(const std::string& cam_sel,
                      const int img_width, const int img_height,
                      const int num_particles,
                      const double resample_ratio,
-                     const ConstString& port_prefix) :
+                     const std::string& port_prefix) :
     port_prefix_(port_prefix),
     cam_sel_(cam_sel),
     img_width_(img_width),
@@ -45,8 +45,18 @@ VisualSIS::VisualSIS(const ConstString& cam_sel,
     num_particles_(num_particles),
     resample_ratio_(resample_ratio)
 {
-    descriptor_length_ = (img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4;
+    /* Page locked dovrebbe essere più veloce da utilizzate con CUDA, non sembra essere il caso. */
+    //Mat::setDefaultAllocator(cuda::HostMem::getAllocator(cuda::HostMem::PAGE_LOCKED));
 
+    cuda::DeviceInfo gpu_dev;
+    yInfo() << log_ID_ << "[CUDA] Engine capability:" << gpu_engine_count_to_string(gpu_dev.asyncEngineCount());
+    yInfo() << log_ID_ << "[CUDA] Can have concurrent kernel:" << gpu_dev.concurrentKernels();
+    yInfo() << log_ID_ << "[CUDA] Streaming multiprocessor count:" << gpu_dev.multiProcessorCount();
+    yInfo() << log_ID_ << "[CUDA] Can map host memory:" << gpu_dev.canMapHostMemory();
+    yInfo() << log_ID_ << "[CUDA] Clock:" << gpu_dev.clockRate() << "KHz";
+
+
+    descriptor_length_ = (img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4;
 
     cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
     cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
@@ -136,11 +146,11 @@ void VisualSIS::filteringStep()
 
 
         /* RESAMPLING */
-        std::cout << "Step: " << getFilteringStep() << std::endl;
-        std::cout << "Neff: " << resampling_->neff(cor_weight_) << std::endl;
+        yInfo() << log_ID_ << "Step:" << getFilteringStep();
+        yInfo() << log_ID_ << "Neff:" << resampling_->neff(cor_weight_);
         if (resampling_->neff(cor_weight_) < std::round(num_particles_ * resample_ratio_))
         {
-            std::cout << "Resampling!" << std::endl;
+            yInfo() << log_ID_ << "Resampling!";
 
             MatrixXf res_particle(7, num_particles_);
             VectorXf res_weight(num_particles_, 1);
@@ -237,18 +247,18 @@ bool VisualSIS::attach(yarp::os::Port &source)
 
 bool VisualSIS::setCommandPort()
 {
-    std::cout << "Opening RPC command port." << std::endl;
+    yInfo() << log_ID_ << "Opening RPC command port.";
     if (!port_rpc_command_.open("/" + port_prefix_ + "/cmd:i"))
     {
-        std::cerr << "Cannot open the RPC command port." << std::endl;
+        yError() << log_ID_ << "Cannot open the RPC command port.";
         return false;
     }
     if (!attach(port_rpc_command_))
     {
-        std::cerr << "Cannot attach the RPC command port." << std::endl;
+        yError() << log_ID_ << "Cannot attach the RPC command port.";
         return false;
     }
-    std::cout << "RPC command port opened and attached. Ready to recieve commands!" << std::endl;
+    yInfo() << log_ID_ << "RPC command port opened and attached. Ready to recieve commands!";
 
     return true;
 }
@@ -378,4 +388,13 @@ bool VisualSIS::set_mobile_average_window(const int16_t window)
 bool VisualSIS::quit()
 {
     return teardown();
+}
+
+
+std::string VisualSIS::gpu_engine_count_to_string(const int engine_count) const
+{
+    if (engine_count == 0) return "concurrency is unsupported on this device";
+    if (engine_count == 1) return "the device can concurrently copy memory between host and device while executing a kernel";
+    if (engine_count == 2) return "the device can concurrently copy memory between host and device in both directions and execute a kernel at the same time";
+    return "wrong argument...!";
 }
