@@ -1,12 +1,20 @@
 set(EXE_TARGET_NAME hand-tracking)
 
 # Dependencies
-find_package(BayesFilters    REQUIRED)
-find_package(Eigen3          REQUIRED CONFIG)
-find_package(ICUB            REQUIRED)
-find_package(OpenCV          REQUIRED)
-find_package(SuperimposeMesh REQUIRED)
-find_package(YARP            REQUIRED)
+find_package(Eigen3 REQUIRED CONFIG)
+find_package(ICUB   REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(YARP   REQUIRED)
+find_package(BayesFilters 0.7.0.0 QUIET)
+if(NOT BayesFilters_FOUND)
+    message(STATUS "Did not found required master release of BayesFilters. Looking for devel version.")
+    find_package(BayesFilters 0.7.100.0 REQUIRED)
+endif()
+find_package(SuperimposeMesh 0.9.4.0 QUIET)
+if(NOT BayesFilters_FOUND)
+    message(STATUS "Did not found required master release of SuperimposeMesh. Looking for devel version.")
+    find_package(SuperimposeMesh 0.9.104.0 REQUIRED)
+endif()
 
 LIST(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
                               ${ICUB_MODULE_PATH})
@@ -49,36 +57,42 @@ set(${EXE_TARGET_NAME}_THRIFT_HDR
 # Application target calls
 yarp_add_idl(${EXE_TARGET_NAME}_THRIFT_SRC ${${EXE_TARGET_NAME}_THRIFT_HDR})
 
-add_executable(${EXE_TARGET_NAME}   ${${EXE_TARGET_NAME}_HDR} ${${EXE_TARGET_NAME}_SRC}
-                                    ${${EXE_TARGET_NAME}_THRIFT_SRC})
+add_executable(${EXE_TARGET_NAME} ${${EXE_TARGET_NAME}_HDR} ${${EXE_TARGET_NAME}_SRC}
+                                  ${${EXE_TARGET_NAME}_THRIFT_SRC})
 
-target_include_directories(${EXE_TARGET_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                                                      ${ICUB_INCLUDE_DIRS}
-                                                      ${YARP_INCLUDE_DIRS})
+target_include_directories(${EXE_TARGET_NAME}
+                           PRIVATE
+                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                               ${ICUB_INCLUDE_DIRS}
+                               ${YARP_INCLUDE_DIRS})
 
 if(UNIX AND NOT APPLE)
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set(THREADS_PREFER_PTHREAD_FLAG TRUE)
     find_package(Threads REQUIRED)
 
-    target_link_libraries(${EXE_TARGET_NAME} PRIVATE BayesFilters::BayesFilters
-                                                     ctrlLib
-                                                     Eigen3::Eigen
-                                                     ${ICUB_LIBRARIES}
-                                                     iKin
-                                                     ${OpenCV_LIBS}
-                                                     SuperimposeMesh::SuperimposeMesh
-                                                     Threads::Threads
-                                                     ${YARP_LIBRARIES})
+    target_link_libraries(${EXE_TARGET_NAME}
+                          PRIVATE
+                              BayesFilters::BayesFilters
+                              ctrlLib
+                              Eigen3::Eigen
+                              ${ICUB_LIBRARIES}
+                              iKin
+                              ${OpenCV_LIBS}
+                              SuperimposeMesh::SuperimposeMesh
+                              Threads::Threads
+                              ${YARP_LIBRARIES})
 else()
-    target_link_libraries(${EXE_TARGET_NAME} PRIVATE BayesFilters::BayesFilters
-                                                     ctrlLib
-                                                     Eigen3::Eigen
-                                                     ${ICUB_LIBRARIES}
-                                                     iKin
-                                                     ${OpenCV_LIBS}
-                                                     SuperimposeMesh::SuperimposeMesh
-                                                     ${YARP_LIBRARIES})
+    target_link_libraries(${EXE_TARGET_NAME}
+                          PRIVATE
+                              BayesFilters::BayesFilters
+                              ctrlLib
+                              Eigen3::Eigen
+                              ${ICUB_LIBRARIES}
+                              iKin
+                              ${OpenCV_LIBS}
+                              SuperimposeMesh::SuperimposeMesh
+                              ${YARP_LIBRARIES})
 endif()
 
 
@@ -92,10 +106,12 @@ set(${EXE_TARGET_NAME}_CONF
         ${CMAKE_CURRENT_SOURCE_DIR}/conf/config.ini)
 
 set(${EXE_TARGET_NAME}_SHADER_VERT
+        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_frame.vert
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.vert
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_background.vert)
 
 set(${EXE_TARGET_NAME}_SHADER_FRAG
+        ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_frame.frag
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.frag
         ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_background.frag)
 
