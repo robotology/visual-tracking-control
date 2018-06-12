@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 
     yInfo() << log_ID << "Resampling parameters:";
     yInfo() << log_ID << " - resample_ratio:" << paramsd["resample_ratio"];
-    
+
     if (paramsd["resample_prior"] == 1.0)
     {
         yInfo() << log_ID << "Resampling with prior parameters:";
