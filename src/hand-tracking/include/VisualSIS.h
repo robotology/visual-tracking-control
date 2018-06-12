@@ -10,7 +10,11 @@
 #include <BayesFilters/VisualParticleFilter.h>
 #include <Eigen/Dense>
 #include <iCub/iKin/iKinFwd.h>
+#ifdef HANDTRACKING_USE_OPENCV_CUDA
 #include <opencv2/cudaobjdetect.hpp>
+#else
+#include <opencv2/objdetect.hpp>
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 #include <thrift/VisualSISParticleFilterIDL.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IAnalogSensor.h>
@@ -48,13 +52,17 @@ protected:
     int          img_width_;
     int          img_height_;
     int          num_particles_;
-    unsigned int descriptor_length_;
     double       resample_ratio_;
+    unsigned int descriptor_length_;
 
     const int block_size_ = 16;
     const int bin_number_ = 9;
 
-    cv::Ptr<cv::cuda::HOG> cuda_hog_;
+#ifdef HANDTRACKING_USE_OPENCV_CUDA
+    cv::Ptr<cv::cuda::HOG> hog_cuda_;
+#else
+    std::unique_ptr<cv::HOGDescriptor> hog_cpu_;
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 
 
     yarp::os::BufferedPort<yarp::sig::Vector>                       port_estimates_out_;
@@ -66,19 +74,19 @@ protected:
     bool           setCommandPort();
 
 
-    bool                     run_filter() override;
+    bool run_filter() override;
 
-    bool                     reset_filter() override;
+    bool reset_filter() override;
 
-    bool                     stop_filter() override;
+    bool stop_filter() override;
 
-    bool                     skip_step(const std::string& what_step, const bool status) override;
+    bool skip_step(const std::string& what_step, const bool status) override;
 
-    bool                     use_analogs(const bool status) override;
+    bool use_analogs(const bool status) override;
 
     std::vector<std::string> get_info() override;
 
-    bool                     quit() override;
+    bool quit() override;
 
 
     bool set_estimates_extraction_method(const std::string& method) override;
