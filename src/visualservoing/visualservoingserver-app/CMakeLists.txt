@@ -15,9 +15,13 @@ set(${APP_TARGET_NAME}_SRC
 # Application target calls
 add_executable(${APP_TARGET_NAME} ${${APP_TARGET_NAME}_SRC})
 
-target_include_directories(${APP_TARGET_NAME} PRIVATE ${YARP_INCLUDE_DIRS})
+target_include_directories(${APP_TARGET_NAME}
+                           PRIVATE
+                               ${YARP_INCLUDE_DIRS})
 
-target_link_libraries(${APP_TARGET_NAME} PRIVATE ${YARP_LIBRARIES}
-                                                 visualservoingplugin)
+target_link_libraries(${APP_TARGET_NAME}
+                      PRIVATE
+                          ${YARP_LIBRARIES}
+                          visualservoingplugin)
 
 install(TARGETS ${APP_TARGET_NAME} DESTINATION bin)
