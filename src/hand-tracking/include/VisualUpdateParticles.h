@@ -8,8 +8,13 @@
 #include <thread>
 
 #include <BayesFilters/PFVisualCorrection.h>
+#include <opencv2/core/core.hpp>
+#ifdef HANDTRACKING_USE_OPENCV_CUDA
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaobjdetect.hpp>
+#else
+#include <opencv2/objdetect.hpp>
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 
 
 class VisualUpdateParticles : public bfl::PFVisualCorrection
@@ -36,16 +41,20 @@ protected:
     std::unique_ptr<VisualProprioception> observation_model_;
     double                                likelihood_gain_;
 
-    cv::Ptr<cv::cuda::HOG>                cuda_hog_;
+#ifdef HANDTRACKING_USE_OPENCV_CUDA
+    cv::Ptr<cv::cuda::HOG> hog_cuda_;
 
-    const int                             num_cuda_stream_;
-    const int                             num_img_stream_;
-    std::vector<cv::cuda::Stream>         cuda_stream_;
-    std::vector<cv::Mat>                  hand_rendered_;
-    std::vector<cv::cuda::GpuMat>         cuda_img_;
-    std::vector<cv::cuda::GpuMat>         cuda_img_alpha_;
-    std::vector<cv::cuda::GpuMat>         cuda_descriptors_;
-    std::vector<cv::Mat>                  cpu_descriptors_;
+    int                           num_cuda_stream_;
+    int                           num_img_stream_;
+    std::vector<cv::cuda::Stream> cuda_stream_;
+    std::vector<cv::cuda::GpuMat> cuda_img_;
+    std::vector<cv::cuda::GpuMat> cuda_img_alpha_;
+    std::vector<cv::cuda::GpuMat> cuda_descriptors_;
+#else
+    std::unique_ptr<cv::HOGDescriptor> hog_cpu_;
+#endif // HANDTRACKING_USE_OPENCV_CUDA
+    std::vector<cv::Mat> hand_rendered_;
+    std::vector<cv::Mat> cpu_descriptors_;
 
     const int    block_size_ = 16;
     const int    bin_number_ = 9;
