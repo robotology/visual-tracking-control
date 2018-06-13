@@ -275,7 +275,6 @@ int main(int argc, char *argv[])
     else
         vpf_correction = std::move(vpf_update_particles);
 
-
     /* RESAMPLING */
     std::unique_ptr<Resampling> pf_resampling;
     if (paramsd["resample_prior"] != 1.0)
@@ -293,7 +292,6 @@ int main(int argc, char *argv[])
 
         pf_resampling = std::unique_ptr<Resampling>(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
     }
-
 
     /* PARTICLE FILTER */
     VisualSIS vsis_pf(paramss["cam_sel"],
