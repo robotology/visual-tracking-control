@@ -104,14 +104,20 @@ if(UNIX AND NOT APPLE)
                               Threads::Threads)
 endif()
 
-if(DEFINED OpenCV_CUDA_VERSION)
+if(DEFINED OpenCV_CUDA_VERSION AND (NOT DEFINED FORCE_NO_OPENCV_CUDA OR NOT FORCE_NO_OPENCV_CUDA))
     message(STATUS "Found OpenCV with CUDA compiled modules.")
     message(STATUS "Set macro HANDTRACKING_USE_OPENCV_CUDA = 1.")
     target_compile_definitions(${EXE_TARGET_NAME}
                                PRIVATE
                                    HANDTRACKING_USE_OPENCV_CUDA=1)
+
+    option(FORCE_NO_OPENCV_CUDA "Force no OpenCV CUDA compiled modules?" OFF)
 else()
-    message(STATUS "Found no OpenCV CUDA compiled modules.")
+    if(NOT DEFINED FORCE_NO_OPENCV_CUDA)
+        message(STATUS "Found no OpenCV CUDA compiled modules.")
+    else()
+        message(STATUS "Forcing no OpenCV CUDA compiled modules.")
+    endif()
     message(STATUS "Set macro HANDTRACKING_USE_OPENCV_CUDA = 0.")
     target_compile_definitions(${EXE_TARGET_NAME}
                                PRIVATE
