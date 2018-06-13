@@ -159,6 +159,7 @@ set(${EXE_TARGET_NAME}_MESH
 		${CMAKE_CURRENT_SOURCE_DIR}/mesh/walkman_right_arm/soft_hand_open.stl)
 
 add_custom_command(TARGET  ${EXE_TARGET_NAME} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_CONF}        $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
                    COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_SHADER_VERT} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
                    COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_SHADER_FRAG} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
                    COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_MESH}        $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>)
