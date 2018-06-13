@@ -10,7 +10,7 @@
 #include <BayesFilters/VisualParticleFilter.h>
 #include <Eigen/Dense>
 #include <iCub/iKin/iKinFwd.h>
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
 #include <opencv2/cudaobjdetect.hpp>
 #else
 #include <opencv2/objdetect.hpp>
@@ -58,7 +58,7 @@ protected:
     const int block_size_ = 16;
     const int bin_number_ = 9;
 
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
     cv::Ptr<cv::cuda::HOG> hog_cuda_;
 #else
     std::unique_ptr<cv::HOGDescriptor> hog_cpu_;

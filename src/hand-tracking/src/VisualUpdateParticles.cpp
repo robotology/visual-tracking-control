@@ -8,7 +8,7 @@
 #include <vector>
 
 #include <opencv2/core/eigen.hpp>
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
 #include <opencv2/cudaimgproc.hpp>
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 #include <opencv2/imgproc/imgproc.hpp>
@@ -36,7 +36,7 @@ VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioceptio
     ogl_tiles_rows_ = observation_model_->getOGLTilesRows();
     feature_dim_    = (img_width_ / block_size_ * 2 - 1) * (img_height_ / block_size_ * 2 - 1) * bin_number_ * 4;
 
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
     num_cuda_stream_ = num_cuda_stream;
     num_img_stream_ = observation_model_->getOGLTilesNumber();
     cuda_stream_ = std::vector<cuda::Stream>(num_cuda_stream);
@@ -65,7 +65,7 @@ VisualUpdateParticles::~VisualUpdateParticles() noexcept { }
 
 void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, cv::InputArray measurements, Ref<MatrixXf> innovations)
 {
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
     for (int s = 0; s < num_cuda_stream_; ++s)
         observation_model_->observe(pred_states.block(0, s * num_img_stream_, 7, num_img_stream_), hand_rendered_[s]);
 

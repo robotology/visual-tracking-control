@@ -9,7 +9,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaimgproc.hpp>
 #include <opencv2/cudawarping.hpp>
@@ -48,7 +48,7 @@ VisualSIS::VisualSIS(const std::string& cam_sel,
     num_particles_(num_particles),
     resample_ratio_(resample_ratio)
 {
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
     /* Page locked allocator should be faster using CUDA. Apparently it seems not the case. */
     //Mat::setDefaultAllocator(cuda::HostMem::getAllocator(cuda::HostMem::PAGE_LOCKED));
 
@@ -110,7 +110,7 @@ void VisualSIS::filteringStep()
 {
     std::vector<float> descriptors_cam_left(descriptor_length_);
 
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
     cuda::GpuMat cuda_img            (Size(img_width_, img_height_), CV_8UC3);
     cuda::GpuMat cuda_img_alpha      (Size(img_width_, img_height_), CV_8UC4);
     cuda::GpuMat descriptors_cam_cuda(Size(descriptor_length_, 1),   CV_32F );
@@ -130,7 +130,7 @@ void VisualSIS::filteringStep()
         /* PROCESS CURRENT MEASUREMENT */
         Mat measurement = cvarrToMat(img_in_.getIplImage());
 
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
         cuda_img.upload(measurement);
         cuda::resize(cuda_img, cuda_img, Size(img_width_, img_height_));
         cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);

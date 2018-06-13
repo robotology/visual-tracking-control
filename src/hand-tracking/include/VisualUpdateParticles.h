@@ -9,7 +9,7 @@
 
 #include <BayesFilters/PFVisualCorrection.h>
 #include <opencv2/core/core.hpp>
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaobjdetect.hpp>
 #else
@@ -41,7 +41,7 @@ protected:
     std::unique_ptr<VisualProprioception> observation_model_;
     double                                likelihood_gain_;
 
-#ifdef HANDTRACKING_USE_OPENCV_CUDA
+#if HANDTRACKING_USE_OPENCV_CUDA
     cv::Ptr<cv::cuda::HOG> hog_cuda_;
 
     int                           num_cuda_stream_;
