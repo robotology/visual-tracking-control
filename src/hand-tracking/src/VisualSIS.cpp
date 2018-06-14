@@ -13,7 +13,6 @@
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaimgproc.hpp>
 #include <opencv2/cudawarping.hpp>
-#else
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 #include <yarp/eigen/Eigen.h>
 #include <yarp/math/Math.h>
@@ -65,6 +64,12 @@ VisualSIS::VisualSIS(const std::string& cam_sel,
     hog_cuda_->setGammaCorrection(true);
     hog_cuda_->setWinStride(Size(img_width_, img_height_));
 #else
+    hog_cpu_ = std::unique_ptr<HOGDescriptor>(new HOGDescriptor(Size(img_width_, img_height_),
+                                                                Size(block_size_, block_size_),
+                                                                Size(block_size_/2, block_size_/2),
+                                                                Size(block_size_/2, block_size_/2),
+                                                                bin_number_,
+                                                                1, -1.0, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false));
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 
     descriptor_length_ = (img_width_ / block_size_ * 2 - 1) * (img_height_ / block_size_ * 2 - 1) * bin_number_ * 4;
@@ -114,7 +119,6 @@ void VisualSIS::filteringStep()
     cuda::GpuMat cuda_img            (Size(img_width_, img_height_), CV_8UC3);
     cuda::GpuMat cuda_img_alpha      (Size(img_width_, img_height_), CV_8UC4);
     cuda::GpuMat descriptors_cam_cuda(Size(descriptor_length_, 1),   CV_32F );
-#else
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 
     ImageOf<PixelRgb>* tmp_imgin = YARP_NULLPTR;
@@ -137,6 +141,8 @@ void VisualSIS::filteringStep()
         hog_cuda_->compute(cuda_img_alpha, descriptors_cam_cuda);
         descriptors_cam_cuda.download(descriptors_cam_left);
 #else
+        cv::resize(measurement, measurement, Size(img_width_, img_height_));
+        hog_cpu_->compute(measurement, descriptors_cam_left);
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 
         /* PREDICTION */
