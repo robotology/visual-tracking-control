@@ -24,7 +24,7 @@ public:
 
     VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain) noexcept;
 
-    VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_cuda_stream) noexcept;
+    VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_parallel_processor) noexcept;
 
     ~VisualUpdateParticles() noexcept;
 
@@ -41,20 +41,24 @@ protected:
     std::unique_ptr<VisualProprioception> observation_model_;
     double                                likelihood_gain_;
 
+    int num_parallel_processor_;
+    int num_rendered_img_;
+
 #if HANDTRACKING_USE_OPENCV_CUDA
     cv::Ptr<cv::cuda::HOG> hog_cuda_;
 
-    int                           num_cuda_stream_;
-    int                           num_img_stream_;
     std::vector<cv::cuda::Stream> cuda_stream_;
     std::vector<cv::cuda::GpuMat> cuda_img_;
     std::vector<cv::cuda::GpuMat> cuda_img_alpha_;
     std::vector<cv::cuda::GpuMat> cuda_descriptors_;
+    std::vector<cv::Mat>          cpu_descriptors_;
 #else
     std::unique_ptr<cv::HOGDescriptor> hog_cpu_;
+
+    std::vector<std::vector<float>> cpu_descriptors_;
 #endif // HANDTRACKING_USE_OPENCV_CUDA
+
     std::vector<cv::Mat> hand_rendered_;
-    std::vector<cv::Mat> cpu_descriptors_;
 
     const int    block_size_ = 16;
     const int    bin_number_ = 9;
