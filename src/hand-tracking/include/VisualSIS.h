@@ -30,7 +30,8 @@ public:
     VisualSIS(const yarp::os::ConstString& cam_sel,
               const int img_width, const int img_height,
               const int num_particles,
-              const double resample_ratio);
+              const double resample_ratio,
+              const yarp::os::ConstString& port_prefix);
 
     ~VisualSIS() noexcept;
 
@@ -86,6 +87,9 @@ protected:
     bool set_mobile_average_window(const int16_t window) override;
 
 private:
+    const yarp::os::ConstString log_ID_ = "[VisualSIS]";
+    yarp::os::ConstString port_prefix_;
+
     Eigen::MatrixXf pred_particle_;
     Eigen::VectorXf pred_weight_;
 
@@ -98,6 +102,9 @@ private:
 
     bool init_img_in_ = false;
     yarp::sig::ImageOf<yarp::sig::PixelRgb> img_in_;
+
+    /* Add to debug Walkman */
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_;
 };
 
 #endif /* VISUALSIS_H */

@@ -21,12 +21,14 @@ using namespace yarp::sig;
 
 
 iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) :
+    port_prefix_(port_prefix),
     icub_kin_arm_(iCubArm(laterality+"_v2")),
-    robot_(robot), laterality_(laterality), port_prefix_(port_prefix)
+    robot_(robot),
+    laterality_(laterality)
 {
     Property opt_arm_enc;
     opt_arm_enc.put("device", "remote_controlboard");
-    opt_arm_enc.put("local",  "/hand-tracking/" + ID_ + "/" + port_prefix + "/control_" + laterality_ + "_arm");
+    opt_arm_enc.put("local",  "/" + port_prefix_ + "/control_" + laterality_ + "_arm");
     opt_arm_enc.put("remote", "/" + robot_ + "/right_arm");
 
     yInfo() << log_ID_ << "Opening " + laterality_ + " arm remote_controlboard driver...";
@@ -43,7 +45,7 @@ iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& la
             yError() << log_ID_ << "Cannot get " + laterality_ + " arm encoder interface!";
 
             drv_arm_enc_.close();
-            throw std::runtime_error("ERROR::" + ID_ + "::CTOR::INTERFACE\nERROR: cannot get " + laterality_ + " arm encoder interface!");
+            throw std::runtime_error("ERROR::ICUBFWDKINMODEL::CTOR::INTERFACE\nERROR: cannot get " + laterality_ + " arm encoder interface!");
         }
 
         yInfo() << log_ID_ << "Succesfully got " + laterality_ + " arm encoder interface.";
@@ -52,7 +54,7 @@ iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& la
     {
         yError() << log_ID_ << "Cannot open " + laterality_ + " arm remote_controlboard!";
 
-        throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open " + laterality_ + " arm remote_controlboard!");
+        throw std::runtime_error("ERROR::ICUBFWDKINMODEL::CTOR::DRIVER\nERROR: cannot open " + laterality_ + " arm remote_controlboard!");
     }
 
     icub_kin_arm_.setAllConstraints(false);
@@ -62,7 +64,7 @@ iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& la
 
     Property opt_torso_enc;
     opt_torso_enc.put("device", "remote_controlboard");
-    opt_torso_enc.put("local",  "/hand-tracking/" + ID_ + "/" + port_prefix + "/control_torso");
+    opt_torso_enc.put("local",  "/" + port_prefix_ + "/control_torso");
     opt_torso_enc.put("remote", "/" + robot_ + "/torso");
 
     yInfo() << log_ID_ << "Opening torso remote_controlboard driver...";
@@ -79,7 +81,7 @@ iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& la
             yError() << log_ID_ << "Cannot get torso encoder interface!";
 
             drv_torso_enc_.close();
-            throw std::runtime_error("ERROR::" + ID_ + "::CTOR::INTERFACE\nERROR: cannot get torso encoder interface!");
+            throw std::runtime_error("ERROR::ICUBFWDKINMODEL::CTOR::INTERFACE\nERROR: cannot get torso encoder interface!");
         }
 
         yInfo() << log_ID_ << "Succesfully got torso encoder interface.";
@@ -88,7 +90,7 @@ iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& la
     {
         yError() << log_ID_ << "Cannot open torso remote_controlboard!";
 
-        throw std::runtime_error("ERROR::" + ID_ + "::CTOR::DRIVER\nERROR: cannot open torso remote_controlboard!");
+        throw std::runtime_error("ERROR::ICUBFWDKINMODEL::CTOR::DRIVER\nERROR: cannot open torso remote_controlboard!");
     }
 
     yInfo() << log_ID_ << "Succesfully initialized.";
@@ -104,7 +106,7 @@ iCubFwdKinModel::~iCubFwdKinModel() noexcept
 
 bool iCubFwdKinModel::setProperty(const std::string& property)
 {
-    return FwdKinModel::setProperty(property);
+    return KinPoseModel::setProperty(property);
 }
 
 

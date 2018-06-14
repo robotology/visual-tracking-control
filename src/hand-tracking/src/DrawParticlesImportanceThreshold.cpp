@@ -1,4 +1,4 @@
-#include <DrawFwdKinPoses.h>
+#include <DrawParticlesImportanceThreshold.h>
 
 #include <utility>
 
@@ -6,18 +6,18 @@ using namespace bfl;
 using namespace Eigen;
 
 
-DrawFwdKinPoses::DrawFwdKinPoses() noexcept { }
+DrawParticlesImportanceThreshold::DrawParticlesImportanceThreshold() noexcept { }
 
 
-DrawFwdKinPoses::~DrawFwdKinPoses() noexcept { }
+DrawParticlesImportanceThreshold::~DrawParticlesImportanceThreshold() noexcept { }
 
 
-DrawFwdKinPoses::DrawFwdKinPoses(DrawFwdKinPoses&& pf_prediction) noexcept :
+DrawParticlesImportanceThreshold::DrawParticlesImportanceThreshold(DrawParticlesImportanceThreshold&& pf_prediction) noexcept :
     state_model_(std::move(pf_prediction.state_model_)),
     exogenous_model_(std::move(pf_prediction.exogenous_model_)) { };
 
 
-DrawFwdKinPoses& DrawFwdKinPoses::operator=(DrawFwdKinPoses&& pf_prediction) noexcept
+DrawParticlesImportanceThreshold& DrawParticlesImportanceThreshold::operator=(DrawParticlesImportanceThreshold&& pf_prediction) noexcept
 {
     state_model_ = std::move(pf_prediction.state_model_);
 
@@ -27,31 +27,31 @@ DrawFwdKinPoses& DrawFwdKinPoses::operator=(DrawFwdKinPoses&& pf_prediction) noe
 }
 
 
-StateModel& DrawFwdKinPoses::getStateModel()
+StateModel& DrawParticlesImportanceThreshold::getStateModel()
 {
     return *state_model_;
 }
 
 
-void DrawFwdKinPoses::setStateModel(std::unique_ptr<StateModel> state_model)
+void DrawParticlesImportanceThreshold::setStateModel(std::unique_ptr<StateModel> state_model)
 {
     state_model_ = std::move(state_model);
 }
 
 
-ExogenousModel& DrawFwdKinPoses::getExogenousModel()
+ExogenousModel& DrawParticlesImportanceThreshold::getExogenousModel()
 {
     return *exogenous_model_;
 }
 
 
-void DrawFwdKinPoses::setExogenousModel(std::unique_ptr<ExogenousModel> exogenous_model)
+void DrawParticlesImportanceThreshold::setExogenousModel(std::unique_ptr<ExogenousModel> exogenous_model)
 {
     exogenous_model_ = std::move(exogenous_model);
 }
 
 
-void DrawFwdKinPoses::predictStep(const Ref<const MatrixXf>& prev_states, const Ref<const VectorXf>& prev_weights,
+void DrawParticlesImportanceThreshold::predictStep(const Ref<const MatrixXf>& prev_states, const Ref<const VectorXf>& prev_weights,
                                               Ref<MatrixXf> pred_states, Ref<VectorXf> pred_weights)
 {
     VectorXf sorted_cor = prev_weights;

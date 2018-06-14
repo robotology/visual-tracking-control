@@ -1,7 +1,7 @@
 #ifndef ICUBFWDKINMODEL_H
 #define ICUBFWDKINMODEL_H
 
-#include <FwdKinModel.h>
+#include <KinPoseModel.h>
 
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/dev/PolyDriver.h>
@@ -10,7 +10,7 @@
 #include <yarp/sig/Vector.h>
 
 
-class iCubFwdKinModel : public FwdKinModel
+class iCubFwdKinModel : public KinPoseModel
 {
 public:
     iCubFwdKinModel(const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix);
@@ -33,12 +33,11 @@ protected:
     iCub::iKin::iCubArm    icub_kin_arm_;
 
 private:
-    yarp::os::ConstString  ID_     = "iCubFwdKinModel";
-    yarp::os::ConstString  log_ID_ = "[" + ID_ + "]";
+    const yarp::os::ConstString  log_ID_ = "[iCubFwdKinModel]";
+    yarp::os::ConstString  port_prefix_ = "iCubFwdKinModel";
     
     yarp::os::ConstString  robot_;
     yarp::os::ConstString  laterality_;
-    yarp::os::ConstString  port_prefix_;
 };
 
 #endif /* ICUBFWDKINMODEL_H */

@@ -1,5 +1,5 @@
-#ifndef FWDKINMODEL_H
-#define FWDKINMODEL_H
+#ifndef FWDPOSEMODEL_H
+#define FWDPOSEMODEL_H
 
 #include <BayesFilters/ExogenousModel.h>
 #include <iCub/iKin/iKinFwd.h>
@@ -9,12 +9,12 @@
 #include <yarp/sig/Vector.h>
 
 
-class FwdKinModel : public bfl::ExogenousModel
+class KinPoseModel : public bfl::ExogenousModel
 {
 public:
-    FwdKinModel() noexcept;
+    KinPoseModel() noexcept;
 
-    ~FwdKinModel() noexcept;
+    ~KinPoseModel() noexcept;
 
     void propagate(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> prop_state) override;
 
@@ -34,4 +34,4 @@ private:
     double          delta_angle_     = 0.0;
 };
 
-#endif /* FWDKINMODEL_H */
+#endif /* FWDPOSEMODEL_H */

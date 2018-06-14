@@ -17,10 +17,12 @@ public:
                  const double gate_x, const double gate_y, const double gate_z,
                  const double gate_aperture,
                  const double gate_rotation,
-                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix);
+                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality,
+                 const yarp::os::ConstString& port_prefix);
 
     iCubGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
-                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix);
+                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality,
+                 const yarp::os::ConstString& port_prefix);
 
     ~iCubGatePose() noexcept override;
 
@@ -39,12 +41,11 @@ protected:
     yarp::sig::Vector readTorso();
 
 private:
-    const yarp::os::ConstString ID_     = "iCubGatePose";
-    const yarp::os::ConstString log_ID_ = "[" + ID_ + "]";
+    const yarp::os::ConstString log_ID_ = "[iCubGatePose]";
+    yarp::os::ConstString port_prefix_ = "iCubGatePose";
 
     yarp::os::ConstString robot_;
     yarp::os::ConstString laterality_;
-    yarp::os::ConstString port_prefix_;
 };
 
 #endif /* ICUBGATEPOSE_H */

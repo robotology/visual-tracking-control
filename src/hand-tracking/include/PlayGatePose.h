@@ -17,10 +17,12 @@ public:
                  const double gate_x, const double gate_y, const double gate_z,
                  const double gate_aperture,
                  const double gate_rotation,
-                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality,
+                 const yarp::os::ConstString& port_prefix) noexcept;
 
     PlayGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
-                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality,
+                 const yarp::os::ConstString& port_prefix) noexcept;
 
     /* Destructor */
     ~PlayGatePose() noexcept override;
@@ -37,12 +39,11 @@ protected:
     yarp::sig::Vector readTorso();
 
 private:
-    const yarp::os::ConstString ID_     = "PlayGatePose";
-    const yarp::os::ConstString log_ID_ = "[" + ID_ + "]";
+    const yarp::os::ConstString log_ID_ = "[PlayGatePose]";
+    yarp::os::ConstString port_prefix_ = "PlayGatePose";
 
     yarp::os::ConstString robot_;
     yarp::os::ConstString laterality_;
-    yarp::os::ConstString port_prefix_;
 };
 
 #endif /* PLAYGATEPOSE_H */

@@ -17,6 +17,9 @@
 #include <yarp/math/Math.h>
 #include <yarp/os/Time.h>
 
+#include <SuperimposeMesh/SICAD.h>
+#include <VisualProprioception.h>
+
 using namespace bfl;
 using namespace cv;
 using namespace Eigen;
@@ -30,10 +33,12 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIS::VisualSIS(const yarp::os::ConstString& cam_sel,
+VisualSIS::VisualSIS(const ConstString& cam_sel,
                      const int img_width, const int img_height,
                      const int num_particles,
-                     const double resample_ratio) :
+                     const double resample_ratio,
+                     const ConstString& port_prefix) :
+    port_prefix_(port_prefix),
     cam_sel_(cam_sel),
     img_width_(img_width),
     img_height_(img_height),
@@ -49,11 +54,13 @@ VisualSIS::VisualSIS(const yarp::os::ConstString& cam_sel,
     cuda_hog_->setWinStride(Size(img_width_, img_height_));
 
 
-    port_image_in_.open     ("/hand-tracking/" + cam_sel_ + "/img:i");
-    port_estimates_out_.open("/hand-tracking/" + cam_sel_ + "/result/estimates:o");
+    port_image_in_.open     ("/" + port_prefix_ + "/img:i");
+    port_estimates_out_.open("/" + port_prefix_ + "/estimates:o");
 
-    img_in_.resize(320, 240);
+    img_in_.resize(img_width_, img_height_);
     img_in_.zero();
+
+    port_image_out_.open("/" + port_prefix_ + "/img:o");
 
     setCommandPort();
 }
@@ -199,6 +206,21 @@ void VisualSIS::filteringStep()
         estimates_out.resize(7);
         toEigen(estimates_out) = out_particle.cast<double>();
         port_estimates_out_.write();
+
+        /* STATE ESTIMATE OUTPUT */
+        Superimpose::ModelPoseContainer hand_pose;
+        Superimpose::ModelPose          pose;
+        ImageOf<PixelRgb>& img_out = port_image_out_.prepare();
+
+        pose.assign(out_particle.data(), out_particle.data() + 3);
+        pose.insert(pose.end(), out_particle.data() + 3, out_particle.data() + 7);
+        hand_pose.emplace("palm", pose);
+
+        dynamic_cast<VisualProprioception*>(&dynamic_cast<VisualUpdateParticles*>(correction_.get())->getVisualObservationModel())->superimpose(hand_pose, measurement);
+
+        img_out.setExternal(measurement.ptr(), img_width_, img_height_);
+
+        port_image_out_.write();
         /* ********** */
     }
 }
@@ -216,7 +238,7 @@ bool VisualSIS::attach(yarp::os::Port &source)
 bool VisualSIS::setCommandPort()
 {
     std::cout << "Opening RPC command port." << std::endl;
-    if (!port_rpc_command_.open("/hand-tracking/" + cam_sel_ + "/cmd:i"))
+    if (!port_rpc_command_.open("/" + port_prefix_ + "/cmd:i"))
     {
         std::cerr << "Cannot open the RPC command port." << std::endl;
         return false;

@@ -1,7 +1,7 @@
-#ifndef PLAYFWDKINMODEL_H
-#define PLAYFWDKINMODEL_H
+#ifndef PLAYICUBFWDKINMODEL_H
+#define PLAYICUBFWDKINMODEL_H
 
-#include <FwdKinModel.h>
+#include <KinPoseModel.h>
 
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/Bottle.h>
@@ -10,12 +10,12 @@
 #include <yarp/sig/Vector.h>
 
 
-class PlayFwdKinModel : public FwdKinModel
+class PlayiCubFwdKinModel : public KinPoseModel
 {
 public:
-    PlayFwdKinModel(const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+    PlayiCubFwdKinModel(const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
 
-    ~PlayFwdKinModel() noexcept;
+    ~PlayiCubFwdKinModel() noexcept;
 
     bool setProperty(const std::string& property) override;
 
@@ -31,12 +31,11 @@ protected:
     iCub::iKin::iCubArm                      icub_kin_arm_;
 
 private:
-    yarp::os::ConstString ID_     = "PlayFwdKinModel";
-    yarp::os::ConstString log_ID_ = "[" + ID_ + "]";
+    const yarp::os::ConstString log_ID_ = "[PlayiCubFwdKinModel]";
+    yarp::os::ConstString port_prefix_ = "PlayiCubFwdKinModel";
 
     yarp::os::ConstString robot_;
     yarp::os::ConstString laterality_;
-    yarp::os::ConstString port_prefix_;
 };
 
-#endif /* PLAYFWDKINMODEL_H */
+#endif /* PLAYICUBFWDKINMODEL_H */

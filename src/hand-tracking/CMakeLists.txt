@@ -16,7 +16,7 @@ if(NOT BayesFilters_FOUND)
     find_package(SuperimposeMesh 0.9.104.0 REQUIRED)
 endif()
 
-LIST(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
+list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
                               ${ICUB_MODULE_PATH})
 
 include(YarpInstallationHelpers)
@@ -24,32 +24,48 @@ include(YarpInstallationHelpers)
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
-        include/DrawFwdKinPoses.h
-        include/FwdKinModel.h
+		include/Camera.h
+        include/DrawParticlesImportanceThreshold.h
+        include/KinPoseModel.h
         include/GatePose.h
         include/iCubFwdKinModel.h
+		include/iCubArmModel.h
+		include/iCubCamera.h
         include/iCubGatePose.h
         include/InitiCubArm.h
-        include/PlayFwdKinModel.h
+        include/InitPoseParticles.h
+        include/InitWalkmanArm.h
+		include/MeshModel.h
+        include/PlayiCubFwdKinModel.h
         include/PlayGatePose.h
+        include/PlayWalkmanPoseModel.h
         include/VisualProprioception.h
         include/VisualSIS.h
-        include/VisualUpdateParticles.h)
+        include/VisualUpdateParticles.h
+		include/WalkmanArmModel.h
+		include/WalkmanCamera.h)
 
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
         src/BrownianMotionPose.cpp
-        src/DrawFwdKinPoses.cpp
-        src/FwdKinModel.cpp
+        src/DrawParticlesImportanceThreshold.cpp
+        src/KinPoseModel.cpp
         src/GatePose.cpp
+		src/iCubArmModel.cpp
+		src/iCubCamera.cpp
         src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
         src/InitiCubArm.cpp
-        src/PlayFwdKinModel.cpp
+        src/InitPoseParticles.cpp
+        src/InitWalkmanArm.cpp
+        src/PlayiCubFwdKinModel.cpp
         src/PlayGatePose.cpp
+        src/PlayWalkmanPoseModel.cpp
         src/VisualProprioception.cpp
         src/VisualSIS.cpp
-        src/VisualUpdateParticles.cpp)
+        src/VisualUpdateParticles.cpp
+		src/WalkmanArmModel.cpp
+		src/WalkmanCamera.cpp)
 
 set(${EXE_TARGET_NAME}_THRIFT_HDR
         thrift/visualsisparticlefilter.thrift)
@@ -98,9 +114,10 @@ endif()
 
 # Custom command for RESOURCE/EXTRA files
 set(${EXE_TARGET_NAME}_APP
-        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking.xml
-        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-BATCH.xml
-        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-SIM.xml)
+        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-iCub.xml
+        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-iCub-BATCH.xml
+        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-iCub-SIM.xml
+		${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-Walkman-BATCH.xml)
 
 set(${EXE_TARGET_NAME}_CONF
         ${CMAKE_CURRENT_SOURCE_DIR}/conf/config.ini)
@@ -131,7 +148,8 @@ set(${EXE_TARGET_NAME}_MESH
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl1.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl2.obj
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl3.obj
-        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl4.obj)
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh/icub_right_arm/r_tl4.obj
+		${CMAKE_CURRENT_SOURCE_DIR}/mesh/walkman_right_arm/soft_hand_open.stl)
 
 add_custom_command(TARGET  ${EXE_TARGET_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_SHADER_VERT} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
