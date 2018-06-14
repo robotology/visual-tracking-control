@@ -1,4 +1,5 @@
 #include <VisualSIS.h>
+#include <VisualUpdateParticles.h>
 
 #include <exception>
 #include <iostream>
@@ -117,7 +118,7 @@ void VisualSIS::filteringStep()
                                  pred_particle_, pred_weight_);
 
         /* CORRECTION */
-        correction_->getVisualObservationModel().setProperty("VP_PARAMS");
+        dynamic_cast<VisualUpdateParticles*>(correction_.get())->getVisualObservationModel().setProperty("VP_PARAMS");
         correction_->correct(pred_particle_, pred_weight_, descriptors_cam_left,
                              cor_particle_, cor_weight_);
         cor_weight_ /= cor_weight_.sum();
@@ -264,9 +265,9 @@ bool VisualSIS::skip_step(const std::string& what_step, const bool status)
 bool VisualSIS::use_analogs(const bool status)
 {
     if (status)
-        return correction_->getVisualObservationModel().setProperty("VP_ANALOGS_ON");
+        return dynamic_cast<VisualUpdateParticles*>(correction_.get())->getVisualObservationModel().setProperty("VP_ANALOGS_ON");
     else
-        return correction_->getVisualObservationModel().setProperty("VP_ANALOGS_OFF");
+        return dynamic_cast<VisualUpdateParticles*>(correction_.get())->getVisualObservationModel().setProperty("VP_ANALOGS_OFF");
 }
 
 

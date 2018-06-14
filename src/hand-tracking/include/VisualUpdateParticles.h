@@ -10,7 +10,6 @@
 #include <BayesFilters/PFVisualCorrection.h>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaobjdetect.hpp>
-#include <opencv2/objdetect/objdetect.hpp>
 
 
 class VisualUpdateParticles : public bfl::PFVisualCorrection
@@ -28,9 +27,7 @@ public:
 
     double likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovations) override;
 
-    bfl::VisualObservationModel& getVisualObservationModel() override;
-
-    void setVisualObservationModel(std::unique_ptr<bfl::VisualObservationModel> visual_observation_model) override;
+    bfl::VisualObservationModel& getVisualObservationModel();
 
 protected:
     void correctStep(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, const Eigen::Ref<const Eigen::VectorXf>& pred_weights, cv::InputArray measurements,
@@ -49,6 +46,14 @@ protected:
     std::vector<cv::cuda::GpuMat>         cuda_img_alpha_;
     std::vector<cv::cuda::GpuMat>         cuda_descriptors_;
     std::vector<cv::Mat>                  cpu_descriptors_;
+
+    const int    block_size_ = 16;
+    const int    bin_number_ = 9;
+    unsigned int img_width_;
+    unsigned int img_height_;
+    unsigned int ogl_tiles_cols_;
+    unsigned int ogl_tiles_rows_;
+    unsigned int feature_dim_;
 };
 
 #endif /* VISUALUPDATEPARTICLES_H */
