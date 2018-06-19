@@ -1,10 +1,14 @@
 set(EXE_TARGET_NAME hand-tracking)
 
 # Dependencies
-find_package(Eigen3 REQUIRED CONFIG)
 find_package(ICUB   REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(YARP   REQUIRED)
+
+find_package(Eigen3 QUIET CONFIG)
+if(NOT EIGEN3_FOUND)
+    find_package(Eigen3 REQUIRED)
+endif()
 
 find_package(BayesFilters 0.7.0.0 QUIET)
 if(NOT BayesFilters_FOUND)
@@ -88,7 +92,6 @@ target_link_libraries(${EXE_TARGET_NAME}
                       PRIVATE
                           BayesFilters::BayesFilters
                           ctrlLib
-                          Eigen3::Eigen
                           ${ICUB_LIBRARIES}
                           iKin
                           ${OpenCV_LIBS}
@@ -102,6 +105,15 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(${EXE_TARGET_NAME}
                           PRIVATE
                               Threads::Threads)
+endif()
+if(NOT TARGET Eigen3)
+    target_include_directories(${EXE_TARGET_NAME}
+                               PRIVATE
+                                   ${EIGEN3_INCLUDE_DIR})
+else()
+    target_link_libraries(${EXE_TARGET_NAME}
+                          PRIVATE
+                              Eigen3::Eigen)
 endif()
 
 if(DEFINED OpenCV_CUDA_VERSION AND (NOT DEFINED FORCE_NO_OPENCV_CUDA OR NOT FORCE_NO_OPENCV_CUDA))
