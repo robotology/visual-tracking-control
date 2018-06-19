@@ -28,7 +28,6 @@ WalkmanArmModel::WalkmanArmModel(const ConstString& laterality,
     model_path_["palm"] = rf.findFileByName("soft_hand_open.stl");
     if (!file_found(model_path_["palm"]))
         throw std::runtime_error("ERROR::WALKMANARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_palm.obj not found!");
-    
 
     rf.setDefaultContext(context + "/shader");
     shader_path_ = rf.findFileByName("shader_model.vert");
@@ -40,7 +39,7 @@ WalkmanArmModel::WalkmanArmModel(const ConstString& laterality,
         rfind_slash = 0;
     size_t rfind_backslash = shader_path_.rfind("\\");
     if (rfind_backslash == std::string::npos)
-        rfind_slash = 0;
+        rfind_backslash = 0;
 
     shader_path_ = shader_path_.substr(0, rfind_slash > rfind_backslash ? rfind_slash : rfind_backslash);
 }
