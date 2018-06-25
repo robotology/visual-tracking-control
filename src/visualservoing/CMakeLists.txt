@@ -1,8 +1,8 @@
 set(PLUGIN_NAME visualservoing)
 
-find_package(YARP REQUIRED)
+find_package(YARP REQUIRED
+             COMPONENTS OS dev sig math)
 
-list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH})
 include(YarpPlugin)
 yarp_configure_external_installation(${PLUGIN_NAME} WITH_PLUGINS)
 

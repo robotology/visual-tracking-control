@@ -1,10 +1,7 @@
 set(APP_TARGET_NAME visualservoingclient_app)
 
-find_package(YARP REQUIRED)
-
-include(YarpInstallationHelpers)
-
-LIST(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH})
+find_package(YARP REQUIRED
+             COMPONENTS OS dev sig math)
 
 include(YarpInstallationHelpers)
 
@@ -15,13 +12,12 @@ set(${APP_TARGET_NAME}_SRC
 # Application target calls
 add_executable(${APP_TARGET_NAME} ${${APP_TARGET_NAME}_SRC})
 
-target_include_directories(${APP_TARGET_NAME}
-                           PRIVATE
-                               ${YARP_INCLUDE_DIRS})
-
 target_link_libraries(${APP_TARGET_NAME}
                       PRIVATE
-                          ${YARP_LIBRARIES}
+                          YARP::YARP_OS
+                          YARP::YARP_dev
+                          YARP::YARP_math
+                          YARP::YARP_sig
                           visualservoingplugin)
 
 install(TARGETS ${APP_TARGET_NAME} DESTINATION bin)

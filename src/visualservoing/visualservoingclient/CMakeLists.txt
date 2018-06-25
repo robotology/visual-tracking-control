@@ -16,8 +16,7 @@ yarp_prepare_plugin(${PLUGIN_TARGET_NAME}
 find_package(ICUB   REQUIRED)
 find_package(OpenCV REQUIRED)
 
-LIST(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
-                              ${ICUB_MODULE_PATH})
+LIST(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 
 include(YarpInstallationHelpers)
 
@@ -44,8 +43,7 @@ yarp_add_plugin(${PLUGIN_TARGET_NAME} ${${PLUGIN_TARGET_NAME}_HDR} ${${PLUGIN_TA
 target_include_directories(${PLUGIN_TARGET_NAME}
                            PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                               ${ICUB_INCLUDE_DIRS}
-                               ${YARP_INCLUDE_DIRS})
+                               ${ICUB_INCLUDE_DIRS})
 
 target_link_libraries(${PLUGIN_TARGET_NAME}
                       PRIVATE
@@ -53,7 +51,10 @@ target_link_libraries(${PLUGIN_TARGET_NAME}
                           ${ICUB_LIBRARIES}
                           iKin
                           ${OpenCV_LIBS}
-                          ${YARP_LIBRARIES})
+                          YARP::YARP_OS
+                          YARP::YARP_dev
+                          YARP::YARP_math
+                          YARP::YARP_sig)
 
 yarp_install(TARGETS ${PLUGIN_TARGET_NAME}
              COMPONENT

@@ -1,9 +1,12 @@
 set(EXE_TARGET_NAME hand-tracking)
 
+message(STATUS "CMAKE_PREFIX_PATH: " ${CMAKE_PREFIX_PATH})
+
 # Dependencies
 find_package(ICUB   REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(YARP   REQUIRED)
+find_package(YARP   CONFIG REQUIRED
+             COMPONENTS OS eigen math sig)
 
 find_package(Eigen3 QUIET CONFIG)
 if(NOT EIGEN3_FOUND)
@@ -22,8 +25,7 @@ if(NOT SuperimposeMesh_FOUND)
     find_package(SuperimposeMesh 0.9.104.0 REQUIRED)
 endif()
 
-list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH}
-                              ${ICUB_MODULE_PATH})
+list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 
 include(YarpInstallationHelpers)
 
@@ -85,8 +87,7 @@ add_executable(${EXE_TARGET_NAME} ${${EXE_TARGET_NAME}_HDR} ${${EXE_TARGET_NAME}
 target_include_directories(${EXE_TARGET_NAME}
                            PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                               ${ICUB_INCLUDE_DIRS}
-                               ${YARP_INCLUDE_DIRS})
+                               ${ICUB_INCLUDE_DIRS})
 
 target_link_libraries(${EXE_TARGET_NAME}
                       PRIVATE
@@ -96,7 +97,10 @@ target_link_libraries(${EXE_TARGET_NAME}
                           iKin
                           ${OpenCV_LIBS}
                           SuperimposeMesh::SuperimposeMesh
-                          ${YARP_LIBRARIES})
+                          YARP::YARP_OS
+                          YARP::YARP_eigen
+                          YARP::YARP_math
+                          YARP::YARP_sig)
 if(UNIX AND NOT APPLE)
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set(THREADS_PREFER_PTHREAD_FLAG TRUE)
