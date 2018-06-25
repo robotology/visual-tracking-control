@@ -23,7 +23,7 @@
 #include <PlayWalkmanPoseModel.h>
 #include <PlayGatePose.h>
 #include <VisualProprioception.h>
-#include <VisualSIS.h>cd
+#include <VisualSIS.h>
 
 #include <VisualUpdateParticles.h>
 #include <WalkmanArmModel.h>
@@ -32,7 +32,6 @@
 using namespace bfl;
 using namespace cv;
 using namespace Eigen;
-using namespace yarp::dev;
 using namespace yarp::os;
 
 

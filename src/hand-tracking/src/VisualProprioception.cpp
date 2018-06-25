@@ -32,11 +32,11 @@ VisualProprioception::VisualProprioception(const int num_images, std::unique_ptr
     try
     {
         si_cad_ = std::unique_ptr<SICAD>(new SICAD(mesh_paths_,
-                                         cam_params_.width, cam_params_.height, cam_params_.fx, cam_params_.fy, cam_params_.cx, cam_params_.cy,
-                                         num_images,
-                                         {1.0, 0.0, 0.0, static_cast<float>(M_PI)},
-                                         shader_folder_,
-                                         false));
+                                                   cam_params_.width, cam_params_.height,
+                                                   cam_params_.fx, cam_params_.fy, cam_params_.cx, cam_params_.cy,
+                                                   num_images,
+                                                   shader_folder_,
+                                                   { 1.0, 0.0, 0.0, static_cast<float>(M_PI) }));
     }
     catch (const std::runtime_error& e)
     {

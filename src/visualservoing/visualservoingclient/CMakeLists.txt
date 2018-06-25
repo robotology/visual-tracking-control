@@ -53,6 +53,7 @@ target_link_libraries(${PLUGIN_TARGET_NAME}
                           ${OpenCV_LIBS}
                           YARP::YARP_OS
                           YARP::YARP_dev
+                          YARP::YARP_init
                           YARP::YARP_math
                           YARP::YARP_sig)
 

@@ -1,7 +1,7 @@
 set(APP_TARGET_NAME visualservoingserver_app)
 
 find_package(YARP REQUIRED
-             COMPONENTS OS dev sig math)
+             COMPONENTS OS dev math sig)
 
 include(YarpInstallationHelpers)
 
@@ -16,6 +16,7 @@ target_link_libraries(${APP_TARGET_NAME}
                       PRIVATE
                           YARP::YARP_OS
                           YARP::YARP_dev
+                          YARP::YARP_init
                           YARP::YARP_math
                           YARP::YARP_sig
                           visualservoingplugin)

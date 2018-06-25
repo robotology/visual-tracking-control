@@ -99,6 +99,7 @@ target_link_libraries(${EXE_TARGET_NAME}
                           SuperimposeMesh::SuperimposeMesh
                           YARP::YARP_OS
                           YARP::YARP_eigen
+                          YARP::YARP_init
                           YARP::YARP_math
                           YARP::YARP_sig)
 if(UNIX AND NOT APPLE)

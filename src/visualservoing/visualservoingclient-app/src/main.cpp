@@ -1,4 +1,5 @@
 #include <yarp/os/LogStream.h>
+#include <yarp/os/Network.h>
 #include <yarp/os/Property.h>
 #include <yarp/dev/Drivers.h>
 #include <yarp/dev/IVisualServoing.h>
