@@ -10,7 +10,6 @@
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/os/Value.h>
 #include <opencv2/core/core.hpp>
-#include <opencv2/core/cuda.hpp>
 
 #include <BrownianMotionPose.h>
 #include <DrawParticlesImportanceThreshold.h>
@@ -36,10 +35,6 @@ using namespace yarp::dev;
 using namespace yarp::os;
 
 
-/* UTILITY FUNCTIONS FOREWORD DECLARATIONS */
-std::string engine_count_to_string(int engine_count);
-
-
 /* MAIN */
 int main(int argc, char *argv[])
 {
@@ -52,18 +47,6 @@ int main(int argc, char *argv[])
         yError() << "YARP seems unavailable!";
         return EXIT_FAILURE;
     }
-
-
-    // Page locked dovrebbe essere più veloce da utilizzate con CUDA, non sembra essere il caso.
-//    Mat::setDefaultAllocator(cuda::HostMem::getAllocator(cuda::HostMem::PAGE_LOCKED));
-
-    cuda::DeviceInfo gpu_dev;
-    yInfo() << log_ID << "[CUDA] Engine capability:"              << engine_count_to_string(gpu_dev.asyncEngineCount());
-    yInfo() << log_ID << "[CUDA] Can have concurrent kernel:"     << gpu_dev.concurrentKernels();
-    yInfo() << log_ID << "[CUDA] Streaming multiprocessor count:" << gpu_dev.multiProcessorCount();
-    yInfo() << log_ID << "[CUDA] Can map host memory:"            << gpu_dev.canMapHostMemory();
-    yInfo() << log_ID << "[CUDA] Clock:"                          << gpu_dev.clockRate() << "KHz";
-
 
     ResourceFinder rf;
     rf.setVerbose();
@@ -292,7 +275,6 @@ int main(int argc, char *argv[])
     else
         vpf_correction = std::move(vpf_update_particles);
 
-
     /* RESAMPLING */
     std::unique_ptr<Resampling> pf_resampling;
     if (paramsd["resample_prior"] != 1.0)
@@ -310,7 +292,6 @@ int main(int argc, char *argv[])
 
         pf_resampling = std::unique_ptr<Resampling>(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
     }
-
 
     /* PARTICLE FILTER */
     VisualSIS vsis_pf(paramss["cam_sel"],
@@ -330,14 +311,4 @@ int main(int argc, char *argv[])
 
     yInfo() << log_ID << "Application closed succesfully.";
     return EXIT_SUCCESS;
-}
-
-
-/* UTILITY FUNCTIONS */
-std::string engine_count_to_string(int engine_count)
-{
-    if (engine_count == 0) return "concurrency is unsupported on this device";
-    if (engine_count == 1) return "the device can concurrently copy memory between host and device while executing a kernel";
-    if (engine_count == 2) return "the device can concurrently copy memory between host and device in both directions and execute a kernel at the same time";
-    return "wrong argument...!";
 }

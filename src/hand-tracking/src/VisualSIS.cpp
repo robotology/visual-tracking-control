@@ -2,19 +2,21 @@
 #include <VisualUpdateParticles.h>
 
 #include <exception>
-#include <iostream>
 #include <utility>
 
 #include <Eigen/Dense>
 #include <iCub/ctrl/math.h>
 #include <opencv2/core/core.hpp>
-#include <opencv2/core/cuda.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#if HANDTRACKING_USE_OPENCV_CUDA
+#include <opencv2/core/cuda.hpp>
 #include <opencv2/cudaimgproc.hpp>
 #include <opencv2/cudawarping.hpp>
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 #include <yarp/eigen/Eigen.h>
 #include <yarp/math/Math.h>
+#include <yarp/os/LogStream.h>
 #include <yarp/os/Time.h>
 
 #include <SuperimposeMesh/SICAD.h>
@@ -33,11 +35,11 @@ using yarp::sig::ImageOf;
 using yarp::sig::PixelRgb;
 
 
-VisualSIS::VisualSIS(const ConstString& cam_sel,
+VisualSIS::VisualSIS(const std::string& cam_sel,
                      const int img_width, const int img_height,
                      const int num_particles,
                      const double resample_ratio,
-                     const ConstString& port_prefix) :
+                     const std::string& port_prefix) :
     port_prefix_(port_prefix),
     cam_sel_(cam_sel),
     img_width_(img_width),
@@ -45,14 +47,32 @@ VisualSIS::VisualSIS(const ConstString& cam_sel,
     num_particles_(num_particles),
     resample_ratio_(resample_ratio)
 {
-    descriptor_length_ = (img_width_/block_size_*2-1) * (img_height_/block_size_*2-1) * bin_number_ * 4;
+#if HANDTRACKING_USE_OPENCV_CUDA
+    /* Page locked allocator should be faster using CUDA. Apparently it seems not the case. */
+    //Mat::setDefaultAllocator(cuda::HostMem::getAllocator(cuda::HostMem::PAGE_LOCKED));
+
+    cuda::DeviceInfo gpu_dev;
+    yInfo() << log_ID_ << "CUDA engine capability:" << gpu_engine_count_to_string(gpu_dev.asyncEngineCount());
+    yInfo() << log_ID_ << "CUDA concurrent kernels:" << gpu_dev.concurrentKernels();
+    yInfo() << log_ID_ << "CUDA streaming multiprocessor count:" << gpu_dev.multiProcessorCount();
+    yInfo() << log_ID_ << "CUDA can map host memory:" << gpu_dev.canMapHostMemory();
+    yInfo() << log_ID_ << "CUDA clock:" << gpu_dev.clockRate() << "KHz";
 
 
-    cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
-    cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
-    cuda_hog_->setGammaCorrection(true);
-    cuda_hog_->setWinStride(Size(img_width_, img_height_));
+    hog_cuda_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
+    hog_cuda_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
+    hog_cuda_->setGammaCorrection(true);
+    hog_cuda_->setWinStride(Size(img_width_, img_height_));
+#else
+    hog_cpu_ = std::unique_ptr<HOGDescriptor>(new HOGDescriptor(Size(img_width_, img_height_),
+                                                                Size(block_size_, block_size_),
+                                                                Size(block_size_/2, block_size_/2),
+                                                                Size(block_size_/2, block_size_/2),
+                                                                bin_number_,
+                                                                1, -1.0, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false));
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 
+    descriptor_length_ = (img_width_ / block_size_ * 2 - 1) * (img_height_ / block_size_ * 2 - 1) * bin_number_ * 4;
 
     port_image_in_.open     ("/" + port_prefix_ + "/img:i");
     port_estimates_out_.open("/" + port_prefix_ + "/estimates:o");
@@ -93,11 +113,13 @@ VisualSIS::~VisualSIS() noexcept
 
 void VisualSIS::filteringStep()
 {
-    std::vector<float> descriptors_cam_left (descriptor_length_);
-    cuda::GpuMat       cuda_img             (Size(img_width_, img_height_), CV_8UC3);
-    cuda::GpuMat       cuda_img_alpha       (Size(img_width_, img_height_), CV_8UC4);
-    cuda::GpuMat       descriptors_cam_cuda (Size(descriptor_length_, 1),   CV_32F );
+    std::vector<float> descriptors_cam_left(descriptor_length_);
 
+#if HANDTRACKING_USE_OPENCV_CUDA
+    cuda::GpuMat cuda_img            (Size(img_width_, img_height_), CV_8UC3);
+    cuda::GpuMat cuda_img_alpha      (Size(img_width_, img_height_), CV_8UC4);
+    cuda::GpuMat descriptors_cam_cuda(Size(descriptor_length_, 1),   CV_32F );
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 
     ImageOf<PixelRgb>* tmp_imgin = YARP_NULLPTR;
     tmp_imgin = port_image_in_.read(false);
@@ -110,14 +132,18 @@ void VisualSIS::filteringStep()
     if (init_img_in_)
     {
         /* PROCESS CURRENT MEASUREMENT */
-        Mat measurement;
+        Mat measurement = cvarrToMat(img_in_.getIplImage());
 
-        measurement = cvarrToMat(img_in_.getIplImage());
+#if HANDTRACKING_USE_OPENCV_CUDA
         cuda_img.upload(measurement);
         cuda::resize(cuda_img, cuda_img, Size(img_width_, img_height_));
         cuda::cvtColor(cuda_img, cuda_img_alpha, COLOR_BGR2BGRA, 4);
-        cuda_hog_->compute(cuda_img_alpha, descriptors_cam_cuda);
+        hog_cuda_->compute(cuda_img_alpha, descriptors_cam_cuda);
         descriptors_cam_cuda.download(descriptors_cam_left);
+#else
+        cv::resize(measurement, measurement, Size(img_width_, img_height_));
+        hog_cpu_->compute(measurement, descriptors_cam_left);
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 
         /* PREDICTION */
         if (getFilteringStep() != 0)
@@ -136,11 +162,11 @@ void VisualSIS::filteringStep()
 
 
         /* RESAMPLING */
-        std::cout << "Step: " << getFilteringStep() << std::endl;
-        std::cout << "Neff: " << resampling_->neff(cor_weight_) << std::endl;
+        yInfo() << log_ID_ << "Step:" << getFilteringStep();
+        yInfo() << log_ID_ << "Neff:" << resampling_->neff(cor_weight_);
         if (resampling_->neff(cor_weight_) < std::round(num_particles_ * resample_ratio_))
         {
-            std::cout << "Resampling!" << std::endl;
+            yInfo() << log_ID_ << "Resampling!";
 
             MatrixXf res_particle(7, num_particles_);
             VectorXf res_weight(num_particles_, 1);
@@ -237,18 +263,18 @@ bool VisualSIS::attach(yarp::os::Port &source)
 
 bool VisualSIS::setCommandPort()
 {
-    std::cout << "Opening RPC command port." << std::endl;
+    yInfo() << log_ID_ << "Opening RPC command port.";
     if (!port_rpc_command_.open("/" + port_prefix_ + "/cmd:i"))
     {
-        std::cerr << "Cannot open the RPC command port." << std::endl;
+        yError() << log_ID_ << "Cannot open the RPC command port.";
         return false;
     }
     if (!attach(port_rpc_command_))
     {
-        std::cerr << "Cannot attach the RPC command port." << std::endl;
+        yError() << log_ID_ << "Cannot attach the RPC command port.";
         return false;
     }
-    std::cout << "RPC command port opened and attached. Ready to recieve commands!" << std::endl;
+    yInfo() << log_ID_ << "RPC command port opened and attached. Ready to recieve commands!";
 
     return true;
 }
@@ -378,4 +404,13 @@ bool VisualSIS::set_mobile_average_window(const int16_t window)
 bool VisualSIS::quit()
 {
     return teardown();
+}
+
+
+std::string VisualSIS::gpu_engine_count_to_string(const int engine_count) const
+{
+    if (engine_count == 0) return "concurrency is unsupported on this device";
+    if (engine_count == 1) return "the device can concurrently copy memory between host and device while executing a kernel";
+    if (engine_count == 2) return "the device can concurrently copy memory between host and device in both directions and execute a kernel at the same time";
+    return "wrong argument...!";
 }

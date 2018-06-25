@@ -7,10 +7,10 @@
 #include <utility>
 #include <vector>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/core/cuda.hpp>
 #include <opencv2/core/eigen.hpp>
+#if HANDTRACKING_USE_OPENCV_CUDA
 #include <opencv2/cudaimgproc.hpp>
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 #include <opencv2/imgproc/imgproc.hpp>
 
 using namespace bfl;
@@ -26,12 +26,9 @@ VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioceptio
     VisualUpdateParticles(std::move(observation_model), likelihood_gain, 1) { }
 
 
-VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_cuda_stream) noexcept :
+VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioception> observation_model, const double likelihood_gain, const int num_parallel_processor) noexcept :
     observation_model_(std::move(observation_model)),
-    likelihood_gain_(likelihood_gain),
-    num_cuda_stream_(num_cuda_stream),
-    num_img_stream_(observation_model_->getOGLTilesNumber()),
-    cuda_stream_(std::vector<cuda::Stream>(num_cuda_stream))
+    likelihood_gain_(likelihood_gain)
 {
     img_width_      = observation_model_->getCamWidth();
     img_height_     = observation_model_->getCamHeight();
@@ -39,19 +36,40 @@ VisualUpdateParticles::VisualUpdateParticles(std::unique_ptr<VisualProprioceptio
     ogl_tiles_rows_ = observation_model_->getOGLTilesRows();
     feature_dim_    = (img_width_ / block_size_ * 2 - 1) * (img_height_ / block_size_ * 2 - 1) * bin_number_ * 4;
 
-    cuda_hog_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
-    cuda_hog_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
-    cuda_hog_->setGammaCorrection(true);
-    cuda_hog_->setWinStride(Size(img_width_, img_height_));
+    num_rendered_img_ = observation_model_->getOGLTilesNumber();
 
-    for (int s = 0; s < num_cuda_stream_; ++s)
+#if HANDTRACKING_USE_OPENCV_CUDA
+    num_parallel_processor_ = num_parallel_processor;
+    cuda_stream_ = std::vector<cuda::Stream>(num_parallel_processor);
+
+    hog_cuda_ = cuda::HOG::create(Size(img_width_, img_height_), Size(block_size_, block_size_), Size(block_size_/2, block_size_/2), Size(block_size_/2, block_size_/2), bin_number_);
+    hog_cuda_->setDescriptorFormat(cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
+    hog_cuda_->setGammaCorrection(true);
+    hog_cuda_->setWinStride(Size(img_width_, img_height_));
+
+    for (int s = 0; s < num_parallel_processor_; ++s)
     {
-        hand_rendered_.emplace_back   (Mat(         Size(img_width_ * ogl_tiles_cols_, img_height_* ogl_tiles_rows_), CV_8UC3));
         cuda_img_.emplace_back        (cuda::GpuMat(Size(img_width_ * ogl_tiles_cols_, img_height_* ogl_tiles_rows_), CV_8UC3));
         cuda_img_alpha_.emplace_back  (cuda::GpuMat(Size(img_width_ * ogl_tiles_cols_, img_height_* ogl_tiles_rows_), CV_8UC4));
-        cuda_descriptors_.emplace_back(cuda::GpuMat(Size(num_img_stream_, feature_dim_),                              CV_32F ));
-        cpu_descriptors_.emplace_back (Mat(         Size(num_img_stream_, feature_dim_),                              CV_32F ));
+        cuda_descriptors_.emplace_back(cuda::GpuMat(Size(num_rendered_img_, feature_dim_),                            CV_32F ));
+        cpu_descriptors_.emplace_back (Mat         (Size(num_rendered_img_, feature_dim_),                            CV_32F));
     }
+#else
+    hog_cpu_ = std::unique_ptr<HOGDescriptor>(new HOGDescriptor(Size(img_width_, img_height_),
+                                                                Size(block_size_, block_size_),
+                                                                Size(block_size_ / 2, block_size_ / 2),
+                                                                Size(block_size_ / 2, block_size_ / 2),
+                                                                bin_number_,
+                                                                1, -1.0, HOGDescriptor::L2Hys, 0.2, true, HOGDescriptor::DEFAULT_NLEVELS, false));
+
+    static_cast<void>(num_parallel_processor);
+    num_parallel_processor_ = 1;
+
+    cpu_descriptors_.emplace_back(std::vector<float>(num_rendered_img_ * feature_dim_));
+#endif // HANDTRACKING_USE_OPENCV_CUDA
+
+    for (int s = 0; s < num_parallel_processor_; ++s)
+        hand_rendered_.emplace_back(Mat(Size(img_width_ * ogl_tiles_cols_, img_height_* ogl_tiles_rows_), CV_8UC3));
 }
 
 
@@ -60,28 +78,31 @@ VisualUpdateParticles::~VisualUpdateParticles() noexcept { }
 
 void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, cv::InputArray measurements, Ref<MatrixXf> innovations)
 {
-    for (int s = 0; s < num_cuda_stream_; ++s)
-        observation_model_->observe(pred_states.block(0, s * num_img_stream_, 7, num_img_stream_), hand_rendered_[s]);
+    const std::vector<float>* measurements_ptr = static_cast<const std::vector<float>*>(measurements.getObj());
 
-    for (int s = 0; s < num_cuda_stream_; ++s)
+    for (int s = 0; s < num_parallel_processor_; ++s)
+        observation_model_->observe(pred_states.block(0, s * num_rendered_img_, 7, num_rendered_img_), hand_rendered_[s]);
+
+#if HANDTRACKING_USE_OPENCV_CUDA
+    for (int s = 0; s < num_parallel_processor_; ++s)
     {
         cuda_img_[s].upload(hand_rendered_[s], cuda_stream_[s]);
         cuda::cvtColor(cuda_img_[s], cuda_img_alpha_[s], COLOR_BGR2BGRA, 4, cuda_stream_[s]);
-        cuda_hog_->compute(cuda_img_alpha_[s], cuda_descriptors_[s], cuda_stream_[s]);
+        hog_cuda_->compute(cuda_img_alpha_[s], cuda_descriptors_[s], cuda_stream_[s]);
     }
 
-    const std::vector<float>* measurements_ptr = static_cast<const std::vector<float>*>(measurements.getObj());
-
-    for (int s = 0; s < num_cuda_stream_; ++s)
+    for (int s = 0; s < num_parallel_processor_; ++s)
     {
         cuda_stream_[s].waitForCompletion();
 
         cuda_descriptors_[s].download(cpu_descriptors_[s], cuda_stream_[s]);
+#else
+    for (int s = 0; s < num_parallel_processor_; ++s)
+    {
+        hog_cpu_->compute(hand_rendered_[s], cpu_descriptors_[s], Size(img_width_, img_height_));
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 
-        MatrixXf descriptors_render;
-        cv2eigen(cpu_descriptors_[s], descriptors_render);
-
-        for (int i = 0; i < num_img_stream_; ++i)
+        for (int i = 0; i < num_rendered_img_; ++i)
         {
             double norm = 0;
             double chi = 0;
@@ -93,9 +114,15 @@ void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, c
             int  j          = 0;
             while (it_cam < it_cam_end)
             {
+#if HANDTRACKING_USE_OPENCV_CUDA
                 norm += std::pow((*it_cam) - cpu_descriptors_[s].at<float>(i, j), 2.0);
 
                 chi += (std::pow((*it_cam) - cpu_descriptors_[s].at<float>(i, j), 2.0)) / ((*it_cam) + cpu_descriptors_[s].at<float>(i, j) + std::numeric_limits<float>::min());
+#else
+                norm += std::pow((*it_cam) - cpu_descriptors_[s][i * feature_dim_ + j], 2.0);
+
+                chi += (std::pow((*it_cam) - cpu_descriptors_[s][i * feature_dim_ + j], 2.0)) / ((*it_cam) + cpu_descriptors_[s][i * feature_dim_ + j] + std::numeric_limits<float>::min());
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 
                 ++it_cam;
                 ++j;
@@ -109,7 +136,7 @@ void VisualUpdateParticles::innovation(const Ref<const MatrixXf>& pred_states, c
                 }
             }
 
-            innovations(s * num_img_stream_ + i, 0) = sum_normchi;
+            innovations(s * num_rendered_img_ + i, 0) = sum_normchi;
         }
     }
 }

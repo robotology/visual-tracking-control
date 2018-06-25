@@ -1,17 +1,23 @@
 set(EXE_TARGET_NAME hand-tracking)
 
 # Dependencies
-find_package(Eigen3 REQUIRED CONFIG)
 find_package(ICUB   REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(YARP   REQUIRED)
+
+find_package(Eigen3 QUIET CONFIG)
+if(NOT EIGEN3_FOUND)
+    find_package(Eigen3 REQUIRED)
+endif()
+
 find_package(BayesFilters 0.7.0.0 QUIET)
 if(NOT BayesFilters_FOUND)
     message(STATUS "Did not found required master release of BayesFilters. Looking for devel version.")
     find_package(BayesFilters 0.7.100.0 REQUIRED)
 endif()
+
 find_package(SuperimposeMesh 0.9.4.0 QUIET)
-if(NOT BayesFilters_FOUND)
+if(NOT SuperimposeMesh_FOUND)
     message(STATUS "Did not found required master release of SuperimposeMesh. Looking for devel version.")
     find_package(SuperimposeMesh 0.9.104.0 REQUIRED)
 endif()
@@ -82,6 +88,15 @@ target_include_directories(${EXE_TARGET_NAME}
                                ${ICUB_INCLUDE_DIRS}
                                ${YARP_INCLUDE_DIRS})
 
+target_link_libraries(${EXE_TARGET_NAME}
+                      PRIVATE
+                          BayesFilters::BayesFilters
+                          ctrlLib
+                          ${ICUB_LIBRARIES}
+                          iKin
+                          ${OpenCV_LIBS}
+                          SuperimposeMesh::SuperimposeMesh
+                          ${YARP_LIBRARIES})
 if(UNIX AND NOT APPLE)
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set(THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -89,26 +104,36 @@ if(UNIX AND NOT APPLE)
 
     target_link_libraries(${EXE_TARGET_NAME}
                           PRIVATE
-                              BayesFilters::BayesFilters
-                              ctrlLib
-                              Eigen3::Eigen
-                              ${ICUB_LIBRARIES}
-                              iKin
-                              ${OpenCV_LIBS}
-                              SuperimposeMesh::SuperimposeMesh
-                              Threads::Threads
-                              ${YARP_LIBRARIES})
+                              Threads::Threads)
+endif()
+if(NOT TARGET Eigen3)
+    target_include_directories(${EXE_TARGET_NAME}
+                               PRIVATE
+                                   ${EIGEN3_INCLUDE_DIR})
 else()
     target_link_libraries(${EXE_TARGET_NAME}
                           PRIVATE
-                              BayesFilters::BayesFilters
-                              ctrlLib
-                              Eigen3::Eigen
-                              ${ICUB_LIBRARIES}
-                              iKin
-                              ${OpenCV_LIBS}
-                              SuperimposeMesh::SuperimposeMesh
-                              ${YARP_LIBRARIES})
+                              Eigen3::Eigen)
+endif()
+
+if(DEFINED OpenCV_CUDA_VERSION AND (NOT DEFINED FORCE_NO_OPENCV_CUDA OR NOT FORCE_NO_OPENCV_CUDA))
+    message(STATUS "Found OpenCV with CUDA compiled modules.")
+    message(STATUS "Set macro HANDTRACKING_USE_OPENCV_CUDA = 1.")
+    target_compile_definitions(${EXE_TARGET_NAME}
+                               PRIVATE
+                                   HANDTRACKING_USE_OPENCV_CUDA=1)
+
+    option(FORCE_NO_OPENCV_CUDA "Force no OpenCV CUDA compiled modules?" OFF)
+else()
+    if(NOT DEFINED FORCE_NO_OPENCV_CUDA)
+        message(STATUS "Found no OpenCV CUDA compiled modules.")
+    else()
+        message(STATUS "Forcing no OpenCV CUDA compiled modules.")
+    endif()
+    message(STATUS "Set macro HANDTRACKING_USE_OPENCV_CUDA = 0.")
+    target_compile_definitions(${EXE_TARGET_NAME}
+                               PRIVATE
+                                   HANDTRACKING_USE_OPENCV_CUDA=0)
 endif()
 
 
@@ -152,6 +177,7 @@ set(${EXE_TARGET_NAME}_MESH
 		${CMAKE_CURRENT_SOURCE_DIR}/mesh/walkman_right_arm/soft_hand_open.stl)
 
 add_custom_command(TARGET  ${EXE_TARGET_NAME} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_CONF}        $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
                    COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_SHADER_VERT} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
                    COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_SHADER_FRAG} $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>
                    COMMAND ${CMAKE_COMMAND} -E copy ${${EXE_TARGET_NAME}_MESH}        $<TARGET_FILE_DIR:${EXE_TARGET_NAME}>)
