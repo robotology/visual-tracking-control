@@ -13,10 +13,10 @@ if(NOT EIGEN3_FOUND)
     find_package(Eigen3 REQUIRED)
 endif()
 
-find_package(BayesFilters 0.7.0.0 QUIET)
+find_package(BayesFilters 0.7.1.0 QUIET)
 if(NOT BayesFilters_FOUND)
     message(STATUS "Did not found required master release of BayesFilters. Looking for devel version.")
-    find_package(BayesFilters 0.7.100.0 REQUIRED)
+    find_package(BayesFilters 0.7.101 REQUIRED)
 endif()
 
 find_package(SuperimposeMesh 0.9.4.0 QUIET)
@@ -26,8 +26,6 @@ if(NOT SuperimposeMesh_FOUND)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
-
-include(YarpInstallationHelpers)
 
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR

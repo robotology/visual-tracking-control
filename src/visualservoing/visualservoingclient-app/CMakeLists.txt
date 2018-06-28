@@ -3,8 +3,6 @@ set(APP_TARGET_NAME visualservoingclient_app)
 find_package(YARP REQUIRED
              COMPONENTS OS dev math sig)
 
-include(YarpInstallationHelpers)
-
 # Application source and header files
 set(${APP_TARGET_NAME}_SRC
         src/main.cpp)

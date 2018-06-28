@@ -3,7 +3,6 @@ set(PLUGIN_NAME visualservoing)
 find_package(YARP REQUIRED
              COMPONENTS OS dev sig math)
 
-include(YarpPlugin)
 yarp_configure_external_installation(${PLUGIN_NAME} WITH_PLUGINS)
 
 yarp_begin_plugin_library(visualservoingplugin)

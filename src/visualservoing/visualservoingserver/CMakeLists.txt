@@ -17,8 +17,6 @@ find_package(OpenCV REQUIRED)
 
 LIST(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 
-include(YarpInstallationHelpers)
-
 # Plugin source and header files
 set(${PLUGIN_TARGET_NAME}_HDR
         ../visualservoingcommon/include/VisualServoingCommon.h
