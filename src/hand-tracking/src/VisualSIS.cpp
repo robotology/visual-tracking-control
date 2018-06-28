@@ -98,7 +98,7 @@ void VisualSIS::initialization()
 
     initialization_->initialize(pred_particle_, pred_weight_);
 
-    prediction_->getExogenousModel().setProperty("ICFW_INIT");
+    prediction_->getExogenousModel().setProperty("init");
 
     skip("all", false);
 }
