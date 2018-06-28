@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 
 
     /* INITIALIZATION */
-    std::unique_ptr<Initialization> init_arm;
+    std::unique_ptr<ParticleSetInitialization> init_arm;
     if (paramss["robot"] == "icub")
         init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["cam_sel"], paramss["laterality"],
                                                 "handTracking/InitiCubArm/" + paramss["cam_sel"]));

@@ -5,7 +5,7 @@
 using namespace Eigen;
 
 
-void InitPoseParticles::initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref<Eigen::VectorXf> weight)
+bool InitPoseParticles::initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref<Eigen::VectorXf> weight)
 {
     VectorXd pose = readPose();
 
