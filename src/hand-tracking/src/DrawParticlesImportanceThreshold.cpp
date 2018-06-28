@@ -52,7 +52,7 @@ void DrawParticlesImportanceThreshold::setExogenousModel(std::unique_ptr<Exogeno
 
 
 void DrawParticlesImportanceThreshold::predictStep(const Ref<const MatrixXf>& prev_states, const Ref<const VectorXf>& prev_weights,
-                                              Ref<MatrixXf> pred_states, Ref<VectorXf> pred_weights)
+                                                   Ref<MatrixXf> pred_states, Ref<VectorXf> pred_weights)
 {
     VectorXf sorted_cor = prev_weights;
     std::sort(sorted_cor.data(), sorted_cor.data() + sorted_cor.size());

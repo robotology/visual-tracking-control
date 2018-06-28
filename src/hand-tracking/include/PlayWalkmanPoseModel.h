@@ -28,9 +28,11 @@ protected:
 
 private:
     const yarp::os::ConstString log_ID_ = "[PlayWalkmanPoseModel]";
+
     yarp::os::ConstString port_prefix_ = "PlayWalkmanPoseModel";
 
     yarp::os::ConstString robot_;
+
     yarp::os::ConstString laterality_;
 };
 

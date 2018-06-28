@@ -1,11 +1,11 @@
 #ifndef DRAWPARTICLESIMPORTANCETHRESHOLD_H
 #define DRAWPARTICLESIMPORTANCETHRESHOLD_H
 
-#include <memory>
-#include <random>
-
 #include <BayesFilters/PFPrediction.h>
 #include <BayesFilters/StateModel.h>
+
+#include <memory>
+#include <random>
 
 namespace bfl {
     class DrawParticlesImportanceThreshold;
@@ -22,7 +22,6 @@ public:
     ~DrawParticlesImportanceThreshold() noexcept;
 
     DrawParticlesImportanceThreshold& operator=(DrawParticlesImportanceThreshold&& pf_prediction) noexcept;
-
 
     StateModel& getStateModel() override;
 

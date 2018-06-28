@@ -168,12 +168,12 @@ int main(int argc, char *argv[])
     if (paramss["robot"] == "icub")
     {
         if (paramsd["play"] != 1.0)
-            robot_motion = std::unique_ptr<iCubFwdKinModel>(new iCubFwdKinModel(paramss["robot"], paramss["laterality"],
-                                                                                "handTracking/iCubFwdKinModel/" + paramss["cam_sel"]));
+            robot_motion = std::unique_ptr<KinPoseModel>(new iCubFwdKinModel(paramss["robot"], paramss["laterality"],
+                                                                             "handTracking/iCubFwdKinModel/" + paramss["cam_sel"]));
         else
         {
-            robot_motion = std::unique_ptr<PlayiCubFwdKinModel>(new PlayiCubFwdKinModel(paramss["robot"], paramss["laterality"],
-                                                                                        "handTracking/PlayiCubFwdKinModel/" + paramss["cam_sel"]));
+            robot_motion = std::unique_ptr<KinPoseModel>(new PlayiCubFwdKinModel(paramss["robot"], paramss["laterality"],
+                                                                                 "handTracking/PlayiCubFwdKinModel/" + paramss["cam_sel"]));
         }
     }
     else if (paramss["robot"] == "walkman")
@@ -184,8 +184,8 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
         else
-            robot_motion = std::unique_ptr<PlayWalkmanPoseModel>(new PlayWalkmanPoseModel(paramss["robot"], paramss["laterality"],
-                                                                                          "handTracking/PlayWalkmanPoseModel/" + paramss["cam_sel"]));
+            robot_motion = std::unique_ptr<KinPoseModel>(new PlayWalkmanPoseModel(paramss["robot"], paramss["laterality"],
+                                                                                  "handTracking/PlayWalkmanPoseModel/" + paramss["cam_sel"]));
     }
     else
     {

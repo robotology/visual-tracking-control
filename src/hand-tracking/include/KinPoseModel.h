@@ -26,11 +26,14 @@ protected:
     virtual Eigen::VectorXd readPose() = 0;
 
     bool initialize_delta_ = true;
+
     bool setDeltaMotion();
 
 private:
     Eigen::VectorXd prev_ee_pose_    = Eigen::VectorXd::Zero(7);
+
     Eigen::VectorXd delta_hand_pose_ = Eigen::VectorXd::Zero(6);
+
     double          delta_angle_     = 0.0;
 };
 
