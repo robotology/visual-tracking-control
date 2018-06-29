@@ -22,9 +22,9 @@ using namespace yarp::sig;
 
 PlayiCubFwdKinModel::PlayiCubFwdKinModel(const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
     icub_kin_arm_(iCubArm(laterality+"_v2")),
+    port_prefix_(port_prefix),
     robot_(robot),
-    laterality_(laterality),
-    port_prefix_(port_prefix)
+    laterality_(laterality)
 {
     port_arm_enc_.open  ("/" + port_prefix_ + "/" + laterality_ + "_arm:i");
     port_torso_enc_.open("/" + port_prefix_ + "/torso:i");

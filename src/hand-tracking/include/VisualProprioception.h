@@ -1,6 +1,8 @@
 #ifndef VISUALPROPRIOCEPTION_H
 #define VISUALPROPRIOCEPTION_H
 
+#include <BayesFilters/MeasurementModel.h>
+
 #include <Camera.h>
 #include <MeshModel.h>
 
@@ -8,33 +10,41 @@
 #include <string>
 #include <memory>
 
-#include <BayesFilters/VisualObservationModel.h>
 #include <opencv2/core/core.hpp>
+#if HANDTRACKING_USE_OPENCV_CUDA
+#include <opencv2/core/cuda.hpp>
+#include <opencv2/cudaobjdetect.hpp>
+#else
+#include <opencv2/objdetect.hpp>
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 #include <SuperimposeMesh/SICAD.h>
 
-
-class VisualProprioception : public bfl::VisualObservationModel
+class VisualProprioception : public bfl::MeasurementModel
 {
 public:
-    VisualProprioception(const int num_images, std::unique_ptr<bfl::Camera> camera, std::unique_ptr<bfl::MeshModel> mesh_model);
+    VisualProprioception(const int num_images, const bfl::Camera::CameraParameters& cam_params, std::unique_ptr<bfl::MeshModel> mesh_model, const int num_parallel_processor);
+
+    VisualProprioception(const int num_images, const bfl::Camera::CameraParameters& cam_params, std::unique_ptr<bfl::MeshModel> mesh_model);
 
     virtual ~VisualProprioception() noexcept { };
 
-    void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_states, cv::OutputArray observations) override;
+    std::pair<bool, Eigen::MatrixXf> measure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
 
-    bool setProperty(const std::string property) override;
+    std::pair<bool, Eigen::MatrixXf> predictedMeasure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
 
-    int getOGLTilesNumber();
-    int getOGLTilesRows();
-    int getOGLTilesCols();
+    std::pair<bool, Eigen::MatrixXf> innovation(const Eigen::Ref<const Eigen::MatrixXf>& predicted_measurements, const Eigen::Ref<const Eigen::MatrixXf>& measurements) const override;
 
-    unsigned int getCamWidth();
-    unsigned int getCamHeight();
+    bool registerProcessData(std::shared_ptr<bfl::GenericData> process_data) override;
 
-    float getCamFx();
-    float getCamFy();
-    float getCamCx();
-    float getCamCy();
+    std::pair<bool, Eigen::MatrixXf> getProcessMeasurements() const override;
+
+    /* FIXME
+       Find a way to better communicate with the callee. Maybe a struct. */
+    int getOGLTilesNumber() const;
+
+    unsigned int getCamWidth() const;
+
+    unsigned int getCamHeight() const;
 
     /* For debugging walkman */
     void superimpose(const Superimpose::ModelPoseContainer& obj2pos_map, cv::Mat& img);
@@ -42,19 +52,43 @@ public:
 protected:
     std::string log_ID_ = "[VisualProprioception]";
 
-    std::unique_ptr<bfl::Camera>    camera_;
+    std::shared_ptr<cv::Mat> camera_image_ = nullptr;
+
+    std::shared_ptr<std::array<double, 3>> camera_position_ = nullptr;
+
+    std::shared_ptr<std::array<double, 4>> camera_orientation_ = nullptr;
+
     std::unique_ptr<bfl::MeshModel> mesh_model_;
 
     bfl::Camera::CameraParameters cam_params_;
 
     SICAD::ModelPathContainer mesh_paths_;
-    std::string               shader_folder_;
+
+    std::string shader_folder_;
 
     std::unique_ptr<SICAD> si_cad_;
-    const int              num_images_;
 
-    std::array<double, 3> cam_x_{ {0.0, 0.0, 0.0} };
-    std::array<double, 4> cam_o_{ {0.0, 0.0, 0.0, 0.0} };
+    int num_parallel_processor_;
+
+    int num_percore_rendered_img_;
+
+#if HANDTRACKING_USE_OPENCV_CUDA
+    cv::Ptr<cv::cuda::HOG> hog_cuda_;
+
+    mutable std::vector<cv::cuda::Stream> cuda_stream_;
+#else
+    std::unique_ptr<cv::HOGDescriptor> hog_cpu_;
+#endif // HANDTRACKING_USE_OPENCV_CUDA
+
+    const int block_size_ = 16;
+
+    const int bin_number_ = 9;
+
+    unsigned int feature_dim_;
+
+    /* FIXME
+       This is a convenient function over cv2eigen provided by opencv2/core/eigen.hpp. */
+    void ocv2eigen(const cv::Mat& src, Eigen::Ref<Eigen::MatrixXf> dst) const;
 };
 
 #endif /* VISUALPROPRIOCEPTION_H */

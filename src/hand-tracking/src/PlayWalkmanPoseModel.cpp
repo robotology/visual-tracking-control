@@ -21,9 +21,9 @@ using namespace yarp::sig;
 
 
 PlayWalkmanPoseModel::PlayWalkmanPoseModel(const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
+    port_prefix_(port_prefix),
     robot_(robot),
-    laterality_(laterality),
-    port_prefix_(port_prefix)
+    laterality_(laterality)
 {
     port_arm_pose_.open  ("/" + port_prefix_ + "/" + laterality_ + "_arm:i");
 

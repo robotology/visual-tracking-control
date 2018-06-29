@@ -40,7 +40,7 @@ private:
     const yarp::os::ConstString  log_ID_ = "[iCubFwdKinModel]";
 
     yarp::os::ConstString  port_prefix_ = "iCubFwdKinModel";
-    
+
     yarp::os::ConstString  robot_;
 
     yarp::os::ConstString  laterality_;

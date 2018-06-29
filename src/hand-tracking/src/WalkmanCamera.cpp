@@ -2,24 +2,23 @@
 
 #include <exception>
 
-#include <iCub/ctrl/math.h>
+#include <opencv2/core/core_c.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Property.h>
 #include <yarp/os/ResourceFinder.h>
 
 using namespace bfl;
-using namespace iCub::iKin;
-using namespace iCub::ctrl;
 using namespace yarp::math;
 using namespace yarp::os;
 using namespace yarp::sig;
 
 
-WalkmanCamera::WalkmanCamera(const yarp::os::ConstString& cam_sel,
+WalkmanCamera::WalkmanCamera(const std::string& cam_sel,
                              const double resolution_ratio,
-                             const yarp::os::ConstString& context,
-                             const yarp::os::ConstString& port_prefix) :
+                             const std::string& context,
+                             const std::string& port_prefix) :
+    camera_data_(std::make_shared<CameraData>()),
     port_prefix_(port_prefix),
     cam_sel_(cam_sel),
     resolution_ratio_(resolution_ratio),
@@ -59,6 +58,9 @@ WalkmanCamera::WalkmanCamera(const yarp::os::ConstString& cam_sel,
     yInfo() << log_ID_ << " - cy:" << params_.cy;
 
 
+    port_image_in_.open("/" + port_prefix_ + "/img:i");
+
+
     port_camera_pose_.open("/" + port_prefix_ + "/camera_pose:i");
 }
 
@@ -70,34 +72,49 @@ WalkmanCamera::~WalkmanCamera() noexcept
 }
 
 
-std::tuple<bool, Camera::CameraParameters> WalkmanCamera::getCameraParameters()
+bool WalkmanCamera::bufferProcessData()
 {
-    return std::make_tuple(true, params_);
+    bool success = false;
+
+    ImageOf<PixelRgb>* tmp_imgin = YARP_NULLPTR;
+    tmp_imgin = port_image_in_.read(false);
+    if (tmp_imgin != YARP_NULLPTR)
+    {
+        init_img_in_ = true;
+        (*camera_data_->image_) = cv::cvarrToMat(tmp_imgin->getIplImage()).clone();
+    }
+
+    if (init_img_in_)
+    {
+
+        Bottle* bottle_camera_pose = port_camera_pose_.read(true);
+        if (!bottle_camera_pose)
+        {
+            (*camera_data_->position_)[0] = bottle_camera_pose->get(0).asDouble();
+            (*camera_data_->position_)[1] = bottle_camera_pose->get(1).asDouble();
+            (*camera_data_->position_)[2] = bottle_camera_pose->get(2).asDouble();
+
+            (*camera_data_->orientation_)[0] = bottle_camera_pose->get(3).asDouble();
+            (*camera_data_->orientation_)[1] = bottle_camera_pose->get(4).asDouble();
+            (*camera_data_->orientation_)[2] = bottle_camera_pose->get(5).asDouble();
+            (*camera_data_->orientation_)[3] = bottle_camera_pose->get(6).asDouble();
+
+            success = true;
+        }
+
+    }
+
+    return success;
 }
 
 
-std::tuple<bool, std::array<double, 3>, std::array<double, 4>> WalkmanCamera::getCameraPose()
+std::shared_ptr<bfl::GenericData> WalkmanCamera::getProcessData()
 {
-    bool success = false;
-    std::array<double, 3> position{ { 0, 0, 0 } };
-    std::array<double, 4> orientation{ { 0, 0, 0, 0 } };
+    return camera_data_;
+}
 
-    Vector camera_pose(7, 0.0);
 
-    Bottle* bottle_camera_pose = port_camera_pose_.read(true);
-    if (!bottle_camera_pose)
-    {
-        position[0] = bottle_camera_pose->get(0).asDouble();
-        position[1] = bottle_camera_pose->get(1).asDouble();
-        position[2] = bottle_camera_pose->get(2).asDouble();
-
-        position[3] = bottle_camera_pose->get(3).asDouble();
-        position[4] = bottle_camera_pose->get(4).asDouble();
-        position[5] = bottle_camera_pose->get(5).asDouble();
-        position[6] = bottle_camera_pose->get(6).asDouble();
-
-        success = true;
-    }
-
-    return std::make_tuple(success, position, orientation);
+Camera::CameraParameters WalkmanCamera::getCameraParameters() const
+{
+    return params_;
 }

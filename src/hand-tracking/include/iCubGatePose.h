@@ -13,39 +13,44 @@
 class iCubGatePose : public GatePose
 {
 public:
-    iCubGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
+    iCubGatePose(std::unique_ptr<PFCorrection> visual_correction,
                  const double gate_x, const double gate_y, const double gate_z,
                  const double gate_aperture,
                  const double gate_rotation,
-                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality,
-                 const yarp::os::ConstString& port_prefix);
+                 const std::string& robot, const std::string& laterality,
+                 const std::string& port_prefix);
 
-    iCubGatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
-                 const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality,
-                 const yarp::os::ConstString& port_prefix);
+    iCubGatePose(std::unique_ptr<PFCorrection> visual_correction,
+                 const std::string& robot, const std::string& laterality,
+                 const std::string& port_prefix);
 
     ~iCubGatePose() noexcept override;
 
 protected:
     yarp::dev::PolyDriver  drv_arm_enc_;
-    yarp::dev::IEncoders * itf_arm_enc_;
-    yarp::dev::PolyDriver  drv_torso_enc_;
-    yarp::dev::IEncoders * itf_torso_enc_;
 
-    iCub::iKin::iCubArm    icub_kin_arm_;
+    yarp::dev::IEncoders* itf_arm_enc_;
 
-    Eigen::VectorXd   readPose() override;
+    yarp::dev::PolyDriver drv_torso_enc_;
+
+    yarp::dev::IEncoders* itf_torso_enc_;
+
+    iCub::iKin::iCubArm icub_kin_arm_;
+
+    Eigen::VectorXd readPose() override;
 
     yarp::sig::Vector readRootToEE();
 
     yarp::sig::Vector readTorso();
 
 private:
-    const yarp::os::ConstString log_ID_ = "[iCubGatePose]";
-    yarp::os::ConstString port_prefix_ = "iCubGatePose";
+    const std::string log_ID_ = "[iCubGatePose]";
 
-    yarp::os::ConstString robot_;
-    yarp::os::ConstString laterality_;
+    std::string port_prefix_ = "iCubGatePose";
+
+    std::string robot_;
+
+    std::string laterality_;
 };
 
 #endif /* ICUBGATEPOSE_H */

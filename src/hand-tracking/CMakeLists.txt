@@ -6,7 +6,7 @@ message(STATUS "CMAKE_PREFIX_PATH: " ${CMAKE_PREFIX_PATH})
 find_package(ICUB   REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(YARP   CONFIG REQUIRED
-             COMPONENTS OS eigen math sig)
+             COMPONENTS OS math sig eigen gsl)
 
 find_package(Eigen3 QUIET CONFIG)
 if(NOT EIGEN3_FOUND)
@@ -31,23 +31,25 @@ list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
 		include/Camera.h
+        include/CameraData.h
+        include/CVMatData.h
         include/DrawParticlesImportanceThreshold.h
         include/KinPoseModel.h
         include/GatePose.h
+        include/HistogramNormChi.h
         include/iCubFwdKinModel.h
-		include/iCubArmModel.h
-		include/iCubCamera.h
+        include/iCubArmModel.h
+        include/iCubCamera.h
         include/iCubGatePose.h
         include/InitiCubArm.h
         include/InitPoseParticles.h
         include/InitWalkmanArm.h
-		include/MeshModel.h
+        include/MeshModel.h
         include/PlayiCubFwdKinModel.h
         include/PlayGatePose.h
         include/PlayWalkmanPoseModel.h
         include/VisualProprioception.h
         include/VisualSIS.h
-        include/VisualUpdateParticles.h
 		include/WalkmanArmModel.h
 		include/WalkmanCamera.h)
 
@@ -57,8 +59,9 @@ set(${EXE_TARGET_NAME}_SRC
         src/DrawParticlesImportanceThreshold.cpp
         src/KinPoseModel.cpp
         src/GatePose.cpp
-		src/iCubArmModel.cpp
-		src/iCubCamera.cpp
+        src/HistogramNormChi.cpp
+        src/iCubArmModel.cpp
+        src/iCubCamera.cpp
         src/iCubFwdKinModel.cpp
         src/iCubGatePose.cpp
         src/InitiCubArm.cpp
@@ -69,7 +72,6 @@ set(${EXE_TARGET_NAME}_SRC
         src/PlayWalkmanPoseModel.cpp
         src/VisualProprioception.cpp
         src/VisualSIS.cpp
-        src/VisualUpdateParticles.cpp
 		src/WalkmanArmModel.cpp
 		src/WalkmanCamera.cpp)
 
@@ -96,10 +98,12 @@ target_link_libraries(${EXE_TARGET_NAME}
                           ${OpenCV_LIBS}
                           SuperimposeMesh::SuperimposeMesh
                           YARP::YARP_OS
-                          YARP::YARP_eigen
                           YARP::YARP_init
                           YARP::YARP_math
-                          YARP::YARP_sig)
+                          YARP::YARP_sig
+                          YARP::YARP_eigen
+                          YARP::YARP_gsl)
+
 if(UNIX AND NOT APPLE)
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set(THREADS_PREFER_PTHREAD_FLAG TRUE)

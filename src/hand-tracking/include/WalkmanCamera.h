@@ -2,42 +2,50 @@
 #define WALKMANHEAD_H
 
 #include <Camera.h>
+#include <CameraData.h>
 
 #include <string>
 
-#include <iCub/iKin/iKinFwd.h>
-#include <yarp/dev/PolyDriver.h>
-#include <yarp/dev/GazeControl.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
-#include <yarp/os/ConstString.h>
-#include <yarp/sig/Vector.h>
+#include <yarp/sig/Image.h>
 
 
 class WalkmanCamera : public bfl::Camera
 {
 public:
-    WalkmanCamera(const yarp::os::ConstString& cam_sel,
+    WalkmanCamera(const std::string& cam_sel,
                   const double resolution_ratio,
-                  const yarp::os::ConstString& context,
-                  const yarp::os::ConstString& port_prefix);
+                  const std::string& context,
+                  const std::string& port_prefix);
 
     virtual ~WalkmanCamera() noexcept;
 
-    std::tuple<bool, CameraParameters> getCameraParameters() override;
+    bool bufferProcessData() override;
 
-    std::tuple<bool, std::array<double, 3>, std::array<double, 4>> getCameraPose() override;
+    std::shared_ptr<bfl::GenericData> getProcessData() override;
+
+    CameraParameters getCameraParameters() const override;
 
 protected:
     CameraParameters params_;
 
-private:
-    const yarp::os::ConstString log_ID_ = "[WalkmanCamera]";
-    yarp::os::ConstString port_prefix_ = "WalkmanCamera";
+    std::shared_ptr<bfl::CameraData> camera_data_ = nullptr;
 
-    yarp::os::ConstString cam_sel_;
-    const double          resolution_ratio_;
-    yarp::os::ConstString context_;
+private:
+    const std::string log_ID_ = "[WalkmanCamera]";
+
+    std::string port_prefix_ = "WalkmanCamera";
+
+    std::string cam_sel_;
+
+    const double resolution_ratio_;
+
+    std::string context_;
+
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_;
+
+    bool init_img_in_ = false;
 
     yarp::os::BufferedPort<yarp::os::Bottle> port_camera_pose_;
 };

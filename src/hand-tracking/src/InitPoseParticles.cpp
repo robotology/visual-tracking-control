@@ -13,4 +13,6 @@ bool InitPoseParticles::initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref
         state.col(i) << pose.cast<float>();
 
     weight.fill(1.0 / state.cols());
+
+    return true;
 }

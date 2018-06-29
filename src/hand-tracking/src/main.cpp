@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <BayesFilters/ResamplingWithPrior.h>
+#include <BayesFilters/UpdateParticles.h>
 #include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
@@ -13,6 +14,7 @@
 
 #include <BrownianMotionPose.h>
 #include <DrawParticlesImportanceThreshold.h>
+#include <HistogramNormChi.h>
 #include <iCubCamera.h>
 #include <iCubArmModel.h>
 #include <iCubGatePose.h>
@@ -25,7 +27,6 @@
 #include <VisualProprioception.h>
 #include <VisualSIS.h>
 
-#include <VisualUpdateParticles.h>
 #include <WalkmanArmModel.h>
 #include <WalkmanCamera.h>
 
@@ -204,31 +205,31 @@ int main(int argc, char *argv[])
     std::unique_ptr<MeshModel> mesh_model;
     if (paramss["robot"] == "icub")
     {
-        camera = std::unique_ptr<iCubCamera>(new iCubCamera(paramss["cam_sel"],
-                                                            paramsd["resolution_ratio"],
-                                                            rf.getContext(),
-                                                            "handTracking/VisualProprioception/iCubCamera/" + paramss["cam_sel"]));
+        camera = std::unique_ptr<Camera>(new iCubCamera(paramss["cam_sel"],
+                                                        paramsd["resolution_ratio"],
+                                                        rf.getContext(),
+                                                        "handTracking/VisualProprioception/iCubCamera/" + paramss["cam_sel"]));
 
-        mesh_model = std::unique_ptr<iCubArmModel>(new iCubArmModel(paramsd["use_thumb"],
-                                                                    paramsd["use_forearm"],
-                                                                    paramss["laterality"],
-                                                                    rf.getContext(),
-                                                                    "handTracking/VisualProprioception/iCubArmModel/" + paramss["cam_sel"]));
+        mesh_model = std::unique_ptr<MeshModel>(new iCubArmModel(paramsd["use_thumb"],
+                                                                 paramsd["use_forearm"],
+                                                                 paramss["laterality"],
+                                                                 rf.getContext(),
+                                                                 "handTracking/VisualProprioception/iCubArmModel/" + paramss["cam_sel"]));
     }
     else if (paramss["robot"] == "walkman")
     {
-        camera = std::unique_ptr<WalkmanCamera>(new WalkmanCamera(paramss["cam_sel"],
-                                                                  paramsd["resolution_ratio"],
-                                                                  rf.getContext(),
-                                                                  "handTracking/VisualProprioception/WalkmanCamera/" + paramss["cam_sel"]));
+        camera = std::unique_ptr<Camera>(new WalkmanCamera(paramss["cam_sel"],
+                                                           paramsd["resolution_ratio"],
+                                                           rf.getContext(),
+                                                           "handTracking/VisualProprioception/WalkmanCamera/" + paramss["cam_sel"]));
 
-        mesh_model = std::unique_ptr<WalkmanArmModel>(new WalkmanArmModel(paramss["laterality"],
-                                                                          rf.getContext(),
-                                                                          "handTracking/VisualProprioception/WalkmanArmModel/" + paramss["cam_sel"]));
+        mesh_model = std::unique_ptr<MeshModel>(new WalkmanArmModel(paramss["laterality"],
+                                                                    rf.getContext(),
+                                                                    "handTracking/VisualProprioception/WalkmanArmModel/" + paramss["cam_sel"]));
     }
     else
     {
-        yError() << log_ID << "Wrong robot name. Provided: " << paramss["robot"] << ". Can be iCub, Walkman.";
+        yError() << log_ID << "Wrong robot name. Provided: " << paramss["robot"] << ". Shall be either 'icub' or 'walkman'.";
         return EXIT_FAILURE;
     }
 
@@ -236,9 +237,9 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        proprio = std::unique_ptr<VisualProprioception>(new VisualProprioception(paramsd["num_images"], std::move(camera), std::move(mesh_model)));
+        proprio = std::unique_ptr<VisualProprioception>(new VisualProprioception(paramsd["num_images"], camera->getCameraParameters(), std::move(mesh_model)));
 
-        paramsd["num_particles"] = proprio->getOGLTilesRows() * proprio->getOGLTilesCols() * paramsd["gpu_count"];
+        paramsd["num_particles"] = proprio->getOGLTilesNumber();
         paramsd["cam_width"]     = proprio->getCamWidth();
         paramsd["cam_height"]    = proprio->getCamHeight();
     }
@@ -248,10 +249,16 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    /* CORRECTION */
-    std::unique_ptr<PFVisualCorrection> vpf_update_particles(new VisualUpdateParticles(std::move(proprio), paramsd["likelihood_gain"], paramsd["gpu_count"]));
+    /* LIKELIHOOD */
+    std::unique_ptr<HistogramNormChi> likelihood_hist_norm_chi(new HistogramNormChi(paramsd["likelihood_gain"], 36));
 
-    std::unique_ptr<PFVisualCorrection> vpf_correction;
+    /* CORRECTION */
+    std::unique_ptr<PFCorrection> vpf_update_particles(new UpdateParticles());
+    vpf_update_particles->setLikelihoodModel(std::move(likelihood_hist_norm_chi));
+    vpf_update_particles->setMeasurementModel(std::move(proprio));
+    vpf_update_particles->setProcess(std::move(camera));
+
+    std::unique_ptr<PFCorrection> vpf_correction;
 
     if (paramsd["gate_pose"] == 1.0)
     {
@@ -259,18 +266,18 @@ int main(int argc, char *argv[])
 
         return EXIT_FAILURE;
 
-        if (paramsd["play"] != 1.0)
-            vpf_correction = std::unique_ptr<iCubGatePose>(new iCubGatePose(std::move(vpf_update_particles),
-                                                                            paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
-                                                                            paramsd["gate_aperture"], paramsd["gate_rotation"],
-                                                                            paramss["robot"], paramss["laterality"],
-                                                                            "handTracking/iCubGatePose/" + paramss["cam_sel"]));
-        else
-            vpf_correction = std::unique_ptr<PlayGatePose>(new PlayGatePose(std::move(vpf_update_particles),
-                                                                            paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
-                                                                            paramsd["gate_aperture"], paramsd["gate_rotation"],
-                                                                            paramss["robot"], paramss["laterality"],
-                                                                            "handTracking/PlayGatePose/" + paramss["cam_sel"]));
+        //if (paramsd["play"] != 1.0)
+        //    vpf_correction = std::unique_ptr<iCubGatePose>(new iCubGatePose(std::move(vpf_update_particles),
+        //                                                                    paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
+        //                                                                    paramsd["gate_aperture"], paramsd["gate_rotation"],
+        //                                                                    paramss["robot"], paramss["laterality"],
+        //                                                                    "handTracking/iCubGatePose/" + paramss["cam_sel"]));
+        //else
+        //    vpf_correction = std::unique_ptr<PlayGatePose>(new PlayGatePose(std::move(vpf_update_particles),
+        //                                                                    paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
+        //                                                                    paramsd["gate_aperture"], paramsd["gate_rotation"],
+        //                                                                    paramss["robot"], paramss["laterality"],
+        //                                                                    "handTracking/PlayGatePose/" + paramss["cam_sel"]));
     }
     else
         vpf_correction = std::move(vpf_update_particles);
@@ -281,7 +288,7 @@ int main(int argc, char *argv[])
         pf_resampling = std::unique_ptr<Resampling>(new Resampling());
     else
     {
-        std::unique_ptr<Initialization> resample_init_arm;
+        std::unique_ptr<ParticleSetInitialization> resample_init_arm;
 
         if (paramss["robot"] == "icub")
             resample_init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["cam_sel"], paramss["laterality"],

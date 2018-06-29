@@ -20,7 +20,7 @@ public:
     bool setProperty(const std::string& property) override;
 
 protected:
-    Eigen::VectorXd   readPose() override;
+    Eigen::VectorXd readPose() override;
 
     yarp::sig::Vector readRootToEE();
 

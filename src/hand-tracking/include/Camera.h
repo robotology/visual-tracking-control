@@ -1,6 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <BayesFilters/Process.h>
+
 #include <array>
 #include <tuple>
 
@@ -9,7 +11,7 @@ namespace bfl {
 }
 
 
-class bfl::Camera
+class bfl::Camera : public bfl::Process
 {
 public:
     virtual ~Camera() noexcept { };
@@ -24,9 +26,7 @@ public:
         double cy;
     };
 
-    virtual std::tuple<bool, CameraParameters> getCameraParameters() = 0;
-
-    virtual std::tuple<bool, std::array<double, 3>, std::array<double, 4>> getCameraPose() = 0;
+    virtual CameraParameters getCameraParameters() const = 0;
 };
 
 #endif /* CAMERA_H */

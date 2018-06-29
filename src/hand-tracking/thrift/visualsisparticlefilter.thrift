@@ -56,16 +56,6 @@ service VisualSISParticleFilterIDL
     bool skip_step(1:string what_step, 2:bool status);
 
     /**
-     * Use/Don't use the analog values from the right hand to correct the finger
-     * poses.
-     *
-     * @param status true/false to use/don't use analog values.
-     *
-     * @return true activation/deactivation success, false otherwise.
-     */
-    bool use_analogs(1:bool status);
-
-    /**
      * Get information about recursive Bayesian filter, like it's status, the
      * available methods, and the current one in use, to extract the state
      * estimate from the particle set.

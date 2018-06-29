@@ -28,7 +28,7 @@ WalkmanArmModel::WalkmanArmModel(const ConstString& laterality,
     model_path_["palm"] = rf.findFileByName("soft_hand_open.stl");
     if (!file_found(model_path_["palm"]))
         throw std::runtime_error("ERROR::WALKMANARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_palm.obj not found!");
-    
+
 
     rf.setDefaultContext(context + "/shader");
     shader_path_ = rf.findFileByName("shader_model.vert");
