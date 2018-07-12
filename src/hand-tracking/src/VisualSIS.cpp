@@ -26,7 +26,6 @@ using yarp::sig::Vector;
 
 
 VisualSIS::VisualSIS(const std::string& cam_sel,
-                     const int img_width, const int img_height,
                      const int num_particles,
                      const double resample_ratio,
                      const std::string& port_prefix) :
@@ -36,7 +35,7 @@ VisualSIS::VisualSIS(const std::string& cam_sel,
 {
     port_estimates_out_.open("/" + port_prefix_ + "/estimates:o");
 
-    port_image_out_.open("/" + port_prefix_ + "/img:o");
+    //port_image_out_.open("/" + port_prefix_ + "/img:o");
 
     setCommandPort();
 }

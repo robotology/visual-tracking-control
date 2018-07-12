@@ -39,27 +39,32 @@ std::pair<bool, Eigen::VectorXf> HistogramNormChi::likelihood(const bfl::Measure
         return std::make_pair(false, VectorXf::Zero(1));
 
 
-    VectorXf likelihood(pred_states.rows());
+    VectorXf likelihood(pred_states.cols());
 
-    for (int i = 0; i < pred_states.rows(); ++i)
+    for (int i = 0; i < pred_states.cols(); ++i)
     {
         double norm = 0;
         double chi = 0;
 
         double sum_normchi = 0;
 
+        size_t histogram_size_counter = 0;
         for (int j = 0; j < measurements.cols(); ++j)
         {
             norm += std::pow(measurements(0, j) - predicted_measurements(i, j), 2.0);
 
             chi += (std::pow(measurements(0, j) - predicted_measurements(i, j), 2.0)) / (measurements(0, j) + predicted_measurements(i, j) + std::numeric_limits<float>::min());
 
-            if (j % (histogram_size_ - 1))
+            histogram_size_counter++;
+
+            if (histogram_size_counter == histogram_size_)
             {
                 sum_normchi += std::sqrt(norm) * chi;
 
                 norm = 0;
                 chi = 0;
+
+                histogram_size_counter = 0;
             }
         }
 

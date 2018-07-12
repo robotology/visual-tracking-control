@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
     pf_prediction->setExogenousModel(std::move(robot_motion));
 
 
-    /* SENSOR MODEL */
+    /* PROCESS MODEL */
     std::unique_ptr<Camera> camera;
     std::unique_ptr<MeshModel> mesh_model;
     if (paramss["robot"] == "icub")
@@ -208,24 +208,24 @@ int main(int argc, char *argv[])
         camera = std::unique_ptr<Camera>(new iCubCamera(paramss["cam_sel"],
                                                         paramsd["resolution_ratio"],
                                                         rf.getContext(),
-                                                        "handTracking/VisualProprioception/iCubCamera/" + paramss["cam_sel"]));
+                                                        "handTracking/Process/iCubCamera/" + paramss["cam_sel"]));
 
         mesh_model = std::unique_ptr<MeshModel>(new iCubArmModel(paramsd["use_thumb"],
                                                                  paramsd["use_forearm"],
                                                                  paramss["laterality"],
                                                                  rf.getContext(),
-                                                                 "handTracking/VisualProprioception/iCubArmModel/" + paramss["cam_sel"]));
+                                                                 "handTracking/MeshModel/iCubArmModel/" + paramss["cam_sel"]));
     }
     else if (paramss["robot"] == "walkman")
     {
         camera = std::unique_ptr<Camera>(new WalkmanCamera(paramss["cam_sel"],
                                                            paramsd["resolution_ratio"],
                                                            rf.getContext(),
-                                                           "handTracking/VisualProprioception/WalkmanCamera/" + paramss["cam_sel"]));
+                                                           "handTracking/Process/WalkmanCamera/" + paramss["cam_sel"]));
 
         mesh_model = std::unique_ptr<MeshModel>(new WalkmanArmModel(paramss["laterality"],
                                                                     rf.getContext(),
-                                                                    "handTracking/VisualProprioception/WalkmanArmModel/" + paramss["cam_sel"]));
+                                                                    "handTracking/MeshModel/WalkmanArmModel/" + paramss["cam_sel"]));
     }
     else
     {
@@ -233,15 +233,18 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-
+    /* SENSOR MODEL */
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
         proprio = std::unique_ptr<VisualProprioception>(new VisualProprioception(paramsd["num_images"], camera->getCameraParameters(), std::move(mesh_model)));
 
         paramsd["num_particles"] = proprio->getOGLTilesNumber();
-        paramsd["cam_width"]     = proprio->getCamWidth();
-        paramsd["cam_height"]    = proprio->getCamHeight();
+
+        proprio->registerProcessData(camera->getProcessData());
+
+        yInfo() << log_ID << "General PF parameters changed after constructing VisualProprioception:";
+        yInfo() << log_ID << " - num_particles:" << paramsd["num_particles"];
     }
     catch (const std::runtime_error& e)
     {
@@ -266,18 +269,18 @@ int main(int argc, char *argv[])
 
         return EXIT_FAILURE;
 
-        //if (paramsd["play"] != 1.0)
-        //    vpf_correction = std::unique_ptr<iCubGatePose>(new iCubGatePose(std::move(vpf_update_particles),
-        //                                                                    paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
-        //                                                                    paramsd["gate_aperture"], paramsd["gate_rotation"],
-        //                                                                    paramss["robot"], paramss["laterality"],
-        //                                                                    "handTracking/iCubGatePose/" + paramss["cam_sel"]));
-        //else
-        //    vpf_correction = std::unique_ptr<PlayGatePose>(new PlayGatePose(std::move(vpf_update_particles),
-        //                                                                    paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
-        //                                                                    paramsd["gate_aperture"], paramsd["gate_rotation"],
-        //                                                                    paramss["robot"], paramss["laterality"],
-        //                                                                    "handTracking/PlayGatePose/" + paramss["cam_sel"]));
+//        if (paramsd["play"] != 1.0)
+//            vpf_correction = std::unique_ptr<iCubGatePose>(new iCubGatePose(std::move(vpf_update_particles),
+//                                                                            paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
+//                                                                            paramsd["gate_aperture"], paramsd["gate_rotation"],
+//                                                                            paramss["robot"], paramss["laterality"],
+//                                                                            "handTracking/iCubGatePose/" + paramss["cam_sel"]));
+//        else
+//            vpf_correction = std::unique_ptr<PlayGatePose>(new PlayGatePose(std::move(vpf_update_particles),
+//                                                                            paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
+//                                                                            paramsd["gate_aperture"], paramsd["gate_rotation"],
+//                                                                            paramss["robot"], paramss["laterality"],
+//                                                                            "handTracking/PlayGatePose/" + paramss["cam_sel"]));
     }
     else
         vpf_correction = std::move(vpf_update_particles);
@@ -302,7 +305,6 @@ int main(int argc, char *argv[])
 
     /* PARTICLE FILTER */
     VisualSIS vsis_pf(paramss["cam_sel"],
-                      paramsd["cam_width"], paramsd["cam_height"],
                       paramsd["num_particles"],
                       paramsd["resample_ratio"],
                       "handTracking/VisualSIS/" + paramss["cam_sel"]);

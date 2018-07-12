@@ -34,23 +34,6 @@ VisualProprioception::VisualProprioception
     if (!valid_parameter)
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR\nERROR: Could not find shader folder.");
 
-    try
-    {
-        si_cad_ = std::unique_ptr<SICAD>(new SICAD(mesh_paths_,
-                                                   cam_params_.width, cam_params_.height,
-                                                   cam_params_.fx, cam_params_.fy, cam_params_.cx, cam_params_.cy,
-                                                   num_images / num_parallel_processor_,
-                                                   shader_folder_,
-                                                   { 1.0, 0.0, 0.0, static_cast<float>(M_PI) }));
-    }
-    catch (const std::runtime_error& e)
-    {
-        throw std::runtime_error(e.what());
-    }
-    num_percore_rendered_img_ = si_cad_->getTilesNumber();
-
-    feature_dim_ = (cam_params_.width / block_size_ * 2 - 1) * (cam_params_.height / block_size_ * 2 - 1) * bin_number_ * 4;
-
 
 #if HANDTRACKING_USE_OPENCV_CUDA
     num_parallel_processor_ = num_parallel_processor;
@@ -71,6 +54,23 @@ VisualProprioception::VisualProprioception
     static_cast<void>(num_parallel_processor);
     num_parallel_processor_ = 1;
 #endif // HANDTRACKING_USE_OPENCV_CUDA
+
+    try
+    {
+        si_cad_ = std::unique_ptr<SICAD>(new SICAD(mesh_paths_,
+                                                   cam_params_.width, cam_params_.height,
+                                                   cam_params_.fx, cam_params_.fy, cam_params_.cx, cam_params_.cy,
+                                                   num_images / num_parallel_processor_,
+                                                   shader_folder_,
+                                                   { 1.0, 0.0, 0.0, static_cast<float>(M_PI) }));
+    }
+    catch (const std::runtime_error& e)
+    {
+        throw std::runtime_error(e.what());
+    }
+    num_percore_rendered_img_ = si_cad_->getTilesNumber();
+
+    feature_dim_ = (cam_params_.width / block_size_ * 2 - 1) * (cam_params_.height / block_size_ * 2 - 1) * bin_number_ * 4;
 }
 
 
@@ -225,19 +225,6 @@ std::pair<bool, MatrixXf> VisualProprioception::getProcessMeasurements() const
 int VisualProprioception::getOGLTilesNumber() const
 {
     return num_percore_rendered_img_ * num_parallel_processor_;
-}
-
-
-
-unsigned int VisualProprioception::getCamWidth() const
-{
-    return cam_params_.width;
-}
-
-
-unsigned int VisualProprioception::getCamHeight() const
-{
-    return cam_params_.height;
 }
 
 

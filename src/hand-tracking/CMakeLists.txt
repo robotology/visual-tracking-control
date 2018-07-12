@@ -147,9 +147,9 @@ endif()
 # Custom command for RESOURCE/EXTRA files
 set(${EXE_TARGET_NAME}_APP
         ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-iCub.xml
-        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-iCub-BATCH.xml
-        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-iCub-SIM.xml
-		${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-Walkman-BATCH.xml)
+        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-iCub-Batch.xml
+        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-iCub-Sim.xml
+        ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-Walkman-Batch.xml)
 
 set(${EXE_TARGET_NAME}_CONF
         ${CMAKE_CURRENT_SOURCE_DIR}/conf/config.ini)

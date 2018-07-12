@@ -32,7 +32,6 @@ class VisualSIS: public bfl::ParticleFilter,
 {
 public:
     VisualSIS(const std::string& cam_sel,
-              const int img_width, const int img_height,
               const int num_particles,
               const double resample_ratio,
               const std::string& port_prefix);
@@ -94,7 +93,7 @@ private:
     bfl::EstimatesExtraction estimate_extraction_;
 
     /* Add to debug Walkman */
-    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_;
+    //yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_out_;
 };
 
 #endif /* VISUALSIS_H */

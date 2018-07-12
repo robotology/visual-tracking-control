@@ -3,7 +3,7 @@
 <application>
 
   <!-- GENERIC INFORMATION -->
-  <name>hand-tracking-BATCH</name>
+  <name>hand-tracking-Batch</name>
   <description>Offline visual hand tracking for the iCub robot using a 3D model-aided particle filter</description>
   <version>0.5.0.0</version>
 
@@ -36,126 +36,126 @@
   <!-- Particle filter connections -->
   <connection>
     <from>/icub/camcalib/left/out</from>
-    <to>/handTracking/VisualSIS/left/img:i</to>
-    <protocol>mcast</protocol>
+    <to>/handTracking/Process/iCubCamera/left/img:i</to>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/camcalib/right/out</from>
-    <to>/handTracking/VisualSIS/right/img:i</to>
-    <protocol>mcast</protocol>
+    <to>/handTracking/Process/iCubCamera/right/img:i</to>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <!-- Initialitazion connections -->
   <connection>
     <from>/icub/torso/state:o</from>
     <to>/handTracking/InitiCubArm/left/torso:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/right_arm/state:o</from>
     <to>/handTracking/InitiCubArm/left/right_arm:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/torso/state:o</from>
     <to>/handTracking/InitiCubArm/right/torso:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/right_arm/state:o</from>
     <to>/handTracking/InitiCubArm/right/right_arm:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <!-- Motion model connections -->
   <connection>
     <from>/icub/torso/state:o</from>
     <to>/handTracking/PlayiCubFwdKinModel/left/torso:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/right_arm/state:o</from>
     <to>/handTracking/PlayiCubFwdKinModel/left/right_arm:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <!-- VisualProprioception connections -->
   <connection>
     <from>/icub/head/state:o</from>
-    <to>/handTracking/VisualProprioception/iCubCamera/left/head:i</to>
-    <protocol>tcp</protocol>
+    <to>/handTracking/Process/iCubCamera/left/head:i</to>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/head/state:o</from>
-    <to>/handTracking/VisualProprioception/iCubCamera/right/head:i</to>
-    <protocol>tcp</protocol>
+    <to>/handTracking/Process/iCubCamera/right/head:i</to>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/torso/state:o</from>
-    <to>/handTracking/VisualProprioception/iCubCamera/left/torso:i</to>
-    <protocol>tcp</protocol>
+    <to>/handTracking/Process/iCubCamera/left/torso:i</to>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/torso/state:o</from>
-    <to>/handTracking/VisualProprioception/iCubCamera/right/torso:i</to>
-    <protocol>tcp</protocol>
+    <to>/handTracking/Process/iCubCamera/right/torso:i</to>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/right_arm/state:o</from>
-    <to>/handTracking/VisualProprioception/iCubArmModel/left/right_arm:i</to>
-    <protocol>tcp</protocol>
+    <to>/handTracking/MeshModel/iCubArmModel/left/right_arm:i</to>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/right_arm/state:o</from>
-    <to>/handTracking/VisualProprioception/iCubArmModel/right/right_arm:i</to>
-    <protocol>tcp</protocol>
+    <to>/handTracking/MeshModel/iCubArmModel/right/right_arm:i</to>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/torso/state:o</from>
-    <to>/handTracking/VisualProprioception/iCubArmModel/left/torso:i</to>
-    <protocol>tcp</protocol>
+    <to>/handTracking/MeshModel/iCubArmModel/left/torso:i</to>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/torso/state:o</from>
-    <to>/handTracking/VisualProprioception/iCubArmModel/right/torso:i</to>
-    <protocol>tcp</protocol>
+    <to>/handTracking/MeshModel/iCubArmModel/right/torso:i</to>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <!-- ResamplingWithPrior connections -->
   <connection>
     <from>/icub/torso/state:o</from>
     <to>/handTracking/ResamplingWithPrior/InitiCubArm/left/torso:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/right_arm/state:o</from>
     <to>/handTracking/ResamplingWithPrior/InitiCubArm/left/right_arm:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/torso/state:o</from>
     <to>/handTracking/ResamplingWithPrior/InitiCubArm/right/torso:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/icub/right_arm/state:o</from>
     <to>/handTracking/ResamplingWithPrior/InitiCubArm/right/right_arm:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
 
@@ -163,13 +163,13 @@
   <connection>
     <from>/handTracking/VisualSIS/left/estimates:o</from>
     <to>/iCubProprioception/BatchCADSuperimposer/cam/left/hand/right_pose:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
   <connection>
     <from>/handTracking/VisualSIS/right/estimates:o</from>
     <to>/iCubProprioception/BatchCADSuperimposer/cam/right/hand/right_pose:i</to>
-    <protocol>tcp</protocol>
+    <protocol>fast_tcp</protocol>
   </connection>
 
 </application>

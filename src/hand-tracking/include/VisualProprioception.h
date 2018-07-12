@@ -42,10 +42,6 @@ public:
        Find a way to better communicate with the callee. Maybe a struct. */
     int getOGLTilesNumber() const;
 
-    unsigned int getCamWidth() const;
-
-    unsigned int getCamHeight() const;
-
     /* For debugging walkman */
     void superimpose(const Superimpose::ModelPoseContainer& obj2pos_map, cv::Mat& img);
 
