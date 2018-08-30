@@ -86,7 +86,7 @@ VisualProprioception::~VisualProprioception() noexcept
 {
 #if HANDTRACKING_USE_OPENCV_CUDA
     cudaGraphicsUnmapResources(static_cast<int>(pbo_size_), pbo_cuda_, 0);
-    
+
     delete[] pbo_cuda_;
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 }
@@ -205,7 +205,6 @@ std::pair<bool, MatrixXf> VisualProprioception::getProcessMeasurements() const
     /* FIXME
      Is the following command slow? */
     ocv2eigen(descriptors_cpu, descriptor_out);
-
 #else
     std::vector<float> descriptors_cpu;
 
