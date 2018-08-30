@@ -22,11 +22,9 @@
 class VisualProprioception : public bfl::MeasurementModel
 {
 public:
-    VisualProprioception(const int num_images, const bfl::Camera::CameraParameters& cam_params, std::unique_ptr<bfl::MeshModel> mesh_model, const int num_parallel_processor);
-
     VisualProprioception(const int num_images, const bfl::Camera::CameraParameters& cam_params, std::unique_ptr<bfl::MeshModel> mesh_model);
 
-    virtual ~VisualProprioception() noexcept { };
+    virtual ~VisualProprioception() noexcept;
 
     std::pair<bool, Eigen::MatrixXf> measure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
 
@@ -64,14 +62,16 @@ protected:
 
     std::unique_ptr<SICAD> si_cad_;
 
-    int num_parallel_processor_;
-
-    int num_percore_rendered_img_;
+    int num_images_;
 
 #if HANDTRACKING_USE_OPENCV_CUDA
     cv::Ptr<cv::cuda::HOG> hog_cuda_;
 
-    mutable std::vector<cv::cuda::Stream> cuda_stream_;
+    const GLuint* pbo_ = nullptr;
+
+    size_t pbo_size_ = 0;
+
+    struct cudaGraphicsResource** pbo_cuda_;
 #else
     std::unique_ptr<cv::HOGDescriptor> hog_cpu_;
 #endif // HANDTRACKING_USE_OPENCV_CUDA

@@ -9,6 +9,10 @@
 
 #if HANDTRACKING_USE_OPENCV_CUDA
 #include <opencv2/cudaimgproc.hpp>
+#include <opencv2/cudaarithm.hpp>
+
+#include <cuda_runtime.h>
+#include <cuda_gl_interop.h>
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 
 using namespace Eigen;
@@ -18,11 +22,11 @@ VisualProprioception::VisualProprioception
 (
     const int num_images,
     const bfl::Camera::CameraParameters& cam_params,
-    std::unique_ptr<bfl::MeshModel> mesh_model,
-    const int num_parallel_processor
+    std::unique_ptr<bfl::MeshModel> mesh_model
 ) :
     mesh_model_(std::move(mesh_model)),
-    cam_params_(cam_params)
+    cam_params_(cam_params),
+    num_images_(num_images)
 {
     bool valid_parameter = false;
 
@@ -36,9 +40,6 @@ VisualProprioception::VisualProprioception
 
 
 #if HANDTRACKING_USE_OPENCV_CUDA
-    num_parallel_processor_ = num_parallel_processor;
-    cuda_stream_ = std::vector<cv::cuda::Stream>(num_parallel_processor);
-
     hog_cuda_ = cv::cuda::HOG::create(cv::Size(cam_params_.width, cam_params_.height), cv::Size(block_size_, block_size_), cv::Size(block_size_ / 2, block_size_ / 2), cv::Size(block_size_ / 2, block_size_ / 2), bin_number_);
     hog_cuda_->setDescriptorFormat(cv::cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
     hog_cuda_->setGammaCorrection(true);
@@ -50,9 +51,6 @@ VisualProprioception::VisualProprioception
                                                                         cv::Size(block_size_ / 2, block_size_ / 2),
                                                                         bin_number_,
                                                                         1, -1.0, cv::HOGDescriptor::L2Hys, 0.2, true, cv::HOGDescriptor::DEFAULT_NLEVELS, false));
-
-    static_cast<void>(num_parallel_processor);
-    num_parallel_processor_ = 1;
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 
     try
@@ -60,7 +58,7 @@ VisualProprioception::VisualProprioception
         si_cad_ = std::unique_ptr<SICAD>(new SICAD(mesh_paths_,
                                                    cam_params_.width, cam_params_.height,
                                                    cam_params_.fx, cam_params_.fy, cam_params_.cx, cam_params_.cy,
-                                                   num_images / num_parallel_processor_,
+                                                   num_images_,
                                                    shader_folder_,
                                                    { 1.0, 0.0, 0.0, static_cast<float>(M_PI) }));
     }
@@ -68,86 +66,87 @@ VisualProprioception::VisualProprioception
     {
         throw std::runtime_error(e.what());
     }
-    num_percore_rendered_img_ = si_cad_->getTilesNumber();
 
     feature_dim_ = (cam_params_.width / block_size_ * 2 - 1) * (cam_params_.height / block_size_ * 2 - 1) * bin_number_ * 4;
+
+#if HANDTRACKING_USE_OPENCV_CUDA
+    std::tie(pbo_, pbo_size_) = si_cad_->getPBOs();
+
+    pbo_cuda_ = new cudaGraphicsResource*[pbo_size_]();
+
+    for (size_t i = 0; i < pbo_size_; ++i)
+        cudaGraphicsGLRegisterBuffer(pbo_cuda_ + i, pbo_[i], cudaGraphicsRegisterFlagsNone);
+
+    si_cad_->releaseContext();
+#endif // HANDTRACKING_USE_OPENCV_CUDA
 }
 
 
-VisualProprioception::VisualProprioception
-(
-    const int num_images,
-    const bfl::Camera::CameraParameters& cam_params,
-    std::unique_ptr<bfl::MeshModel> mesh_model
-) :
-    VisualProprioception
-    (
-        num_images,
-        cam_params,
-        std::move(mesh_model),
-        1
-    )
-{ }
+VisualProprioception::~VisualProprioception() noexcept
+{
+#if HANDTRACKING_USE_OPENCV_CUDA
+    cudaGraphicsUnmapResources(static_cast<int>(pbo_size_), pbo_cuda_, 0);
+    
+    delete[] pbo_cuda_;
+#endif // HANDTRACKING_USE_OPENCV_CUDA
+}
 
 
 std::pair<bool, MatrixXf> VisualProprioception::measure(const Ref<const MatrixXf>& cur_states) const
 {
-    MatrixXf descriptor_out(num_percore_rendered_img_ * num_parallel_processor_, feature_dim_);
-
-    std::vector<cv::Mat> rendered_image(num_parallel_processor_);
-
-    for (int s = 0; s < num_parallel_processor_; ++s)
-    {
-        std::vector<Superimpose::ModelPoseContainer> hand_poses;
-        bool success = false;
-
-        std::tie(success, hand_poses) = mesh_model_->getModelPose(cur_states.block(0, s * num_percore_rendered_img_, 7, num_percore_rendered_img_));
-        if (!success)
-            return std::make_pair(false, MatrixXf::Zero(1, 1));
-
-        success &= si_cad_->superimpose(hand_poses, camera_position_->data(), camera_orientation_->data(), rendered_image[s]);
-        if (!success)
-            return std::make_pair(false, MatrixXf::Zero(1, 1));
-    }
+    MatrixXf descriptor_out(num_images_, feature_dim_);
 
 #if HANDTRACKING_USE_OPENCV_CUDA
-    std::vector<cv::cuda::GpuMat> img_cuda(num_parallel_processor_);
-    std::vector<cv::cuda::GpuMat> img_alpha_cuda(num_parallel_processor_);
-    std::vector<cv::cuda::GpuMat> descriptors_cuda(num_parallel_processor_);
-    std::vector<cv::Mat>          descriptors_cpu(num_parallel_processor_);
+    std::vector<Superimpose::ModelPoseContainer> mesh_poses;
+    bool success = false;
 
-    for (int s = 0; s < num_parallel_processor_; ++s)
-    {
-        img_cuda[s].upload(rendered_image[s], cuda_stream_[s]);
+    std::tie(success, mesh_poses) = mesh_model_->getModelPose(cur_states);
+    if (!success)
+        return std::make_pair(false, MatrixXf::Zero(1, 1));
 
-        cv::cuda::cvtColor(img_cuda[s], img_alpha_cuda[s], cv::COLOR_BGR2BGRA, 4, cuda_stream_[s]);
+    success &= si_cad_->superimpose(mesh_poses, camera_position_->data(), camera_orientation_->data(), 0);
+    if (!success)
+        return std::make_pair(false, MatrixXf::Zero(1, 1));
 
-        hog_cuda_->compute(img_alpha_cuda[s], descriptors_cuda[s], cuda_stream_[s]);
-    }
+    cv::cuda::GpuMat cuda_mat_render(si_cad_->getTilesRows() * cam_params_.height, si_cad_->getTilesCols() * cam_params_.width, CV_8UC3, static_cast<void*>(pbo_cuda_));
 
-    for (int s = 0; s < num_parallel_processor_; ++s)
-    {
-        cuda_stream_[s].waitForCompletion();
+    cv::cuda::GpuMat cuda_mat_render_flipped;
+    cv::cuda::flip(cuda_mat_render, cuda_mat_render_flipped, 0);
 
-        descriptors_cuda[s].download(descriptors_cpu[s], cuda_stream_[s]);
+    /* FIXME
+     This step shold be performed by OpenGL. */
+    cv::cuda::GpuMat cuda_mat_render_flipped_alpha;
+    cv::cuda::cvtColor(cuda_mat_render_flipped, cuda_mat_render_flipped_alpha, cv::COLOR_BGR2BGRA, 4);
 
-        /* FIXME
-         Is the following command slow? */
-        ocv2eigen(descriptors_cpu[s], descriptor_out.block(s * num_percore_rendered_img_, 0, num_percore_rendered_img_, feature_dim_));
-    }
+    cv::cuda::GpuMat cuda_descriptor;
+    hog_cuda_->compute(cuda_mat_render_flipped_alpha, cuda_descriptor);
 
+    cv::Mat cpu_descriptor;
+    cuda_descriptor.download(cpu_descriptor);
+
+    /* FIXME
+     Is the following command slow? */
+    ocv2eigen(cpu_descriptor, descriptor_out);
 #else
-    std::vector<std::vector<float>> descriptors_cpu(num_parallel_processor_);
+    std::vector<Superimpose::ModelPoseContainer> mesh_poses;
+    bool success = false;
 
-    for (int s = 0; s < num_parallel_processor_; ++s)
-    {
-        hog_cpu_->compute(rendered_image[s], descriptors_cpu[s], cv::Size(cam_params_.width, cam_params_.height));
+    std::tie(success, mesh_poses) = mesh_model_->getModelPose(cur_states);
+    if (!success)
+        return std::make_pair(false, MatrixXf::Zero(1, 1));
 
-        /* FIXME
-         The following copy operation is super slow (approx 4 ms for 2M numbers).
-         Must find out a new, direct, way of doing this. */
-        descriptor_out.block(s * num_percore_rendered_img_, 0, num_percore_rendered_img_, feature_dim_) = Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(descriptors_cpu[s].data(), num_percore_rendered_img_, feature_dim_);
-    }
+    cv::Mat rendered_image;
+    success &= si_cad_->superimpose(mesh_poses, camera_position_->data(), camera_orientation_->data(), rendered_image);
+    if (!success)
+        return std::make_pair(false, MatrixXf::Zero(1, 1));
+
+    std::vector<float> descriptors_cpu;
+    hog_cpu_->compute(rendered_image, descriptors_cpu, cv::Size(cam_params_.width, cam_params_.height));
+
+    /* FIXME
+     The following copy operation is super slow (approx 4 ms for 2M numbers).
+     Must find out a new, direct, way of doing this. */
+    descriptor_out.block(s * num_percore_rendered_img_, 0, num_percore_rendered_img_, feature_dim_) = Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(descriptors_cpu.data(), num_percore_rendered_img_, feature_dim_);
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 
     return std::make_pair(true, descriptor_out);
@@ -224,7 +223,7 @@ std::pair<bool, MatrixXf> VisualProprioception::getProcessMeasurements() const
 
 int VisualProprioception::getOGLTilesNumber() const
 {
-    return num_percore_rendered_img_ * num_parallel_processor_;
+    return num_images_;
 }
 
 
