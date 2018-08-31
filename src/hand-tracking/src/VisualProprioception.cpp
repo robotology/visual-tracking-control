@@ -20,13 +20,12 @@ using namespace Eigen;
 
 VisualProprioception::VisualProprioception
 (
-    const int num_images,
+    const int num_requested_images,
     const bfl::Camera::CameraParameters& cam_params,
     std::unique_ptr<bfl::MeshModel> mesh_model
 ) :
     mesh_model_(std::move(mesh_model)),
-    cam_params_(cam_params),
-    num_images_(num_images)
+    cam_params_(cam_params)
 {
     bool valid_parameter = false;
 
@@ -58,7 +57,7 @@ VisualProprioception::VisualProprioception
         si_cad_ = std::unique_ptr<SICAD>(new SICAD(mesh_paths_,
                                                    cam_params_.width, cam_params_.height,
                                                    cam_params_.fx, cam_params_.fy, cam_params_.cx, cam_params_.cy,
-                                                   num_images_,
+                                                   num_requested_images,
                                                    shader_folder_,
                                                    { 1.0, 0.0, 0.0, static_cast<float>(M_PI) }));
     }
@@ -66,6 +65,8 @@ VisualProprioception::VisualProprioception
     {
         throw std::runtime_error(e.what());
     }
+
+    num_images_ = si_cad_->getTilesNumber();
 
     feature_dim_ = (cam_params_.width / block_size_ * 2 - 1) * (cam_params_.height / block_size_ * 2 - 1) * bin_number_ * 4;
 

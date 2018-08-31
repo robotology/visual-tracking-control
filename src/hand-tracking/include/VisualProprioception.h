@@ -22,7 +22,7 @@
 class VisualProprioception : public bfl::MeasurementModel
 {
 public:
-    VisualProprioception(const int num_images, const bfl::Camera::CameraParameters& cam_params, std::unique_ptr<bfl::MeshModel> mesh_model);
+    VisualProprioception(const int num_requested_images, const bfl::Camera::CameraParameters& cam_params, std::unique_ptr<bfl::MeshModel> mesh_model);
 
     virtual ~VisualProprioception() noexcept;
 
