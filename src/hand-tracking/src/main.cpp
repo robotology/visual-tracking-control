@@ -14,7 +14,8 @@
 
 #include <BrownianMotionPose.h>
 #include <DrawParticlesImportanceThreshold.h>
-#include <HistogramNormChi.h>
+#include <HistogramNormOne.h>
+#include <HistogramNormTwoChi.h>
 #include <iCubCamera.h>
 #include <iCubArmModel.h>
 #include <iCubGatePose.h>
@@ -253,11 +254,20 @@ int main(int argc, char *argv[])
     }
 
     /* LIKELIHOOD */
-    std::unique_ptr<HistogramNormChi> likelihood_hist_norm_chi(new HistogramNormChi(paramsd["likelihood_gain"], 36));
+    std::unique_ptr<LikelihoodModel> likelihood_hist;
+    if (paramss["likelihood_type"] == "norm_one")
+        likelihood_hist = std::unique_ptr<HistogramNormOne>(new HistogramNormOne(paramsd["likelihood_gain"], 36));
+    else if (paramss["likelihood_type"] == "norm_two_chi")
+        likelihood_hist = std::unique_ptr<HistogramNormTwoChi>(new HistogramNormTwoChi(paramsd["likelihood_gain"], 36));
+    else
+    {
+        yError() << log_ID << "Wrong likelihood type. Provided: " << paramss["likelihood_type"] << ". Shalle be either 'norm_one' or 'norm_two_chi'.";
+        return EXIT_FAILURE;
+    }
 
     /* CORRECTION */
     std::unique_ptr<PFCorrection> vpf_update_particles(new UpdateParticles());
-    vpf_update_particles->setLikelihoodModel(std::move(likelihood_hist_norm_chi));
+    vpf_update_particles->setLikelihoodModel(std::move(likelihood_hist));
     vpf_update_particles->setMeasurementModel(std::move(proprio));
     vpf_update_particles->setProcess(std::move(camera));
 

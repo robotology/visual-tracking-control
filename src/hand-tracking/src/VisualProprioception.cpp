@@ -224,7 +224,7 @@ std::pair<bool, MatrixXf> VisualProprioception::getProcessMeasurements() const
     descriptor_out = Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(descriptors_cpu.data(), 1, feature_dim_);
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 
-    return std::make_pair(true, descriptor_out);
+    return std::make_pair(true, std::move(descriptor_out));
 }
 
 

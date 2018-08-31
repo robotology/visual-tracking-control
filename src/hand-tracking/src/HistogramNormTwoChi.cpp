@@ -1,4 +1,4 @@
-#include <HistogramNormChi.h>
+#include <HistogramNormTwoChi.h>
 
 #include <cmath>
 #include <exception>
@@ -11,17 +11,17 @@ using namespace bfl;
 using namespace Eigen;
 
 
-HistogramNormChi::HistogramNormChi(const double likelihood_gain, const int histogram_size) noexcept :
+HistogramNormTwoChi::HistogramNormTwoChi(const double likelihood_gain, const int histogram_size) noexcept :
     likelihood_gain_(likelihood_gain),
     histogram_size_(histogram_size)
 { }
 
 
-HistogramNormChi::~HistogramNormChi() noexcept
+HistogramNormTwoChi::~HistogramNormTwoChi() noexcept
 { }
 
 
-std::pair<bool, Eigen::VectorXf> HistogramNormChi::likelihood(const bfl::MeasurementModel& measurement_model, const Eigen::Ref<const Eigen::MatrixXf>& pred_states)
+std::pair<bool, Eigen::VectorXf> HistogramNormTwoChi::likelihood(const bfl::MeasurementModel& measurement_model, const Eigen::Ref<const Eigen::MatrixXf>& pred_states)
 {
     bool valid_measurements;
     MatrixXf measurements;
@@ -51,9 +51,11 @@ std::pair<bool, Eigen::VectorXf> HistogramNormChi::likelihood(const bfl::Measure
         size_t histogram_size_counter = 0;
         for (int j = 0; j < measurements.cols(); ++j)
         {
-            norm += std::pow(measurements(0, j) - predicted_measurements(i, j), 2.0);
+            double suqared_diff = std::pow(measurements(0, j) - predicted_measurements(i, j), 2.0);
 
-            chi += (std::pow(measurements(0, j) - predicted_measurements(i, j), 2.0)) / (measurements(0, j) + predicted_measurements(i, j) + std::numeric_limits<float>::min());
+            norm += suqared_diff;
+
+            chi += suqared_diff / (measurements(0, j) + predicted_measurements(i, j) + std::numeric_limits<float>::min());
 
             histogram_size_counter++;
 
@@ -68,8 +70,10 @@ std::pair<bool, Eigen::VectorXf> HistogramNormChi::likelihood(const bfl::Measure
             }
         }
 
-        likelihood(i) = exp(-likelihood_gain_ * sum_normchi);
+        likelihood(i) = static_cast<float>(sum_normchi);
     }
+    likelihood = (-static_cast<float>(likelihood_gain_) * likelihood).array().exp();
 
-    return std::make_pair(true, likelihood);
+
+    return std::make_pair(true, std::move(likelihood));
 }

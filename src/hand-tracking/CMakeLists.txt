@@ -79,7 +79,8 @@ set(${EXE_TARGET_NAME}_HDR
         include/DrawParticlesImportanceThreshold.h
         include/KinPoseModel.h
         include/GatePose.h
-        include/HistogramNormChi.h
+        include/HistogramNormOne.h
+        include/HistogramNormTwoChi.h
         include/iCubFwdKinModel.h
         include/iCubArmModel.h
         include/iCubCamera.h
@@ -103,7 +104,8 @@ set(${EXE_TARGET_NAME}_SRC
         src/DrawParticlesImportanceThreshold.cpp
         src/KinPoseModel.cpp
         src/GatePose.cpp
-        src/HistogramNormChi.cpp
+        src/HistogramNormOne.cpp
+        src/HistogramNormTwoChi.cpp
         src/iCubArmModel.cpp
         src/iCubCamera.cpp
         src/iCubFwdKinModel.cpp
