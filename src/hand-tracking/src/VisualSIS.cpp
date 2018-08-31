@@ -1,5 +1,4 @@
 #include <VisualSIS.h>
-#include <HistogramNormChi.h>
 
 #include <exception>
 #include <utility>
