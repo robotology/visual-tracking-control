@@ -57,57 +57,72 @@ int main(int argc, char *argv[])
     rf.configure(argc, argv);
 
     FilteringParamtersD paramsd;
-    paramsd["num_particles"]    = rf.findGroup("PF").check("num_particles",    Value(50)).asInt();
-    paramsd["gpu_count"]        = rf.findGroup("PF").check("gpu_count",        Value(1.0)).asInt();
-    paramsd["resample_prior"]   = rf.findGroup("PF").check("resample_prior",   Value(1.0)).asInt();
-    paramsd["gate_pose"]        = rf.findGroup("PF").check("gate_pose",        Value(0.0)).asInt();
-    paramsd["resolution_ratio"] = rf.findGroup("PF").check("resolution_ratio", Value(1.0)).asInt();
+    FilteringParamtersS paramss;
+
+    /* Get Particle Filter parameters */
+    yarp::os::Bottle bottle_pf_params = rf.findGroup("PF");
+    paramsd["num_particles"]    = bottle_pf_params.check("num_particles",    Value(50)).asInt();
+    paramsd["gpu_count"]        = bottle_pf_params.check("gpu_count",        Value(1.0)).asInt();
+    paramsd["resample_prior"]   = bottle_pf_params.check("resample_prior",   Value(1.0)).asInt();
+    paramsd["gate_pose"]        = bottle_pf_params.check("gate_pose",        Value(0.0)).asInt();
+    paramsd["resolution_ratio"] = bottle_pf_params.check("resolution_ratio", Value(1.0)).asInt();
+    paramss["laterality"]       = bottle_pf_params.check("laterality", Value("right")).asString();
+
     paramsd["num_images"]       = paramsd["num_particles"] / paramsd["gpu_count"];
+
     if (rf.check("play"))
         paramsd["play"] = 1.0;
     else
-        paramsd["play"] = rf.findGroup("PF").check("play", Value(1.0)).asDouble();
+        paramsd["play"] = bottle_pf_params.check("play", Value(1.0)).asDouble();
 
-    paramsd["q_xy"]       = rf.findGroup("BROWNIANMOTION").check("q_xy",       Value(0.005)).asDouble();
-    paramsd["q_z"]        = rf.findGroup("BROWNIANMOTION").check("q_z",        Value(0.005)).asDouble();
-    paramsd["theta"]      = rf.findGroup("BROWNIANMOTION").check("theta",      Value(3.0)).asDouble();
-    paramsd["cone_angle"] = rf.findGroup("BROWNIANMOTION").check("cone_angle", Value(2.5)).asDouble();
-    paramsd["seed"]       = rf.findGroup("BROWNIANMOTION").check("seed",       Value(1.0)).asDouble();
-
-    paramsd["use_thumb"]   = rf.findGroup("VISUALPROPRIOCEPTION").check("use_thumb", Value(0.0)).asDouble();
-    paramsd["use_forearm"] = rf.findGroup("VISUALPROPRIOCEPTION").check("use_forearm", Value(0.0)).asDouble();
-
-    paramsd["likelihood_gain"] = rf.findGroup("VISUALUPDATEPARTICLES").check("likelihood_gain", Value(0.001)).asDouble();
-
-    paramsd["gate_x"]        = rf.findGroup("GATEPOSE").check("gate_x",        Value(0.1)).asDouble();
-    paramsd["gate_y"]        = rf.findGroup("GATEPOSE").check("gate_y",        Value(0.1)).asDouble();
-    paramsd["gate_z"]        = rf.findGroup("GATEPOSE").check("gate_z",        Value(0.1)).asDouble();
-    paramsd["gate_aperture"] = rf.findGroup("GATEPOSE").check("gate_aperture", Value(15.0)).asDouble();
-    paramsd["gate_rotation"] = rf.findGroup("GATEPOSE").check("gate_rotation", Value(30.0)).asDouble();
-
-    paramsd["resample_ratio"] = rf.findGroup("RESAMPLING").check("resample_ratio", Value(0.3)).asDouble();
-    paramsd["prior_ratio"]    = rf.findGroup("RESAMPLING").check("prior_ratio",    Value(0.5)).asDouble();
-
-    FilteringParamtersS paramss;
     if (rf.check("robot"))
         paramss["robot"] = rf.find("robot").asString();
     else
-        paramss["robot"] = rf.findGroup("PF").check("robot", Value("icub")).asString();
-
-    if (paramss["robot"] != "icub" && paramss["robot"] != "walkman")
-    {
-        yError() << log_ID << "Wrong robot name. Provided: " << paramss["robot"] << ". Can be iCub, Walkman.";
-        return EXIT_FAILURE;
-    }
+        paramss["robot"] = bottle_pf_params.check("robot", Value("icub")).asString();
 
     if (rf.check("cam"))
         paramss["cam_sel"] = rf.find("cam").asString();
     else
-        paramss["cam_sel"] = rf.findGroup("PF").check("cam_sel", Value("left")).asString();
-
-    paramss["laterality"]  = rf.findGroup("PF").check("laterality", Value("right")).asString();
+        paramss["cam_sel"] = bottle_pf_params.check("cam_sel", Value("left")).asString();
 
 
+    /* Get Brownian Motion parameters */
+    yarp::os::Bottle bottle_brownianmotion_params = rf.findGroup("BROWNIANMOTION");
+    paramsd["q_xy"]       = bottle_brownianmotion_params.check("q_xy",       Value(0.005)).asDouble();
+    paramsd["q_z"]        = bottle_brownianmotion_params.check("q_z",        Value(0.005)).asDouble();
+    paramsd["theta"]      = bottle_brownianmotion_params.check("theta",      Value(3.0)).asDouble();
+    paramsd["cone_angle"] = bottle_brownianmotion_params.check("cone_angle", Value(2.5)).asDouble();
+    paramsd["seed"]       = bottle_brownianmotion_params.check("seed",       Value(1.0)).asDouble();
+
+
+    /* Get Visual Proprioception parameters */
+    yarp::os::Bottle bottle_visualproprioception_params = rf.findGroup("VISUALPROPRIOCEPTION");
+    paramsd["use_thumb"]   = bottle_visualproprioception_params.check("use_thumb", Value(0.0)).asDouble();
+    paramsd["use_forearm"] = bottle_visualproprioception_params.check("use_forearm", Value(0.0)).asDouble();
+
+
+    /* Get Likelihood parameters */
+    yarp::os::Bottle bottle_likelihood_params = rf.findGroup("LIKELIHOOD");
+    paramss["likelihood_type"] = bottle_likelihood_params.check("likelihood_type", Value("norm_one")).asString();
+    paramsd["likelihood_gain"] = bottle_likelihood_params.check("likelihood_gain", Value(0.001)).asDouble();
+
+
+    /* Get Gate Pose parameters */
+    yarp::os::Bottle bottle_gatepose_params = rf.findGroup("GATEPOSE");
+    paramsd["gate_x"]        = bottle_gatepose_params.check("gate_x",        Value(0.1)).asDouble();
+    paramsd["gate_y"]        = bottle_gatepose_params.check("gate_y",        Value(0.1)).asDouble();
+    paramsd["gate_z"]        = bottle_gatepose_params.check("gate_z",        Value(0.1)).asDouble();
+    paramsd["gate_aperture"] = bottle_gatepose_params.check("gate_aperture", Value(15.0)).asDouble();
+    paramsd["gate_rotation"] = bottle_gatepose_params.check("gate_rotation", Value(30.0)).asDouble();
+
+
+    /* Get Resampling parameters */
+    yarp::os::Bottle bottle_resampling_params = rf.findGroup("RESAMPLING");
+    paramsd["resample_ratio"] = bottle_resampling_params.check("resample_ratio", Value(0.3)).asDouble();
+    paramsd["prior_ratio"]    = bottle_resampling_params.check("prior_ratio",    Value(0.5)).asDouble();
+
+
+    /* Log parameters */
     yInfo() << log_ID << "General PF parameters:";
     yInfo() << log_ID << " - robot:"          << paramss["robot"];
     yInfo() << log_ID << " - cam_sel:"        << paramss["cam_sel"];
@@ -131,6 +146,7 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - use_forearm:" << paramsd["use_forearm"];
 
     yInfo() << log_ID << "Correction parameters:";
+    yInfo() << log_ID << " - likelihood_type:" << paramss["likelihood_type"];
     yInfo() << log_ID << " - likelihood_gain:" << paramsd["likelihood_gain"];
 
     yInfo() << log_ID << "Resampling parameters:";
