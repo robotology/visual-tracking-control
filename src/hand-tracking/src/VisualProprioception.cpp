@@ -109,7 +109,12 @@ std::pair<bool, MatrixXf> VisualProprioception::measure(const Ref<const MatrixXf
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
 
-    cv::cuda::GpuMat cuda_mat_render(si_cad_->getTilesRows() * cam_params_.height, si_cad_->getTilesCols() * cam_params_.width, CV_8UC3, static_cast<void*>(pbo_cuda_));
+    char* pbo_cuda_data;
+    cudaGraphicsMapResources(static_cast<int>(pbo_size_), pbo_cuda_, 0);
+    size_t num_bytes;
+    cudaGraphicsResourceGetMappedPointer(reinterpret_cast<void**>(&pbo_cuda_data), &num_bytes, pbo_cuda_[0]);
+
+    cv::cuda::GpuMat cuda_mat_render(si_cad_->getTilesRows() * cam_params_.height, si_cad_->getTilesCols() * cam_params_.width, CV_8UC3, static_cast<void*>(pbo_cuda_data));
 
     cv::cuda::GpuMat cuda_mat_render_flipped;
     cv::cuda::flip(cuda_mat_render, cuda_mat_render_flipped, 0);
@@ -124,6 +129,8 @@ std::pair<bool, MatrixXf> VisualProprioception::measure(const Ref<const MatrixXf
 
     cv::Mat cpu_descriptor;
     cuda_descriptor.download(cpu_descriptor);
+
+    si_cad_->releaseContext();
 
     /* FIXME
      Is the following command slow? */
