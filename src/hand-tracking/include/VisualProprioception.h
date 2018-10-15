@@ -19,22 +19,23 @@
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 #include <SuperimposeMesh/SICAD.h>
 
+
 class VisualProprioception : public bfl::MeasurementModel
 {
 public:
-    VisualProprioception(const int num_requested_images, const bfl::Camera::CameraParameters& cam_params, std::unique_ptr<bfl::MeshModel> mesh_model);
+    VisualProprioception(std::unique_ptr<bfl::Camera> camera, const int num_requested_images, std::unique_ptr<bfl::MeshModel> mesh_model);
 
     virtual ~VisualProprioception() noexcept;
 
-    std::pair<bool, Eigen::MatrixXf> measure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
+    std::pair<bool, bfl::Data> measure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
 
-    std::pair<bool, Eigen::MatrixXf> predictedMeasure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
+    std::pair<bool, bfl::Data> predictedMeasure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
 
-    std::pair<bool, Eigen::MatrixXf> innovation(const Eigen::Ref<const Eigen::MatrixXf>& predicted_measurements, const Eigen::Ref<const Eigen::MatrixXf>& measurements) const override;
+    std::pair<bool, bfl::Data> innovation(const bfl::Data& predicted_measurements, const bfl::Data& measurements) const override;
 
-    bool registerProcessData(std::shared_ptr<bfl::GenericData> process_data) override;
+    bool bufferAgentData() const override;
 
-    std::pair<bool, Eigen::MatrixXf> getProcessMeasurements() const override;
+    std::pair<bool, bfl::Data> getAgentMeasurements() const override;
 
     /* FIXME
        Find a way to better communicate with the callee. Maybe a struct. */
@@ -46,15 +47,15 @@ public:
 protected:
     std::string log_ID_ = "[VisualProprioception]";
 
-    std::shared_ptr<cv::Mat> camera_image_ = nullptr;
+    std::unique_ptr<bfl::Camera> camera_ = nullptr;
 
-    std::shared_ptr<std::array<double, 3>> camera_position_ = nullptr;
+    mutable std::array<double, 3> camera_position_;
 
-    std::shared_ptr<std::array<double, 4>> camera_orientation_ = nullptr;
+    mutable std::array<double, 4> camera_orientation_;
 
     std::unique_ptr<bfl::MeshModel> mesh_model_;
 
-    bfl::Camera::CameraParameters cam_params_;
+    bfl::Camera::CameraIntrinsics cam_params_;
 
     SICAD::ModelPathContainer mesh_paths_;
 

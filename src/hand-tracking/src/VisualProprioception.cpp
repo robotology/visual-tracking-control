@@ -1,5 +1,4 @@
 #include <VisualProprioception.h>
-#include <CameraData.h>
 
 #include <array>
 #include <cmath>
@@ -20,12 +19,13 @@ using namespace Eigen;
 
 VisualProprioception::VisualProprioception
 (
+    std::unique_ptr<bfl::Camera> camera,
     const int num_requested_images,
-    const bfl::Camera::CameraParameters& cam_params,
     std::unique_ptr<bfl::MeshModel> mesh_model
 ) :
+    camera_(std::move(camera)),
     mesh_model_(std::move(mesh_model)),
-    cam_params_(cam_params)
+    cam_params_(camera_->getCameraParameters())
 {
     bool valid_parameter = false;
 
@@ -93,9 +93,14 @@ VisualProprioception::~VisualProprioception() noexcept
 }
 
 
-std::pair<bool, MatrixXf> VisualProprioception::measure(const Ref<const MatrixXf>& cur_states) const
+/** FIXME
+ Sicuri che measure, predicted measure e innovation debbano essere const?!
+ */
+std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixXf>& cur_states) const
 {
-    MatrixXf descriptor_out(num_images_, feature_dim_);
+    MatrixXf descriptor(num_images_, feature_dim_);
+
+    std::tie(std::ignore, camera_position_, camera_orientation_) = bfl::any::any_cast<bfl::Camera::CameraData>(camera_->getData());
 
 #if HANDTRACKING_USE_OPENCV_CUDA
     std::vector<Superimpose::ModelPoseContainer> mesh_poses;
@@ -105,7 +110,7 @@ std::pair<bool, MatrixXf> VisualProprioception::measure(const Ref<const MatrixXf
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
 
-    success &= si_cad_->superimpose(mesh_poses, camera_position_->data(), camera_orientation_->data(), 0);
+    success &= si_cad_->superimpose(mesh_poses, camera_position_.data(), camera_orientation_.data(), 0);
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
 
@@ -134,7 +139,7 @@ std::pair<bool, MatrixXf> VisualProprioception::measure(const Ref<const MatrixXf
 
     /* FIXME
      Is the following command slow? */
-    ocv2eigen(cpu_descriptor, descriptor_out);
+    ocv2eigen(cpu_descriptor, descriptor);
 #else
     std::vector<Superimpose::ModelPoseContainer> mesh_poses;
     bool success = false;
@@ -157,43 +162,35 @@ std::pair<bool, MatrixXf> VisualProprioception::measure(const Ref<const MatrixXf
     descriptor_out.block(s * num_percore_rendered_img_, 0, num_percore_rendered_img_, feature_dim_) = Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(descriptors_cpu.data(), num_percore_rendered_img_, feature_dim_);
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 
-    return std::make_pair(true, descriptor_out);
+    return std::make_pair(true, std::move(descriptor));
 }
 
 
-std::pair<bool, MatrixXf> VisualProprioception::predictedMeasure(const Ref<const MatrixXf>& cur_states) const
+std::pair<bool, bfl::Data> VisualProprioception::predictedMeasure(const Ref<const MatrixXf>& cur_states) const
 {
     return measure(cur_states);
 }
 
 
-std::pair<bool, MatrixXf> VisualProprioception::innovation(const Ref<const MatrixXf>& predicted_measurements, const Ref<const MatrixXf>& measurements) const
+std::pair<bool, bfl::Data> VisualProprioception::innovation(const bfl::Data& predicted_measurements, const bfl::Data& measurements) const
 {
-    return std::make_pair(true, -(predicted_measurements.rowwise() - measurements.row(0)));
+    MatrixXf innovation = -(bfl::any::any_cast<MatrixXf>(predicted_measurements).rowwise() - bfl::any::any_cast<MatrixXf>(measurements).row(0));
+
+    return std::make_pair(true, std::move(innovation));
 }
 
 
-bool VisualProprioception::registerProcessData(std::shared_ptr<bfl::GenericData> process_data)
+bool VisualProprioception::bufferAgentData() const
 {
-    std::shared_ptr<bfl::CameraData> process_data_casted = std::dynamic_pointer_cast<bfl::CameraData>(process_data);
-
-    if (process_data)
-    {
-        camera_image_ = process_data_casted->image_;
-
-        camera_position_ = process_data_casted->position_;
-
-        camera_orientation_ = process_data_casted->orientation_;
-
-        return true;
-    }
-    else
-        return false;
+    return camera_->bufferData();
 }
 
 
-std::pair<bool, MatrixXf> VisualProprioception::getProcessMeasurements() const
+std::pair<bool, bfl::Data> VisualProprioception::getAgentMeasurements() const
 {
+    cv::Mat camera_image;
+    std::tie(camera_image, std::ignore, std::ignore) = bfl::any::any_cast<bfl::Camera::CameraData>(camera_->getData());
+
     MatrixXf descriptor_out(1, feature_dim_);
 
 #if HANDTRACKING_USE_OPENCV_CUDA
@@ -202,7 +199,7 @@ std::pair<bool, MatrixXf> VisualProprioception::getProcessMeasurements() const
     cv::cuda::GpuMat descriptors_cuda;
     cv::Mat          descriptors_cpu;
 
-    img_cuda.upload(*camera_image_);
+    img_cuda.upload(camera_image);
 
     cv::cuda::cvtColor(img_cuda, img_alpha_cuda, cv::COLOR_BGR2BGRA, 4);
 
@@ -216,7 +213,7 @@ std::pair<bool, MatrixXf> VisualProprioception::getProcessMeasurements() const
 #else
     std::vector<float> descriptors_cpu;
 
-    hog_cpu_->compute(*camera_image_, descriptors_cpu, cv::Size(cam_params_.width, cam_params_.height));
+    hog_cpu_->compute(*camera_image, descriptors_cpu, cv::Size(cam_params_.width, cam_params_.height));
 
     /* FIXME
      The following copy operation is super slow (approx 4 ms for 2M numbers).
@@ -236,10 +233,21 @@ int VisualProprioception::getOGLTilesNumber() const
 
 void VisualProprioception::superimpose(const Superimpose::ModelPoseContainer& obj2pos_map, cv::Mat& img)
 {
+    try
+    {
+        std::tie(std::ignore, camera_position_, camera_orientation_) = bfl::any::any_cast<bfl::Camera::CameraData>(camera_->getData());
+    }
+    catch(const bfl::any::bad_any_cast& e)
+    {
+        std::cout << log_ID_ << "[superimpose] Error: " << e.what() << std::endl;
+
+        return;
+    }
+
     si_cad_->setBackgroundOpt(true);
     si_cad_->setWireframeOpt(true);
 
-    si_cad_->superimpose(obj2pos_map, camera_position_->data(), camera_orientation_->data(), img);
+    si_cad_->superimpose(obj2pos_map, camera_position_.data(), camera_orientation_.data(), img);
 
     si_cad_->setBackgroundOpt(false);
     si_cad_->setWireframeOpt(false);
@@ -250,7 +258,7 @@ void VisualProprioception::ocv2eigen(const cv::Mat& src, Ref<MatrixXf> dst) cons
 {
     CV_DbgAssert(src.rows == dst.rows() && src.cols == dst.cols());
 
-    if (!(dst.Flags & Eigen::RowMajorBit))
+    if (!(dst.Flags & RowMajorBit))
     {
         const cv::Mat _dst(src.cols, src.rows, cv::traits::Type<float>::value, dst.data(), (size_t)(dst.outerStride() * sizeof(float)));
         if (src.type() == _dst.type())

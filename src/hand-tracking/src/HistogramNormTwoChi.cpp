@@ -21,19 +21,27 @@ HistogramNormTwoChi::~HistogramNormTwoChi() noexcept
 { }
 
 
-std::pair<bool, Eigen::VectorXf> HistogramNormTwoChi::likelihood(const bfl::MeasurementModel& measurement_model, const Eigen::Ref<const Eigen::MatrixXf>& pred_states)
+std::pair<bool, VectorXf> HistogramNormTwoChi::likelihood
+(
+    const MeasurementModel& measurement_model,
+    const Ref<const MatrixXf>& pred_states
+)
 {
     bool valid_measurements;
-    MatrixXf measurements;
-    std::tie(valid_measurements, measurements) = measurement_model.getProcessMeasurements();
+    Data data_measurements;
+    std::tie(valid_measurements, data_measurements) = measurement_model.getAgentMeasurements();
+    
+    MatrixXf measurements = any::any_cast<MatrixXf&&>(std::move(data_measurements));
 
     if (!valid_measurements)
         return std::make_pair(false, VectorXf::Zero(1));
 
 
     bool valid_predicted_measurements;
-    MatrixXf predicted_measurements;
-    std::tie(valid_predicted_measurements, predicted_measurements) = measurement_model.predictedMeasure(pred_states);
+    Data data_predicted_measurements;
+    std::tie(valid_predicted_measurements, data_predicted_measurements) = measurement_model.predictedMeasure(pred_states);
+
+    MatrixXf predicted_measurements = any::any_cast<MatrixXf&&>(std::move(data_predicted_measurements));
 
     if (!valid_predicted_measurements)
         return std::make_pair(false, VectorXf::Zero(1));
