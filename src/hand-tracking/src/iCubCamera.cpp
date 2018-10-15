@@ -133,7 +133,7 @@ iCubCamera::~iCubCamera() noexcept
 }
 
 
-bool iCubCamera::bufferProcessData()
+bool iCubCamera::bufferData()
 {
     bool success = false;
 
@@ -194,7 +194,7 @@ bool iCubCamera::bufferProcessData()
 }
 
 
-std::shared_ptr<GenericData> iCubCamera::getProcessData()
+Data iCubCamera::getData() const
 {
     return camera_data_;
 }

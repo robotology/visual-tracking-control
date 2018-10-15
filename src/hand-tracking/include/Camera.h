@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <BayesFilters/Process.h>
+#include <BayesFilters/Agent.h>
 
 #include <array>
 #include <tuple>
@@ -11,7 +11,7 @@ namespace bfl {
 }
 
 
-class bfl::Camera : public bfl::Process
+class bfl::Camera : public bfl::Agent
 {
 public:
     virtual ~Camera() noexcept { };

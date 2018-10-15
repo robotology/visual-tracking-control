@@ -72,7 +72,7 @@ WalkmanCamera::~WalkmanCamera() noexcept
 }
 
 
-bool WalkmanCamera::bufferProcessData()
+bool WalkmanCamera::bufferData()
 {
     bool success = false;
 
@@ -108,7 +108,7 @@ bool WalkmanCamera::bufferProcessData()
 }
 
 
-std::shared_ptr<bfl::GenericData> WalkmanCamera::getProcessData()
+Data WalkmanCamera::getData() const
 {
     return camera_data_;
 }

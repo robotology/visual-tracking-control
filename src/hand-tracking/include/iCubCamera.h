@@ -25,9 +25,9 @@ public:
 
     virtual ~iCubCamera() noexcept;
 
-    bool bufferProcessData() override;
+    bool bufferData() override;
 
-    std::shared_ptr<bfl::GenericData> getProcessData() override;
+    bfl::Data getData() const override;
 
     CameraParameters getCameraParameters() const override;
 
