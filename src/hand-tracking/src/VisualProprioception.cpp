@@ -14,6 +14,10 @@
 #include <cuda_gl_interop.h>
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 
+#include <opencv2/imgcodecs/imgcodecs.hpp>
+
+int i = 0;
+
 using namespace Eigen;
 
 
@@ -102,7 +106,6 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
 
     std::tie(std::ignore, camera_position_, camera_orientation_) = bfl::any::any_cast<bfl::Camera::CameraData>(camera_->getData());
 
-#if HANDTRACKING_USE_OPENCV_CUDA
     std::vector<Superimpose::ModelPoseContainer> mesh_poses;
     bool success = false;
 
@@ -110,6 +113,7 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
 
+#if HANDTRACKING_USE_OPENCV_CUDA
     success &= si_cad_->superimpose(mesh_poses, camera_position_.data(), camera_orientation_.data(), 0);
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
@@ -123,6 +127,10 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
 
     cv::cuda::GpuMat cuda_mat_render_flipped;
     cv::cuda::flip(cuda_mat_render, cuda_mat_render_flipped, 0);
+
+    cv::Mat downlaoded;
+    cuda_mat_render_flipped.download(downlaoded);
+    cv::imwrite("./image" + std::to_string(i++) + ".jpg", downlaoded);
 
     /* FIXME
      This step shold be performed by OpenGL. */
@@ -141,15 +149,8 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
      Is the following command slow? */
     ocv2eigen(cpu_descriptor, descriptor);
 #else
-    std::vector<Superimpose::ModelPoseContainer> mesh_poses;
-    bool success = false;
-
-    std::tie(success, mesh_poses) = mesh_model_->getModelPose(cur_states);
-    if (!success)
-        return std::make_pair(false, MatrixXf::Zero(1, 1));
-
     cv::Mat rendered_image;
-    success &= si_cad_->superimpose(mesh_poses, camera_position_->data(), camera_orientation_->data(), rendered_image);
+    success &= si_cad_->superimpose(mesh_poses, camera_position_.data(), camera_orientation_.data(), rendered_image);
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
 
@@ -159,7 +160,7 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
     /* FIXME
      The following copy operation is super slow (approx 4 ms for 2M numbers).
      Must find out a new, direct, way of doing this. */
-    descriptor_out.block(s * num_percore_rendered_img_, 0, num_percore_rendered_img_, feature_dim_) = Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(descriptors_cpu.data(), num_percore_rendered_img_, feature_dim_);
+    descriptor = Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(descriptors_cpu.data(), num_images_, feature_dim_);
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 
     return std::make_pair(true, std::move(descriptor));
@@ -213,7 +214,7 @@ std::pair<bool, bfl::Data> VisualProprioception::getAgentMeasurements() const
 #else
     std::vector<float> descriptors_cpu;
 
-    hog_cpu_->compute(*camera_image, descriptors_cpu, cv::Size(cam_params_.width, cam_params_.height));
+    hog_cpu_->compute(camera_image, descriptors_cpu, cv::Size(cam_params_.width, cam_params_.height));
 
     /* FIXME
      The following copy operation is super slow (approx 4 ms for 2M numbers).

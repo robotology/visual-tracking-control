@@ -69,9 +69,6 @@ std::pair<bool, VectorXf> HistogramNormOne::likelihood
 
     VectorXf likelihood(pred_states.cols());
 
-    std::cout << "measurements:\n" << measurements.rows() << " " << measurements.cols() << std::endl;
-    std::cout << "predicted_measurements:\n" << predicted_measurements.rows() << " " << predicted_measurements.cols() << std::endl;
-
     for (int i = 0; i < pred_states.cols(); ++i)
     {
         double sum_diff = 0;
@@ -79,13 +76,9 @@ std::pair<bool, VectorXf> HistogramNormOne::likelihood
             sum_diff += std::abs(measurements(0, j) - predicted_measurements(i, j));
 
         likelihood(i) = static_cast<float>(sum_diff);
-
-        std::cout << "sum_diff:\n" << sum_diff << std::endl;
-        std::cout << "likelihood:\n" << likelihood << std::endl;
     }
-    likelihood = (-static_cast<float>(likelihood_gain_) * likelihood).array().exp();
 
-    std::cout << "likelihood after:\n" << likelihood << std::endl;
+    likelihood = (-static_cast<float>(likelihood_gain_) * likelihood).array().exp();
 
 
     return std::make_pair(true, std::move(likelihood));
