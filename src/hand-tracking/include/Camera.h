@@ -6,6 +6,8 @@
 #include <array>
 #include <tuple>
 
+#include <opencv2/core/core.hpp>
+
 namespace bfl {
     class Camera;
 }
@@ -16,7 +18,7 @@ class bfl::Camera : public bfl::Agent
 public:
     virtual ~Camera() noexcept { };
 
-    struct CameraParameters
+    struct CameraIntrinsics
     {
         unsigned int width;
         unsigned int height;
@@ -26,7 +28,9 @@ public:
         double cy;
     };
 
-    virtual CameraParameters getCameraParameters() const = 0;
+    using CameraData = std::tuple<cv::Mat, std::array<double, 3>, std::array<double, 4>>;
+
+    virtual CameraIntrinsics getCameraParameters() const = 0;
 };
 
 #endif /* CAMERA_H */

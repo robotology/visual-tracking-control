@@ -1,7 +1,5 @@
 #include <WalkmanCamera.h>
 
-#include <exception>
-
 #include <opencv2/core/core_c.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/LogStream.h>
@@ -14,11 +12,13 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-WalkmanCamera::WalkmanCamera(const std::string& cam_sel,
-                             const double resolution_ratio,
-                             const std::string& context,
-                             const std::string& port_prefix) :
-    camera_data_(std::make_shared<CameraData>()),
+WalkmanCamera::WalkmanCamera
+(
+    const std::string& cam_sel,
+    const double resolution_ratio,
+    const std::string& context,
+    const std::string& port_prefix
+ ) :
     port_prefix_(port_prefix),
     cam_sel_(cam_sel),
     resolution_ratio_(resolution_ratio),
@@ -81,23 +81,23 @@ bool WalkmanCamera::bufferData()
     if (tmp_imgin != YARP_NULLPTR)
     {
         init_img_in_ = true;
-        (*camera_data_->image_) = cv::cvarrToMat(tmp_imgin->getIplImage()).clone();
+        image_ = cv::cvarrToMat(tmp_imgin->getIplImage()).clone();
     }
 
     if (init_img_in_)
     {
-
         Bottle* bottle_camera_pose = port_camera_pose_.read(true);
+
         if (!bottle_camera_pose)
         {
-            (*camera_data_->position_)[0] = bottle_camera_pose->get(0).asDouble();
-            (*camera_data_->position_)[1] = bottle_camera_pose->get(1).asDouble();
-            (*camera_data_->position_)[2] = bottle_camera_pose->get(2).asDouble();
+            position_[0] = bottle_camera_pose->get(0).asDouble();
+            position_[1] = bottle_camera_pose->get(1).asDouble();
+            position_[2] = bottle_camera_pose->get(2).asDouble();
 
-            (*camera_data_->orientation_)[0] = bottle_camera_pose->get(3).asDouble();
-            (*camera_data_->orientation_)[1] = bottle_camera_pose->get(4).asDouble();
-            (*camera_data_->orientation_)[2] = bottle_camera_pose->get(5).asDouble();
-            (*camera_data_->orientation_)[3] = bottle_camera_pose->get(6).asDouble();
+            orientation_[0] = bottle_camera_pose->get(3).asDouble();
+            orientation_[1] = bottle_camera_pose->get(4).asDouble();
+            orientation_[2] = bottle_camera_pose->get(5).asDouble();
+            orientation_[3] = bottle_camera_pose->get(6).asDouble();
 
             success = true;
         }
@@ -110,11 +110,11 @@ bool WalkmanCamera::bufferData()
 
 Data WalkmanCamera::getData() const
 {
-    return camera_data_;
+    return Data(CameraData(image_, position_, orientation_));
 }
 
 
-Camera::CameraParameters WalkmanCamera::getCameraParameters() const
+Camera::CameraIntrinsics WalkmanCamera::getCameraParameters() const
 {
     return params_;
 }

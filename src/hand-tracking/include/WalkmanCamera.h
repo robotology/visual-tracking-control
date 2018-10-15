@@ -2,7 +2,7 @@
 #define WALKMANHEAD_H
 
 #include <Camera.h>
-#include <CameraData.h>
+#include <BayesFilters/Data.h>
 
 #include <string>
 
@@ -25,12 +25,16 @@ public:
 
     bfl::Data getData() const override;
 
-    CameraParameters getCameraParameters() const override;
-
+    CameraIntrinsics getCameraParameters() const override;
+    
 protected:
-    CameraParameters params_;
+    CameraIntrinsics params_;
 
-    std::shared_ptr<bfl::CameraData> camera_data_ = nullptr;
+    cv::Mat image_;
+
+    std::array<double, 3> position_;
+
+    std::array<double, 4> orientation_;
 
 private:
     const std::string log_ID_ = "[WalkmanCamera]";

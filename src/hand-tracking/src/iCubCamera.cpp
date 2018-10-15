@@ -17,11 +17,13 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-iCubCamera::iCubCamera(const yarp::os::ConstString& cam_sel,
-                       const double resolution_ratio,
-                       const yarp::os::ConstString& context,
-                       const yarp::os::ConstString& port_prefix) :
-    camera_data_(std::make_shared<CameraData>()),
+iCubCamera::iCubCamera
+(
+    const yarp::os::ConstString& cam_sel,
+    const double resolution_ratio,
+    const yarp::os::ConstString& context,
+    const yarp::os::ConstString& port_prefix
+ ) :
     port_prefix_(port_prefix),
     cam_sel_(cam_sel),
     resolution_ratio_(resolution_ratio),
@@ -142,7 +144,7 @@ bool iCubCamera::bufferData()
     if (tmp_imgin != YARP_NULLPTR)
     {
         init_img_in_ = true;
-        (*camera_data_->image_) = cv::cvarrToMat(tmp_imgin->getIplImage()).clone();
+        image_ = cv::cvarrToMat(tmp_imgin->getIplImage()).clone();
     }
 
     if (init_img_in_)
@@ -159,14 +161,14 @@ bool iCubCamera::bufferData()
 
             if (success)
             {
-                (*camera_data_->position_)[0] = x[0];
-                (*camera_data_->position_)[1] = x[1];
-                (*camera_data_->position_)[2] = x[2];
+                position_[0] = x[0];
+                position_[1] = x[1];
+                position_[2] = x[2];
 
-                (*camera_data_->orientation_)[0] = o[0];
-                (*camera_data_->orientation_)[1] = o[1];
-                (*camera_data_->orientation_)[2] = o[2];
-                (*camera_data_->orientation_)[3] = o[3];
+                orientation_[0] = o[0];
+                orientation_[1] = o[1];
+                orientation_[2] = o[2];
+                orientation_[3] = o[3];
             }
         }
         else
@@ -178,14 +180,14 @@ bool iCubCamera::bufferData()
             {
                 Vector eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * root_to_eye_enc);
 
-                (*camera_data_->position_)[0] = eye_pose[0];
-                (*camera_data_->position_)[1] = eye_pose[1];
-                (*camera_data_->position_)[2] = eye_pose[2];
+                position_[0] = eye_pose[0];
+                position_[1] = eye_pose[1];
+                position_[2] = eye_pose[2];
 
-                (*camera_data_->orientation_)[0] = eye_pose[3];
-                (*camera_data_->orientation_)[1] = eye_pose[4];
-                (*camera_data_->orientation_)[2] = eye_pose[5];
-                (*camera_data_->orientation_)[3] = eye_pose[6];
+                orientation_[0] = eye_pose[3];
+                orientation_[1] = eye_pose[4];
+                orientation_[2] = eye_pose[5];
+                orientation_[3] = eye_pose[6];
             }
         }
     }
@@ -196,11 +198,11 @@ bool iCubCamera::bufferData()
 
 Data iCubCamera::getData() const
 {
-    return camera_data_;
+    return Data(CameraData(image_, position_, orientation_));
 }
 
 
-Camera::CameraParameters iCubCamera::getCameraParameters() const
+Camera::CameraIntrinsics iCubCamera::getCameraParameters() const
 {
     return params_;
 }
