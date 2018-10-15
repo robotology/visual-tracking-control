@@ -254,11 +254,11 @@ int main(int argc, char *argv[])
     std::unique_ptr<VisualProprioception> proprio;
     try
     {
-        proprio = std::unique_ptr<VisualProprioception>(new VisualProprioception(paramsd["num_images"], camera->getCameraParameters(), std::move(mesh_model)));
+        proprio = std::unique_ptr<VisualProprioception>(new VisualProprioception(std::move(camera),
+                                                                                 paramsd["num_images"],
+                                                                                 std::move(mesh_model)));
 
         paramsd["num_particles"] = proprio->getOGLTilesNumber();
-
-        proprio->registerProcessData(camera->getProcessData());
 
         yInfo() << log_ID << "General PF parameters changed after constructing VisualProprioception:";
         yInfo() << log_ID << " - num_particles:" << paramsd["num_particles"];
@@ -285,7 +285,6 @@ int main(int argc, char *argv[])
     std::unique_ptr<PFCorrection> vpf_update_particles(new UpdateParticles());
     vpf_update_particles->setLikelihoodModel(std::move(likelihood_hist));
     vpf_update_particles->setMeasurementModel(std::move(proprio));
-    vpf_update_particles->setProcess(std::move(camera));
 
     std::unique_ptr<PFCorrection> vpf_correction;
 
