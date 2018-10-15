@@ -33,9 +33,13 @@ protected:
 
 private:
     double gate_x_;
+
     double gate_y_;
+
     double gate_z_;
+
     double gate_aperture_;
+    
     double gate_rotation_;
 
     Eigen::VectorXd ee_pose_;

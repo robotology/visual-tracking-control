@@ -38,7 +38,7 @@ private:
 
     SICAD::ModelPathContainer model_path_;
 
-    std::string               shader_path_;
+    std::string shader_path_;
 };
 
 #endif /* WALKMANAMMODEL_H */

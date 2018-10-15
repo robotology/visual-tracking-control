@@ -51,9 +51,9 @@ private:
 
     SICAD::ModelPathContainer model_path_;
 
-    std::string               shader_path_;
+    std::string shader_path_;
 
-    iCub::iKin::iCubArm    icub_arm_;
+    iCub::iKin::iCubArm icub_arm_;
 
     iCub::iKin::iCubFinger icub_kin_finger_[3];
 
