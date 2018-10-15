@@ -74,8 +74,6 @@ endif()
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
 		include/Camera.h
-        include/CameraData.h
-        include/CVMatData.h
         include/DrawParticlesImportanceThreshold.h
         include/KinPoseModel.h
         include/GatePose.h
