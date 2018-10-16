@@ -90,8 +90,6 @@ VisualProprioception::VisualProprioception
 VisualProprioception::~VisualProprioception() noexcept
 {
 #if HANDTRACKING_USE_OPENCV_CUDA
-    cudaGraphicsUnmapResources(static_cast<int>(pbo_size_), pbo_cuda_, 0);
-
     delete[] pbo_cuda_;
 #endif // HANDTRACKING_USE_OPENCV_CUDA
 }
@@ -128,10 +126,6 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
     cv::cuda::GpuMat cuda_mat_render_flipped;
     cv::cuda::flip(cuda_mat_render, cuda_mat_render_flipped, 0);
 
-    cv::Mat downlaoded;
-    cuda_mat_render_flipped.download(downlaoded);
-    cv::imwrite("./image" + std::to_string(i++) + ".jpg", downlaoded);
-
     /* FIXME
      This step shold be performed by OpenGL. */
     cv::cuda::GpuMat cuda_mat_render_flipped_alpha;
@@ -143,6 +137,7 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
     cv::Mat cpu_descriptor;
     cuda_descriptor.download(cpu_descriptor);
 
+    cudaGraphicsUnmapResources(static_cast<int>(pbo_size_), pbo_cuda_, 0);
     si_cad_->releaseContext();
 
     /* FIXME
