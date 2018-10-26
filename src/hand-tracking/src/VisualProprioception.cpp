@@ -16,8 +16,6 @@
 
 #include <opencv2/imgcodecs/imgcodecs.hpp>
 
-int i = 0;
-
 using namespace Eigen;
 
 
