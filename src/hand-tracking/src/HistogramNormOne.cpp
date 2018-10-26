@@ -31,20 +31,10 @@ std::pair<bool, VectorXf> HistogramNormOne::likelihood
     Data data_agent_measurements;
     std::tie(valid_agent_measurements, data_agent_measurements) = measurement_model.getAgentMeasurements();
 
-    MatrixXf measurements;
-    try
-    {
-        measurements = any::any_cast<MatrixXf>(data_agent_measurements);
-    }
-    catch(const any::bad_any_cast& e)
-    {
-        std::cerr << e.what() << std::endl;
-
-        valid_agent_measurements = false;
-    }
-
     if (!valid_agent_measurements)
         return std::make_pair(false, VectorXf::Zero(1));
+
+    MatrixXf& measurements = any::any_cast<MatrixXf&>(data_agent_measurements);
 
 
     bool valid_predicted_measurements;
