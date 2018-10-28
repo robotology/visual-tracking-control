@@ -23,6 +23,8 @@
 #include <thrust/iterator/transform_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
 
+
+/* >- ************************************************** -< */
 using FloatIterator = thrust::device_vector<float>::iterator;
 
 
@@ -34,16 +36,16 @@ public:
     using DifferenceType = typename thrust::iterator_difference<Iterator>::type;
 
     StridedIterator(Iterator first, Iterator last, DifferenceType stride) :
-        first_(first),
-        last_(last),
-        stride(stride) { }
+    first_(first),
+    last_(last),
+    stride(stride) { }
 
     struct stride_functor : public thrust::unary_function<DifferenceType, DifferenceType>
     {
         DifferenceType stride;
 
         stride_functor(DifferenceType stride) :
-            stride(stride) { }
+        stride(stride) { }
 
         __host__ __device__
         DifferenceType operator()(const DifferenceType& i) const
@@ -86,11 +88,11 @@ public:
 
     __host__ __device__
     CircularIterator(const Iterator& begin, const Iterator& end) :
-        base_t(begin),
-        begin_(begin),
-        end_(end),
-        range_(end - begin),
-        upper_bound_(end - begin - 1) { }
+    base_t(begin),
+    begin_(begin),
+    end_(end),
+    range_(end - begin),
+    upper_bound_(end - begin - 1) { }
 
     friend class thrust::iterator_core_access;
 
@@ -179,7 +181,7 @@ thrust::device_vector<float> sum_subvectors_in_device(cv::cuda::GpuMat& mat, con
                            out_inclusive_scan.begin());
 
     std::size_t num_element = mat.cols / subvector_size;
-    
+
     thrust::device_vector<float> out_gpu(num_element);
     out_gpu[0] = out_inclusive_scan[subvector_size - 1];
 
@@ -220,7 +222,7 @@ struct normalize_kld_functor_foreach
         thrust::get<2>(t) = (thrust::get<2>(t) / thrust::get<0>(t)) + log10f(thrust::get<1>(t) + NPP_MINABS_32F) - log10f(thrust::get<0>(t) + NPP_MINABS_32F);
 
         /* The following line is to force 0 on very low numbers, but may result in thread divergence in warps. */
-//        thrust::get<2>(t) = (thrust::get<2>(t) < 0.00001f) ? 0 : thrust::get<2>(t);
+        //        thrust::get<2>(t) = (thrust::get<2>(t) < 0.00001f) ? 0 : thrust::get<2>(t);
     }
 };
 
@@ -248,6 +250,11 @@ struct sqrt_functor : public thrust::unary_function<float, float>
 };
 
 
+namespace bfl
+{
+namespace cuda
+{
+
 /* >- ************************************************** -< */
 struct euclidean_kld_functor_foreach
 {
@@ -258,13 +265,13 @@ struct euclidean_kld_functor_foreach
         thrust::get<3>(t) = sqrtf(thrust::get<0>(t)) * ((thrust::get<3>(t) / thrust::get<1>(t)) + log10f(thrust::get<2>(t) + NPP_MINABS_32F) - log10f(thrust::get<1>(t) + NPP_MINABS_32F));
 
         /* The following line is to force 0 on very low numbers, but may result in thread divergence in warps. */
-//        thrust::get<3>(t) = (thrust::get<3>(t) < 0.00001f) ? 0 : thrust::get<3>(t);
+        //        thrust::get<3>(t) = (thrust::get<3>(t) < 0.00001f) ? 0 : thrust::get<3>(t);
     }
 };
 
 
 /* >- ************************************************** -< */
-thrust::host_vector<float> kld_device
+thrust::host_vector<float> kld
 (
     cv::cuda::GpuMat& p,
     cv::cuda::GpuMat& q,
@@ -293,7 +300,7 @@ thrust::host_vector<float> kld_device
 
 
 /* >- ************************************************** -< */
-thrust::host_vector<float> normtwo_device
+thrust::host_vector<float> normtwo
 (
     cv::cuda::GpuMat& p,
     cv::cuda::GpuMat& q,
@@ -320,7 +327,7 @@ thrust::host_vector<float> normtwo_device
 
 
 /* >- ************************************************** -< */
-thrust::host_vector<float> euclidean_kld_device
+thrust::host_vector<float> normtwo_kld
 (
     cv::cuda::GpuMat& p,
     cv::cuda::GpuMat& q,
@@ -358,3 +365,7 @@ thrust::host_vector<float> euclidean_kld_device
 
     return image_euclidean_kld_cpu;
 }
+
+}
+}
+
