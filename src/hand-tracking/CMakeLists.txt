@@ -1,5 +1,7 @@
 set(EXE_TARGET_NAME hand-tracking)
 
+include(AddDependenciesPrintUtils)
+
 
 # Dependencies
 find_package(CUDA   QUIET)
@@ -27,9 +29,33 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 
+if(DEFINED OpenCV_CUDA_VERSION)
+    message(STATUS "Found OpenCV with CUDA compiled modules.")
+
+    if(CUDA_FOUND)
+        option(FORCE_NO_OPENCV_CUDA "Force no CUDA compiled modules?" OFF)
+
+        if(FORCE_NO_OPENCV_CUDA)
+            message(STATUS "Forcing no CUDA compiled modules.")
+
+            set(BFL_CUDA OFF)
+        else()
+            message(STATUS "Compiling with CUDA support and modules.")
+
+            set(BFL_CUDA ON)
+        endif()
+    endif()
+else()
+    message(STATUS "Found no OpenCV CUDA compiled modules.")
+    message(STATUS "Forcing no CUDA compiled modules.")
+
+    set(BFL_CUDA OFF)
+endif()
+message(STATUS "Set BFL_CUDA to ${BFL_CUDA}.")
+
 
 # CUDA settings
-if (CUDA_FOUND AND (NOT DEFINED FORCE_NO_OPENCV_CUDA OR NOT FORCE_NO_OPENCV_CUDA))
+if(BFL_CUDA)
     if(WIN32)
         option(CUDA_LIB_DYN "Build CUDA files as dynamic libraries (default OFF - STATIC)" OFF)
     else()
@@ -83,12 +109,6 @@ if (CUDA_FOUND AND (NOT DEFINED FORCE_NO_OPENCV_CUDA OR NOT FORCE_NO_OPENCV_CUDA
     set(CUDA_HDR_FILES include/devicelikelihood.h
                        include/OpenCVToThrust.h
     )
-else()
-    if(NOT DEFINED FORCE_NO_OPENCV_CUDA)
-        message(STATUS "Found no CUDA module.")
-    else()
-        message(STATUS "Forcing no CUDA module.")
-    endif()
 endif()
 
 
@@ -125,9 +145,6 @@ set(${EXE_TARGET_NAME}_SRC
         src/DrawParticlesImportanceThreshold.cpp
         src/KinPoseModel.cpp
         src/GatePose.cpp
-        src/HistogramNormOne.cpp
-        src/HistogramNormTwoChi.cpp
-        src/HistogramNormTwoKLD.cpp
         src/iCubArmModel.cpp
         src/iCubCamera.cpp
         src/iCubFwdKinModel.cpp
@@ -144,6 +161,16 @@ set(${EXE_TARGET_NAME}_SRC
 		src/WalkmanCamera.cpp
 )
 
+set(${EXE_TARGET_NAME}_CPU_SRC
+        src/cpu/HistogramNormOne.cpp
+        src/cpu/HistogramNormTwoChi.cpp
+)
+
+set(${EXE_TARGET_NAME}_CUDA_SRC
+        src/cuda/HistogramNormOne.cpp
+        src/cuda/HistogramNormTwoKLD.cpp
+)
+
 set(${EXE_TARGET_NAME}_THRIFT_HDR
         thrift/visualsisparticlefilter.thrift)
 
@@ -151,7 +178,7 @@ yarp_add_idl(${EXE_TARGET_NAME}_THRIFT_SRC ${${EXE_TARGET_NAME}_THRIFT_HDR})
 
 
 # CUDA library target calls
-if(CUDA_FOUND AND DEFINED OpenCV_CUDA_VERSION AND (NOT DEFINED FORCE_NO_OPENCV_CUDA OR NOT FORCE_NO_OPENCV_CUDA))
+if(BFL_CUDA)
     cuda_add_library(${CUDA_LIB_NAME} ${CUDA_HDR_FILES} ${CUDA_SRC_FILES} ${CUDA_LIB_TYPE})
 
     target_include_directories(${CUDA_LIB_NAME} ${CUDA_LINK_LIBRARIES_KEYWORD}
@@ -171,7 +198,24 @@ endif()
 add_executable(${EXE_TARGET_NAME}
                    ${${EXE_TARGET_NAME}_HDR}
                    ${${EXE_TARGET_NAME}_SRC}
+                   ${${EXE_TARGET_NAME}_CUDA_SRC}
+                   ${${EXE_TARGET_NAME}_CPU_SRC}
                    ${${EXE_TARGET_NAME}_THRIFT_SRC}
+)
+
+if(BFL_CUDA)
+    set_source_files_properties(${${EXE_TARGET_NAME}_CPU_SRC}
+                                PROPERTIES LANGUAGE "DONOTCOMPILE")
+else()
+    set_source_files_properties(${${EXE_TARGET_NAME}_CUDA_SRC}
+                                PROPERTIES LANGUAGE "DONOTCOMPILE")
+endif()
+
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src"
+             PREFIX "Source Files"
+             FILES
+                 ${${EXE_TARGET_NAME}_CUDA_SRC}
+                 ${${EXE_TARGET_NAME}_CPU_SRC}
 )
 
 target_include_directories(${EXE_TARGET_NAME}
@@ -199,7 +243,7 @@ target_link_libraries(${EXE_TARGET_NAME}
                           YARP::YARP_gsl
 )
 
-if(UNIX AND NOT APPLE)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set(THREADS_PREFER_PTHREAD_FLAG TRUE)
     find_package(Threads REQUIRED)
@@ -221,24 +265,16 @@ else()
     )
 endif()
 
-if(CUDA_FOUND AND DEFINED OpenCV_CUDA_VERSION AND (NOT DEFINED FORCE_NO_OPENCV_CUDA OR NOT FORCE_NO_OPENCV_CUDA))
-    message(STATUS "Found OpenCV with CUDA compiled modules.")
+if(BFL_CUDA)
     message(STATUS "Set macro HANDTRACKING_USE_OPENCV_CUDA = 1.")
 
     target_compile_definitions(${EXE_TARGET_NAME}
                                PRIVATE
                                    HANDTRACKING_USE_OPENCV_CUDA=1
     )
-
-    option(FORCE_NO_OPENCV_CUDA "Force no OpenCV CUDA compiled modules?" OFF)
 else()
-    if(NOT DEFINED FORCE_NO_OPENCV_CUDA)
-        message(STATUS "Found no OpenCV CUDA compiled modules.")
-    else()
-        message(STATUS "Forcing no OpenCV CUDA compiled modules.")
-    endif()
-
     message(STATUS "Set macro HANDTRACKING_USE_OPENCV_CUDA = 0.")
+
     target_compile_definitions(${EXE_TARGET_NAME}
                                PRIVATE
                                    HANDTRACKING_USE_OPENCV_CUDA=0
