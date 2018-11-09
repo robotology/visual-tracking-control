@@ -113,11 +113,11 @@ if(BFL_CUDA)
     message(STATUS "Compiling CUDA library: " ${CUDA_LIB_NAME})
 
     # CUDA source and header files
-    set(CUDA_SRC_FILES src/devicelikelihood.cu
+    set(CUDA_SRC_FILES src/device_likelihood.cu
     )
 
-    set(CUDA_HDR_FILES include/devicelikelihood.h
-                       include/OpenCVToThrust.h
+    set(CUDA_HDR_FILES include/device_likelihood.h
+                       include/thrust_opencv_iterator.h
     )
 endif()
 
@@ -215,10 +215,10 @@ add_executable(${EXE_TARGET_NAME}
 
 if(BFL_CUDA)
     set_source_files_properties(${${EXE_TARGET_NAME}_CPU_SRC}
-                                PROPERTIES LANGUAGE "DONOTCOMPILE")
+                                PROPERTIES HEADER_FILE_ONLY ON)
 else()
     set_source_files_properties(${${EXE_TARGET_NAME}_CUDA_SRC}
-                                PROPERTIES LANGUAGE "DONOTCOMPILE")
+                                PROPERTIES HEADER_FILE_ONLY ON)
 endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src"
