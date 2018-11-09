@@ -27,6 +27,16 @@ if(NOT SuperimposeMesh_FOUND)
     find_package(SuperimposeMesh 0.9.104.0 REQUIRED)
 endif()
 
+
+print_dependency(CUDA)
+print_dependency(OpenCV)
+print_dependency(YARP)
+print_dependency(ICUB)
+print_dependency(Eigen3)
+print_dependency(BayesFilters)
+print_dependency(SuperimposeMesh)
+
+
 list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 
 if(DEFINED OpenCV_CUDA_VERSION)
