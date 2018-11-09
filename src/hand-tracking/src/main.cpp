@@ -16,6 +16,7 @@
 #include <DrawParticlesImportanceThreshold.h>
 #include <HistogramNormOne.h>
 #include <HistogramNormTwoChi.h>
+#include <HistogramNormTwoKLD.h>
 #include <iCubCamera.h>
 #include <iCubArmModel.h>
 #include <iCubGatePose.h>
@@ -273,8 +274,10 @@ int main(int argc, char *argv[])
     std::unique_ptr<LikelihoodModel> likelihood_hist;
     if (paramss["likelihood_type"] == "norm_one")
         likelihood_hist = std::unique_ptr<HistogramNormOne>(new HistogramNormOne(paramsd["likelihood_gain"], 36));
-    else if (paramss["likelihood_type"] == "norm_two_chi")
-        likelihood_hist = std::unique_ptr<HistogramNormTwoChi>(new HistogramNormTwoChi(paramsd["likelihood_gain"], 36));
+    else if (paramss["likelihood_type"] == "norm_two_kld")
+        likelihood_hist = std::unique_ptr<HistogramNormTwoKLD>(new HistogramNormTwoKLD(paramsd["likelihood_gain"], 36));
+    //else if (paramss["likelihood_type"] == "norm_two_chi")
+    //    likelihood_hist = std::unique_ptr<HistogramNormTwoChi>(new HistogramNormTwoChi(paramsd["likelihood_gain"], 36));
     else
     {
         yError() << log_ID << "Wrong likelihood type. Provided: " << paramss["likelihood_type"] << ". Shalle be either 'norm_one' or 'norm_two_chi'.";

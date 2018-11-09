@@ -1,6 +1,6 @@
 #include <HistogramNormTwoKLD.h>
 
-#include <devicelikelihood.h>
+#include <device_likelihood.h>
 
 #include <cmath>
 #include <exception>
