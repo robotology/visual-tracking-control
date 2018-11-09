@@ -11,12 +11,7 @@
 #include <memory>
 
 #include <opencv2/core/core.hpp>
-#if HANDTRACKING_USE_OPENCV_CUDA
-#include <opencv2/core/cuda.hpp>
-#include <opencv2/cudaobjdetect.hpp>
-#else
-#include <opencv2/objdetect.hpp>
-#endif // HANDTRACKING_USE_OPENCV_CUDA
+
 #include <SuperimposeMesh/SICAD.h>
 
 
@@ -64,18 +59,6 @@ protected:
     std::unique_ptr<SICAD> si_cad_;
 
     int num_images_;
-
-#if HANDTRACKING_USE_OPENCV_CUDA
-    cv::Ptr<cv::cuda::HOG> hog_cuda_;
-
-    const GLuint* pbo_ = nullptr;
-
-    size_t pbo_size_ = 0;
-
-    struct cudaGraphicsResource** pbo_cuda_;
-#else
-    std::unique_ptr<cv::HOGDescriptor> hog_cpu_;
-#endif // HANDTRACKING_USE_OPENCV_CUDA
 
     const int block_size_ = 16;
 

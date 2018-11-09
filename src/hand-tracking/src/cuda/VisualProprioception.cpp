@@ -6,17 +6,28 @@
 #include <iostream>
 #include <utility>
 
-#if HANDTRACKING_USE_OPENCV_CUDA
+#include <opencv2/core/cuda.hpp>
+#include <opencv2/cudaobjdetect.hpp>
 #include <opencv2/cudaimgproc.hpp>
 #include <opencv2/cudaarithm.hpp>
+#include <opencv2/imgcodecs/imgcodecs.hpp>
 
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
-#endif // HANDTRACKING_USE_OPENCV_CUDA
-
-#include <opencv2/imgcodecs/imgcodecs.hpp>
 
 using namespace Eigen;
+
+
+/* FIXME:
+   Implement PIMPL pattern to remove global variables.
+ */
+cv::Ptr<cv::cuda::HOG> hog_cuda_;
+
+const GLuint* pbo_ = nullptr;
+
+size_t pbo_size_ = 0;
+
+struct cudaGraphicsResource** pbo_cuda_;
 
 
 VisualProprioception::VisualProprioception
@@ -40,19 +51,11 @@ VisualProprioception::VisualProprioception
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR\nERROR: Could not find shader folder.");
 
 
-#if HANDTRACKING_USE_OPENCV_CUDA
     hog_cuda_ = cv::cuda::HOG::create(cv::Size(cam_params_.width, cam_params_.height), cv::Size(block_size_, block_size_), cv::Size(block_size_ / 2, block_size_ / 2), cv::Size(block_size_ / 2, block_size_ / 2), bin_number_);
     hog_cuda_->setDescriptorFormat(cv::cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
     hog_cuda_->setGammaCorrection(true);
     hog_cuda_->setWinStride(cv::Size(cam_params_.width, cam_params_.height));
-#else
-    hog_cpu_ = std::unique_ptr<cv::HOGDescriptor>(new cv::HOGDescriptor(cv::Size(cam_params_.width, cam_params_.height),
-                                                                        cv::Size(block_size_, block_size_),
-                                                                        cv::Size(block_size_ / 2, block_size_ / 2),
-                                                                        cv::Size(block_size_ / 2, block_size_ / 2),
-                                                                        bin_number_,
-                                                                        1, -1.0, cv::HOGDescriptor::L2Hys, 0.2, true, cv::HOGDescriptor::DEFAULT_NLEVELS, false));
-#endif // HANDTRACKING_USE_OPENCV_CUDA
+
 
     try
     {
@@ -72,7 +75,6 @@ VisualProprioception::VisualProprioception
 
     feature_dim_ = (cam_params_.width / block_size_ * 2 - 1) * (cam_params_.height / block_size_ * 2 - 1) * bin_number_ * 4;
 
-#if HANDTRACKING_USE_OPENCV_CUDA
     std::tie(pbo_, pbo_size_) = si_cad_->getPBOs();
 
     pbo_cuda_ = new cudaGraphicsResource*[pbo_size_]();
@@ -81,15 +83,12 @@ VisualProprioception::VisualProprioception
         cudaGraphicsGLRegisterBuffer(pbo_cuda_ + i, pbo_[i], cudaGraphicsRegisterFlagsNone);
 
     si_cad_->releaseContext();
-#endif // HANDTRACKING_USE_OPENCV_CUDA
 }
 
 
 VisualProprioception::~VisualProprioception() noexcept
 {
-#if HANDTRACKING_USE_OPENCV_CUDA
     delete[] pbo_cuda_;
-#endif // HANDTRACKING_USE_OPENCV_CUDA
 }
 
 
@@ -98,8 +97,6 @@ VisualProprioception::~VisualProprioception() noexcept
  */
 std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixXf>& cur_states) const
 {
-    MatrixXf descriptor(num_images_, feature_dim_);
-
     std::tie(std::ignore, camera_position_, camera_orientation_) = bfl::any::any_cast<bfl::Camera::CameraData>(camera_->getData());
 
     std::vector<Superimpose::ModelPoseContainer> mesh_poses;
@@ -109,7 +106,6 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
 
-#if HANDTRACKING_USE_OPENCV_CUDA
     success &= si_cad_->superimpose(mesh_poses, camera_position_.data(), camera_orientation_.data(), 0);
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
@@ -121,42 +117,26 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
 
     cv::cuda::GpuMat cuda_mat_render(si_cad_->getTilesRows() * cam_params_.height, si_cad_->getTilesCols() * cam_params_.width, CV_8UC3, static_cast<void*>(pbo_cuda_data));
 
+
+    /* FIXME
+       The following two steps shold be performed by OpenGL. */
     cv::cuda::GpuMat cuda_mat_render_flipped;
     cv::cuda::flip(cuda_mat_render, cuda_mat_render_flipped, 0);
 
-    /* FIXME
-     This step shold be performed by OpenGL. */
     cv::cuda::GpuMat cuda_mat_render_flipped_alpha;
     cv::cuda::cvtColor(cuda_mat_render_flipped, cuda_mat_render_flipped_alpha, cv::COLOR_BGR2BGRA, 4);
+
 
     cv::cuda::GpuMat cuda_descriptor;
     hog_cuda_->compute(cuda_mat_render_flipped_alpha, cuda_descriptor);
 
-    cv::Mat cpu_descriptor;
-    cuda_descriptor.download(cpu_descriptor);
 
     cudaGraphicsUnmapResources(static_cast<int>(pbo_size_), pbo_cuda_, 0);
     si_cad_->releaseContext();
 
-    /* FIXME
-     Is the following command slow? */
-    ocv2eigen(cpu_descriptor, descriptor);
-#else
-    cv::Mat rendered_image;
-    success &= si_cad_->superimpose(mesh_poses, camera_position_.data(), camera_orientation_.data(), rendered_image);
-    if (!success)
-        return std::make_pair(false, MatrixXf::Zero(1, 1));
 
-    std::vector<float> descriptors_cpu;
-    hog_cpu_->compute(rendered_image, descriptors_cpu, cv::Size(cam_params_.width, cam_params_.height));
-
-    /* FIXME
-     The following copy operation is super slow (approx 4 ms for 2M numbers).
-     Must find out a new, direct, way of doing this. */
-    descriptor = Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(descriptors_cpu.data(), num_images_, feature_dim_);
-#endif // HANDTRACKING_USE_OPENCV_CUDA
-
-    return std::make_pair(true, std::move(descriptor));
+    //return std::make_pair(true, std::move(cuda_descriptor));
+    return std::make_pair(true, cuda_descriptor);
 }
 
 
@@ -185,37 +165,19 @@ std::pair<bool, bfl::Data> VisualProprioception::getAgentMeasurements() const
     cv::Mat camera_image;
     std::tie(camera_image, std::ignore, std::ignore) = bfl::any::any_cast<bfl::Camera::CameraData>(camera_->getData());
 
-    MatrixXf descriptor_out(1, feature_dim_);
+    cv::cuda::GpuMat cuda_img;
+    cv::cuda::GpuMat cuda_img_alpha;
+    cv::cuda::GpuMat cuda_descriptors;
 
-#if HANDTRACKING_USE_OPENCV_CUDA
-    cv::cuda::GpuMat img_cuda;
-    cv::cuda::GpuMat img_alpha_cuda;
-    cv::cuda::GpuMat descriptors_cuda;
-    cv::Mat          descriptors_cpu;
+    cuda_img.upload(camera_image);
 
-    img_cuda.upload(camera_image);
+    cv::cuda::cvtColor(cuda_img, cuda_img_alpha, cv::COLOR_BGR2BGRA, 4);
 
-    cv::cuda::cvtColor(img_cuda, img_alpha_cuda, cv::COLOR_BGR2BGRA, 4);
+    hog_cuda_->compute(cuda_img_alpha, cuda_descriptors);
 
-    hog_cuda_->compute(img_alpha_cuda, descriptors_cuda);
 
-    descriptors_cuda.download(descriptors_cpu);
-
-    /* FIXME
-     Is the following command slow? */
-    ocv2eigen(descriptors_cpu, descriptor_out);
-#else
-    std::vector<float> descriptors_cpu;
-
-    hog_cpu_->compute(camera_image, descriptors_cpu, cv::Size(cam_params_.width, cam_params_.height));
-
-    /* FIXME
-     The following copy operation is super slow (approx 4 ms for 2M numbers).
-     Must find out a new, direct, way of doing this. */
-    descriptor_out = Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(descriptors_cpu.data(), 1, feature_dim_);
-#endif // HANDTRACKING_USE_OPENCV_CUDA
-
-    return std::make_pair(true, std::move(descriptor_out));
+    //return std::make_pair(true, std::move(cuda_descriptors));
+    return std::make_pair(true, cuda_descriptors);
 }
 
 
@@ -245,29 +207,4 @@ void VisualProprioception::superimpose(const Superimpose::ModelPoseContainer& ob
 
     si_cad_->setBackgroundOpt(false);
     si_cad_->setWireframeOpt(false);
-}
-
-
-void VisualProprioception::ocv2eigen(const cv::Mat& src, Ref<MatrixXf> dst) const
-{
-    CV_DbgAssert(src.rows == dst.rows() && src.cols == dst.cols());
-
-    if (!(dst.Flags & RowMajorBit))
-    {
-        const cv::Mat _dst(src.cols, src.rows, cv::traits::Type<float>::value, dst.data(), (size_t)(dst.outerStride() * sizeof(float)));
-        if (src.type() == _dst.type())
-            transpose(src, _dst);
-        else if (src.cols == src.rows)
-        {
-            src.convertTo(_dst, _dst.type());
-            transpose(_dst, _dst);
-        }
-        else
-            cv::Mat(src.t()).convertTo(_dst, _dst.type());
-    }
-    else
-    {
-        const cv::Mat _dst(src.rows, src.cols, cv::traits::Type<float>::value, dst.data(), (size_t)(dst.outerStride() * sizeof(float)));
-        src.convertTo(_dst, _dst.type());
-    }
 }

@@ -165,7 +165,6 @@ set(${EXE_TARGET_NAME}_SRC
         src/PlayiCubFwdKinModel.cpp
         src/PlayGatePose.cpp
         src/PlayWalkmanPoseModel.cpp
-        src/VisualProprioception.cpp
         src/VisualSIS.cpp
 		src/WalkmanArmModel.cpp
 		src/WalkmanCamera.cpp
@@ -174,11 +173,13 @@ set(${EXE_TARGET_NAME}_SRC
 set(${EXE_TARGET_NAME}_CPU_SRC
         src/cpu/HistogramNormOne.cpp
         src/cpu/HistogramNormTwoChi.cpp
+        src/cpu/VisualProprioception.cpp
 )
 
 set(${EXE_TARGET_NAME}_CUDA_SRC
         src/cuda/HistogramNormOne.cpp
         src/cuda/HistogramNormTwoKLD.cpp
+        src/cuda/VisualProprioception.cpp
 )
 
 set(${EXE_TARGET_NAME}_THRIFT_HDR
