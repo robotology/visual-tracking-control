@@ -3,20 +3,22 @@
 
 #include <BayesFilters/LikelihoodModel.h>
 
+#include <memory>
+
 
 class HistogramNormOne : public bfl::LikelihoodModel
 {
 public:
-    HistogramNormOne(const double likelihood_gain, const int histogram_size) noexcept;
+    HistogramNormOne(const double likelihood_gain) noexcept;
 
     ~HistogramNormOne() noexcept;
 
     std::pair<bool, Eigen::VectorXf> likelihood(const bfl::MeasurementModel& measurement_model, const Eigen::Ref<const Eigen::MatrixXf>& pred_states) override;
 
-protected:
-    double likelihood_gain_;
+private:
+    struct ImplHNO;
 
-    int histogram_size_;
+    std::unique_ptr<ImplHNO> pImpl_;
 };
 
 #endif /* HISTOGRAMNORMONE_H */

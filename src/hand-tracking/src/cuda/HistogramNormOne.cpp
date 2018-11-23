@@ -13,14 +13,27 @@ using namespace bfl;
 using namespace Eigen;
 
 
-HistogramNormOne::HistogramNormOne(const double likelihood_gain, const int histogram_size) noexcept :
-    likelihood_gain_(likelihood_gain),
-    histogram_size_(histogram_size)
-{ }
+
+struct HistogramNormOne::ImplHNO
+{
+    cublasHandle_t handle_;
+    double likelihood_gain_;
+};
+
+
+HistogramNormOne::HistogramNormOne(const double likelihood_gain) noexcept :
+    pImpl_(std::unique_ptr<ImplHNO>(new ImplHNO))
+{
+    pImpl_->likelihood_gain_ = likelihood_gain;
+
+    cublasCreate(&(pImpl_->handle_));
+}
 
 
 HistogramNormOne::~HistogramNormOne() noexcept
-{ }
+{
+    cublasDestroy(pImpl_->handle_);
+}
 
 
 std::pair<bool, VectorXf> HistogramNormOne::likelihood
@@ -48,12 +61,10 @@ std::pair<bool, VectorXf> HistogramNormOne::likelihood
     if (!valid_predicted_measurements)
         return std::make_pair(false, VectorXf::Zero(1));
 
-    /* FIXME
-       Implement NormOne likelihood in CUDA. */
-    thrust::host_vector<float> device_normtwo_kld = bfl::cuda::normtwo_kld(measurements, predicted_measurements, 36, 1131, true);
+    thrust::host_vector<float> device_normtwo_kld = bfl::cuda::normone(pImpl_->handle_, measurements, predicted_measurements, 36, 1131);
 
     Map<VectorXf> likelihood(device_normtwo_kld.data(), device_normtwo_kld.size());
-    likelihood = (-static_cast<float>(likelihood_gain_) * likelihood).array().exp();
+    likelihood = (-static_cast<float>(pImpl_->likelihood_gain_) * likelihood).array().exp();
 
 
     return std::make_pair(true, std::move(likelihood));

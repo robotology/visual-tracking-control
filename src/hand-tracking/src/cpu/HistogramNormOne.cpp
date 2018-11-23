@@ -11,14 +11,21 @@ using namespace bfl;
 using namespace Eigen;
 
 
-HistogramNormOne::HistogramNormOne(const double likelihood_gain, const int histogram_size) noexcept :
-    likelihood_gain_(likelihood_gain),
-    histogram_size_(histogram_size)
-{ }
+
+struct HistogramNormOne::ImplHNO
+{
+    double likelihood_gain_;
+};
 
 
-HistogramNormOne::~HistogramNormOne() noexcept
-{ }
+HistogramNormOne::HistogramNormOne(const double likelihood_gain) noexcept :
+    pImpl_(std::unique_ptr<ImplHNO>(new ImplHNO))
+{
+    pImpl_->likelihood_gain_ = likelihood_gain;
+}
+
+
+HistogramNormOne::~HistogramNormOne() = default;
 
 
 std::pair<bool, VectorXf> HistogramNormOne::likelihood
@@ -68,7 +75,7 @@ std::pair<bool, VectorXf> HistogramNormOne::likelihood
         likelihood(i) = static_cast<float>(sum_diff);
     }
 
-    likelihood = (-static_cast<float>(likelihood_gain_) * likelihood).array().exp();
+    likelihood = (-static_cast<float>(pImpl_->likelihood_gain_) * likelihood).array().exp();
 
 
     return std::make_pair(true, std::move(likelihood));
