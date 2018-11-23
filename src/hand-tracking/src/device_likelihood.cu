@@ -157,15 +157,15 @@ private:
 
 /* >- ************************************************** -< */
 template<typename Iterator>
-class SlowPaceIterator : public thrust::iterator_adaptor<SlowPaceIterator<Iterator>, Iterator>
+class PaceIterator : public thrust::iterator_adaptor<PaceIterator<Iterator>, Iterator>
 {
 public:
-    using base_t = typename thrust::iterator_adaptor<SlowPaceIterator<Iterator>, Iterator>;
+    using base_t = typename thrust::iterator_adaptor<PaceIterator<Iterator>, Iterator>;
 
-    using difference_t = typename thrust::iterator_adaptor<SlowPaceIterator<Iterator>, Iterator>::difference_type;
+    using difference_t = typename thrust::iterator_adaptor<PaceIterator<Iterator>, Iterator>::difference_type;
 
     __host__ __device__
-    SlowPaceIterator(const Iterator& begin, const Iterator& end, const std::size_t pace) :
+    PaceIterator(const Iterator& begin, const Iterator& end, const std::size_t pace) :
         base_t(begin),
         begin_(begin),
         end_(end),
@@ -225,58 +225,59 @@ private:
 
 
 /* >- ************************************************** -< */
-thrust::device_vector<float> sum_subvectors_in_device(const thrust::device_vector<float>& vec, const std::size_t subvector_size)
+thrust::device_vector<float> sum_subvectors_in_device(cublasHandle_t handle, const thrust::device_vector<float>& vec, const std::size_t subvector_size)
 {
-    thrust::device_vector<float> vec_inclusive_scan_gpu(vec.size());
+    std::size_t subvector_num = vec.size() / subvector_size;
 
-    thrust::inclusive_scan(vec.begin(), vec.end(), vec_inclusive_scan_gpu.begin());
+    const float *A = ::thrust::raw_pointer_cast(&vec[0]);
 
-    std::size_t num_element = vec_inclusive_scan_gpu.size() / subvector_size;
+    ::thrust::device_vector<float> ones(subvector_size, 1.0f);
+    const float *B = ::thrust::raw_pointer_cast(&ones[0]);
 
-    thrust::device_vector<float> sum_subvectors_gpu(num_element);
-    sum_subvectors_gpu[0] = vec_inclusive_scan_gpu[subvector_size - 1];
+    ::thrust::device_vector<float> sum_subvectors_gpu(subvector_num);
+    float *C = ::thrust::raw_pointer_cast(&sum_subvectors_gpu[0]);
 
-    if (num_element > 1)
-    {
-        StridedIterator<FloatIterator> base(vec_inclusive_scan_gpu.begin() + (2 * subvector_size) - 1, vec_inclusive_scan_gpu.end(), subvector_size);
-        StridedIterator<FloatIterator> to_remove(vec_inclusive_scan_gpu.begin() + subvector_size - 1, vec_inclusive_scan_gpu.end(), subvector_size);
+    int m = static_cast<int>(subvector_size);
+    int n = static_cast<int>(subvector_num);
+    int lda = m;
+    int ldb = 1;
+    int ldc = 1;
+    const float alf = 1.0f;
+    const float bet = 0.0f;
+    const float *alpha = &alf;
+    const float *beta = &bet;
 
-        thrust::transform(base.begin(), base.end(),
-            to_remove.begin(),
-            sum_subvectors_gpu.begin() + 1,
-            thrust::minus<float>());
-    }
+    cublasSgemv(handle, cublasOperation_t::CUBLAS_OP_T,
+                m, n,
+                alpha, A, lda,
+                B, ldb, beta,
+                C, ldc);
 
     return sum_subvectors_gpu;
 }
 
 
 /* >- ************************************************** -< */
-thrust::device_vector<float> sum_subvectors_in_device(const cv::cuda::GpuMat& mat, const std::size_t subvector_size)
+thrust::device_vector<float> sum_subvectors_in_device(cublasHandle_t handle, const cv::cuda::GpuMat& mat, const std::size_t subvector_size)
 {
-    thrust::device_vector<float> mat_inclusive_scan_gpu(mat.size().area());
+    thrust::device_vector<float> p_thrust(mat.size().area());
 
-    thrust::inclusive_scan(bfl::thrust::GpuMat_begin_iterator<float>(mat), bfl::thrust::GpuMat_end_iterator<float>(mat),
-        mat_inclusive_scan_gpu.begin());
+    thrust::copy(bfl::thrust::GpuMat_begin_iterator<float>(mat), bfl::thrust::GpuMat_end_iterator<float>(mat),
+                 p_thrust.begin());
 
-    std::size_t num_element = mat_inclusive_scan_gpu.size() / subvector_size;
-
-    thrust::device_vector<float> sum_subvectors_gpu(num_element);
-    sum_subvectors_gpu[0] = mat_inclusive_scan_gpu[subvector_size - 1];
-
-    if (num_element > 1)
-    {
-        StridedIterator<FloatIterator> base(mat_inclusive_scan_gpu.begin() + (2 * subvector_size) - 1, mat_inclusive_scan_gpu.end(), subvector_size);
-        StridedIterator<FloatIterator> to_remove(mat_inclusive_scan_gpu.begin() + subvector_size - 1, mat_inclusive_scan_gpu.end(), subvector_size);
-
-        thrust::transform(base.begin(), base.end(),
-            to_remove.begin(),
-            sum_subvectors_gpu.begin() + 1,
-            thrust::minus<float>());
-    }
-
-    return sum_subvectors_gpu;
+    return sum_subvectors_in_device(handle, p_thrust, subvector_size);
 }
+
+
+/* >- ************************************************** -< */
+struct functor_is_less_than_zero
+{
+    __host__ __device__
+    bool operator()(const float& x)
+    {
+        return x <= 0;
+    }
+};
 
 
 /* >- ************************************************** -< */
@@ -284,7 +285,7 @@ struct functor_kld
 {
     template<typename Tuple>
     __host__ __device__
-        void operator()(Tuple& t)
+    void operator()(Tuple& t)
     {
         thrust::get<2>(t) = thrust::get<0>(t) * (log10f(thrust::get<0>(t) + NPP_MINABS_32F) - log10f(thrust::get<1>(t) + NPP_MINABS_32F));
     }
@@ -301,9 +302,9 @@ struct functor_kld_with_consistency
 
     template<typename Tuple>
     __host__ __device__
-        void operator()(Tuple& t)
+    void operator()(Tuple& t)
     {
-        if (thrust::get<2>(t) == 0.0f)
+        if (thrust::get<2>(t) <= 0.0f)
             thrust::get<3>(t) = thrust::get<0>(t) * (log10f(thrust::get<0>(t) + NPP_MINABS_32F) - log10f(uniform_pmf_value_ + NPP_MINABS_32F));
         else
             thrust::get<3>(t) = thrust::get<0>(t) * (log10f(thrust::get<0>(t) + NPP_MINABS_32F) - log10f(thrust::get<1>(t) + NPP_MINABS_32F));
@@ -316,12 +317,36 @@ struct functor_normalize_kld
 {
     template<typename Tuple>
     __host__ __device__
-        void operator()(Tuple& t)
+    void operator()(Tuple& t)
     {
         thrust::get<2>(t) = (thrust::get<2>(t) / thrust::get<0>(t)) + log10f(thrust::get<1>(t) + NPP_MINABS_32F) - log10f(thrust::get<0>(t) + NPP_MINABS_32F);
 
         /* The following line is to force 0 on very low numbers, but may result in thread divergence in warps. */
-        //thrust::get<2>(t) = (thrust::get<2>(t) < 0.00001f) ? 0 : thrust::get<2>(t);
+        //thrust::get<2>(t) = (thrust::get<2>(t) < 0.00001f) ? 0.0f : thrust::get<2>(t);
+    }
+};
+
+
+/* >- ************************************************** -< */
+struct functor_chi_square
+{
+    template<typename Tuple>
+    __host__ __device__
+    void operator()(Tuple& t)
+    {
+        thrust::get<2>(t) = powf(thrust::get<0>(t) - thrust::get<1>(t), 2.0f) / (2.0f * (thrust::get<0>(t) + thrust::get<1>(t)));
+    }
+};
+
+
+/* >- ************************************************** -< */
+struct functor_absolute_difference
+{
+    template<typename Tuple>
+    __host__ __device__
+    void operator()(Tuple& t)
+    {
+        thrust::get<2>(t) = fabsf(thrust::get<0>(t) - thrust::get<1>(t));
     }
 };
 
@@ -331,7 +356,7 @@ struct functor_sqared_difference
 {
     template<typename Tuple>
     __host__ __device__
-        void operator()(Tuple& t)
+    void operator()(Tuple& t)
     {
         thrust::get<2>(t) = powf(thrust::get<0>(t) - thrust::get<1>(t), 2.0f);
     }
@@ -342,7 +367,7 @@ struct functor_sqared_difference
 struct functor_sqrt : public thrust::unary_function<float, float>
 {
     __host__ __device__
-        float operator()(const float x) const
+    float operator()(const float x) const
     {
         return sqrtf(x);
     }
@@ -354,33 +379,38 @@ struct functor_euclidean_kld
 {
     template<typename Tuple>
     __host__ __device__
-        void operator()(Tuple& t)
+    void operator()(Tuple& t)
     {
         thrust::get<3>(t) = sqrtf(thrust::get<0>(t)) * ((thrust::get<3>(t) / thrust::get<1>(t)) + log10f(thrust::get<2>(t) + NPP_MINABS_32F) - log10f(thrust::get<1>(t) + NPP_MINABS_32F));
 
         /* The following line is to force 0 on very low numbers, but may result in thread divergence in warps. */
-        //thrust::get<3>(t) = (thrust::get<3>(t) < 0.00001f) ? 0 : thrust::get<3>(t);
+        //thrust::get<3>(t) = (thrust::get<3>(t) < 0.00001f) ? 0.0f : thrust::get<3>(t);
     }
 };
 
 
 /* >- ************************************************** -< */
-struct functor_is_less_than_zero
+struct functor_euclidean_kld_chisquare
 {
+    template<typename Tuple>
     __host__ __device__
-    bool operator()(const float& x)
+    void operator()(Tuple& t)
     {
-        return x <= 0;
+        thrust::get<4>(t) = sqrtf(thrust::get<0>(t)) * ((thrust::get<4>(t) / thrust::get<1>(t)) + log10f(thrust::get<2>(t) + NPP_MINABS_32F) - log10f(thrust::get<1>(t) + NPP_MINABS_32F)) * thrust::get<3>(t);
+
+        /* The following line is to force 0 on very low numbers, but may result in thread divergence in warps. */
+        //thrust::get<4>(t) = (thrust::get<4>(t) < 0.00001f) ? 0.0f : thrust::get<4>(t);
     }
 };
 
 
 /* TODO
- * When switching to MSVC 15.7 plus, upgrade this implementation to use tuples and move constructors to return device vectors.
- */
+* When switching to MSVC 15.7 plus, upgrade this implementation to use tuples and move constructors to return device vectors.
+*/
 /* >- ************************************************** -< */
 void kld_components_from_pmf
 (
+    cublasHandle_t handle,
     const cv::cuda::GpuMat& p,
     const cv::cuda::GpuMat& q,
     const std::size_t histogram_size,
@@ -391,8 +421,8 @@ void kld_components_from_pmf
 {
     std::size_t number_element_q = q.size().area();
 
-    normalizing_term_p_gpu = sum_subvectors_in_device(p, histogram_size);
-    normalizing_term_q_gpu = sum_subvectors_in_device(q, histogram_size);
+    normalizing_term_p_gpu = sum_subvectors_in_device(handle, p, histogram_size);
+    normalizing_term_q_gpu = sum_subvectors_in_device(handle, q, histogram_size);
 
     thrust::device_vector<float> unnormalized_kld_gpu(number_element_q);
 
@@ -400,16 +430,17 @@ void kld_components_from_pmf
                        unnormalized_kld_gpu.size(),
                        functor_kld());
 
-    histogram_unnormalized_kld_gpu = sum_subvectors_in_device(unnormalized_kld_gpu, histogram_size);
+    histogram_unnormalized_kld_gpu = sum_subvectors_in_device(handle, unnormalized_kld_gpu, histogram_size);
 }
 
 
 /* TODO
- * When switching to MSVC 15.7 plus, upgrade this implementation to use tuples and move constructors to return device vectors.
- */
+* When switching to MSVC 15.7 plus, upgrade this implementation to use tuples and move constructors to return device vectors.
+*/
 /* >- ************************************************** -< */
 void kld_components_from_versor
 (
+    cublasHandle_t handle,
     const cv::cuda::GpuMat& p,
     const cv::cuda::GpuMat& q,
     const std::size_t histogram_size,
@@ -420,25 +451,70 @@ void kld_components_from_versor
 {
     std::size_t number_element_q = q.size().area();
 
-    normalizing_term_p_gpu = sum_subvectors_in_device(p, histogram_size);
-    normalizing_term_q_gpu = sum_subvectors_in_device(q, histogram_size);
+    normalizing_term_p_gpu = sum_subvectors_in_device(handle, p, histogram_size);
+    normalizing_term_q_gpu = sum_subvectors_in_device(handle, q, histogram_size);
 
     thrust::device_vector<float> unnormalized_kld_gpu(number_element_q);
 
-    thrust::for_each_n(thrust::make_zip_iterator(thrust::make_tuple(CircularIterator<bfl::thrust::const_ocv_iterator<float>>(bfl::thrust::GpuMat_begin_iterator<float>(p), bfl::thrust::GpuMat_end_iterator<float>(p)), bfl::thrust::GpuMat_begin_iterator<float>(q), SlowPaceIterator<ConstFloatIterator>(normalizing_term_q_gpu.cbegin(), normalizing_term_q_gpu.cend(), histogram_size), unnormalized_kld_gpu.begin())),
+    thrust::for_each_n(thrust::make_zip_iterator(thrust::make_tuple(CircularIterator<bfl::thrust::const_ocv_iterator<float>>(bfl::thrust::GpuMat_begin_iterator<float>(p), bfl::thrust::GpuMat_end_iterator<float>(p)), bfl::thrust::GpuMat_begin_iterator<float>(q), PaceIterator<ConstFloatIterator>(normalizing_term_q_gpu.cbegin(), normalizing_term_q_gpu.cend(), histogram_size), unnormalized_kld_gpu.begin())),
                        unnormalized_kld_gpu.size(),
                        functor_kld_with_consistency(histogram_size));
 
     thrust::replace_if(normalizing_term_q_gpu.begin(), normalizing_term_q_gpu.end(),
                        functor_is_less_than_zero(), 1.0f);
 
-    histogram_unnormalized_kld_gpu = sum_subvectors_in_device(unnormalized_kld_gpu, histogram_size);
+    histogram_unnormalized_kld_gpu = sum_subvectors_in_device(handle, unnormalized_kld_gpu, histogram_size);
+}
+
+
+/* >- ************************************************** -< */
+void chisquare_components
+(
+    cublasHandle_t handle,
+    const cv::cuda::GpuMat& p,
+    const cv::cuda::GpuMat& q,
+    const std::size_t histogram_size,
+    thrust::device_vector<float>& histogram_chi_square_gpu
+)
+{
+    std::size_t number_element_q = q.size().area();
+
+    thrust::device_vector<float> component_chi_square_gpu(number_element_q);
+
+    thrust::for_each_n(thrust::make_zip_iterator(thrust::make_tuple(CircularIterator<bfl::thrust::const_ocv_iterator<float>>(bfl::thrust::GpuMat_begin_iterator<float>(p), bfl::thrust::GpuMat_end_iterator<float>(p)), bfl::thrust::GpuMat_begin_iterator<float>(q), component_chi_square_gpu.begin())),
+                       number_element_q,
+                       functor_chi_square());
+
+    histogram_chi_square_gpu = sum_subvectors_in_device(handle, component_chi_square_gpu, histogram_size);
+}
+
+
+/* >- ************************************************** -< */
+void normone_components
+(
+    cublasHandle_t handle,
+    const cv::cuda::GpuMat& p,
+    const cv::cuda::GpuMat& q,
+    const std::size_t histogram_size,
+    thrust::device_vector<float>& histogram_absolute_difference_gpu
+)
+{
+    std::size_t number_element_q = q.size().area();
+
+    thrust::device_vector<float> component_absolute_difference_gpu(number_element_q);
+
+    thrust::for_each_n(thrust::make_zip_iterator(thrust::make_tuple(CircularIterator<bfl::thrust::const_ocv_iterator<float>>(bfl::thrust::GpuMat_begin_iterator<float>(p), bfl::thrust::GpuMat_end_iterator<float>(p)), bfl::thrust::GpuMat_begin_iterator<float>(q), component_absolute_difference_gpu.begin())),
+                       number_element_q,
+                       functor_absolute_difference());
+
+    histogram_absolute_difference_gpu = sum_subvectors_in_device(handle, component_absolute_difference_gpu, histogram_size);
 }
 
 
 /* >- ************************************************** -< */
 void normtwo_components
 (
+    cublasHandle_t handle,
     const cv::cuda::GpuMat& p,
     const cv::cuda::GpuMat& q,
     const std::size_t histogram_size,
@@ -453,7 +529,7 @@ void normtwo_components
                        number_element_q,
                        functor_sqared_difference());
 
-    histogram_sqared_difference_gpu = sum_subvectors_in_device(component_squared_difference_gpu, histogram_size);
+    histogram_sqared_difference_gpu = sum_subvectors_in_device(handle, component_squared_difference_gpu, histogram_size);
 }
 
 
@@ -465,6 +541,7 @@ namespace cuda
 /* >- ************************************************** -< */
 ::thrust::host_vector<float> kld
 (
+    cublasHandle_t handle,
     const cv::cuda::GpuMat& p,
     const cv::cuda::GpuMat& q,
     const std::size_t histogram_size,
@@ -478,29 +555,81 @@ namespace cuda
     ::thrust::device_vector<float> histogram_unnormalized_kld_gpu;
 
     if (check_pmf)
-        kld_components_from_versor(p, q, histogram_size,
+        kld_components_from_versor(handle,
+                                   p, q, histogram_size,
                                    normalizing_term_p_gpu, normalizing_term_q_gpu, histogram_unnormalized_kld_gpu);
     else
-        kld_components_from_pmf(p, q, histogram_size,
+        kld_components_from_pmf(handle,
+                                p, q, histogram_size,
                                 normalizing_term_p_gpu, normalizing_term_q_gpu, histogram_unnormalized_kld_gpu);
 
 
     /* Histogram-wise KLD */
-    ::thrust::for_each_n(::thrust::make_zip_iterator(::thrust::make_tuple(CircularIterator<FloatIterator>(normalizing_term_p_gpu.begin(), normalizing_term_p_gpu.end()), normalizing_term_q_gpu.begin(), histogram_unnormalized_kld_gpu.begin())),
+    ::thrust::for_each_n(::thrust::make_zip_iterator(::thrust::make_tuple(CircularIterator<ConstFloatIterator>(normalizing_term_p_gpu.cbegin(), normalizing_term_p_gpu.cend()), normalizing_term_q_gpu.cbegin(), histogram_unnormalized_kld_gpu.begin())),
                          histogram_unnormalized_kld_gpu.size(),
                          functor_normalize_kld());
 
 
     /* Sum over histogram-wise KLD */
-    ::thrust::host_vector<float> summed_histogram_kld_cpu(sum_subvectors_in_device(histogram_unnormalized_kld_gpu, histogram_number));
+    ::thrust::host_vector<float> summed_histogram_kld_cpu(sum_subvectors_in_device(handle, histogram_unnormalized_kld_gpu, histogram_number));
 
     return summed_histogram_kld_cpu;
 }
 
 
 /* >- ************************************************** -< */
+::thrust::host_vector<float> chisquare
+(
+    cublasHandle_t handle,
+    const cv::cuda::GpuMat& p,
+    const cv::cuda::GpuMat& q,
+    const std::size_t histogram_size,
+    const std::size_t histogram_number
+)
+{
+    /* Chi-square components */
+    ::thrust::device_vector<float> histogram_chi_square_gpu;
+
+    chisquare_components(handle,
+                         p, q, histogram_size,
+                         histogram_chi_square_gpu);
+
+
+    /* Sum over histogram-wise chi-square */
+    ::thrust::host_vector<float> summed_histogram_normone_cpu(sum_subvectors_in_device(handle, histogram_chi_square_gpu, histogram_number));
+
+    return summed_histogram_normone_cpu;
+}
+
+
+/* >- ************************************************** -< */
+::thrust::host_vector<float> normone
+(
+    cublasHandle_t handle,
+    const cv::cuda::GpuMat& p,
+    const cv::cuda::GpuMat& q,
+    const std::size_t histogram_size,
+    const std::size_t histogram_number
+)
+{
+    /* Absolute difference components */
+    ::thrust::device_vector<float> histogram_abs_difference_gpu;
+
+    normone_components(handle,
+                       p, q, histogram_size,
+                       histogram_abs_difference_gpu);
+
+
+    /* Sum over histogram-wise absolute difference */
+    ::thrust::host_vector<float> summed_histogram_normone_cpu(sum_subvectors_in_device(handle, histogram_abs_difference_gpu, histogram_number));
+
+    return summed_histogram_normone_cpu;
+}
+
+/* >- ************************************************** -< */
 ::thrust::host_vector<float> normtwo
 (
+    cublasHandle_t handle,
     const cv::cuda::GpuMat& p,
     const cv::cuda::GpuMat& q,
     const std::size_t histogram_size,
@@ -510,18 +639,19 @@ namespace cuda
     /* Euclidean distance components */
     ::thrust::device_vector<float> histogram_sqared_difference_gpu;
 
-    normtwo_components(p, q, histogram_size,
+    normtwo_components(handle,
+                       p, q, histogram_size,
                        histogram_sqared_difference_gpu);
 
 
     /* Histogram-wise Euclidean */
-    ::thrust::transform(histogram_sqared_difference_gpu.begin(), histogram_sqared_difference_gpu.end(),
+    ::thrust::transform(histogram_sqared_difference_gpu.cbegin(), histogram_sqared_difference_gpu.cend(),
                         histogram_sqared_difference_gpu.begin(),
                         functor_sqrt());
 
 
     /* Sum over histogram-wise Euclidean */
-    ::thrust::host_vector<float> summed_histogram_normtwo_cpu(sum_subvectors_in_device(histogram_sqared_difference_gpu, histogram_number));
+    ::thrust::host_vector<float> summed_histogram_normtwo_cpu(sum_subvectors_in_device(handle, histogram_sqared_difference_gpu, histogram_number));
 
     return summed_histogram_normtwo_cpu;
 }
@@ -530,6 +660,7 @@ namespace cuda
 /* >- ************************************************** -< */
 ::thrust::host_vector<float> normtwo_kld
 (
+    cublasHandle_t handle,
     const cv::cuda::GpuMat& p,
     const cv::cuda::GpuMat& q,
     const std::size_t histogram_size,
@@ -543,7 +674,8 @@ namespace cuda
     /* Euclidean distance components */
     ::thrust::device_vector<float> histogram_sqared_difference_gpu;
 
-    normtwo_components(p, q, histogram_size,
+    normtwo_components(handle,
+                       p, q, histogram_size,
                        histogram_sqared_difference_gpu);
 
 
@@ -553,21 +685,81 @@ namespace cuda
     ::thrust::device_vector<float> histogram_unnormalized_kld_gpu;
 
     if (check_pmf)
-        kld_components_from_versor(p, q, histogram_size,
+        kld_components_from_versor(handle,
+                                   p, q, histogram_size,
                                    normalizing_term_p_gpu, normalizing_term_q_gpu, histogram_unnormalized_kld_gpu);
     else
-        kld_components_from_pmf(p, q, histogram_size,
+        kld_components_from_pmf(handle,
+                                p, q, histogram_size,
                                 normalizing_term_p_gpu, normalizing_term_q_gpu, histogram_unnormalized_kld_gpu);
 
 
     /* Histogram-wise Euclidean * KLD */
-    ::thrust::for_each_n(::thrust::make_zip_iterator(::thrust::make_tuple(histogram_sqared_difference_gpu.begin(), CircularIterator<FloatIterator>(normalizing_term_p_gpu.begin(), normalizing_term_p_gpu.end()), normalizing_term_q_gpu.begin(), histogram_unnormalized_kld_gpu.begin())),
+    ::thrust::for_each_n(::thrust::make_zip_iterator(::thrust::make_tuple(histogram_sqared_difference_gpu.cbegin(), CircularIterator<ConstFloatIterator>(normalizing_term_p_gpu.cbegin(), normalizing_term_p_gpu.cend()), normalizing_term_q_gpu.cbegin(), histogram_unnormalized_kld_gpu.begin())),
                          histogram_unnormalized_kld_gpu.size(),
                          functor_euclidean_kld());
 
 
     /* Sum over histogram-wise Euclidean * KLD */
-    ::thrust::host_vector<float> summed_histogram_euclidean_kld_cpu(sum_subvectors_in_device(histogram_unnormalized_kld_gpu, histogram_number));
+    ::thrust::host_vector<float> summed_histogram_euclidean_kld_cpu(sum_subvectors_in_device(handle, histogram_unnormalized_kld_gpu, histogram_number));
+
+    return summed_histogram_euclidean_kld_cpu;
+}
+
+
+/* >- ************************************************** -< */
+::thrust::host_vector<float> normtwo_kld_chisquare
+(
+    cublasHandle_t handle,
+    const cv::cuda::GpuMat& p,
+    const cv::cuda::GpuMat& q,
+    const std::size_t histogram_size,
+    const std::size_t histogram_number,
+    const bool check_pmf
+)
+{
+    std::size_t number_element_q = q.size().area();
+
+
+    /* Euclidean distance components */
+    ::thrust::device_vector<float> histogram_sqared_difference_gpu;
+
+    normtwo_components(handle,
+                       p, q, histogram_size,
+                       histogram_sqared_difference_gpu);
+
+
+    /* KLD components */
+    ::thrust::device_vector<float> normalizing_term_p_gpu;
+    ::thrust::device_vector<float> normalizing_term_q_gpu;
+    ::thrust::device_vector<float> histogram_unnormalized_kld_gpu;
+
+    if (check_pmf)
+        kld_components_from_versor(handle,
+                                   p, q, histogram_size,
+                                   normalizing_term_p_gpu, normalizing_term_q_gpu, histogram_unnormalized_kld_gpu);
+    else
+        kld_components_from_pmf(handle,
+                                p, q, histogram_size,
+                                normalizing_term_p_gpu, normalizing_term_q_gpu, histogram_unnormalized_kld_gpu);
+
+
+    /* Chi-square components */
+    ::thrust::device_vector<float> histogram_chi_square_gpu;
+
+    chisquare_components(handle,
+                         p, q, histogram_size,
+                         histogram_chi_square_gpu);
+
+
+    /* Histogram-wise Euclidean * KLD * Chi-square */
+    ::thrust::for_each_n(::thrust::make_zip_iterator(::thrust::make_tuple(histogram_sqared_difference_gpu.cbegin(), CircularIterator<ConstFloatIterator>(normalizing_term_p_gpu.cbegin(), normalizing_term_p_gpu.cend()), normalizing_term_q_gpu.cbegin(), histogram_chi_square_gpu.cbegin(), histogram_unnormalized_kld_gpu.begin())),
+                         histogram_unnormalized_kld_gpu.size(),
+                         functor_euclidean_kld_chisquare());
+
+
+    /* Sum over histogram-wise Euclidean * KLD */
+    ::thrust::host_vector<float> summed_histogram_euclidean_kld_cpu(sum_subvectors_in_device(handle, histogram_unnormalized_kld_gpu, histogram_number));
 
     return summed_histogram_euclidean_kld_cpu;
 }

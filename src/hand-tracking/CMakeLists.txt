@@ -201,6 +201,8 @@ if(BFL_CUDA)
                                 ${CUDA_nppc_LIBRARY}
                                 ${OpenCV_LIBS})
 
+    cuda_add_cublas_to_target(${CUDA_LIB_NAME})
+
     cuda_build_clean_target()
 endif()
 
