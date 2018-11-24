@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
                                                                                  paramsd["num_images"],
                                                                                  std::move(mesh_model)));
 
-        paramsd["num_particles"] = proprio->getOGLTilesNumber();
+        paramsd["num_particles"] = proprio->getNumberOfUsedParticles();
 
         yInfo() << log_ID << "General PF parameters changed after constructing VisualProprioception:";
         yInfo() << log_ID << " - num_particles:" << paramsd["num_particles"];
@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
     /* LIKELIHOOD */
     std::unique_ptr<LikelihoodModel> likelihood_hist;
     if (paramss["likelihood_type"] == "norm_one")
-        likelihood_hist = std::unique_ptr<HistogramNormOne>(new HistogramNormOne(paramsd["likelihood_gain"], 36));
+        likelihood_hist = std::unique_ptr<HistogramNormOne>(new HistogramNormOne(paramsd["likelihood_gain"]));
     else if (paramss["likelihood_type"] == "norm_two_kld")
         likelihood_hist = std::unique_ptr<HistogramNormTwoKLD>(new HistogramNormTwoKLD(paramsd["likelihood_gain"], 36));
     //else if (paramss["likelihood_type"] == "norm_two_chi")
