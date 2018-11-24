@@ -32,43 +32,20 @@ public:
 
     std::pair<bool, bfl::Data> getAgentMeasurements() const override;
 
-    /* FIXME
-       Find a way to better communicate with the callee. Maybe a struct. */
-    int getOGLTilesNumber() const;
+    /* IMPROVEME
+     * Find a way to better communicate with the callee. Maybe a struct.
+     */
+    int getNumberOfUsedParticles() const;
 
-    /* For debugging walkman */
+    /* TODELETE
+     * For debugging walkman
+     */
     void superimpose(const Superimpose::ModelPoseContainer& obj2pos_map, cv::Mat& img);
 
-protected:
-    std::string log_ID_ = "[VisualProprioception]";
+private:
+    struct ImplData;
 
-    std::unique_ptr<bfl::Camera> camera_ = nullptr;
-
-    mutable std::array<double, 3> camera_position_;
-
-    mutable std::array<double, 4> camera_orientation_;
-
-    std::unique_ptr<bfl::MeshModel> mesh_model_;
-
-    bfl::Camera::CameraIntrinsics cam_params_;
-
-    SICAD::ModelPathContainer mesh_paths_;
-
-    std::string shader_folder_;
-
-    std::unique_ptr<SICAD> si_cad_;
-
-    int num_images_;
-
-    const int block_size_ = 16;
-
-    const int bin_number_ = 9;
-
-    unsigned int feature_dim_;
-
-    /* FIXME
-       This is a convenient function over cv2eigen provided by opencv2/core/eigen.hpp. */
-    void ocv2eigen(const cv::Mat& src, Eigen::Ref<Eigen::MatrixXf> dst) const;
+    std::unique_ptr<ImplData> pImpl_;
 };
 
 #endif /* VISUALPROPRIOCEPTION_H */

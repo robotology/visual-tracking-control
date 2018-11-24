@@ -18,16 +18,39 @@
 using namespace Eigen;
 
 
-/* FIXME:
-   Implement PIMPL pattern to remove global variables.
- */
-cv::Ptr<cv::cuda::HOG> hog_cuda_;
 
-const GLuint* pbo_ = nullptr;
+struct VisualProprioception::ImplData
+{
+    const std::string log_ID_ = "[VisualProprioception]";
 
-size_t pbo_size_ = 0;
+    std::unique_ptr<bfl::Camera> camera_ = nullptr;
 
-struct cudaGraphicsResource** pbo_cuda_;
+    std::unique_ptr<bfl::MeshModel> mesh_model_;
+
+    bfl::Camera::CameraIntrinsics cam_params_;
+
+    SICAD::ModelPathContainer mesh_paths_;
+
+    std::string shader_folder_;
+
+    std::unique_ptr<SICAD> si_cad_;
+
+    int num_images_;
+
+    const int block_size_ = 16;
+
+    const int bin_number_ = 9;
+
+    unsigned int feature_dim_;
+
+    cv::Ptr<cv::cuda::HOG> hog_cuda_;
+
+    const GLuint* pbo_ = nullptr;
+
+    size_t pbo_size_ = 0;
+
+    struct cudaGraphicsResource** pbo_cuda_;
+};
 
 
 VisualProprioception::VisualProprioception
@@ -36,90 +59,108 @@ VisualProprioception::VisualProprioception
     const int num_requested_images,
     std::unique_ptr<bfl::MeshModel> mesh_model
 ) :
-    camera_(std::move(camera)),
-    mesh_model_(std::move(mesh_model)),
-    cam_params_(camera_->getCameraParameters())
+    pImpl_(std::unique_ptr<ImplData>(new ImplData))
 {
+    ImplData& rImpl = *pImpl_;
+
+
+    rImpl.camera_ = std::move(camera);
+
+    rImpl.mesh_model_ = std::move(mesh_model);
+
+    rImpl.cam_params_ = rImpl.camera_->getCameraParameters();
+
+
     bool valid_parameter = false;
 
-    std::tie(valid_parameter, mesh_paths_) = mesh_model_->getMeshPaths();
+    std::tie(valid_parameter, rImpl.mesh_paths_) = rImpl.mesh_model_->getMeshPaths();
     if (!valid_parameter)
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR\nERROR: Could not find meshe files.");
 
-    std::tie(valid_parameter, shader_folder_) = mesh_model_->getShaderPaths();
+    std::tie(valid_parameter, rImpl.shader_folder_) = rImpl.mesh_model_->getShaderPaths();
     if (!valid_parameter)
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTION::CTOR\nERROR: Could not find shader folder.");
 
 
-    hog_cuda_ = cv::cuda::HOG::create(cv::Size(cam_params_.width, cam_params_.height), cv::Size(block_size_, block_size_), cv::Size(block_size_ / 2, block_size_ / 2), cv::Size(block_size_ / 2, block_size_ / 2), bin_number_);
-    hog_cuda_->setDescriptorFormat(cv::cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
-    hog_cuda_->setGammaCorrection(true);
-    hog_cuda_->setWinStride(cv::Size(cam_params_.width, cam_params_.height));
+    rImpl.hog_cuda_ = cv::cuda::HOG::create(cv::Size(rImpl.cam_params_.width, rImpl.cam_params_.height), cv::Size(rImpl.block_size_, rImpl.block_size_), cv::Size(rImpl.block_size_ / 2, rImpl.block_size_ / 2), cv::Size(rImpl.block_size_ / 2, rImpl.block_size_ / 2), rImpl.bin_number_);
+    rImpl.hog_cuda_->setDescriptorFormat(cv::cuda::HOG::DESCR_FORMAT_ROW_BY_ROW);
+    rImpl.hog_cuda_->setGammaCorrection(true);
+    rImpl.hog_cuda_->setWinStride(cv::Size(rImpl.cam_params_.width, rImpl.cam_params_.height));
 
 
     try
     {
-        si_cad_ = std::unique_ptr<SICAD>(new SICAD(mesh_paths_,
-                                                   cam_params_.width, cam_params_.height,
-                                                   cam_params_.fx, cam_params_.fy, cam_params_.cx, cam_params_.cy,
-                                                   num_requested_images,
-                                                   shader_folder_,
-                                                   { 1.0, 0.0, 0.0, static_cast<float>(M_PI) }));
+        rImpl.si_cad_ = std::unique_ptr<SICAD>(new SICAD(rImpl.mesh_paths_,
+                                                         rImpl.cam_params_.width, rImpl.cam_params_.height,
+                                                         rImpl.cam_params_.fx, rImpl.cam_params_.fy, rImpl.cam_params_.cx, rImpl.cam_params_.cy,
+                                                         num_requested_images,
+                                                         rImpl.shader_folder_,
+                                                         { 1.0, 0.0, 0.0, static_cast<float>(M_PI) }));
     }
     catch (const std::runtime_error& e)
     {
         throw std::runtime_error(e.what());
     }
 
-    num_images_ = si_cad_->getTilesNumber();
+    rImpl.num_images_ = rImpl.si_cad_->getTilesNumber();
 
-    feature_dim_ = (cam_params_.width / block_size_ * 2 - 1) * (cam_params_.height / block_size_ * 2 - 1) * bin_number_ * 4;
+    rImpl.feature_dim_ = (rImpl.cam_params_.width / rImpl.block_size_ * 2 - 1) * (rImpl.cam_params_.height / rImpl.block_size_ * 2 - 1) * rImpl.bin_number_ * 4;
 
-    std::tie(pbo_, pbo_size_) = si_cad_->getPBOs();
+    std::tie(rImpl.pbo_, rImpl.pbo_size_) = rImpl.si_cad_->getPBOs();
 
-    pbo_cuda_ = new cudaGraphicsResource*[pbo_size_]();
+    rImpl.pbo_cuda_ = new cudaGraphicsResource*[rImpl.pbo_size_]();
 
-    for (size_t i = 0; i < pbo_size_; ++i)
-        cudaGraphicsGLRegisterBuffer(pbo_cuda_ + i, pbo_[i], cudaGraphicsRegisterFlagsNone);
+    for (size_t i = 0; i < rImpl.pbo_size_; ++i)
+        cudaGraphicsGLRegisterBuffer(rImpl.pbo_cuda_ + i, rImpl.pbo_[i], cudaGraphicsRegisterFlagsNone);
 
-    si_cad_->releaseContext();
+    rImpl.si_cad_->releaseContext();
 }
 
 
 VisualProprioception::~VisualProprioception() noexcept
 {
-    delete[] pbo_cuda_;
+    ImplData& rImpl = *pImpl_;
+
+    delete[] rImpl.pbo_cuda_;
 }
 
 
-/** FIXME
- Sicuri che measure, predicted measure e innovation debbano essere const?!
+/* FIXME
+ * Sicuri che measure, predicted measure e innovation debbano essere const?!
  */
 std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixXf>& cur_states) const
 {
-    std::tie(std::ignore, camera_position_, camera_orientation_) = bfl::any::any_cast<bfl::Camera::CameraData>(camera_->getData());
+    ImplData& rImpl = *pImpl_;
+
+    std::array<double, 3> camera_position;
+    std::array<double, 4> camera_orientation;
+
+    std::tie(std::ignore, camera_position, camera_orientation) = bfl::any::any_cast<bfl::Camera::CameraData>(rImpl.camera_->getData());
 
     std::vector<Superimpose::ModelPoseContainer> mesh_poses;
     bool success = false;
 
-    std::tie(success, mesh_poses) = mesh_model_->getModelPose(cur_states);
+    std::tie(success, mesh_poses) = rImpl.mesh_model_->getModelPose(cur_states);
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
 
-    success &= si_cad_->superimpose(mesh_poses, camera_position_.data(), camera_orientation_.data(), 0);
+    success &= rImpl.si_cad_->superimpose(mesh_poses, camera_position.data(), camera_orientation.data(), 0);
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
 
     char* pbo_cuda_data;
-    cudaGraphicsMapResources(static_cast<int>(pbo_size_), pbo_cuda_, 0);
+    cudaGraphicsMapResources(static_cast<int>(rImpl.pbo_size_), rImpl.pbo_cuda_, 0);
     size_t num_bytes;
-    cudaGraphicsResourceGetMappedPointer(reinterpret_cast<void**>(&pbo_cuda_data), &num_bytes, pbo_cuda_[0]);
+    cudaGraphicsResourceGetMappedPointer(reinterpret_cast<void**>(&pbo_cuda_data), &num_bytes, rImpl.pbo_cuda_[0]);
 
-    cv::cuda::GpuMat cuda_mat_render(si_cad_->getTilesRows() * cam_params_.height, si_cad_->getTilesCols() * cam_params_.width, CV_8UC3, static_cast<void*>(pbo_cuda_data));
+    cv::cuda::GpuMat cuda_mat_render(rImpl.si_cad_->getTilesRows() * rImpl.cam_params_.height,
+                                     rImpl.si_cad_->getTilesCols() * rImpl.cam_params_.width,
+                                     CV_8UC3, static_cast<void*>(pbo_cuda_data));
 
 
-    /* FIXME
-       The following two steps shold be performed by OpenGL. */
+    /* IMPROVEME
+     * The following two steps shold be performed by OpenGL.
+     */
     cv::cuda::GpuMat cuda_mat_render_flipped;
     cv::cuda::flip(cuda_mat_render, cuda_mat_render_flipped, 0);
 
@@ -128,11 +169,11 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
 
 
     cv::cuda::GpuMat cuda_descriptor;
-    hog_cuda_->compute(cuda_mat_render_flipped_alpha, cuda_descriptor);
+    rImpl.hog_cuda_->compute(cuda_mat_render_flipped_alpha, cuda_descriptor);
 
 
-    cudaGraphicsUnmapResources(static_cast<int>(pbo_size_), pbo_cuda_, 0);
-    si_cad_->releaseContext();
+    cudaGraphicsUnmapResources(static_cast<int>(rImpl.pbo_size_), rImpl.pbo_cuda_, 0);
+    rImpl.si_cad_->releaseContext();
 
 
     //return std::make_pair(true, std::move(cuda_descriptor));
@@ -156,14 +197,18 @@ std::pair<bool, bfl::Data> VisualProprioception::innovation(const bfl::Data& pre
 
 bool VisualProprioception::bufferAgentData() const
 {
-    return camera_->bufferData();
+    ImplData& rImpl = *pImpl_;
+
+    return rImpl.camera_->bufferData();
 }
 
 
 std::pair<bool, bfl::Data> VisualProprioception::getAgentMeasurements() const
 {
+    ImplData& rImpl = *pImpl_;
+
     cv::Mat camera_image;
-    std::tie(camera_image, std::ignore, std::ignore) = bfl::any::any_cast<bfl::Camera::CameraData>(camera_->getData());
+    std::tie(camera_image, std::ignore, std::ignore) = bfl::any::any_cast<bfl::Camera::CameraData>(rImpl.camera_->getData());
 
     cv::cuda::GpuMat cuda_img;
     cv::cuda::GpuMat cuda_img_alpha;
@@ -173,7 +218,7 @@ std::pair<bool, bfl::Data> VisualProprioception::getAgentMeasurements() const
 
     cv::cuda::cvtColor(cuda_img, cuda_img_alpha, cv::COLOR_BGR2BGRA, 4);
 
-    hog_cuda_->compute(cuda_img_alpha, cuda_descriptors);
+    rImpl.hog_cuda_->compute(cuda_img_alpha, cuda_descriptors);
 
 
     //return std::make_pair(true, std::move(cuda_descriptors));
@@ -181,30 +226,37 @@ std::pair<bool, bfl::Data> VisualProprioception::getAgentMeasurements() const
 }
 
 
-int VisualProprioception::getOGLTilesNumber() const
+int VisualProprioception::getNumberOfUsedParticles() const
 {
-    return num_images_;
+    ImplData& rImpl = *pImpl_;
+
+    return rImpl.num_images_;
 }
 
 
 void VisualProprioception::superimpose(const Superimpose::ModelPoseContainer& obj2pos_map, cv::Mat& img)
 {
+    ImplData& rImpl = *pImpl_;
+
+    std::array<double, 3> camera_position;
+    std::array<double, 4> camera_orientation;
+
     try
     {
-        std::tie(std::ignore, camera_position_, camera_orientation_) = bfl::any::any_cast<bfl::Camera::CameraData>(camera_->getData());
+        std::tie(std::ignore, camera_position, camera_orientation) = bfl::any::any_cast<bfl::Camera::CameraData>(rImpl.camera_->getData());
     }
     catch(const bfl::any::bad_any_cast& e)
     {
-        std::cout << log_ID_ << "[superimpose] Error: " << e.what() << std::endl;
+        std::cout << rImpl.log_ID_ << "[superimpose] Error: " << e.what() << std::endl;
 
         return;
     }
 
-    si_cad_->setBackgroundOpt(true);
-    si_cad_->setWireframeOpt(true);
+    rImpl.si_cad_->setBackgroundOpt(true);
+    rImpl.si_cad_->setWireframeOpt(true);
 
-    si_cad_->superimpose(obj2pos_map, camera_position_.data(), camera_orientation_.data(), img);
+    rImpl.si_cad_->superimpose(obj2pos_map, camera_position.data(), camera_orientation.data(), img);
 
-    si_cad_->setBackgroundOpt(false);
-    si_cad_->setWireframeOpt(false);
+    rImpl.si_cad_->setBackgroundOpt(false);
+    rImpl.si_cad_->setWireframeOpt(false);
 }
