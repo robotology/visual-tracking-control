@@ -11,11 +11,6 @@
 
 #include <Eigen/Dense>
 #include <iCub/iKin/iKinFwd.h>
-#if HANDTRACKING_USE_OPENCV_CUDA
-#include <opencv2/cudaobjdetect.hpp>
-#else
-#include <opencv2/objdetect.hpp>
-#endif // HANDTRACKING_USE_OPENCV_CUDA
 #include <thrift/VisualSISParticleFilterIDL.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IAnalogSensor.h>

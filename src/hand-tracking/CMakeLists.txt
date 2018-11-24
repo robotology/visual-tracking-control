@@ -282,22 +282,6 @@ else()
     )
 endif()
 
-if(BFL_CUDA)
-    message(STATUS "Set macro HANDTRACKING_USE_OPENCV_CUDA = 1.")
-
-    target_compile_definitions(${EXE_TARGET_NAME}
-                               PRIVATE
-                                   HANDTRACKING_USE_OPENCV_CUDA=1
-    )
-else()
-    message(STATUS "Set macro HANDTRACKING_USE_OPENCV_CUDA = 0.")
-
-    target_compile_definitions(${EXE_TARGET_NAME}
-                               PRIVATE
-                                   HANDTRACKING_USE_OPENCV_CUDA=0
-    )
-endif()
-
 
 # Custom command for RESOURCE/EXTRA files
 set(${EXE_TARGET_NAME}_APP
