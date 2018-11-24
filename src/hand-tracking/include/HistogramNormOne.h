@@ -16,9 +16,9 @@ public:
     std::pair<bool, Eigen::VectorXf> likelihood(const bfl::MeasurementModel& measurement_model, const Eigen::Ref<const Eigen::MatrixXf>& pred_states) override;
 
 private:
-    struct ImplHNO;
+    struct ImplData;
 
-    std::unique_ptr<ImplHNO> pImpl_;
+    std::unique_ptr<ImplData> pImpl_;
 };
 
 #endif /* HISTOGRAMNORMONE_H */

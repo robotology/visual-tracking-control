@@ -12,14 +12,14 @@ using namespace Eigen;
 
 
 
-struct HistogramNormOne::ImplHNO
+struct HistogramNormOne::ImplData
 {
     double likelihood_gain_;
 };
 
 
 HistogramNormOne::HistogramNormOne(const double likelihood_gain) noexcept :
-    pImpl_(std::unique_ptr<ImplHNO>(new ImplHNO))
+    pImpl_(std::unique_ptr<ImplData>(new ImplData))
 {
     pImpl_->likelihood_gain_ = likelihood_gain;
 }
