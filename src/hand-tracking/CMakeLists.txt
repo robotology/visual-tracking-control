@@ -256,6 +256,10 @@ target_link_libraries(${EXE_TARGET_NAME}
                           YARP::YARP_gsl
 )
 
+if(BFL_CUDA)
+    cuda_add_cublas_to_target(${EXE_TARGET_NAME})
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set(THREADS_PREFER_PTHREAD_FLAG TRUE)
