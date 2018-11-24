@@ -3,6 +3,8 @@
 
 #include <BayesFilters/LikelihoodModel.h>
 
+#include <memory>
+
 
 class HistogramNormTwoChi : public bfl::LikelihoodModel
 {
@@ -13,10 +15,10 @@ public:
 
     std::pair<bool, Eigen::VectorXf> likelihood(const bfl::MeasurementModel& measurement_model, const Eigen::Ref<const Eigen::MatrixXf>& pred_states) override;
 
-protected:
-    double likelihood_gain_;
+private:
+    struct ImplHNTC;
 
-    int histogram_size_;
+    std::unique_ptr<ImplHNTC> pImpl_;
 };
 
 #endif /* HISTOGRAMNORMTWOCHI_H */

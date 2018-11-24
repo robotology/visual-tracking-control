@@ -11,10 +11,21 @@ using namespace bfl;
 using namespace Eigen;
 
 
+
+struct HistogramNormTwoChi::ImplHNTC
+{
+    double likelihood_gain_;
+    int histogram_size_;
+};
+
+
 HistogramNormTwoChi::HistogramNormTwoChi(const double likelihood_gain, const int histogram_size) noexcept :
-    likelihood_gain_(likelihood_gain),
-    histogram_size_(histogram_size)
-{ }
+    pImpl_(std::unique_ptr<ImplHNTC>(new ImplHNTC))
+{
+    pImpl_->likelihood_gain_ = likelihood_gain;
+
+    pImpl_->histogram_size_ = histogram_size;
+}
 
 
 HistogramNormTwoChi::~HistogramNormTwoChi() noexcept
@@ -77,7 +88,7 @@ std::pair<bool, VectorXf> HistogramNormTwoChi::likelihood
 
             histogram_size_counter++;
 
-            if (histogram_size_counter == histogram_size_)
+            if (histogram_size_counter == pImpl_->histogram_size_)
             {
                 sum_normchi += std::sqrt(norm) * chi;
 
@@ -90,7 +101,7 @@ std::pair<bool, VectorXf> HistogramNormTwoChi::likelihood
 
         likelihood(i) = static_cast<float>(sum_normchi);
     }
-    likelihood = (-static_cast<float>(likelihood_gain_) * likelihood).array().exp();
+    likelihood = (-static_cast<float>(pImpl_->likelihood_gain_) * likelihood).array().exp();
 
 
     return std::make_pair(true, std::move(likelihood));
