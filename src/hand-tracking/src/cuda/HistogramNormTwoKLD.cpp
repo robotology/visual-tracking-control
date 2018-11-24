@@ -13,14 +13,30 @@ using namespace bfl;
 using namespace Eigen;
 
 
-HistogramNormTwoKLD::HistogramNormTwoKLD(const double likelihood_gain, const int histogram_size) noexcept :
-    likelihood_gain_(likelihood_gain),
-    histogram_size_(histogram_size)
-{ }
+
+struct HistogramNormTwoKLD::ImplData
+{
+    cublasHandle_t handle_;
+    double likelihood_gain_;
+    std::size_t histogram_size_;
+};
+
+
+HistogramNormTwoKLD::HistogramNormTwoKLD(const double likelihood_gain, const std::size_t histogram_size) noexcept :
+    pImpl_(std::unique_ptr<ImplData>(new ImplData))
+{
+    pImpl_->likelihood_gain_ = likelihood_gain;
+
+    pImpl_->histogram_size_ = histogram_size;
+
+    cublasCreate(&(pImpl_->handle_));
+}
 
 
 HistogramNormTwoKLD::~HistogramNormTwoKLD() noexcept
-{ }
+{
+    cublasDestroy(pImpl_->handle_);
+}
 
 
 std::pair<bool, VectorXf> HistogramNormTwoKLD::likelihood
@@ -49,10 +65,12 @@ std::pair<bool, VectorXf> HistogramNormTwoKLD::likelihood
         return std::make_pair(false, VectorXf::Zero(1));
 
 
-    thrust::host_vector<float> device_normtwo_kld = bfl::cuda::normtwo_kld(measurements, predicted_measurements, 36, 1131);
+    thrust::host_vector<float> device_normtwo_kld = bfl::cuda::normtwo_kld(pImpl_->handle_, measurements, predicted_measurements,
+                                                                           pImpl_->histogram_size_, predicted_measurements.size().area() / pImpl_->histogram_size_,
+                                                                           true);
 
     Map<VectorXf> likelihood(device_normtwo_kld.data(), device_normtwo_kld.size());
-    likelihood = (-static_cast<float>(likelihood_gain_) * likelihood).array().exp();
+    likelihood = (-static_cast<float>(pImpl_->likelihood_gain_) * likelihood).array().exp();
 
 
     return std::make_pair(true, std::move(likelihood));

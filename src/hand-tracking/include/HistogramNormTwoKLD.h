@@ -7,16 +7,16 @@
 class HistogramNormTwoKLD : public bfl::LikelihoodModel
 {
 public:
-    HistogramNormTwoKLD(const double likelihood_gain, const int histogram_size) noexcept;
+    HistogramNormTwoKLD(const double likelihood_gain, const std::size_t histogram_size) noexcept;
 
     ~HistogramNormTwoKLD() noexcept;
 
     std::pair<bool, Eigen::VectorXf> likelihood(const bfl::MeasurementModel& measurement_model, const Eigen::Ref<const Eigen::MatrixXf>& pred_states) override;
 
-protected:
-    double likelihood_gain_;
+private:
+    struct ImplData;
 
-    int histogram_size_;
+    std::unique_ptr<ImplData> pImpl_;
 };
 
 #endif /* HISTOGRAMNORMTWOKLD_H */
