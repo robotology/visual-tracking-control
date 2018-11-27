@@ -13,17 +13,17 @@ namespace bfl
 namespace cuda
 {
 
-::thrust::host_vector<float> kld(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t histogram_size, const std::size_t histogram_number, const bool check_pmf = false);
+::thrust::host_vector<float> normone(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q);
 
-::thrust::host_vector<float> chisquare(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t histogram_size, const std::size_t histogram_number);
+::thrust::host_vector<float> normtwo(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t vector_size);
 
-::thrust::host_vector<float> normone(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t histogram_size, const std::size_t histogram_number);
+::thrust::host_vector<float> chisquare(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t vector_size);
 
-::thrust::host_vector<float> normtwo(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t histogram_size, const std::size_t histogram_number);
+::thrust::host_vector<float> kld(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t vector_size, const bool check_pmf = false);
 
-::thrust::host_vector<float> normtwo_kld(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t histogram_size, const std::size_t histogram_number, const bool check_pmf = false);
+::thrust::host_vector<float> normtwo_kld(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t vector_size, const bool check_pmf = false);
 
-::thrust::host_vector<float> normtwo_kld_chisquare(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t histogram_size, const std::size_t histogram_number, const bool check_pmf = false);
+::thrust::host_vector<float> normtwo_kld_chisquare(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t vector_size, const bool check_pmf = false);
 
 }
 }

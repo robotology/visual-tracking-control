@@ -61,7 +61,7 @@ std::pair<bool, VectorXf> HistogramNormOne::likelihood
     if (!valid_predicted_measurements)
         return std::make_pair(false, VectorXf::Zero(1));
 
-    thrust::host_vector<float> device_normtwo_kld = bfl::cuda::normone(pImpl_->handle_, measurements, predicted_measurements, 36, 1131);
+    thrust::host_vector<float> device_normtwo_kld = bfl::cuda::normone(pImpl_->handle_, measurements, predicted_measurements);
 
     Map<VectorXf> likelihood(device_normtwo_kld.data(), device_normtwo_kld.size());
     likelihood = (-static_cast<float>(pImpl_->likelihood_gain_) * likelihood).array().exp();

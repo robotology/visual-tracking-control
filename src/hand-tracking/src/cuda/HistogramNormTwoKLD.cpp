@@ -66,8 +66,7 @@ std::pair<bool, VectorXf> HistogramNormTwoKLD::likelihood
 
 
     thrust::host_vector<float> device_normtwo_kld = bfl::cuda::normtwo_kld(pImpl_->handle_, measurements, predicted_measurements,
-                                                                           pImpl_->histogram_size_, predicted_measurements.size().area() / pImpl_->histogram_size_,
-                                                                           true);
+                                                                           pImpl_->histogram_size_, true);
 
     Map<VectorXf> likelihood(device_normtwo_kld.data(), device_normtwo_kld.size());
     likelihood = (-static_cast<float>(pImpl_->likelihood_gain_) * likelihood).array().exp();
