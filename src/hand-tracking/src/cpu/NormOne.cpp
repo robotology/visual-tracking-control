@@ -1,4 +1,4 @@
-#include <HistogramNormOne.h>
+#include <NormOne.h>
 
 #include <cmath>
 #include <exception>

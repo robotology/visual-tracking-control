@@ -1,4 +1,4 @@
-#include <HistogramNormTwoChi.h>
+#include <NormTwoChiSquare.h>
 
 #include <cmath>
 #include <exception>
@@ -15,16 +15,17 @@ using namespace Eigen;
 struct HistogramNormTwoChi::ImplHNTC
 {
     double likelihood_gain_;
-    int histogram_size_;
+
+    std::size_t vector_size_;
 };
 
 
-HistogramNormTwoChi::HistogramNormTwoChi(const double likelihood_gain, const int histogram_size) noexcept :
+HistogramNormTwoChi::HistogramNormTwoChi(const double likelihood_gain, const std::size_t vector_size) noexcept :
     pImpl_(std::unique_ptr<ImplHNTC>(new ImplHNTC))
 {
     pImpl_->likelihood_gain_ = likelihood_gain;
 
-    pImpl_->histogram_size_ = histogram_size;
+    pImpl_->vector_size_ = vector_size;
 }
 
 
@@ -88,7 +89,7 @@ std::pair<bool, VectorXf> HistogramNormTwoChi::likelihood
 
             histogram_size_counter++;
 
-            if (histogram_size_counter == pImpl_->histogram_size_)
+            if (histogram_size_counter == pImpl_->vector_size_)
             {
                 sum_normchi += std::sqrt(norm) * chi;
 

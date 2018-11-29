@@ -175,8 +175,10 @@ set(${EXE_TARGET_NAME}_SRC
 )
 
 set(${EXE_TARGET_NAME}_CPU_SRC
-        src/cpu/HistogramNormOne.cpp
-        src/cpu/HistogramNormTwoChi.cpp
+        src/cpu/ChiSquare.cpp
+        src/cpu/NormOne.cpp
+        src/cpu/NormTwo.cpp
+        src/cpu/NormTwoChiSquare.cpp
         src/cpu/VisualProprioception.cpp
 )
 
