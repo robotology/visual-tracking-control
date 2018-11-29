@@ -181,8 +181,13 @@ set(${EXE_TARGET_NAME}_CPU_SRC
 )
 
 set(${EXE_TARGET_NAME}_CUDA_SRC
-        src/cuda/HistogramNormOne.cpp
-        src/cuda/HistogramNormTwoKLD.cpp
+        src/cuda/ChiSquare.cpp
+        src/cuda/NormOne.cpp
+        src/cuda/NormTwo.cpp
+        src/cuda/NormTwoChiSquare.cpp
+        src/cuda/KLD.cpp
+        src/cuda/NormTwoKLD.cpp
+        src/cuda/NormTwoKLDChiSquare.cpp
         src/cuda/VisualProprioception.cpp
 )
 
