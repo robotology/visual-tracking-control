@@ -1,15 +1,17 @@
-#ifndef HISTOGRAMNORMTWOKLD_H
-#define HISTOGRAMNORMTWOKLD_H
+#ifndef NORMTWOKLD_H
+#define NORMTWOKLD_H
 
 #include <BayesFilters/LikelihoodModel.h>
 
+#include <memory>
 
-class HistogramNormTwoKLD : public bfl::LikelihoodModel
+
+class NormTwoKLD : public bfl::LikelihoodModel
 {
 public:
-    HistogramNormTwoKLD(const double likelihood_gain, const std::size_t histogram_size) noexcept;
+    NormTwoKLD(const double likelihood_gain, const std::size_t vector_size) noexcept;
 
-    ~HistogramNormTwoKLD() noexcept;
+    ~NormTwoKLD() noexcept;
 
     std::pair<bool, Eigen::VectorXf> likelihood(const bfl::MeasurementModel& measurement_model, const Eigen::Ref<const Eigen::MatrixXf>& pred_states) override;
 
@@ -19,4 +21,4 @@ private:
     std::unique_ptr<ImplData> pImpl_;
 };
 
-#endif /* HISTOGRAMNORMTWOKLD_H */
+#endif /* NORMTWOKLD_H */

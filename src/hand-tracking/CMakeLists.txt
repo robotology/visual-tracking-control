@@ -126,12 +126,10 @@ endif()
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
 		include/Camera.h
+        include/ChiSquare.h
         include/DrawParticlesImportanceThreshold.h
         include/KinPoseModel.h
         include/GatePose.h
-        include/HistogramNormOne.h
-        include/HistogramNormTwoChi.h
-        include/HistogramNormTwoKLD.h
         include/iCubFwdKinModel.h
         include/iCubArmModel.h
         include/iCubCamera.h
@@ -139,7 +137,13 @@ set(${EXE_TARGET_NAME}_HDR
         include/InitiCubArm.h
         include/InitPoseParticles.h
         include/InitWalkmanArm.h
+        include/KLD.h
         include/MeshModel.h
+        include/NormOne.h
+        include/NormTwo.h
+        include/NormTwoChiSquare.h
+        include/NormTwoKLD.h
+        include/NormTwoKLDChiSquare.h
         include/PlayiCubFwdKinModel.h
         include/PlayGatePose.h
         include/PlayWalkmanPoseModel.h
