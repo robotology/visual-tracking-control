@@ -13,16 +13,20 @@
 #include <opencv2/core/core.hpp>
 
 #include <BrownianMotionPose.h>
+#include <ChiSquare.h>
 #include <DrawParticlesImportanceThreshold.h>
-#include <HistogramNormOne.h>
-#include <HistogramNormTwoChi.h>
-#include <HistogramNormTwoKLD.h>
+#include <NormOne.h>
+#include <NormTwo.h>
+#include <NormTwoChi.h>
+#include <NormTwoKLD.h>
+#include <NormTwoKLDChiSquare.h>
 #include <iCubCamera.h>
 #include <iCubArmModel.h>
 #include <iCubGatePose.h>
 #include <iCubFwdKinModel.h>
 #include <InitiCubArm.h>
 #include <InitWalkmanArm.h>
+#include <KLD.h>
 #include <PlayiCubFwdKinModel.h>
 #include <PlayWalkmanPoseModel.h>
 #include <PlayGatePose.h>
@@ -273,9 +277,9 @@ int main(int argc, char *argv[])
     /* LIKELIHOOD */
     std::unique_ptr<LikelihoodModel> likelihood_hist;
     if (paramss["likelihood_type"] == "norm_one")
-        likelihood_hist = std::unique_ptr<HistogramNormOne>(new HistogramNormOne(paramsd["likelihood_gain"]));
+        likelihood_hist = std::unique_ptr<NormOne>(new NormOne(paramsd["likelihood_gain"]));
     else if (paramss["likelihood_type"] == "norm_two_kld")
-        likelihood_hist = std::unique_ptr<HistogramNormTwoKLD>(new HistogramNormTwoKLD(paramsd["likelihood_gain"], 36));
+        likelihood_hist = std::unique_ptr<NormTwoKLD>(new NormTwoKLD(paramsd["likelihood_gain"], 36));
     //else if (paramss["likelihood_type"] == "norm_two_chi")
     //    likelihood_hist = std::unique_ptr<HistogramNormTwoChi>(new HistogramNormTwoChi(paramsd["likelihood_gain"], 36));
     else
