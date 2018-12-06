@@ -21,6 +21,8 @@ namespace cuda
 
 ::thrust::host_vector<float> kld(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t vector_size, const bool check_pmf = false);
 
+::thrust::host_vector<float> normtwo_chisquare(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t vector_size);
+
 ::thrust::host_vector<float> normtwo_kld(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t vector_size, const bool check_pmf = false);
 
 ::thrust::host_vector<float> normtwo_kld_chisquare(cublasHandle_t handle, const cv::cuda::GpuMat& p, const cv::cuda::GpuMat& q, const std::size_t vector_size, const bool check_pmf = false);

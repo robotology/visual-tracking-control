@@ -17,7 +17,7 @@ using namespace Eigen;
 struct NormTwoChi::ImplData
 {
     cublasHandle_t handle_;
-    
+
     double likelihood_gain_;
 
     std::size_t vector_size_;
@@ -74,9 +74,9 @@ std::pair<bool, VectorXf> NormTwoChi::likelihood
     if (!valid_predicted_measurements)
         return std::make_pair(false, VectorXf::Zero(1));
 
-    thrust::host_vector<float> device_normtwo_kld = bfl::cuda::normtwo_chi(rImpl.handle_,
-                                                                           measurements, predicted_measurements,
-                                                                           rImpl.vector_size_);
+    thrust::host_vector<float> device_normtwo_kld = bfl::cuda::normtwo_chisquare(rImpl.handle_,
+                                                                                 measurements, predicted_measurements,
+                                                                                 rImpl.vector_size_);
 
     Map<VectorXf> likelihood(device_normtwo_kld.data(), device_normtwo_kld.size());
     likelihood = (-static_cast<float>(rImpl.likelihood_gain_) * likelihood).array().exp();

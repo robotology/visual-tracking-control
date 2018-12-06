@@ -18,13 +18,9 @@ namespace thrust
 
 
 template<typename T>
-struct step_functor : public ::thrust::unary_function<int, int>
+class step_functor : public ::thrust::unary_function<int, int>
 {
-    int columns;
-    int step;
-    int channels;
-
-
+public:
     __host__ __device__
     step_functor(int columns_, int step_, int channels_ = 1) :
         columns(columns_),
@@ -51,6 +47,11 @@ struct step_functor : public ::thrust::unary_function<int, int>
         int idx = (row * step) + (x % columns) * channels;
         return idx;
     }
+
+private:
+    int columns;
+    int step;
+    int channels;
 };
 
 
