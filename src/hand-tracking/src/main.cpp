@@ -17,7 +17,7 @@
 #include <DrawParticlesImportanceThreshold.h>
 #include <NormOne.h>
 #include <NormTwo.h>
-#include <NormTwoChi.h>
+#include <NormTwoChiSquare.h>
 #include <NormTwoKLD.h>
 #include <NormTwoKLDChiSquare.h>
 #include <iCubCamera.h>
@@ -275,13 +275,21 @@ int main(int argc, char *argv[])
     }
 
     /* LIKELIHOOD */
-    std::unique_ptr<LikelihoodModel> likelihood_hist;
-    if (paramss["likelihood_type"] == "norm_one")
-        likelihood_hist = std::unique_ptr<NormOne>(new NormOne(paramsd["likelihood_gain"]));
+    std::unique_ptr<LikelihoodModel> likelihood;
+    if (paramss["likelihood_type"] == "chi")
+        likelihood = std::unique_ptr<ChiSquare>(new ChiSquare(paramsd["likelihood_gain"], 36));
+    else if (paramss["likelihood_type"] == "kld")
+        likelihood = std::unique_ptr<KLD>(new KLD(paramsd["likelihood_gain"], 36));
+    else if (paramss["likelihood_type"] == "norm_one")
+        likelihood = std::unique_ptr<NormOne>(new NormOne(paramsd["likelihood_gain"]));
+    else if (paramss["likelihood_type"] == "norm_two")
+        likelihood = std::unique_ptr<NormTwo>(new NormTwo(paramsd["likelihood_gain"], 36));
+    else if (paramss["likelihood_type"] == "norm_two_chi")
+        likelihood = std::unique_ptr<NormTwoChiSquare>(new NormTwoChiSquare(paramsd["likelihood_gain"], 36));
     else if (paramss["likelihood_type"] == "norm_two_kld")
-        likelihood_hist = std::unique_ptr<NormTwoKLD>(new NormTwoKLD(paramsd["likelihood_gain"], 36));
-    //else if (paramss["likelihood_type"] == "norm_two_chi")
-    //    likelihood_hist = std::unique_ptr<HistogramNormTwoChi>(new HistogramNormTwoChi(paramsd["likelihood_gain"], 36));
+        likelihood = std::unique_ptr<NormTwoKLD>(new NormTwoKLD(paramsd["likelihood_gain"], 36));
+    else if (paramss["likelihood_type"] == "norm_two_kld_chi")
+        likelihood = std::unique_ptr<NormTwoKLDChiSquare>(new NormTwoKLDChiSquare(paramsd["likelihood_gain"], 36));
     else
     {
         yError() << log_ID << "Wrong likelihood type. Provided: " << paramss["likelihood_type"] << ". Shalle be either 'norm_one' or 'norm_two_chi'.";
@@ -290,7 +298,7 @@ int main(int argc, char *argv[])
 
     /* CORRECTION */
     std::unique_ptr<PFCorrection> vpf_update_particles(new UpdateParticles());
-    vpf_update_particles->setLikelihoodModel(std::move(likelihood_hist));
+    vpf_update_particles->setLikelihoodModel(std::move(likelihood));
     vpf_update_particles->setMeasurementModel(std::move(proprio));
 
     std::unique_ptr<PFCorrection> vpf_correction;
