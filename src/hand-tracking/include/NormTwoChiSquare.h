@@ -1,17 +1,17 @@
-#ifndef NORMTWOCHI_H
-#define NORMTWOCHI_H
+#ifndef NORMTWOCHISQUARE_H
+#define NORMTWOCHISQUARE_H
 
 #include <BayesFilters/LikelihoodModel.h>
 
 #include <memory>
 
 
-class NormTwoChi : public bfl::LikelihoodModel
+class NormTwoChiSquare : public bfl::LikelihoodModel
 {
 public:
-    NormTwoChi(const double likelihood_gain, const std::size_t vector_size) noexcept;
+    NormTwoChiSquare(const double likelihood_gain, const std::size_t vector_size) noexcept;
 
-    ~NormTwoChi() noexcept;
+    ~NormTwoChiSquare() noexcept;
 
     std::pair<bool, Eigen::VectorXf> likelihood(const bfl::MeasurementModel& measurement_model, const Eigen::Ref<const Eigen::MatrixXf>& pred_states) override;
 
@@ -21,4 +21,4 @@ private:
     std::unique_ptr<ImplData> pImpl_;
 };
 
-#endif /* NORMTWOCHI_H */
+#endif /* NORMTWOCHISQUARE_H */

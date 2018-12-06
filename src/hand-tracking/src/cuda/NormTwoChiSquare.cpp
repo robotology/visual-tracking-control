@@ -14,7 +14,7 @@ using namespace Eigen;
 
 
 
-struct NormTwoChi::ImplData
+struct NormTwoChiSquare::ImplData
 {
     cublasHandle_t handle_;
 
@@ -24,7 +24,7 @@ struct NormTwoChi::ImplData
 };
 
 
-NormTwoChi::NormTwoChi(const double likelihood_gain, const std::size_t vector_size) noexcept :
+NormTwoChiSquare::NormTwoChiSquare(const double likelihood_gain, const std::size_t vector_size) noexcept :
     pImpl_(std::unique_ptr<ImplData>(new ImplData))
 {
     ImplData& rImpl = *pImpl_;
@@ -38,7 +38,7 @@ NormTwoChi::NormTwoChi(const double likelihood_gain, const std::size_t vector_si
 }
 
 
-NormTwoChi::~NormTwoChi() noexcept
+NormTwoChiSquare::~NormTwoChiSquare() noexcept
 {
     ImplData& rImpl = *pImpl_;
 
@@ -46,7 +46,7 @@ NormTwoChi::~NormTwoChi() noexcept
 }
 
 
-std::pair<bool, VectorXf> NormTwoChi::likelihood
+std::pair<bool, VectorXf> NormTwoChiSquare::likelihood
 (
     const MeasurementModel& measurement_model,
     const Ref<const MatrixXf>& pred_states
