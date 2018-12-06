@@ -114,7 +114,7 @@ iCubCamera::iCubCamera
 
 
     port_image_in_.open("/" + port_prefix_ + "/img:i");
-    
+
 
     port_head_enc_.open("/" + port_prefix_ + "/head:i");
     port_torso_enc_.open("/" + port_prefix_ + "/torso:i");
