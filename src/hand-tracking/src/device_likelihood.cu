@@ -336,7 +336,7 @@ struct functor_chi_square
     __host__ __device__
     void operator()(Tuple& t)
     {
-        thrust::get<2>(t) = powf(thrust::get<0>(t) - thrust::get<1>(t), 2.0f) / (2.0f * (thrust::get<0>(t) + thrust::get<1>(t)));
+        thrust::get<2>(t) = powf(thrust::get<0>(t) - thrust::get<1>(t), 2.0f) / (2.0f * (thrust::get<0>(t) + thrust::get<1>(t) + NPP_MINABS_32F));
     }
 };
 
