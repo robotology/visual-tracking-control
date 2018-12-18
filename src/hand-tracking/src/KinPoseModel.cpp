@@ -55,10 +55,10 @@ MatrixXf KinPoseModel::getExogenousMatrix()
 
 bool KinPoseModel::setProperty(const std::string& property)
 {
-    if (property == "ICFW_DELTA")
+    if (property == "kin_pose_delta")
         return setDeltaMotion();
 
-    if (property == "ICFW_INIT")
+    if (property == "init")
     {
         initialize_delta_ = true;
         return setDeltaMotion();

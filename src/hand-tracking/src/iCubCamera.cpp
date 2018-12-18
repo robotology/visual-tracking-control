@@ -3,6 +3,7 @@
 #include <exception>
 
 #include <iCub/ctrl/math.h>
+#include <opencv2/core/core_c.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Property.h>
@@ -16,14 +17,17 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-iCubCamera::iCubCamera(const yarp::os::ConstString& cam_sel,
-                       const double resolution_ratio,
-                       const yarp::os::ConstString& context,
-                       const yarp::os::ConstString& port_prefix) :
+iCubCamera::iCubCamera
+(
+    const yarp::os::ConstString& cam_sel,
+    const double resolution_ratio,
+    const yarp::os::ConstString& context,
+    const yarp::os::ConstString& port_prefix
+ ) :
+    port_prefix_(port_prefix),
     cam_sel_(cam_sel),
     resolution_ratio_(resolution_ratio),
-    context_(context),
-    port_prefix_(port_prefix)
+    context_(context)
 {
     ResourceFinder rf;
 
@@ -109,6 +113,9 @@ iCubCamera::iCubCamera(const yarp::os::ConstString& cam_sel,
     yInfo() << log_ID_ << " - cy:"     << params_.cy;
 
 
+    port_image_in_.open("/" + port_prefix_ + "/img:i");
+
+
     port_head_enc_.open("/" + port_prefix_ + "/head:i");
     port_torso_enc_.open("/" + port_prefix_ + "/torso:i");
 }
@@ -118,6 +125,8 @@ iCubCamera::~iCubCamera() noexcept
 {
     drv_gaze_.close();
 
+    port_image_in_.close();
+
     port_head_enc_.interrupt();
     port_head_enc_.close();
 
@@ -126,61 +135,76 @@ iCubCamera::~iCubCamera() noexcept
 }
 
 
-std::tuple<bool, Camera::CameraParameters> iCubCamera::getCameraParameters()
+bool iCubCamera::bufferData()
 {
-    return std::make_tuple(true, params_);
+    bool success = false;
+
+    ImageOf<PixelRgb>* tmp_imgin = YARP_NULLPTR;
+    tmp_imgin = port_image_in_.read(false);
+    if (tmp_imgin != YARP_NULLPTR)
+    {
+        init_img_in_ = true;
+        image_ = cv::cvarrToMat(tmp_imgin->getIplImage()).clone();
+    }
+
+    if (init_img_in_)
+    {
+        if (itf_gaze_)
+        {
+            Vector x(3);
+            Vector o(4);
+
+            if (cam_sel_ == "left")
+                success = itf_gaze_->getLeftEyePose(x, o);
+            else if (cam_sel_ == "right")
+                success = itf_gaze_->getRightEyePose(x, o);
+
+            if (success)
+            {
+                position_[0] = x[0];
+                position_[1] = x[1];
+                position_[2] = x[2];
+
+                orientation_[0] = o[0];
+                orientation_[1] = o[1];
+                orientation_[2] = o[2];
+                orientation_[3] = o[3];
+            }
+        }
+        else
+        {
+            Vector root_to_eye_enc;
+            std::tie(success, root_to_eye_enc) = readRootToEye();
+
+            if (success)
+            {
+                Vector eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * root_to_eye_enc);
+
+                position_[0] = eye_pose[0];
+                position_[1] = eye_pose[1];
+                position_[2] = eye_pose[2];
+
+                orientation_[0] = eye_pose[3];
+                orientation_[1] = eye_pose[4];
+                orientation_[2] = eye_pose[5];
+                orientation_[3] = eye_pose[6];
+            }
+        }
+    }
+
+    return success;
 }
 
 
-std::tuple<bool, std::array<double, 3>, std::array<double, 4>> iCubCamera::getCameraPose()
+Data iCubCamera::getData() const
 {
-    bool success = false;
-    std::array<double, 3> position{ {0, 0, 0} };
-    std::array<double, 4> orientation{ {0, 0, 0, 0} };
+    return Data(CameraData(image_, position_, orientation_));
+}
 
-    if (itf_gaze_)
-    {
-        Vector x(3);
-        Vector o(4);
 
-        if (cam_sel_ == "left")
-            success = itf_gaze_->getLeftEyePose(x, o);
-        else if (cam_sel_ == "right")
-            success = itf_gaze_->getRightEyePose(x, o);
-
-        if (success)
-        {
-            position[0] = x[0];
-            position[1] = x[1];
-            position[2] = x[2];
-
-            orientation[0] = o[0];
-            orientation[1] = o[1];
-            orientation[2] = o[2];
-            orientation[3] = o[3];
-        }
-    }
-    else
-    {
-        Vector root_to_eye_enc;
-        std::tie(success, root_to_eye_enc) = readRootToEye();
-
-        if (success)
-        {
-            Vector eye_pose = icub_kin_eye_.EndEffPose(CTRL_DEG2RAD * root_to_eye_enc);
-
-            position[0] = eye_pose[0];
-            position[1] = eye_pose[1];
-            position[2] = eye_pose[2];
-
-            orientation[0] = eye_pose[3];
-            orientation[1] = eye_pose[4];
-            orientation[2] = eye_pose[5];
-            orientation[3] = eye_pose[6];
-        }
-    }
-
-    return std::make_tuple(success, position, orientation);
+Camera::CameraIntrinsics iCubCamera::getCameraParameters() const
+{
+    return params_;
 }
 
 
@@ -221,7 +245,7 @@ std::tuple<bool, Vector> iCubCamera::readRootToEye()
     Bottle* bottle_head  = port_head_enc_.read(true);
     if (!bottle_torso || !bottle_head)
         return std::make_tuple(false, root_eye_enc);
-    
+
 
     root_eye_enc(0) = bottle_torso->get(2).asDouble();
     root_eye_enc(1) = bottle_torso->get(1).asDouble();

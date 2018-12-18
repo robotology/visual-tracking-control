@@ -100,7 +100,7 @@ iCubArmModel::iCubArmModel(const bool use_thumb,
         rfind_slash = 0;
     size_t rfind_backslash = shader_path_.rfind("\\");
     if (rfind_backslash == std::string::npos)
-        rfind_slash = 0;
+        rfind_backslash = 0;
 
     shader_path_ = shader_path_.substr(0, rfind_slash > rfind_backslash ? rfind_slash : rfind_backslash);
 

@@ -52,13 +52,16 @@ void DrawParticlesImportanceThreshold::setExogenousModel(std::unique_ptr<Exogeno
 
 
 void DrawParticlesImportanceThreshold::predictStep(const Ref<const MatrixXf>& prev_states, const Ref<const VectorXf>& prev_weights,
-                                              Ref<MatrixXf> pred_states, Ref<VectorXf> pred_weights)
+                                                   Ref<MatrixXf> pred_states, Ref<VectorXf> pred_weights)
 {
     VectorXf sorted_cor = prev_weights;
     std::sort(sorted_cor.data(), sorted_cor.data() + sorted_cor.size());
     float threshold = sorted_cor.tail(6)(0);
 
-    exogenous_model_->setProperty("ICFW_DELTA");
+    /* FIXME
+       There should be no set property method here.
+       There is a coupling with the prediction and pose-related exogenous models. */
+    exogenous_model_->setProperty("kin_pose_delta");
 
     for (int j = 0; j < prev_weights.rows(); ++j)
     {

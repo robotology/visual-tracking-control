@@ -3,28 +3,24 @@
 
 #include <string>
 
-#include <BayesFilters/PFVisualCorrectionDecorator.h>
+#include <BayesFilters/PFCorrectionDecorator.h>
 #include <BayesFilters/StateModel.h>
 
 
-class GatePose : public bfl::PFVisualCorrectionDecorator
+class GatePose : public bfl::PFCorrectionDecorator
 {
 public:
-    GatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
+    GatePose(std::unique_ptr<PFCorrection> visual_correction,
              const double gate_x, const double gate_y, const double gate_z,
              const double gate_rotation,
              const double gate_aperture) noexcept;
 
-    GatePose(std::unique_ptr<PFVisualCorrection> visual_correction) noexcept;
+    GatePose(std::unique_ptr<PFCorrection> visual_correction) noexcept;
 
     ~GatePose() noexcept;
 
-    void innovation(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, cv::InputArray measurements, Eigen::Ref<Eigen::MatrixXf> innovations) override;
-
-    double likelihood(const Eigen::Ref<const Eigen::MatrixXf>& innovations) override;
-
 protected:
-    void correctStep(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, const Eigen::Ref<const Eigen::VectorXf>& pred_weights, cv::InputArray measurements,
+    void correctStep(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, const Eigen::Ref<const Eigen::VectorXf>& pred_weights,
                      Eigen::Ref<Eigen::MatrixXf> cor_states, Eigen::Ref<Eigen::VectorXf> cor_weights) override;
 
     virtual Eigen::VectorXd readPose() = 0;
@@ -37,9 +33,13 @@ protected:
 
 private:
     double gate_x_;
+
     double gate_y_;
+
     double gate_z_;
+
     double gate_aperture_;
+    
     double gate_rotation_;
 
     Eigen::VectorXd ee_pose_;

@@ -29,13 +29,16 @@ protected:
 
 private:
     const yarp::os::ConstString log_ID_ = "[WalkmanArmModel]";
+
     yarp::os::ConstString port_prefix_ = "WalkmanArmModel";
 
     yarp::os::ConstString laterality_;
+
     yarp::os::ConstString context_;
 
     SICAD::ModelPathContainer model_path_;
-    std::string               shader_path_;
+
+    std::string shader_path_;
 };
 
 #endif /* WALKMANAMMODEL_H */

@@ -1,6 +1,8 @@
 #ifndef VISUALPROPRIOCEPTION_H
 #define VISUALPROPRIOCEPTION_H
 
+#include <BayesFilters/MeasurementModel.h>
+
 #include <Camera.h>
 #include <MeshModel.h>
 
@@ -8,53 +10,42 @@
 #include <string>
 #include <memory>
 
-#include <BayesFilters/VisualObservationModel.h>
 #include <opencv2/core/core.hpp>
+
 #include <SuperimposeMesh/SICAD.h>
 
 
-class VisualProprioception : public bfl::VisualObservationModel
+class VisualProprioception : public bfl::MeasurementModel
 {
 public:
-    VisualProprioception(const int num_images, std::unique_ptr<bfl::Camera> camera, std::unique_ptr<bfl::MeshModel> mesh_model);
+    VisualProprioception(std::unique_ptr<bfl::Camera> camera, const int num_requested_images, std::unique_ptr<bfl::MeshModel> mesh_model);
 
-    virtual ~VisualProprioception() noexcept { };
+    virtual ~VisualProprioception() noexcept;
 
-    void observe(const Eigen::Ref<const Eigen::MatrixXf>& cur_states, cv::OutputArray observations) override;
+    std::pair<bool, bfl::Data> measure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
 
-    bool setProperty(const std::string property) override;
+    std::pair<bool, bfl::Data> predictedMeasure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
 
-    int getOGLTilesNumber();
-    int getOGLTilesRows();
-    int getOGLTilesCols();
+    std::pair<bool, bfl::Data> innovation(const bfl::Data& predicted_measurements, const bfl::Data& measurements) const override;
 
-    unsigned int getCamWidth();
-    unsigned int getCamHeight();
+    bool bufferAgentData() const override;
 
-    float getCamFx();
-    float getCamFy();
-    float getCamCx();
-    float getCamCy();
+    std::pair<bool, bfl::Data> getAgentMeasurements() const override;
 
-    /* For debugging walkman */
+    /* IMPROVEME
+     * Find a way to better communicate with the callee. Maybe a struct.
+     */
+    int getNumberOfUsedParticles() const;
+
+    /* TODELETE
+     * For debugging walkman
+     */
     void superimpose(const Superimpose::ModelPoseContainer& obj2pos_map, cv::Mat& img);
 
-protected:
-    std::string log_ID_ = "[VisualProprioception]";
+private:
+    struct ImplData;
 
-    std::unique_ptr<bfl::Camera>    camera_;
-    std::unique_ptr<bfl::MeshModel> mesh_model_;
-
-    bfl::Camera::CameraParameters cam_params_;
-
-    SICAD::ModelPathContainer mesh_paths_;
-    std::string               shader_folder_;
-
-    std::unique_ptr<SICAD> si_cad_;
-    const int              num_images_;
-
-    std::array<double, 3> cam_x_{ {0.0, 0.0, 0.0} };
-    std::array<double, 4> cam_o_{ {0.0, 0.0, 0.0, 0.0} };
+    std::unique_ptr<ImplData> pImpl_;
 };
 
 #endif /* VISUALPROPRIOCEPTION_H */

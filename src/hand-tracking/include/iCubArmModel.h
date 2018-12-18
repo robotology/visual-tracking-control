@@ -38,20 +38,27 @@ protected:
 
 private:
     const yarp::os::ConstString log_ID_ = "[iCubArmModel]";
+
     yarp::os::ConstString port_prefix_ = "iCubArmModel";
 
     const bool use_thumb_;
+
     const bool use_forearm_;
+
     yarp::os::ConstString laterality_;
+
     yarp::os::ConstString context_;
 
     SICAD::ModelPathContainer model_path_;
-    std::string               shader_path_;
 
-    iCub::iKin::iCubArm    icub_arm_;
+    std::string shader_path_;
+
+    iCub::iKin::iCubArm icub_arm_;
+
     iCub::iKin::iCubFinger icub_kin_finger_[3];
 
     yarp::os::BufferedPort<yarp::os::Bottle> port_torso_enc_;
+
     yarp::os::BufferedPort<yarp::os::Bottle> port_arm_enc_;
 };
 

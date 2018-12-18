@@ -1,7 +1,7 @@
 set(PLUGIN_NAME visualservoing)
 
 find_package(YARP REQUIRED
-             COMPONENTS OS dev sig math)
+             COMPONENTS OS dev sig math gsl)
 
 yarp_configure_external_installation(${PLUGIN_NAME} WITH_PLUGINS)
 

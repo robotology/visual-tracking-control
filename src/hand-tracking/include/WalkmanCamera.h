@@ -2,42 +2,54 @@
 #define WALKMANHEAD_H
 
 #include <Camera.h>
+#include <BayesFilters/Data.h>
 
 #include <string>
 
-#include <iCub/iKin/iKinFwd.h>
-#include <yarp/dev/PolyDriver.h>
-#include <yarp/dev/GazeControl.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
-#include <yarp/os/ConstString.h>
-#include <yarp/sig/Vector.h>
+#include <yarp/sig/Image.h>
 
 
 class WalkmanCamera : public bfl::Camera
 {
 public:
-    WalkmanCamera(const yarp::os::ConstString& cam_sel,
+    WalkmanCamera(const std::string& cam_sel,
                   const double resolution_ratio,
-                  const yarp::os::ConstString& context,
-                  const yarp::os::ConstString& port_prefix);
+                  const std::string& context,
+                  const std::string& port_prefix);
 
     virtual ~WalkmanCamera() noexcept;
 
-    std::tuple<bool, CameraParameters> getCameraParameters() override;
+    bool bufferData() override;
 
-    std::tuple<bool, std::array<double, 3>, std::array<double, 4>> getCameraPose() override;
+    bfl::Data getData() const override;
 
+    CameraIntrinsics getCameraParameters() const override;
+    
 protected:
-    CameraParameters params_;
+    CameraIntrinsics params_;
+
+    cv::Mat image_;
+
+    std::array<double, 3> position_;
+
+    std::array<double, 4> orientation_;
 
 private:
-    const yarp::os::ConstString log_ID_ = "[WalkmanCamera]";
-    yarp::os::ConstString port_prefix_ = "WalkmanCamera";
+    const std::string log_ID_ = "[WalkmanCamera]";
 
-    yarp::os::ConstString cam_sel_;
-    const double          resolution_ratio_;
-    yarp::os::ConstString context_;
+    std::string port_prefix_ = "WalkmanCamera";
+
+    std::string cam_sel_;
+
+    const double resolution_ratio_;
+
+    std::string context_;
+
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb>> port_image_in_;
+
+    bool init_img_in_ = false;
 
     yarp::os::BufferedPort<yarp::os::Bottle> port_camera_pose_;
 };

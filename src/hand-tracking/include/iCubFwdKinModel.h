@@ -27,16 +27,22 @@ protected:
     yarp::sig::Vector readRootToEE();
 
     yarp::dev::PolyDriver  drv_arm_enc_;
+
     yarp::dev::PolyDriver  drv_torso_enc_;
+
     yarp::dev::IEncoders * itf_arm_enc_;
+
     yarp::dev::IEncoders * itf_torso_enc_;
+
     iCub::iKin::iCubArm    icub_kin_arm_;
 
 private:
     const yarp::os::ConstString  log_ID_ = "[iCubFwdKinModel]";
+
     yarp::os::ConstString  port_prefix_ = "iCubFwdKinModel";
-    
+
     yarp::os::ConstString  robot_;
+
     yarp::os::ConstString  laterality_;
 };
 

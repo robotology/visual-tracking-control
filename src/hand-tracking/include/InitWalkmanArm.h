@@ -24,6 +24,7 @@ protected:
 
 private:
     const yarp::os::ConstString  log_ID_ = "[InitWalkmanArm]";
+
     yarp::os::ConstString port_prefix_;
 
     yarp::os::BufferedPort<yarp::os::Bottle> port_arm_pose_;

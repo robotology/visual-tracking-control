@@ -3,15 +3,14 @@
 #include <cmath>
 
 using namespace bfl;
-using namespace cv;
 using namespace Eigen;
 
 
-GatePose::GatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
+GatePose::GatePose(std::unique_ptr<PFCorrection> visual_correction,
                    const double gate_x, const double gate_y, const double gate_z,
                    const double gate_rotation,
                    const double gate_aperture) noexcept :
-    PFVisualCorrectionDecorator(std::move(visual_correction)),
+    PFCorrectionDecorator(std::move(visual_correction)),
     gate_x_(gate_x), gate_y_(gate_y), gate_z_(gate_z),
     gate_aperture_((M_PI / 180.0) * gate_aperture),
     gate_rotation_((M_PI / 180.0) * gate_rotation)
@@ -20,30 +19,18 @@ GatePose::GatePose(std::unique_ptr<PFVisualCorrection> visual_correction,
 }
 
 
-GatePose::GatePose(std::unique_ptr<PFVisualCorrection> visual_correction) noexcept :
+GatePose::GatePose(std::unique_ptr<PFCorrection> visual_correction) noexcept :
     GatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30) { }
 
 
 GatePose::~GatePose() noexcept { }
 
 
-void GatePose::innovation(const Ref<const MatrixXf>& pred_states, cv::InputArray measurements, Ref<MatrixXf> innovations)
-{
-    PFVisualCorrectionDecorator::innovation(pred_states, measurements, innovations);
-}
-
-
-double GatePose::likelihood(const Ref<const MatrixXf>& innovations)
-{
-    return PFVisualCorrectionDecorator::likelihood(innovations);
-}
-
-
-void GatePose::correctStep(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights, cv::InputArray measurements,
+void GatePose::correctStep(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights,
                            Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
 {
-    PFVisualCorrectionDecorator::correctStep(pred_states, pred_weights, measurements,
-                                             cor_states, cor_weights);
+    PFCorrectionDecorator::correctStep(pred_states, pred_weights,
+                                       cor_states, cor_weights);
 
     ee_pose_ = readPose();
 

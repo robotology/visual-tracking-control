@@ -1,7 +1,8 @@
 #ifndef INITPOSEPARTICLES_H
 #define INITPOSEPARTICLES_H
 
-#include <BayesFilters/Initialization.h>
+#include <BayesFilters/ParticleSetInitialization.h>
+
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
@@ -9,12 +10,12 @@
 #include <yarp/sig/Vector.h>
 
 
-class InitPoseParticles : public bfl::Initialization
+class InitPoseParticles : public bfl::ParticleSetInitialization
 {
 public:
     virtual ~InitPoseParticles() noexcept { };
 
-    void initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref<Eigen::VectorXf> weight) override;
+    bool initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref<Eigen::VectorXf> weight) override;
 
 protected:
     virtual Eigen::VectorXd readPose() = 0;

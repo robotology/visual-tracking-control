@@ -20,7 +20,7 @@ public:
     bool setProperty(const std::string& property) override;
 
 protected:
-    Eigen::VectorXd   readPose() override;
+    Eigen::VectorXd readPose() override;
 
     yarp::sig::Vector readRootToEE();
 
@@ -28,9 +28,11 @@ protected:
 
 private:
     const yarp::os::ConstString log_ID_ = "[PlayWalkmanPoseModel]";
+
     yarp::os::ConstString port_prefix_ = "PlayWalkmanPoseModel";
 
     yarp::os::ConstString robot_;
+
     yarp::os::ConstString laterality_;
 };
 

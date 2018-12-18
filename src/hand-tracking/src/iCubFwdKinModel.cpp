@@ -21,8 +21,8 @@ using namespace yarp::sig;
 
 
 iCubFwdKinModel::iCubFwdKinModel(const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) :
-    port_prefix_(port_prefix),
     icub_kin_arm_(iCubArm(laterality+"_v2")),
+    port_prefix_(port_prefix),
     robot_(robot),
     laterality_(laterality)
 {

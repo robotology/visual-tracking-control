@@ -1,20 +1,24 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <BayesFilters/Agent.h>
+
 #include <array>
 #include <tuple>
+
+#include <opencv2/core/core.hpp>
 
 namespace bfl {
     class Camera;
 }
 
 
-class bfl::Camera
+class bfl::Camera : public bfl::Agent
 {
 public:
     virtual ~Camera() noexcept { };
 
-    struct CameraParameters
+    struct CameraIntrinsics
     {
         unsigned int width;
         unsigned int height;
@@ -24,9 +28,9 @@ public:
         double cy;
     };
 
-    virtual std::tuple<bool, CameraParameters> getCameraParameters() = 0;
+    using CameraData = std::tuple<cv::Mat, std::array<double, 3>, std::array<double, 4>>;
 
-    virtual std::tuple<bool, std::array<double, 3>, std::array<double, 4>> getCameraPose() = 0;
+    virtual CameraIntrinsics getCameraParameters() const = 0;
 };
 
 #endif /* CAMERA_H */
