@@ -55,7 +55,7 @@ private:
 
     iCub::iKin::iCubArm icub_arm_;
 
-    iCub::iKin::iCubFinger icub_kin_finger_[3];
+    iCub::iKin::iCubFinger icub_kin_finger_[5];
 
     yarp::os::BufferedPort<yarp::os::Bottle> port_torso_enc_;
 

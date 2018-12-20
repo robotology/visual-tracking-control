@@ -24,7 +24,7 @@ iCubArmModel::iCubArmModel(const bool use_thumb,
     laterality_(laterality),
     context_(context),
     icub_arm_(iCubArm(laterality + "_v2")),
-    icub_kin_finger_{ iCubFinger(laterality + "_thumb"), iCubFinger(laterality + "_index"), iCubFinger(laterality + "_middle") }
+    icub_kin_finger_{ iCubFinger(laterality + "_thumb"), iCubFinger(laterality + "_index"), iCubFinger(laterality + "_middle"), iCubFinger(laterality + "_ring"), iCubFinger(laterality + "_little") }
 {
     ResourceFinder rf;
 
@@ -81,6 +81,38 @@ iCubArmModel::iCubArmModel(const bool use_thumb,
     model_path_["medium3"] = rf.findFileByName("r_ml3.obj");
     if (!file_found(model_path_["medium3"]))
         throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ml3.obj not found!");
+
+    model_path_["ring0"] = rf.findFileByName("r_ringbase.obj");
+    if (!file_found(model_path_["ring0"]))
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ringbase.obj not found!");
+    model_path_["ring1"] = rf.findFileByName("r_ril0.obj");
+    if (!file_found(model_path_["ring1"]))
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ril0.obj not found!");
+    model_path_["ring2"] = rf.findFileByName("r_ril1.obj");
+    if (!file_found(model_path_["ring2"]))
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ril1.obj not found!");
+    model_path_["ring3"] = rf.findFileByName("r_ril2.obj");
+    if (!file_found(model_path_["ring3"]))
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ril2.obj not found!");
+    model_path_["ring4"] = rf.findFileByName("r_ril3.obj");
+    if (!file_found(model_path_["ring4"]))
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_ril3.obj not found!");
+
+    model_path_["little0"] = rf.findFileByName("r_littlebase.obj");
+    if (!file_found(model_path_["little0"]))
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_littlebase.obj not found!");
+    model_path_["little1"] = rf.findFileByName("r_lil0.obj");
+    if (!file_found(model_path_["little1"]))
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_lil0.obj not found!");
+    model_path_["little2"] = rf.findFileByName("r_lil1.obj");
+    if (!file_found(model_path_["little2"]))
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_lil1.obj not found!");
+    model_path_["little3"] = rf.findFileByName("r_lil2.obj");
+    if (!file_found(model_path_["little3"]))
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_lil2.obj not found!");
+    model_path_["little4"] = rf.findFileByName("r_lil3.obj");
+    if (!file_found(model_path_["little4"]))
+        throw std::runtime_error("ERROR::ICUBARMMODEL::CTOR::FILE\nERROR: 3D mesh file r_lil3.obj not found!");
 
     if (use_forearm)
     {
@@ -187,7 +219,7 @@ std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> iCubArmModel::get
 
             Matrix Ha = axis2dcm(ee_o);
             Ha.setCol(3, ee_t);
-            for (unsigned int fng = (use_thumb_ ? 0 : 1); fng < 3; ++fng)
+            for (unsigned int fng = (use_thumb_ ? 0 : 1); fng < 5; ++fng)
             {
                 std::string finger_s;
                 pose.clear();
@@ -198,6 +230,8 @@ std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> iCubArmModel::get
 
                     if (fng == 1) finger_s = "index0";
                     else if (fng == 2) finger_s = "medium0";
+                    else if (fng == 3) finger_s = "ring0";
+                    else if (fng == 4) finger_s = "little0";
 
                     pose.assign(j_x.data(), j_x.data() + 3);
                     pose.insert(pose.end(), j_o.data(), j_o.data() + 4);
@@ -212,6 +246,8 @@ std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> iCubArmModel::get
                     if (fng == 0) finger_s = "thumb";
                     else if (fng == 1) finger_s = "index";
                     else if (fng == 2) finger_s = "medium";
+                    else if (fng == 3) finger_s = "ring";
+                    else if (fng == 4) finger_s = "little";
                     finger_s += std::to_string(i + 1);
 
                     pose.assign(j_x.data(), j_x.data() + 3);

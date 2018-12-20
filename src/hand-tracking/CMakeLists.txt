@@ -14,7 +14,8 @@ find_package(YARP CONFIG REQUIRED
                  math
                  sig
                  eigen
-                 gsl)
+                 gsl
+)
 
 find_package(ICUB REQUIRED)
 
