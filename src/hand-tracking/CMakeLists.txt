@@ -33,7 +33,7 @@ endif()
 find_package(SuperimposeMesh 0.9.4.0 QUIET)
 if(NOT SuperimposeMesh_FOUND)
     message(STATUS "Did not found required master release of SuperimposeMesh. Looking for devel version.")
-    find_package(SuperimposeMesh 0.9.104.0 REQUIRED)
+    find_package(SuperimposeMesh 0.10.100.0 REQUIRED)
 endif()
 
 print_dependency(CUDA)
