@@ -12,27 +12,23 @@ using namespace Eigen;
 
 
 
-struct HistogramNormOne::ImplData
+struct NormOne::ImplData
 {
     double likelihood_gain_;
 };
 
 
-HistogramNormOne::HistogramNormOne(const double likelihood_gain) noexcept :
+NormOne::NormOne(const double likelihood_gain) noexcept :
     pImpl_(std::unique_ptr<ImplData>(new ImplData))
 {
     pImpl_->likelihood_gain_ = likelihood_gain;
 }
 
 
-HistogramNormOne::~HistogramNormOne() = default;
+NormOne::~NormOne() = default;
 
 
-std::pair<bool, VectorXf> HistogramNormOne::likelihood
-(
-    const MeasurementModel& measurement_model,
-    const Ref<const MatrixXf>& pred_states
-)
+std::pair<bool, VectorXf> NormOne::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXf>& pred_states)
 {
     bool valid_agent_measurements;
     Data data_agent_measurements;

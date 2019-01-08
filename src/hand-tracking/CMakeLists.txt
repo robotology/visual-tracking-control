@@ -119,14 +119,6 @@ if(BFL_CUDA)
 
     set(CUDA_LIB_NAME cudadevicelikelihood)
     message(STATUS "Compiling CUDA library: " ${CUDA_LIB_NAME})
-
-    # CUDA source and header files
-    set(CUDA_SRC_FILES src/device_likelihood.cu
-    )
-
-    set(CUDA_HDR_FILES include/device_likelihood.h
-                       include/thrust_opencv_iterator.h
-    )
 endif()
 
 
@@ -184,18 +176,21 @@ set(${EXE_TARGET_NAME}_SRC
 
 set(${EXE_TARGET_NAME}_CPU_SRC
         src/cpu/ChiSquare.cpp
+        src/cpu/KLD.cpp
         src/cpu/NormOne.cpp
         src/cpu/NormTwo.cpp
         src/cpu/NormTwoChiSquare.cpp
+        src/cpu/NormTwoKLD.cpp
+        src/cpu/NormTwoKLDChiSquare.cpp
         src/cpu/VisualProprioception.cpp
 )
 
 set(${EXE_TARGET_NAME}_CUDA_SRC
         src/cuda/ChiSquare.cpp
+        src/cuda/KLD.cpp
         src/cuda/NormOne.cpp
         src/cuda/NormTwo.cpp
         src/cuda/NormTwoChiSquare.cpp
-        src/cuda/KLD.cpp
         src/cuda/NormTwoKLD.cpp
         src/cuda/NormTwoKLDChiSquare.cpp
         src/cuda/VisualProprioception.cpp
@@ -206,10 +201,22 @@ set(${EXE_TARGET_NAME}_THRIFT_HDR
 
 yarp_add_idl(${EXE_TARGET_NAME}_THRIFT_SRC ${${EXE_TARGET_NAME}_THRIFT_HDR})
 
+set(${CUDA_LIB_NAME}_SRC_FILES
+        src/cuda/device_likelihood.cu
+)
+
+set(${CUDA_LIB_NAME}_HDR_FILES
+        include/device_likelihood.h
+        include/thrust_opencv_iterator.h
+)
+
 
 # CUDA library target calls
 if(BFL_CUDA)
-    cuda_add_library(${CUDA_LIB_NAME} ${CUDA_HDR_FILES} ${CUDA_SRC_FILES} ${CUDA_LIB_TYPE})
+    cuda_add_library(${CUDA_LIB_NAME}
+                         ${${CUDA_LIB_NAME}_HDR_FILES}
+                         ${${CUDA_LIB_NAME}_SRC_FILES}
+                         ${CUDA_LIB_TYPE})
 
     target_include_directories(${CUDA_LIB_NAME} ${CUDA_LINK_LIBRARIES_KEYWORD}
                                     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -239,6 +246,12 @@ if(BFL_CUDA)
     set_source_files_properties(${${EXE_TARGET_NAME}_CPU_SRC}
                                 PROPERTIES HEADER_FILE_ONLY ON)
 else()
+    set_source_files_properties(${${CUDA_LIB_NAME}_HDR_FILES}
+                                PROPERTIES HEADER_FILE_ONLY ON)
+
+    set_source_files_properties(${${CUDA_LIB_NAME}_SRC_FILES}
+                                PROPERTIES HEADER_FILE_ONLY ON)
+
     set_source_files_properties(${${EXE_TARGET_NAME}_CUDA_SRC}
                                 PROPERTIES HEADER_FILE_ONLY ON)
 endif()

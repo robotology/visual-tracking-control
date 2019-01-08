@@ -12,7 +12,7 @@ using namespace Eigen;
 
 
 
-struct HistogramNormTwoChi::ImplHNTC
+struct NormTwo::ImplData
 {
     double likelihood_gain_;
 
@@ -20,8 +20,8 @@ struct HistogramNormTwoChi::ImplHNTC
 };
 
 
-HistogramNormTwoChi::HistogramNormTwoChi(const double likelihood_gain, const std::size_t vector_size) noexcept :
-pImpl_(std::unique_ptr<ImplHNTC>(new ImplHNTC))
+NormTwo::NormTwo(const double likelihood_gain, const std::size_t vector_size) noexcept :
+    pImpl_(std::unique_ptr<ImplData>(new ImplData))
 {
     pImpl_->likelihood_gain_ = likelihood_gain;
 
@@ -29,15 +29,11 @@ pImpl_(std::unique_ptr<ImplHNTC>(new ImplHNTC))
 }
 
 
-HistogramNormTwoChi::~HistogramNormTwoChi() noexcept
+NormTwo::~NormTwo() noexcept
 { }
 
 
-std::pair<bool, VectorXf> HistogramNormTwoChi::likelihood
-(
- const MeasurementModel& measurement_model,
- const Ref<const MatrixXf>& pred_states
- )
+std::pair<bool, VectorXf> NormTwo::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXf>& pred_states)
 {
     bool valid_measurements;
     Data data_measurements;
@@ -73,34 +69,28 @@ std::pair<bool, VectorXf> HistogramNormTwoChi::likelihood
 
     for (int i = 0; i < pred_states.cols(); ++i)
     {
-        double norm = 0;
-        double chi = 0;
+        double norm_two = 0;
 
-        double sum_normchi = 0;
+        double sum_norm_two = 0;
 
         size_t histogram_size_counter = 0;
         for (int j = 0; j < measurements.cols(); ++j)
         {
-            double suqared_diff = std::pow(measurements(0, j) - predicted_measurements(i, j), 2.0);
-
-            norm += suqared_diff;
-
-            chi += suqared_diff / (measurements(0, j) + predicted_measurements(i, j) + std::numeric_limits<float>::min());
+            norm_two += std::pow(measurements(0, j) - predicted_measurements(i, j), 2.0);
 
             histogram_size_counter++;
 
             if (histogram_size_counter == pImpl_->vector_size_)
             {
-                sum_normchi += std::sqrt(norm) * chi;
+                sum_norm_two += std::sqrt(norm_two);
 
-                norm = 0;
-                chi = 0;
+                norm_two = 0;
 
                 histogram_size_counter = 0;
             }
         }
 
-        likelihood(i) = static_cast<float>(sum_normchi);
+        likelihood(i) = static_cast<float>(sum_norm_two);
     }
     likelihood = (-static_cast<float>(pImpl_->likelihood_gain_) * likelihood).array().exp();
 

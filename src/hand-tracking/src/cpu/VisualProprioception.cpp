@@ -185,7 +185,7 @@ std::pair<bool, bfl::Data> VisualProprioception::getAgentMeasurements() const
 }
 
 
-int VisualProprioception::getOGLTilesNumber() const
+int VisualProprioception::getNumberOfUsedParticles() const
 {
     ImplData& rImpl = *pImpl_;
 

@@ -46,14 +46,10 @@ ChiSquare::~ChiSquare() noexcept
 }
 
 
-std::pair<bool, VectorXf> ChiSquare::likelihood
-(
-    const MeasurementModel& measurement_model,
-    const Ref<const MatrixXf>& pred_states
-)
+std::pair<bool, VectorXf> ChiSquare::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXf>& pred_states)
 {
     ImplData& rImpl = *pImpl_;
-    
+
 
     bool valid_measurements;
     Data data_measurements;

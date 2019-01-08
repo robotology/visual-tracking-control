@@ -46,11 +46,7 @@ NormTwoKLD::~NormTwoKLD() noexcept
 }
 
 
-std::pair<bool, VectorXf> NormTwoKLD::likelihood
-(
-    const MeasurementModel& measurement_model,
-    const Ref<const MatrixXf>& pred_states
-)
+std::pair<bool, VectorXf> NormTwoKLD::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXf>& pred_states)
 {
     ImplData& rImpl = *pImpl_;
 

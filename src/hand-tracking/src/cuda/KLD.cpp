@@ -46,11 +46,7 @@ KLD::~KLD() noexcept
 }
 
 
-std::pair<bool, VectorXf> KLD::likelihood
-(
-    const MeasurementModel& measurement_model,
-    const Ref<const MatrixXf>& pred_states
-)
+std::pair<bool, VectorXf> KLD::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXf>& pred_states)
 {
     ImplData& rImpl = *pImpl_;
 

@@ -46,11 +46,7 @@ NormTwoChiSquare::~NormTwoChiSquare() noexcept
 }
 
 
-std::pair<bool, VectorXf> NormTwoChiSquare::likelihood
-(
-    const MeasurementModel& measurement_model,
-    const Ref<const MatrixXf>& pred_states
-)
+std::pair<bool, VectorXf> NormTwoChiSquare::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXf>& pred_states)
 {
     ImplData& rImpl = *pImpl_;
 

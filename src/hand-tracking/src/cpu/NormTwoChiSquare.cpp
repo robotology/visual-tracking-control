@@ -33,11 +33,7 @@ NormTwoChiSquare::~NormTwoChiSquare() noexcept
 { }
 
 
-std::pair<bool, VectorXf> NormTwoChiSquare::likelihood
-(
-    const MeasurementModel& measurement_model,
-    const Ref<const MatrixXf>& pred_states
-)
+std::pair<bool, VectorXf> NormTwoChiSquare::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXf>& pred_states)
 {
     bool valid_measurements;
     Data data_measurements;
@@ -73,34 +69,34 @@ std::pair<bool, VectorXf> NormTwoChiSquare::likelihood
 
     for (int i = 0; i < pred_states.cols(); ++i)
     {
-        double norm = 0;
+        double norm_two = 0;
         double chi = 0;
 
-        double sum_normchi = 0;
+        double sum_norm_two_chi = 0;
 
         size_t histogram_size_counter = 0;
         for (int j = 0; j < measurements.cols(); ++j)
         {
-            double suqared_diff = std::pow(measurements(0, j) - predicted_measurements(i, j), 2.0);
+            double squared_diff = std::pow(measurements(0, j) - predicted_measurements(i, j), 2.0);
 
-            norm += suqared_diff;
+            norm_two += squared_diff;
 
-            chi += suqared_diff / (measurements(0, j) + predicted_measurements(i, j) + std::numeric_limits<float>::min());
+            chi += squared_diff / (measurements(0, j) + predicted_measurements(i, j) + std::numeric_limits<float>::min());
 
             histogram_size_counter++;
 
             if (histogram_size_counter == pImpl_->vector_size_)
             {
-                sum_normchi += std::sqrt(norm) * chi;
+                sum_norm_two_chi += std::sqrt(norm_two) * chi;
 
-                norm = 0;
+                norm_two = 0;
                 chi = 0;
 
                 histogram_size_counter = 0;
             }
         }
 
-        likelihood(i) = static_cast<float>(sum_normchi);
+        likelihood(i) = static_cast<float>(sum_norm_two_chi);
     }
     likelihood = (-static_cast<float>(pImpl_->likelihood_gain_) * likelihood).array().exp();
 
