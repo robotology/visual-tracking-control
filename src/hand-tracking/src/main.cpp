@@ -4,8 +4,9 @@
 #include <memory>
 #include <string>
 
+#include <BayesFilters/BootstrapCorrection.h>
 #include <BayesFilters/ResamplingWithPrior.h>
-#include <BayesFilters/UpdateParticles.h>
+
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
 #include <yarp/os/ResourceFinder.h>
@@ -297,7 +298,7 @@ int main(int argc, char *argv[])
     }
 
     /* CORRECTION */
-    std::unique_ptr<PFCorrection> vpf_update_particles(new UpdateParticles());
+    std::unique_ptr<PFCorrection> vpf_update_particles(new BootstrapCorrection());
     vpf_update_particles->setLikelihoodModel(std::move(likelihood));
     vpf_update_particles->setMeasurementModel(std::move(proprio));
 
