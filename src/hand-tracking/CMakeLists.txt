@@ -73,6 +73,7 @@ message(STATUS "Set BFL_CUDA to ${BFL_CUDA}.")
 
 
 # CUDA settings
+set(CUDA_LIB_NAME cudadevicelikelihood)
 if(BFL_CUDA)
     if(WIN32)
         option(CUDA_LIB_DYN "Build CUDA files as dynamic libraries (default OFF - STATIC)" OFF)
@@ -86,15 +87,15 @@ if(BFL_CUDA)
         set(CUDA_LIB_TYPE STATIC)
     endif()
 
-    message(STATUS "CUDA_LIB_TYPE: " ${CUDA_LIB_TYPE})
+    message(STATUS "CUDA_LIB_TYPE: ${CUDA_LIB_TYPE}")
 
 
     set(CUDA_SEPARABLE_COMPILATION ON)
-    message(STATUS "CUDA_SEPARABLE_COMPILATION: " ${CUDA_SEPARABLE_COMPILATION})
+    message(STATUS "CUDA_SEPARABLE_COMPILATION: ${CUDA_SEPARABLE_COMPILATION}")
 
 
     cuda_select_nvcc_arch_flags(CUDA_ARCH_FLAGS Auto)
-    message(STATUS "CUDA_ARCH_FLAGS: " ${CUDA_ARCH_FLAGS})
+    message(STATUS "CUDA_ARCH_FLAGS: ${CUDA_ARCH_FLAGS}")
 
 
     list(APPEND CUDA_NVCC_FLAGS ${CUDA_ARCH_FLAGS})
@@ -103,22 +104,23 @@ if(BFL_CUDA)
         list(APPEND CUDA_NVCC_FLAGS "-std=c++11")
     endif()
 
-    message(STATUS "CUDA_NVCC_FLAGS: " ${CUDA_NVCC_FLAGS})
+    message(STATUS "CUDA_NVCC_FLAGS: ${CUDA_NVCC_FLAGS}")
 
 
     set(CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
-    message(STATUS "CUDA_HOST_COMPILER: " ${CUDA_HOST_COMPILER})
+    message(STATUS "CUDA_HOST_COMPILER: ${CUDA_HOST_COMPILER}")
 
 
     set(CUDA_LINK_LIBRARIES_KEYWORD PRIVATE)
-    message(STATUS "CUDA_LINK_LIBRARIES_KEYWORD: " ${CUDA_LINK_LIBRARIES_KEYWORD})
+    message(STATUS "CUDA_LINK_LIBRARIES_KEYWORD: ${CUDA_LINK_LIBRARIES_KEYWORD}")
 
 
-    message(STATUS "CUDA_PROPAGATE_HOST_FLAGS: " ${CUDA_PROPAGATE_HOST_FLAGS})
+    message(STATUS "CUDA_PROPAGATE_HOST_FLAGS: ${CUDA_PROPAGATE_HOST_FLAGS}")
 
 
-    set(CUDA_LIB_NAME cudadevicelikelihood)
-    message(STATUS "Compiling CUDA library: " ${CUDA_LIB_NAME})
+    message(STATUS "CUDA library ${CUDA_LIB_NAME} compilation is enabled.")
+else()
+    message(STATUS "CUDA library ${CUDA_LIB_NAME} compilation is disabled.")
 endif()
 
 
@@ -242,7 +244,42 @@ add_executable(${EXE_TARGET_NAME}
                    ${${EXE_TARGET_NAME}_THRIFT_SRC}
 )
 
+target_include_directories(${EXE_TARGET_NAME}
+                           PRIVATE
+                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                               ${ICUB_INCLUDE_DIRS}
+)
+
+target_link_libraries(${EXE_TARGET_NAME}
+                      PRIVATE
+                          BayesFilters::BayesFilters
+                          ctrlLib
+                          ${ICUB_LIBRARIES}
+                          iKin
+                          ${OpenCV_LIBS}
+                          SuperimposeMesh::SuperimposeMesh
+                          YARP::YARP_OS
+                          YARP::YARP_init
+                          YARP::YARP_math
+                          YARP::YARP_sig
+                          YARP::YARP_eigen
+                          YARP::YARP_gsl
+)
+
 if(BFL_CUDA)
+    target_include_directories(${EXE_TARGET_NAME}
+                               PRIVATE
+                                   ${CUDA_INCLUDE_DIRS}
+    )
+
+    target_link_libraries(${EXE_TARGET_NAME}
+                          PRIVATE
+                              ${CUDA_LIBRARIES}
+                              ${CUDA_LIB_NAME}
+    )
+
+    cuda_add_cublas_to_target(${EXE_TARGET_NAME})
+
     set_source_files_properties(${${EXE_TARGET_NAME}_CPU_SRC}
                                 PROPERTIES HEADER_FILE_ONLY ON)
 else()
@@ -263,34 +300,6 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src"
                  ${${EXE_TARGET_NAME}_CPU_SRC}
 )
 
-target_include_directories(${EXE_TARGET_NAME}
-                           PRIVATE
-                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                               ${ICUB_INCLUDE_DIRS}
-                               ${CUDA_INCLUDE_DIRS}
-)
-
-target_link_libraries(${EXE_TARGET_NAME}
-                      PRIVATE
-                          BayesFilters::BayesFilters
-                          ctrlLib
-                          ${CUDA_LIBRARIES}
-                          ${CUDA_LIB_NAME}
-                          ${ICUB_LIBRARIES}
-                          iKin
-                          ${OpenCV_LIBS}
-                          SuperimposeMesh::SuperimposeMesh
-                          YARP::YARP_OS
-                          YARP::YARP_init
-                          YARP::YARP_math
-                          YARP::YARP_sig
-                          YARP::YARP_eigen
-                          YARP::YARP_gsl
-)
-
-if(BFL_CUDA)
-    cuda_add_cublas_to_target(${EXE_TARGET_NAME})
-endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
