@@ -30,7 +30,7 @@ public:
 
     void motion(const Eigen::Ref<const Eigen::MatrixXd>& cur_state, Eigen::Ref<Eigen::MatrixXd> mot_state) override;
 
-    Eigen::MatrixXd getNoiseSample(const int num) override;
+    Eigen::MatrixXd getNoiseSample(const int num);
 
     Eigen::MatrixXd getNoiseCovarianceMatrix() override { return Eigen::MatrixXd::Zero(1, 1); };
 
