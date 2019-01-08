@@ -7,24 +7,24 @@
 using namespace Eigen;
 
 
-BrownianMotionPose::BrownianMotionPose(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept :
+BrownianMotionPose::BrownianMotionPose(const double q_xy, const double q_z, const double theta, const double cone_angle, const unsigned int seed) noexcept :
     q_xy_(q_xy),
     q_z_(q_z),
     theta_(theta * (M_PI/180.0)),
     cone_angle_(cone_angle * (M_PI/180.0)),
     cone_dir_(Vector4f(0.0, 0.0, 1.0, 0.0)),
     generator_(std::mt19937_64(seed)),
-    distribution_pos_xy_(std::normal_distribution<float>(0.0, q_xy)),
-    distribution_pos_z_(std::normal_distribution<float>(0.0, q_z)),
-    distribution_theta_(std::normal_distribution<float>(0.0, theta_)),
-    distribution_cone_(std::uniform_real_distribution<float>(0.0, 1.0)),
+    distribution_pos_xy_(std::normal_distribution<double>(0.0, q_xy)),
+    distribution_pos_z_(std::normal_distribution<double>(0.0, q_z)),
+    distribution_theta_(std::normal_distribution<double>(0.0, theta_)),
+    distribution_cone_(std::uniform_real_distribution<double>(0.0, 1.0)),
     gaussian_random_pos_xy_([&] { return (distribution_pos_xy_)(generator_); }),
     gaussian_random_pos_z_([&] { return (distribution_pos_z_)(generator_); }),
     gaussian_random_theta_([&] { return (distribution_theta_)(generator_); }),
     gaussian_random_cone_([&] { return (distribution_cone_)(generator_); }) { }
 
 
-BrownianMotionPose::BrownianMotionPose(const float q_xy, const float q_z, const float theta, const float cone_angle) noexcept :
+BrownianMotionPose::BrownianMotionPose(const double q_xy, const double q_z, const double theta, const double cone_angle) noexcept :
     BrownianMotionPose(q_xy, q_z, theta, cone_angle, 1) { }
 
 
@@ -145,10 +145,10 @@ Eigen::MatrixXd BrownianMotionPose::getNoiseSample(const int num)
     /* [1] http://math.stackexchange.com/a/205589/81266 */
     for(unsigned int i = 0; i < num; ++i)
     {
-        float z   = gaussian_random_cone_() * (1 - cos(cone_angle_)) + cos(cone_angle_);
-        float phi = gaussian_random_cone_() * (2.0 * M_PI);
-        float x   = sqrt(1 - (z * z)) * cos(phi);
-        float y   = sqrt(1 - (z * z)) * sin(phi);
+        double z   = gaussian_random_cone_() * (1 - cos(cone_angle_)) + cos(cone_angle_);
+        double phi = gaussian_random_cone_() * (2.0 * M_PI);
+        double x   = sqrt(1 - (z * z)) * cos(phi);
+        double y   = sqrt(1 - (z * z)) * sin(phi);
 
         sample(3, i) = x;
         sample(4, i) = y;
@@ -164,7 +164,7 @@ void BrownianMotionPose::addAxisangleDisturbance(const Ref<const MatrixXd>& dist
 {
     for (unsigned int i = 0; i < current_vec.cols(); ++i)
     {
-        float ang = current_vec(3, i) + disturbance_vec(3, i);
+        double ang = current_vec(3, i) + disturbance_vec(3, i);
 
         if      (ang >   M_PI) ang -= 2.0 * M_PI;
         else if (ang <= -M_PI) ang += 2.0 * M_PI;
@@ -175,7 +175,7 @@ void BrownianMotionPose::addAxisangleDisturbance(const Ref<const MatrixXd>& dist
 
         Vector3d u = def_dir.cross(current_vec.col(i).head<3>()).normalized();
 
-        float rot  = static_cast<float>(std::acos(current_vec.col(i).head<3>().dot(def_dir)));
+        double rot  = static_cast<double>(std::acos(current_vec.col(i).head<3>().dot(def_dir)));
 
 
         /* Convert rotation axis and angle to 3x3 rotation matrix [2] */
