@@ -110,17 +110,17 @@ BrownianMotionPose& BrownianMotionPose::operator=(BrownianMotionPose&& brown) no
 }
 
 
-void BrownianMotionPose::propagate(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> prop_state)
+void BrownianMotionPose::propagate(const Eigen::Ref<const Eigen::MatrixXd>& cur_state, Eigen::Ref<Eigen::MatrixXd> prop_state)
 {
     prop_state = cur_state;
 }
 
 
-void BrownianMotionPose::motion(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> mot_state)
+void BrownianMotionPose::motion(const Eigen::Ref<const Eigen::MatrixXd>& cur_state, Eigen::Ref<Eigen::MatrixXd> mot_state)
 {
     propagate(cur_state, mot_state);
 
-    MatrixXf sample(7, mot_state.cols());
+    MatrixXd sample(7, mot_state.cols());
     sample = getNoiseSample(mot_state.cols());
 
     mot_state.topRows<3>() += sample.topRows<3>();
@@ -128,9 +128,9 @@ void BrownianMotionPose::motion(const Eigen::Ref<const Eigen::MatrixXf>& cur_sta
 }
 
 
-Eigen::MatrixXf BrownianMotionPose::getNoiseSample(const int num)
+Eigen::MatrixXd BrownianMotionPose::getNoiseSample(const int num)
 {
-    MatrixXf sample(7, num);
+    MatrixXd sample(7, num);
 
     /* Position */
     for (unsigned int i = 0; i < num; ++i)
@@ -160,7 +160,7 @@ Eigen::MatrixXf BrownianMotionPose::getNoiseSample(const int num)
 }
 
 
-void BrownianMotionPose::addAxisangleDisturbance(const Ref<const MatrixXf>& disturbance_vec, Ref<MatrixXf> current_vec)
+void BrownianMotionPose::addAxisangleDisturbance(const Ref<const MatrixXd>& disturbance_vec, Ref<MatrixXd> current_vec)
 {
     for (unsigned int i = 0; i < current_vec.cols(); ++i)
     {
@@ -171,21 +171,21 @@ void BrownianMotionPose::addAxisangleDisturbance(const Ref<const MatrixXf>& dist
 
 
         /* Find the rotation axis 'u' and rotation angle 'rot' [1] */
-        Vector3f def_dir(0.0, 0.0, 1.0);
+        Vector3d def_dir(0.0, 0.0, 1.0);
 
-        Vector3f u = def_dir.cross(current_vec.col(i).head<3>()).normalized();
+        Vector3d u = def_dir.cross(current_vec.col(i).head<3>()).normalized();
 
         float rot  = static_cast<float>(std::acos(current_vec.col(i).head<3>().dot(def_dir)));
 
 
         /* Convert rotation axis and angle to 3x3 rotation matrix [2] */
         /* [2] https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle */
-        Matrix3f cross_matrix;
+        Matrix3d cross_matrix;
         cross_matrix <<     0,  -u(2),   u(1),
                          u(2),      0,  -u(0),
                         -u(1),   u(0),      0;
 
-        Matrix3f R = std::cos(rot) * Matrix3f::Identity() + std::sin(rot) * cross_matrix + (1 - std::cos(rot)) * (u * u.transpose());
+        Matrix3d R = std::cos(rot) * Matrix3d::Identity() + std::sin(rot) * cross_matrix + (1 - std::cos(rot)) * (u * u.transpose());
 
 
         current_vec.col(i).head<3>() = (R * disturbance_vec.col(i).head<3>()).normalized();

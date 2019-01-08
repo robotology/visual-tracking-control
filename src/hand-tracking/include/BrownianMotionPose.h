@@ -26,13 +26,13 @@ public:
 
     BrownianMotionPose& operator=(BrownianMotionPose&& bm) noexcept;
 
-    void propagate(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> prop_state) override;
+    void propagate(const Eigen::Ref<const Eigen::MatrixXd>& cur_state, Eigen::Ref<Eigen::MatrixXd> prop_state) override;
 
-    void motion(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> mot_state) override;
+    void motion(const Eigen::Ref<const Eigen::MatrixXd>& cur_state, Eigen::Ref<Eigen::MatrixXd> mot_state) override;
 
-    Eigen::MatrixXf getNoiseSample(const int num) override;
+    Eigen::MatrixXd getNoiseSample(const int num) override;
 
-    Eigen::MatrixXf getNoiseCovarianceMatrix() override { return Eigen::MatrixXf::Zero(1, 1); };
+    Eigen::MatrixXd getNoiseCovarianceMatrix() override { return Eigen::MatrixXd::Zero(1, 1); };
 
     bool setProperty(const std::string& property) override { return false; };
 
@@ -54,7 +54,7 @@ protected:
     std::function<float()>                gaussian_random_theta_;
     std::function<float()>                gaussian_random_cone_;
 
-    void addAxisangleDisturbance(const Eigen::Ref<const Eigen::MatrixXf>& disturbance_vec, Eigen::Ref<Eigen::MatrixXf> current_vec);
+    void addAxisangleDisturbance(const Eigen::Ref<const Eigen::MatrixXd>& disturbance_vec, Eigen::Ref<Eigen::MatrixXd> current_vec);
 };
 
 #endif /* BROWNIANMOTIONPOSE_H */
