@@ -24,10 +24,10 @@ if(NOT EIGEN3_FOUND)
     find_package(Eigen3 REQUIRED)
 endif()
 
-find_package(BayesFilters 0.7.1.0 QUIET)
+find_package(BayesFilters 0.9.0 QUIET)
 if(NOT BayesFilters_FOUND)
     message(STATUS "Did not found required master release of BayesFilters. Looking for devel version.")
-    find_package(BayesFilters 0.7.101 REQUIRED)
+    find_package(BayesFilters 0.9.100 REQUIRED)
 endif()
 
 find_package(SuperimposeMesh 0.9.4.0 QUIET)
