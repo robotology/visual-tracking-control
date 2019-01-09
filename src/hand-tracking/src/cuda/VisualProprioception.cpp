@@ -226,6 +226,14 @@ std::pair<bool, bfl::Data> VisualProprioception::getAgentMeasurements() const
 }
 
 
+std::pair<std::size_t, std::size_t> VisualProprioception::getOutputSize() const
+{
+    /* The output size is set to (0, 0) since the measurements are stored in a row major format,
+       hence not compatible with the required output format. */
+    return std::make_pair(0, 0);
+}
+
+
 int VisualProprioception::getNumberOfUsedParticles() const
 {
     ImplData& rImpl = *pImpl_;
