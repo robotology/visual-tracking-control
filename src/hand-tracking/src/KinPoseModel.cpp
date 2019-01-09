@@ -25,14 +25,14 @@ KinPoseModel::KinPoseModel() noexcept { }
 KinPoseModel::~KinPoseModel() noexcept { }
 
 
-void KinPoseModel::propagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf> prop_state)
+void KinPoseModel::propagate(const Ref<const MatrixXd>& cur_state, Ref<MatrixXd> prop_state)
 {
     prop_state.topRows<3>() = cur_state.topRows<3>().colwise() + delta_hand_pose_.head<3>().cast<float>();
 
     prop_state.middleRows<3>(3) = (cur_state.middleRows<3>(3).colwise() + delta_hand_pose_.middleRows<3>(3).cast<float>());
     prop_state.middleRows<3>(3).colwise().normalize();
 
-    RowVectorXf ang = cur_state.bottomRows<1>().array() + static_cast<float>(delta_angle_);
+    RowVectorXd ang = cur_state.bottomRows<1>().array() + static_cast<float>(delta_angle_);
 
     for (unsigned int i = 0; i < ang.cols(); ++i)
     {
@@ -44,12 +44,12 @@ void KinPoseModel::propagate(const Ref<const MatrixXf>& cur_state, Ref<MatrixXf>
 }
 
 
-MatrixXf KinPoseModel::getExogenousMatrix()
+MatrixXd KinPoseModel::getExogenousMatrix()
 {
     std::cerr << "ERROR::PFPREDICTION::SETEXOGENOUSMODEL\n";
     std::cerr << "ERROR:\n\tCall to unimplemented base class method." << std::endl;
 
-    return MatrixXf::Zero(1, 1);
+    return MatrixXd::Zero(1, 1);
 }
 
 

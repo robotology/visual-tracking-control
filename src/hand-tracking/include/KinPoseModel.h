@@ -15,9 +15,9 @@ public:
 
     ~KinPoseModel() noexcept;
 
-    void propagate(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> prop_state) override;
+    void propagate(const Eigen::Ref<const Eigen::MatrixXd>& cur_state, Eigen::Ref<Eigen::MatrixXd> prop_state) override;
 
-    Eigen::MatrixXf getExogenousMatrix() override;
+    Eigen::MatrixXd getExogenousMatrix() override;
 
     bool setProperty(const std::string& property) override;
 
