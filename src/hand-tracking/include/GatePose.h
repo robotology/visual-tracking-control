@@ -1,6 +1,7 @@
 #ifndef GATEPOSE_H
 #define GATEPOSE_H
 
+#include <BayesFilters/ParticleSet.h>
 #include <BayesFilters/PFCorrectionDecorator.h>
 #include <BayesFilters/StateModel.h>
 
@@ -18,8 +19,7 @@ public:
     ~GatePose() noexcept;
 
 protected:
-    void correctStep(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, const Eigen::Ref<const Eigen::VectorXf>& pred_weights,
-                     Eigen::Ref<Eigen::MatrixXf> cor_states, Eigen::Ref<Eigen::VectorXf> cor_weights) override;
+    void correctStep(const bfl::ParticleSet& pred_particles, bfl::ParticleSet& corr_particles) override;
 
     virtual Eigen::VectorXd readPose() = 0;
 

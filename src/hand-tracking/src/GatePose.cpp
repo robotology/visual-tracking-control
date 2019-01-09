@@ -26,20 +26,18 @@ GatePose::GatePose(std::unique_ptr<PFCorrection> visual_correction) noexcept :
 GatePose::~GatePose() noexcept { }
 
 
-void GatePose::correctStep(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights,
-                           Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
+void GatePose::correctStep(const ParticleSet& pred_particles, ParticleSet& corr_particles)
 {
-    PFCorrectionDecorator::correctStep(pred_states, pred_weights,
-                                       cor_states, cor_weights);
+    PFCorrectionDecorator::correctStep(pred_particles, corr_particles);
 
     ee_pose_ = readPose();
 
-    for (int i = 0; i < cor_states.cols(); ++i)
+    for (int i = 0; i < corr_particles.state().cols(); ++i)
     {
-        if (!isInsideEllipsoid(cor_states.col(i).head<3>())        ||
-            !isInsideCone     (cor_states.col(i).middleRows<3>(3)) ||
-            !isWithinRotation (cor_states(6, i))                     )
-            cor_weights(i) = std::numeric_limits<float>::min();
+        if (!isInsideEllipsoid(corr_particles.state(i).topRows<3>())     ||
+            !isInsideCone     (corr_particles.state(i).middleRows<3>(3)) ||
+            !isWithinRotation (corr_particles.state(i, 6))                 )
+            corr_particles.weight(i) = std::numeric_limits<double>::min();
     }
 }
 
