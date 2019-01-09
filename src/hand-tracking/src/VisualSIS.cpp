@@ -9,6 +9,8 @@
 #include <yarp/math/Math.h>
 #include <yarp/os/LogStream.h>
 
+#include <BayesFilters/utils.h>
+
 //#include <SuperimposeMesh/SICAD.h>
 //#include <VisualProprioception.h>
 
@@ -24,13 +26,21 @@ using yarp::sig::Vector;
 //using yarp::sig::PixelRgb;
 
 
-VisualSIS::VisualSIS(const std::string& cam_sel,
+VisualSIS::VisualSIS(std::unique_ptr<bfl::ParticleSetInitialization> initialization,
+                     std::unique_ptr<bfl::PFPrediction> prediction,
+                     std::unique_ptr<bfl::PFCorrection> correction,
+                     std::unique_ptr<bfl::Resampling> resampling,
+                     const std::string& cam_sel,
                      const int num_particles,
                      const double resample_ratio,
                      const std::string& port_prefix) :
+    ParticleFilter(std::move(initialization), std::move(prediction), std::move(correction), std::move(resampling)),
     num_particles_(num_particles),
     resample_ratio_(resample_ratio),
-    port_prefix_(port_prefix)
+    port_prefix_(port_prefix),
+    pred_particle_(num_particles_, 7),
+    cor_particle_(num_particles_, 7),
+    estimate_extraction_(7)
 {
     port_estimates_out_.open("/" + port_prefix_ + "/estimates:o");
 
@@ -42,15 +52,9 @@ VisualSIS::VisualSIS(const std::string& cam_sel,
 
 bool VisualSIS::initialization()
 {
-    pred_particle_ = MatrixXf(7, num_particles_);
-    pred_weight_   = VectorXf(num_particles_, 1);
-
-    cor_particle_ = MatrixXf(7, num_particles_);
-    cor_weight_   = VectorXf(num_particles_, 1);
-
     estimate_extraction_.clear();
 
-    initialization_->initialize(pred_particle_, pred_weight_);
+    initialization_->initialize(pred_particle_);
 
     prediction_->getExogenousModel().setProperty("init");
 
@@ -70,37 +74,36 @@ void VisualSIS::filteringStep()
 {
     /* PREDICTION */
     if (getFilteringStep() != 0)
-        prediction_->predict(cor_particle_, cor_weight_,
-                             pred_particle_, pred_weight_);
+        prediction_->predict(cor_particle_, pred_particle_);
 
 
     /* CORRECTION */
-    correction_->correct(pred_particle_, pred_weight_,
-                         cor_particle_, cor_weight_);
-    cor_weight_ /= cor_weight_.sum();
+    correction_->correct(pred_particle_, cor_particle_);
+    /* Normalize weights using LogSumExp. */
+    cor_particle_.weight().array() -= bfl::utils::log_sum_exp(cor_particle_.weight());
 
 
     /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
-    VectorXf out_particle = estimate_extraction_.extract(cor_particle_, cor_weight_);
+    VectorXd out_particle;
+    bool valid_estimate = false;
+    std::tie(valid_estimate, out_particle) = estimate_extraction_.extract(cor_particle_.state(), cor_particle_.weight());
+    if (!valid_estimate)
+        yInfo() << log_ID_ << "Cannot extract point estimate!";
 
 
     /* RESAMPLING */
     yInfo() << log_ID_ << "Step:" << getFilteringStep();
-    yInfo() << log_ID_ << "Neff:" << resampling_->neff(cor_weight_);
-    if (resampling_->neff(cor_weight_) < std::round(num_particles_ * resample_ratio_))
+    yInfo() << log_ID_ << "Neff:" << resampling_->neff(cor_particle_.weight());
+    if (resampling_->neff(cor_particle_.weight()) < std::round(num_particles_ * resample_ratio_))
     {
         yInfo() << log_ID_ << "Resampling!";
 
-        MatrixXf res_particle(7, num_particles_);
-        VectorXf res_weight(num_particles_, 1);
-        VectorXf res_parent(num_particles_, 1);
+        ParticleSet res_particle(num_particles_, 7);
+        VectorXi res_parent(num_particles_, 1);
 
-        resampling_->resample(cor_particle_, cor_weight_,
-                              res_particle, res_weight,
-                              res_parent);
+        resampling_->resample(cor_particle_, res_particle, res_parent);
 
         cor_particle_ = res_particle;
-        cor_weight_   = res_weight;
     }
 
 
@@ -153,11 +156,13 @@ void VisualSIS::filteringStep()
 
 
     /* PALM */
-    Vector& estimates_out = port_estimates_out_.prepare();
-    estimates_out.resize(7);
-    toEigen(estimates_out) = out_particle.cast<double>();
-    port_estimates_out_.write();
-
+    if (valid_estimate)
+    {
+        Vector& estimates_out = port_estimates_out_.prepare();
+        estimates_out.resize(7);
+        toEigen(estimates_out) = out_particle;
+        port_estimates_out_.write();
+    }
 
     /* STATE ESTIMATE OUTPUT */
 //    Superimpose::ModelPoseContainer hand_pose;
@@ -298,6 +303,11 @@ bool VisualSIS::set_estimates_extraction_method(const std::string& method)
         estimate_extraction_.setMethod(EstimatesExtraction::ExtractionMethod::emode);
 
         return true;
+    }
+    else if ((method == "map") || (method == "smap") || (method == "wmap") || (method == "emap"))
+    {
+        /* These extraction methods are not supported. */
+        return false;
     }
 
     return false;
