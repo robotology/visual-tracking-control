@@ -27,12 +27,12 @@ KinPoseModel::~KinPoseModel() noexcept { }
 
 void KinPoseModel::propagate(const Ref<const MatrixXd>& cur_state, Ref<MatrixXd> prop_state)
 {
-    prop_state.topRows<3>() = cur_state.topRows<3>().colwise() + delta_hand_pose_.head<3>().cast<float>();
+    prop_state.topRows<3>() = cur_state.topRows<3>().colwise() + delta_hand_pose_.head<3>();
 
-    prop_state.middleRows<3>(3) = (cur_state.middleRows<3>(3).colwise() + delta_hand_pose_.middleRows<3>(3).cast<float>());
+    prop_state.middleRows<3>(3) = cur_state.middleRows<3>(3).colwise() + delta_hand_pose_.middleRows<3>(3);
     prop_state.middleRows<3>(3).colwise().normalize();
 
-    RowVectorXd ang = cur_state.bottomRows<1>().array() + static_cast<float>(delta_angle_);
+    RowVectorXd ang = cur_state.bottomRows<1>().array() + delta_angle_;
 
     for (unsigned int i = 0; i < ang.cols(); ++i)
     {
