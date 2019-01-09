@@ -38,6 +38,8 @@ struct VisualProprioception::ImplData
     unsigned int feature_dim_;
 
     std::unique_ptr<cv::HOGDescriptor> hog_cpu_;
+
+    MatrixXf descriptor_out_;
 };
 
 
@@ -93,19 +95,23 @@ VisualProprioception::VisualProprioception
     rImpl.num_images_ = rImpl.si_cad_->getTilesNumber();
 
     rImpl.feature_dim_ = (rImpl.cam_params_.width / rImpl.block_size_ * 2 - 1) * (rImpl.cam_params_.height / rImpl.block_size_ * 2 - 1) * rImpl.bin_number_ * 4;
+
+    rImpl.descriptor_out_.resize(1, rImpl.feature_dim_);
 }
 
 
 VisualProprioception::~VisualProprioception() noexcept = default;
 
 
-/* FIXME
- * Sicuri che measure, predicted measure e innovation debbano essere const?!
- */
-std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixXf>& cur_states) const
+std::pair<bool, bfl::Data> VisualProprioception::measure() const
+{
+    return std::make_pair(true, std::move(pImpl_->descriptor_out_));
+}
+
+
+std::pair<bool, bfl::Data> VisualProprioception::predictedMeasure(const Ref<const MatrixXd>& cur_states) const
 {
     ImplData& rImpl = *pImpl_;
-
 
     std::array<double, 3> camera_position;
     std::array<double, 4> camera_orientation;
@@ -126,6 +132,9 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
 
+    /*
+     * cv::HOGDescriptor::compute requires a std::vector<float>.
+     */
     std::vector<float> descriptors_cpu;
     rImpl.hog_cpu_->compute(rendered_image, descriptors_cpu, cv::Size(rImpl.cam_params_.width, rImpl.cam_params_.height));
 
@@ -139,12 +148,6 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
 }
 
 
-std::pair<bool, bfl::Data> VisualProprioception::predictedMeasure(const Ref<const MatrixXf>& cur_states) const
-{
-    return measure(cur_states);
-}
-
-
 std::pair<bool, bfl::Data> VisualProprioception::innovation(const bfl::Data& predicted_measurements, const bfl::Data& measurements) const
 {
     MatrixXf innovation = -(bfl::any::any_cast<MatrixXf>(predicted_measurements).rowwise() - bfl::any::any_cast<MatrixXf>(measurements).row(0));
@@ -153,35 +156,29 @@ std::pair<bool, bfl::Data> VisualProprioception::innovation(const bfl::Data& pre
 }
 
 
-bool VisualProprioception::bufferAgentData() const
+bool VisualProprioception::freezeMeasurements()
 {
     ImplData& rImpl = *pImpl_;
 
-    return rImpl.camera_->bufferData();
-}
-
-
-std::pair<bool, bfl::Data> VisualProprioception::getAgentMeasurements() const
-{
-    ImplData& rImpl = *pImpl_;
-
+    if(!rImpl.camera_->bufferData())
+        return false;
 
     cv::Mat camera_image;
     std::tie(camera_image, std::ignore, std::ignore) = bfl::any::any_cast<bfl::Camera::CameraData>(rImpl.camera_->getData());
 
-    MatrixXf descriptor_out(1, rImpl.feature_dim_);
-
+    /*
+     * cv::HOGDescriptor::compute requires a std::vector<float>.
+     */    
     std::vector<float> descriptors_cpu;
-
     rImpl.hog_cpu_->compute(camera_image, descriptors_cpu, cv::Size(rImpl.cam_params_.width, rImpl.cam_params_.height));
 
     /* FIXME
      * The following copy operation is super slow (approx 4 ms for 2M numbers).
      * Must find out a new, direct, way of doing this.
      */
-    descriptor_out = Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(descriptors_cpu.data(), 1, rImpl.feature_dim_);
+    rImpl.descriptor_out_ = Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(descriptors_cpu.data(), 1, rImpl.feature_dim_);
 
-    return std::make_pair(true, std::move(descriptor_out));
+    return true;
 }
 
 

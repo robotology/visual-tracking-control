@@ -22,15 +22,13 @@ public:
 
     virtual ~VisualProprioception() noexcept;
 
-    std::pair<bool, bfl::Data> measure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
+    std::pair<bool, bfl::Data> measure() const override;
 
-    std::pair<bool, bfl::Data> predictedMeasure(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) const override;
+    std::pair<bool, bfl::Data> predictedMeasure(const Eigen::Ref<const Eigen::MatrixXd>& cur_states) const override;
 
     std::pair<bool, bfl::Data> innovation(const bfl::Data& predicted_measurements, const bfl::Data& measurements) const override;
 
-    bool bufferAgentData() const override;
-
-    std::pair<bool, bfl::Data> getAgentMeasurements() const override;
+    bool freezeMeasurements() override;
 
     /* IMPROVEME
      * Find a way to better communicate with the callee. Maybe a struct.
