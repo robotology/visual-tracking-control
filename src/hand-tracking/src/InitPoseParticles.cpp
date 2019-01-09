@@ -13,7 +13,7 @@ bool InitPoseParticles::initialize(ParticleSet& particles)
     for (int i = 0; i < particles.state().cols(); ++i)
         particles.state(i) << pose;
 
-    particles.weight().fill(1.0 / particles.state().cols());
+    particles.weight().fill(-std::log(particles.state().cols()));
 
     return true;
 }
