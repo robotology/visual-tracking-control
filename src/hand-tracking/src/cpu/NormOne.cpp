@@ -30,14 +30,14 @@ NormOne::~NormOne() = default;
 
 std::pair<bool, VectorXd> NormOne::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXd>& pred_states)
 {
-    bool valid_agent_measurements;
-    Data data_agent_measurements;
-    std::tie(valid_agent_measurements, data_agent_measurements) = measurement_model.getAgentMeasurements();
+    bool valid_measurements;
+    Data data_measurements;
+    std::tie(valid_measurements, data_measurements) = measurement_model.measure();
 
-    if (!valid_agent_measurements)
+    if (!valid_measurements)
         return std::make_pair(false, VectorXd::Zero(1));
 
-    MatrixXf& measurements = any::any_cast<MatrixXf&>(data_agent_measurements);
+    MatrixXf& measurements = any::any_cast<MatrixXf&>(data_measurements);
 
 
     bool valid_predicted_measurements;
