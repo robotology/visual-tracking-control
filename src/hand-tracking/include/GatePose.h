@@ -23,11 +23,11 @@ protected:
 
     virtual Eigen::VectorXd readPose() = 0;
 
-    bool isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXf>& state);
+    bool isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXd>& state);
 
-    bool isWithinRotation(float rot_angle);
+    bool isWithinRotation(double rot_angle);
 
-    bool isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state);
+    bool isInsideCone(const Eigen::Ref<const Eigen::VectorXd>& state);
 
 private:
     double gate_x_;

@@ -42,7 +42,7 @@ void GatePose::correctStep(const ParticleSet& pred_particles, ParticleSet& corr_
 }
 
 
-bool GatePose::isInsideEllipsoid(const Ref<const VectorXf>& state)
+bool GatePose::isInsideEllipsoid(const Ref<const VectorXd>& state)
 {
     return ( (abs(state(0) - ee_pose_(0)) <= gate_x_) &&
              (abs(state(1) - ee_pose_(1)) <= gate_y_) &&
@@ -50,23 +50,21 @@ bool GatePose::isInsideEllipsoid(const Ref<const VectorXf>& state)
 }
 
 
-bool GatePose::isWithinRotation(float rot_angle)
+bool GatePose::isWithinRotation(double rot_angle)
 {
-    float ang_diff = abs(rot_angle - ee_pose_(6));
+    double ang_diff = abs(rot_angle - ee_pose_(6));
 
     return (ang_diff <= gate_rotation_);
 }
 
 
-bool GatePose::isInsideCone(const Ref<const VectorXf>& state)
+bool GatePose::isInsideCone(const Ref<const VectorXd>& state)
 {
     /* See: http://stackoverflow.com/questions/10768142/verify-if-point-is-inside-a-cone-in-3d-space#10772759 */
 
     double   half_aperture    =  gate_aperture_ / 2.0;
 
-    VectorXd test_direction   = -state.cast<double>();
-
     VectorXd fwdkin_direction = -ee_pose_.middleRows<3>(3);
 
-    return ( (test_direction.dot(fwdkin_direction) / test_direction.norm() / fwdkin_direction.norm()) >= cos(half_aperture) );
+    return ( (state.dot(fwdkin_direction) / state.norm() / fwdkin_direction.norm()) >= cos(half_aperture) );
 }
