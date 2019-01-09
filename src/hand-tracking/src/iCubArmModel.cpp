@@ -173,7 +173,7 @@ std::tuple<bool, std::string> iCubArmModel::getShaderPaths()
 }
 
 
-std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> iCubArmModel::getModelPose(const Eigen::Ref<const Eigen::MatrixXf>& cur_states)
+std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> iCubArmModel::getModelPose(const Eigen::Ref<const Eigen::MatrixXd>& cur_states)
 {
     bool success = false;
     std::vector<Superimpose::ModelPoseContainer> model_poses(cur_states.cols());

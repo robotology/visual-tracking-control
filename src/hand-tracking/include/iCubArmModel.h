@@ -25,7 +25,7 @@ public:
 
     std::tuple<bool, std::string> getShaderPaths();
 
-    std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> getModelPose(const Eigen::Ref<const Eigen::MatrixXf>& cur_states);
+    std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> getModelPose(const Eigen::Ref<const Eigen::MatrixXd>& cur_states);
 
 protected:
     bool file_found(const std::string& file);
