@@ -46,7 +46,7 @@ NormTwoKLD::~NormTwoKLD() noexcept
 }
 
 
-std::pair<bool, VectorXf> NormTwoKLD::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXf>& pred_states)
+std::pair<bool, VectorXd> NormTwoKLD::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXd>& pred_states)
 {
     ImplData& rImpl = *pImpl_;
 
@@ -56,7 +56,7 @@ std::pair<bool, VectorXf> NormTwoKLD::likelihood(const MeasurementModel& measure
     std::tie(valid_measurements, data_measurements) = measurement_model.getAgentMeasurements();
 
     if (!valid_measurements)
-        return std::make_pair(false, VectorXf::Zero(1));
+        return std::make_pair(false, VectorXd::Zero(1));
 
     cv::cuda::GpuMat measurements = any::any_cast<cv::cuda::GpuMat>(data_measurements);
 
@@ -68,15 +68,15 @@ std::pair<bool, VectorXf> NormTwoKLD::likelihood(const MeasurementModel& measure
     cv::cuda::GpuMat predicted_measurements = any::any_cast<cv::cuda::GpuMat&&>(std::move(data_predicted_measurements));
 
     if (!valid_predicted_measurements)
-        return std::make_pair(false, VectorXf::Zero(1));
+        return std::make_pair(false, VectorXd::Zero(1));
 
 
     thrust::host_vector<float> device_normtwo_kld = bfl::cuda::normtwo_kld(rImpl.handle_,
                                                                            measurements, predicted_measurements,
                                                                            rImpl.vector_size_, true);
 
-    Map<VectorXf> likelihood(device_normtwo_kld.data(), device_normtwo_kld.size());
-    likelihood = (-static_cast<float>(rImpl.likelihood_gain_) * likelihood).array().exp();
+    Map<VectorXf> likelihood_float(device_normtwo_kld.data(), device_normtwo_kld.size());
+    VectorXd likelihood = (-rImpl.likelihood_gain_ * likelihood.cast<double>()).array().exp();
 
 
     return std::make_pair(true, std::move(likelihood));
