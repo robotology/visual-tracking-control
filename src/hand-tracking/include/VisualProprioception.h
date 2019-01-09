@@ -42,6 +42,8 @@ public:
      */
     void superimpose(const Superimpose::ModelPoseContainer& obj2pos_map, cv::Mat& img);
 
+    std::pair<std::size_t, std::size_t> getOutputSize() const override;
+
 private:
     struct ImplData;
 
