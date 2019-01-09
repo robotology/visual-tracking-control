@@ -19,10 +19,10 @@ using namespace yarp::sig;
 
 iCubCamera::iCubCamera
 (
-    const yarp::os::ConstString& cam_sel,
+    const std::string& cam_sel,
     const double resolution_ratio,
-    const yarp::os::ConstString& context,
-    const yarp::os::ConstString& port_prefix
+    const std::string& context,
+    const std::string& port_prefix
  ) :
     port_prefix_(port_prefix),
     cam_sel_(cam_sel),

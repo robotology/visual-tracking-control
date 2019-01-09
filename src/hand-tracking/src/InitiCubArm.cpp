@@ -12,8 +12,8 @@ using namespace yarp::sig;
 using namespace yarp::os;
 
 
-InitiCubArm::InitiCubArm(const ConstString& cam_sel, const ConstString& laterality,
-                         const ConstString& port_prefix) noexcept :
+InitiCubArm::InitiCubArm(const std::string& cam_sel, const std::string& laterality,
+                         const std::string& port_prefix) noexcept :
     port_prefix_(port_prefix),
     icub_kin_arm_(iCubArm(laterality + "_v2"))
 {
@@ -27,7 +27,7 @@ InitiCubArm::InitiCubArm(const ConstString& cam_sel, const ConstString& laterali
 }
 
 
-InitiCubArm::InitiCubArm(const ConstString& cam_sel, const ConstString& laterality) noexcept :
+InitiCubArm::InitiCubArm(const std::string& cam_sel, const std::string& laterality) noexcept :
     InitiCubArm("InitiCubArm", cam_sel, laterality) { }
 
 

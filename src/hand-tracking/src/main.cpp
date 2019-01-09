@@ -2,10 +2,10 @@
 #include <future>
 #include <iostream>
 #include <memory>
+#include <string>
 
 #include <BayesFilters/ResamplingWithPrior.h>
 #include <BayesFilters/UpdateParticles.h>
-#include <yarp/os/ConstString.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
 #include <yarp/os/ResourceFinder.h>
@@ -45,7 +45,7 @@ using namespace yarp::os;
 /* MAIN */
 int main(int argc, char *argv[])
 {
-    ConstString log_ID = "[Main]";
+    const std::string log_ID = "[Main]";
     yInfo() << log_ID << "Configuring and starting module...";
 
     Network yarp;

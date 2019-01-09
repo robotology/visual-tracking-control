@@ -6,14 +6,15 @@
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
-#include <yarp/os/ConstString.h>
 #include <yarp/sig/Vector.h>
+
+#include <string>
 
 
 class PlayiCubFwdKinModel : public KinPoseModel
 {
 public:
-    PlayiCubFwdKinModel(const yarp::os::ConstString& robot, const yarp::os::ConstString& laterality, const yarp::os::ConstString& port_prefix) noexcept;
+    PlayiCubFwdKinModel(const std::string& robot, const std::string& laterality, const std::string& port_prefix) noexcept;
 
     ~PlayiCubFwdKinModel() noexcept;
 
@@ -33,13 +34,13 @@ protected:
     iCub::iKin::iCubArm icub_kin_arm_;
 
 private:
-    const yarp::os::ConstString log_ID_ = "[PlayiCubFwdKinModel]";
+    const std::string log_ID_ = "[PlayiCubFwdKinModel]";
 
-    yarp::os::ConstString port_prefix_ = "PlayiCubFwdKinModel";
+    const std::string port_prefix_ = "PlayiCubFwdKinModel";
 
-    yarp::os::ConstString robot_;
+    const std::string robot_;
 
-    yarp::os::ConstString laterality_;
+    const std::string laterality_;
 };
 
 #endif /* PLAYICUBFWDKINMODEL_H */

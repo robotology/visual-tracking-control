@@ -6,8 +6,9 @@
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/dev/IEncoders.h>
 #include <yarp/dev/PolyDriver.h>
-#include <yarp/os/ConstString.h>
 #include <yarp/sig/Vector.h>
+
+#include <string>
 
 
 class iCubGatePose : public GatePose
