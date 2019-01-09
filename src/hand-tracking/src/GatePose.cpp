@@ -37,7 +37,7 @@ void GatePose::correctStep(const ParticleSet& pred_particles, ParticleSet& corr_
         if (!isInsideEllipsoid(corr_particles.state(i).topRows<3>())     ||
             !isInsideCone     (corr_particles.state(i).middleRows<3>(3)) ||
             !isWithinRotation (corr_particles.state(i, 6))                 )
-            corr_particles.weight(i) = std::numeric_limits<double>::min();
+            corr_particles.weight(i) = std::log(std::numeric_limits<double>::min());
     }
 }
 
