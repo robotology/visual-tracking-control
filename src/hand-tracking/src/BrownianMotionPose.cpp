@@ -160,6 +160,12 @@ Eigen::MatrixXd BrownianMotionPose::getNoiseSample(const int num)
 }
 
 
+std::pair<std::size_t, std::size_t> BrownianMotionPose::getOutputSize() const
+{
+    return std::make_pair(7, 0);
+}
+
+
 void BrownianMotionPose::addAxisangleDisturbance(const Ref<const MatrixXd>& disturbance_vec, Ref<MatrixXd> current_vec)
 {
     for (unsigned int i = 0; i < current_vec.cols(); ++i)

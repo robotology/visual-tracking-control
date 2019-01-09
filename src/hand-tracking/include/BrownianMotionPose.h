@@ -36,6 +36,8 @@ public:
 
     bool setProperty(const std::string& property) override { return false; };
 
+    std::pair<std::size_t, std::size_t> getOutputSize() const override;
+
 protected:
     double                                 q_xy_;        /* Noise standard deviation for z   3D position */
     double                                 q_z_;         /* Noise standard deviation for x-y 3D position */
