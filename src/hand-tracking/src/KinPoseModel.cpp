@@ -68,6 +68,12 @@ bool KinPoseModel::setProperty(const std::string& property)
 }
 
 
+std::pair<std::size_t, std::size_t> KinPoseModel::getOutputSize() const
+{
+    return std::make_pair(7, 0);
+}
+
+
 bool KinPoseModel::setDeltaMotion()
 {
     VectorXd ee_pose = readPose();
