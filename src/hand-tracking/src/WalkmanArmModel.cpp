@@ -57,7 +57,7 @@ std::tuple<bool, std::string> WalkmanArmModel::getShaderPaths()
 }
 
 
-std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> WalkmanArmModel::getModelPose(const Eigen::Ref<const Eigen::MatrixXf>& cur_states)
+std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> WalkmanArmModel::getModelPose(const Eigen::Ref<const Eigen::MatrixXd>& cur_states)
 {
     std::vector<Superimpose::ModelPoseContainer> model_poses(cur_states.cols());
 
