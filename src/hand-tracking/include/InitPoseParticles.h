@@ -1,6 +1,7 @@
 #ifndef INITPOSEPARTICLES_H
 #define INITPOSEPARTICLES_H
 
+#include <BayesFilters/ParticleSet.h>
 #include <BayesFilters/ParticleSetInitialization.h>
 
 #include <iCub/iKin/iKinFwd.h>
@@ -14,7 +15,7 @@ class InitPoseParticles : public bfl::ParticleSetInitialization
 public:
     virtual ~InitPoseParticles() noexcept { };
 
-    bool initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref<Eigen::VectorXf> weight) override;
+    bool initialize(bfl::ParticleSet& particles) override;
 
 protected:
     virtual Eigen::VectorXd readPose() = 0;
