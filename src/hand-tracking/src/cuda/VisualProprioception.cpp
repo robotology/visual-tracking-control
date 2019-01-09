@@ -50,6 +50,8 @@ struct VisualProprioception::ImplData
     size_t pbo_size_ = 0;
 
     struct cudaGraphicsResource** pbo_cuda_;
+
+    cv::cuda::GpuMat cuda_descriptors_;
 };
 
 
@@ -125,10 +127,14 @@ VisualProprioception::~VisualProprioception() noexcept
 }
 
 
-/* FIXME
- * Sicuri che measure, predicted measure e innovation debbano essere const?!
- */
-std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixXf>& cur_states) const
+std::pair<bool, bfl::Data> VisualProprioception::measure() const
+{
+    //return std::make_pair(true, std::move(rImpl.cuda_descriptors_));
+    return std::make_pair(true, pImpl_->cuda_descriptors_);
+}
+
+
+std::pair<bool, bfl::Data> VisualProprioception::predictedMeasure(const Ref<const MatrixXd>& cur_states) const
 {
     ImplData& rImpl = *pImpl_;
 
@@ -181,12 +187,6 @@ std::pair<bool, bfl::Data> VisualProprioception::measure(const Ref<const MatrixX
 }
 
 
-std::pair<bool, bfl::Data> VisualProprioception::predictedMeasure(const Ref<const MatrixXf>& cur_states) const
-{
-    return measure(cur_states);
-}
-
-
 std::pair<bool, bfl::Data> VisualProprioception::innovation(const bfl::Data& predicted_measurements, const bfl::Data& measurements) const
 {
     MatrixXf innovation = -(bfl::any::any_cast<MatrixXf>(predicted_measurements).rowwise() - bfl::any::any_cast<MatrixXf>(measurements).row(0));
@@ -195,34 +195,26 @@ std::pair<bool, bfl::Data> VisualProprioception::innovation(const bfl::Data& pre
 }
 
 
-bool VisualProprioception::bufferAgentData() const
+bool VisualProprioception::freezeMeasurements()
 {
     ImplData& rImpl = *pImpl_;
 
-    return rImpl.camera_->bufferData();
-}
-
-
-std::pair<bool, bfl::Data> VisualProprioception::getAgentMeasurements() const
-{
-    ImplData& rImpl = *pImpl_;
+    if(!rImpl.camera_->bufferData())
+        return false;
 
     cv::Mat camera_image;
     std::tie(camera_image, std::ignore, std::ignore) = bfl::any::any_cast<bfl::Camera::CameraData>(rImpl.camera_->getData());
 
     cv::cuda::GpuMat cuda_img;
     cv::cuda::GpuMat cuda_img_alpha;
-    cv::cuda::GpuMat cuda_descriptors;
 
     cuda_img.upload(camera_image);
 
     cv::cuda::cvtColor(cuda_img, cuda_img_alpha, cv::COLOR_BGR2BGRA, 4);
 
-    rImpl.hog_cuda_->compute(cuda_img_alpha, cuda_descriptors);
+    rImpl.hog_cuda_->compute(cuda_img_alpha, rImpl.cuda_descriptors_);
 
-
-    //return std::make_pair(true, std::move(cuda_descriptors));
-    return std::make_pair(true, cuda_descriptors);
+    return true;
 }
 
 
