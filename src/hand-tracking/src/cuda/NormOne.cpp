@@ -49,7 +49,7 @@ std::pair<bool, VectorXd> NormOne::likelihood(const MeasurementModel& measuremen
 
     bool valid_measurements;
     Data data_measurements;
-    std::tie(valid_measurements, data_measurements) = measurement_model.getAgentMeasurements();
+    std::tie(valid_measurements, data_measurements) = measurement_model.measure();
 
     if (!valid_measurements)
         return std::make_pair(false, VectorXd::Zero(1));
