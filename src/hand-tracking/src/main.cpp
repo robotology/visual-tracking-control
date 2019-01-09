@@ -345,14 +345,14 @@ int main(int argc, char *argv[])
     }
 
     /* PARTICLE FILTER */
-    VisualSIS vsis_pf(paramss["cam_sel"],
+    VisualSIS vsis_pf(std::move(init_arm),
+                      std::move(pf_prediction),
+                      std::move(vpf_correction),
+                      std::move(pf_resampling),
+                      paramss["cam_sel"],
                       paramsd["num_particles"],
                       paramsd["resample_ratio"],
                       "handTracking/VisualSIS/" + paramss["cam_sel"]);
-    vsis_pf.setInitialization(std::move(init_arm));
-    vsis_pf.setPrediction(std::move(pf_prediction));
-    vsis_pf.setCorrection(std::move(vpf_correction));
-    vsis_pf.setResampling(std::move(pf_resampling));
 
 
     vsis_pf.boot();
