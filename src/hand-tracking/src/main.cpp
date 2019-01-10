@@ -179,11 +179,9 @@ int main(int argc, char *argv[])
     /* INITIALIZATION */
     std::unique_ptr<ParticleSetInitialization> init_arm;
     if (paramss["robot"] == "icub")
-        init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["cam_sel"], paramss["laterality"],
-                                                "handTracking/InitiCubArm/" + paramss["cam_sel"]));
+        init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["laterality"], "handTracking/InitiCubArm/" + paramss["cam_sel"]));
     else if (paramss["robot"] == "walkman")
-        init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["cam_sel"], paramss["laterality"],
-                                                   "handTracking/InitWalkmanArm/" + paramss["cam_sel"]));
+        init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/InitWalkmanArm/" + paramss["cam_sel"]));
 
 
     /* MOTION MODEL */
@@ -336,11 +334,9 @@ int main(int argc, char *argv[])
         std::unique_ptr<ParticleSetInitialization> resample_init_arm;
 
         if (paramss["robot"] == "icub")
-            resample_init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["cam_sel"], paramss["laterality"],
-                                                                             "handTracking/ResamplingWithPrior/InitiCubArm/" + paramss["cam_sel"]));
+            resample_init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitiCubArm/" + paramss["cam_sel"]));
         else if (paramss["robot"] == "walkman")
-            resample_init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["cam_sel"], paramss["laterality"],
-                                                                                   "handTracking/ResamplingWithPrior/InitWalkmanArm/" + paramss["cam_sel"]));
+            resample_init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitWalkmanArm/" + paramss["cam_sel"]));
 
         pf_resampling = std::unique_ptr<Resampling>(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
     }
