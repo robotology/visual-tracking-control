@@ -1,4 +1,5 @@
 #include <VisualSIS.h>
+#include <utils.h>
 
 #include <exception>
 #include <utility>
@@ -24,6 +25,7 @@ using namespace yarp::os;
 using yarp::sig::Vector;
 //using yarp::sig::ImageOf;
 //using yarp::sig::PixelRgb;
+using namespace hand_tracking::utils;
 
 
 VisualSIS::VisualSIS(std::unique_ptr<bfl::ParticleSetInitialization> initialization,
@@ -156,11 +158,19 @@ void VisualSIS::filteringStep()
 
 
     /* PALM */
+
+    /*
+     * Convert from Euler ZYX to axis angle.
+     */
     if (valid_estimate)
     {
+        VectorXd out_particle_axis_angle(7);
+        out_particle_axis_angle.head<3>() = out_particle.head<3>();
+        out_particle_axis_angle.segment<4>(3) = euler_to_axis_angle(out_particle.tail<3>(), AxisOfRotation::UnitZ, AxisOfRotation::UnitY, AxisOfRotation::UnitX);
+
         Vector& estimates_out = port_estimates_out_.prepare();
-        estimates_out.resize(state_size_);
-        toEigen(estimates_out) = out_particle;
+        estimates_out.resize(7);
+        toEigen(estimates_out) = out_particle_axis_angle;
         port_estimates_out_.write();
     }
 
