@@ -14,10 +14,9 @@
 class InitiCubArm : public InitPoseParticles
 {
 public:
-    InitiCubArm(const std::string& cam_sel, const std::string& laterality,
-                const std::string& port_prefix) noexcept;
+    InitiCubArm(const std::string& laterality, const std::string& port_prefix) noexcept;
 
-    InitiCubArm(const std::string& cam_sel, const std::string& laterality) noexcept;
+    InitiCubArm(const std::string& laterality) noexcept;
 
     ~InitiCubArm() noexcept;
 
