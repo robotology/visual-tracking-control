@@ -94,7 +94,8 @@ int main(int argc, char *argv[])
 
     /* Get Brownian Motion parameters */
     yarp::os::Bottle bottle_brownianmotion_params = rf.findGroup("BROWNIANMOTION");
-    paramsd["q_xy"]       = bottle_brownianmotion_params.check("q_xy",       Value(0.005)).asDouble();
+    paramsd["q_x"]        = bottle_brownianmotion_params.check("q_x",        Value(0.005)).asDouble();
+    paramsd["q_y"]        = bottle_brownianmotion_params.check("q_y",        Value(0.005)).asDouble();
     paramsd["q_z"]        = bottle_brownianmotion_params.check("q_z",        Value(0.005)).asDouble();
     paramsd["theta"]      = bottle_brownianmotion_params.check("theta",      Value(3.0)).asDouble();
     paramsd["cone_angle"] = bottle_brownianmotion_params.check("cone_angle", Value(2.5)).asDouble();
@@ -141,7 +142,8 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - play:"           << (paramsd["play"] == 1.0 ? "true" : "false");
 
     yInfo() << log_ID << "Motion modle parameters:";
-    yInfo() << log_ID << " - q_xy:"       << paramsd["q_xy"];
+    yInfo() << log_ID << " - q_x:"        << paramsd["q_x"];
+    yInfo() << log_ID << " - q_y:"        << paramsd["q_y"];
     yInfo() << log_ID << " - q_z:"        << paramsd["q_z"];
     yInfo() << log_ID << " - theta:"      << paramsd["theta"];
     yInfo() << log_ID << " - cone_angle:" << paramsd["cone_angle"];
@@ -186,7 +188,7 @@ int main(int argc, char *argv[])
 
 
     /* MOTION MODEL */
-    std::unique_ptr<StateModel> brown(new BrownianMotionPose(paramsd["q_xy"], paramsd["q_z"], paramsd["theta"], paramsd["cone_angle"], paramsd["seed"]));
+    std::unique_ptr<StateModel> brown(new BrownianMotionPose(paramsd["q_x"], paramsd["q_y"], paramsd["q_z"], paramsd["theta"], paramsd["cone_angle"], paramsd["seed"]));
 
     std::unique_ptr<ExogenousModel> robot_motion;
     if (paramss["robot"] == "icub")
