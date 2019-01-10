@@ -1,7 +1,7 @@
 #ifndef PLAYICUBFWDKINMODEL_H
 #define PLAYICUBFWDKINMODEL_H
 
-#include <KinPoseModel.h>
+#include <KinPoseModelAxisAngle.h>
 
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/Bottle.h>
@@ -11,7 +11,7 @@
 #include <string>
 
 
-class PlayiCubFwdKinModel : public KinPoseModel
+class PlayiCubFwdKinModel : public KinPoseModelAxisAngle
 {
 public:
     PlayiCubFwdKinModel(const std::string& robot, const std::string& laterality, const std::string& port_prefix) noexcept;
@@ -21,7 +21,7 @@ public:
     bool setProperty(const std::string& property) override;
 
 protected:
-    Eigen::VectorXd readPose() override;
+    Eigen::VectorXd readPoseAxisAngle() override;
 
     yarp::sig::Vector readTorso();
 

@@ -54,10 +54,9 @@ bool PlayiCubFwdKinModel::setProperty(const std::string& property)
 }
 
 
-VectorXd PlayiCubFwdKinModel::readPose()
+VectorXd PlayiCubFwdKinModel::readPoseAxisAngle()
 {
-    Vector ee_pose = icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE());
-    return toEigen(ee_pose);
+    return toEigen(icub_kin_arm_.EndEffPose(CTRL_DEG2RAD * readRootToEE()));
 }
 
 
