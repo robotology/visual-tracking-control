@@ -15,9 +15,9 @@ using namespace yarp::sig;
 
 iCubArmModel::iCubArmModel(const bool use_thumb,
                            const bool use_forearm,
-                           const ConstString& laterality,
-                           const ConstString& context,
-                           const yarp::os::ConstString& port_prefix) :
+                           const std::string& laterality,
+                           const std::string& context,
+                           const std::string& port_prefix) :
     port_prefix_(port_prefix),
     use_thumb_(use_thumb),
     use_forearm_(use_forearm),
@@ -280,7 +280,7 @@ std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> iCubArmModel::get
 }
 
 
-bool iCubArmModel::file_found(const ConstString& file)
+bool iCubArmModel::file_found(const std::string& file)
 {
     if (!file.empty())
     {

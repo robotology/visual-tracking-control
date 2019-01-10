@@ -20,7 +20,7 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-PlayWalkmanPoseModel::PlayWalkmanPoseModel(const ConstString& robot, const ConstString& laterality, const ConstString& port_prefix) noexcept :
+PlayWalkmanPoseModel::PlayWalkmanPoseModel(const std::string& robot, const std::string& laterality, const std::string& port_prefix) noexcept :
     port_prefix_(port_prefix),
     robot_(robot),
     laterality_(laterality)

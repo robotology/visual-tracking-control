@@ -6,17 +6,18 @@
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
-#include <yarp/os/ConstString.h>
 #include <yarp/sig/Vector.h>
+
+#include <string>
 
 
 class InitiCubArm : public InitPoseParticles
 {
 public:
-    InitiCubArm(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality,
-                const yarp::os::ConstString& port_prefix) noexcept;
+    InitiCubArm(const std::string& cam_sel, const std::string& laterality,
+                const std::string& port_prefix) noexcept;
 
-    InitiCubArm(const yarp::os::ConstString& cam_sel, const yarp::os::ConstString& laterality) noexcept;
+    InitiCubArm(const std::string& cam_sel, const std::string& laterality) noexcept;
 
     ~InitiCubArm() noexcept;
 
@@ -24,9 +25,9 @@ protected:
     Eigen::VectorXd readPose() override;
 
 private:
-    const yarp::os::ConstString  log_ID_ = "[InitiCubArm]";
+    const std::string  log_ID_ = "[InitiCubArm]";
 
-    yarp::os::ConstString port_prefix_;
+    const std::string port_prefix_;
 
     iCub::iKin::iCubArm                      icub_kin_arm_;
 

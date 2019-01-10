@@ -1,8 +1,6 @@
 #ifndef GATEPOSE_H
 #define GATEPOSE_H
 
-#include <string>
-
 #include <BayesFilters/PFCorrectionDecorator.h>
 #include <BayesFilters/StateModel.h>
 

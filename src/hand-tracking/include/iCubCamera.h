@@ -17,10 +17,10 @@
 class iCubCamera : public bfl::Camera
 {
 public:
-    iCubCamera(const yarp::os::ConstString& cam_sel,
+    iCubCamera(const std::string& cam_sel,
                const double resolution_ratio,
-               const yarp::os::ConstString& context,
-               const yarp::os::ConstString& port_prefix);
+               const std::string& context,
+               const std::string& port_prefix);
 
     virtual ~iCubCamera() noexcept;
 
@@ -44,15 +44,15 @@ protected:
     std::tuple<bool, yarp::sig::Vector> readRootToEye();
 
 private:
-    const yarp::os::ConstString log_ID_ = "[iCubCamera]";
+    const std::string log_ID_ = "[iCubCamera]";
 
-    yarp::os::ConstString port_prefix_ = "iCubCamera";
+    const std::string port_prefix_ = "iCubCamera";
 
-    yarp::os::ConstString cam_sel_;
+    const std::string cam_sel_;
 
     const double resolution_ratio_;
 
-    yarp::os::ConstString context_;
+    const std::string context_;
 
     yarp::dev::PolyDriver drv_gaze_;
 

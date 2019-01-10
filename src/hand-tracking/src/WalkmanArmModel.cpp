@@ -14,9 +14,9 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-WalkmanArmModel::WalkmanArmModel(const ConstString& laterality,
-                                 const ConstString& context,
-                                 const yarp::os::ConstString& port_prefix) :
+WalkmanArmModel::WalkmanArmModel(const std::string& laterality,
+                                 const std::string& context,
+                                 const std::string& port_prefix) :
     port_prefix_(port_prefix),
     laterality_(laterality),
     context_(context)
@@ -90,7 +90,7 @@ std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> WalkmanArmModel::
 }
 
 
-bool WalkmanArmModel::file_found(const ConstString& file)
+bool WalkmanArmModel::file_found(const std::string& file)
 {
     if (!file.empty())
     {

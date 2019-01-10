@@ -15,9 +15,9 @@ class iCubArmModel : public bfl::MeshModel
 public:
     iCubArmModel(const bool use_thumb,
                  const bool use_forearm,
-                 const yarp::os::ConstString& laterality,
-                 const yarp::os::ConstString& context,
-                 const yarp::os::ConstString& port_prefix);
+                 const std::string& laterality,
+                 const std::string& context,
+                 const std::string& port_prefix);
 
     virtual ~iCubArmModel() noexcept;
 
@@ -28,7 +28,7 @@ public:
     std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> getModelPose(const Eigen::Ref<const Eigen::MatrixXf>& cur_states);
 
 protected:
-    bool file_found(const yarp::os::ConstString& file);
+    bool file_found(const std::string& file);
 
     yarp::sig::Matrix getInvertedH(const double a, const double d, const double alpha, const double offset, const double q);
 
@@ -37,17 +37,17 @@ protected:
     bool setArmJoints(const yarp::sig::Vector& q);
 
 private:
-    const yarp::os::ConstString log_ID_ = "[iCubArmModel]";
+    const std::string log_ID_ = "[iCubArmModel]";
 
-    yarp::os::ConstString port_prefix_ = "iCubArmModel";
+    const std::string port_prefix_ = "iCubArmModel";
 
     const bool use_thumb_;
 
     const bool use_forearm_;
 
-    yarp::os::ConstString laterality_;
+    const std::string laterality_;
 
-    yarp::os::ConstString context_;
+    const std::string context_;
 
     SICAD::ModelPathContainer model_path_;
 
