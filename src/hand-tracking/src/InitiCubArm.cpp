@@ -40,7 +40,7 @@ InitiCubArm::~InitiCubArm() noexcept
 }
 
 
-VectorXd InitiCubArm::readPose()
+VectorXd InitiCubArm::readPoseAxisAngle()
 {
     return toEigen(icub_kin_arm_.EndEffPose(readRootToEE() * CTRL_DEG2RAD));
 }

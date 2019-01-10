@@ -1,7 +1,7 @@
 #ifndef INITICUBARM_H
 #define INITICUBARM_H
 
-#include <InitPoseParticles.h>
+#include <InitPoseParticlesAxisAngle.h>
 
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/os/Bottle.h>
@@ -11,7 +11,7 @@
 #include <string>
 
 
-class InitiCubArm : public InitPoseParticles
+class InitiCubArm : public InitPoseParticlesAxisAngle
 {
 public:
     InitiCubArm(const std::string& laterality, const std::string& port_prefix) noexcept;
@@ -21,7 +21,7 @@ public:
     ~InitiCubArm() noexcept;
 
 protected:
-    Eigen::VectorXd readPose() override;
+    Eigen::VectorXd readPoseAxisAngle() override;
 
 private:
     const std::string  log_ID_ = "[InitiCubArm]";
