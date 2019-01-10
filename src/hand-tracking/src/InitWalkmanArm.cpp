@@ -12,16 +12,15 @@ using namespace yarp::sig;
 using namespace yarp::os;
 
 
-InitWalkmanArm::InitWalkmanArm(const std::string& cam_sel, const std::string& laterality,
-                               const std::string& port_prefix) noexcept :
+InitWalkmanArm::InitWalkmanArm(const std::string& laterality, const std::string& port_prefix) noexcept :
     port_prefix_(port_prefix)
 {
     port_arm_pose_.open("/" + port_prefix_ + "/" + laterality + "_arm:i");
 }
 
 
-InitWalkmanArm::InitWalkmanArm(const std::string& cam_sel, const std::string& laterality) noexcept :
-    InitWalkmanArm("InitWalkmanArm", cam_sel, laterality) { }
+InitWalkmanArm::InitWalkmanArm(const std::string& laterality) noexcept :
+    InitWalkmanArm("InitWalkmanArm", laterality) { }
 
 
 InitWalkmanArm::~InitWalkmanArm() noexcept

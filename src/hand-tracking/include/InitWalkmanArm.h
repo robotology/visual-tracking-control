@@ -13,10 +13,9 @@
 class InitWalkmanArm : public InitPoseParticles
 {
 public:
-    InitWalkmanArm(const std::string& cam_sel, const std::string& laterality,
-                   const std::string& port_prefix) noexcept;
+    InitWalkmanArm(const std::string& laterality, const std::string& port_prefix) noexcept;
 
-    InitWalkmanArm(const std::string& cam_sel, const std::string& laterality) noexcept;
+    InitWalkmanArm(const std::string& laterality) noexcept;
 
     ~InitWalkmanArm() noexcept;
 
