@@ -1,4 +1,5 @@
 #include <iCubArmModel.h>
+#include <utils.h>
 
 #include <iCub/ctrl/math.h>
 #include <yarp/math/Math.h>
@@ -6,11 +7,14 @@
 #include <yarp/os/LogStream.h>
 #include <yarp/sig/Vector.h>
 
+#include <Eigen/Dense>
+
 using namespace iCub::ctrl;
 using namespace iCub::iKin;
 using namespace yarp::math;
 using namespace yarp::os;
 using namespace yarp::sig;
+using namespace hand_tracking::utils;
 
 
 iCubArmModel::iCubArmModel(const bool use_thumb,
@@ -208,10 +212,11 @@ std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> iCubArmModel::get
             ee_t(2) = cur_states(2, i);
             ee_t(3) = 1.0;
 
-            ee_o(0) = cur_states(3, i);
-            ee_o(1) = cur_states(4, i);
-            ee_o(2) = cur_states(5, i);
-            ee_o(3) = cur_states(6, i);
+            /* 
+             * SuperimposeMeshLib requires axis-angle representation,
+             * hence the Euler ZYX representation stored in cur_states is converted to axis-angle.
+             */
+            ee_o = Vector(4, euler_to_axis_angle(cur_states.col(i).tail<3>(), AxisOfRotation::UnitZ, AxisOfRotation::UnitY, AxisOfRotation::UnitX).data());
 
             pose.assign(ee_t.data(), ee_t.data() + 3);
             pose.insert(pose.end(), ee_o.data(), ee_o.data() + 4);
