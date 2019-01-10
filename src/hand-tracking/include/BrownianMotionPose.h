@@ -44,9 +44,9 @@ protected:
     double                                 theta_;       /* Noise standard deviation for axis-angle rotation */
     double                                 cone_angle_;  /* Noise standard deviation for axis-angle axis cone */
 
-    Eigen::Vector4f                       cone_dir_;    /* Cone direction of rotation. Fixed, left here for future implementation. */
+    Eigen::Vector4f                        cone_dir_;    /* Cone direction of rotation. Fixed, left here for future implementation. */
 
-    std::mt19937_64                       generator_;
+    std::mt19937_64                        generator_;
     std::normal_distribution<double>       distribution_pos_xy_;
     std::normal_distribution<double>       distribution_pos_z_;
     std::normal_distribution<double>       distribution_theta_;
