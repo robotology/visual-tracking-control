@@ -1,7 +1,7 @@
 #ifndef ICUBFWDKINMODEL_H
 #define ICUBFWDKINMODEL_H
 
-#include <KinPoseModel.h>
+#include <KinPoseModelAxisAngle.h>
 
 #include <iCub/iKin/iKinFwd.h>
 #include <yarp/dev/PolyDriver.h>
@@ -11,7 +11,7 @@
 #include <string>
 
 
-class iCubFwdKinModel : public KinPoseModel
+class iCubFwdKinModel : public KinPoseModelAxisAngle
 {
 public:
     iCubFwdKinModel(const std::string& robot, const std::string& laterality, const std::string& port_prefix);
@@ -21,7 +21,7 @@ public:
     bool setProperty(const std::string& property) override;
 
 protected:
-    Eigen::VectorXd   readPose() override;
+    Eigen::VectorXd   readPoseAxisAngle() override;
 
     yarp::sig::Vector readTorso();
 
