@@ -30,7 +30,7 @@ InitWalkmanArm::~InitWalkmanArm() noexcept
 }
 
 
-VectorXd InitWalkmanArm::readPose()
+VectorXd InitWalkmanArm::readPoseAxisAngle()
 {
     return toEigen(readRootToEE());
 }
