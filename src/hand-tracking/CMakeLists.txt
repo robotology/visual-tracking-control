@@ -153,6 +153,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/VisualSIS.h
 		include/WalkmanArmModel.h
 		include/WalkmanCamera.h
+        include/utils.h
 )
 
 set(${EXE_TARGET_NAME}_SRC
@@ -174,6 +175,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/VisualSIS.cpp
 		src/WalkmanArmModel.cpp
 		src/WalkmanCamera.cpp
+        src/utils.cpp
 )
 
 set(${EXE_TARGET_NAME}_CPU_SRC
