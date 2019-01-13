@@ -40,3 +40,23 @@ VectorXd hand_tracking::utils::axis_angle_to_euler
                                                      axis_of_rotation_to_index(axis_2),
                                                      axis_of_rotation_to_index(axis_3));
 }
+
+
+VectorXd hand_tracking::utils::euler_to_axis_angle
+(
+    const Ref<const VectorXd>& euler_angles,
+    const AxisOfRotation axis_1,
+    const AxisOfRotation axis_2,
+    const AxisOfRotation axis_3
+)
+{
+    AngleAxisd angle_axis(AngleAxisd(euler_angles(0), axis_of_rotation_to_vector(axis_1)) *
+                          AngleAxisd(euler_angles(1), axis_of_rotation_to_vector(axis_2)) *
+                          AngleAxisd(euler_angles(2), axis_of_rotation_to_vector(axis_3)));
+
+    VectorXd axis_angle(4);
+    axis_angle.head<3>() = angle_axis.axis();
+    axis_angle(3) = angle_axis.angle();
+
+    return axis_angle;
+}
