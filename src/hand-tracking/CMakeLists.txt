@@ -131,6 +131,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/ChiSquare.h
         include/DrawParticlesImportanceThreshold.h
         include/KinPoseModel.h
+        include/KinPoseModelAxisAngle.h
         include/GatePose.h
         include/iCubFwdKinModel.h
         include/iCubArmModel.h
@@ -162,6 +163,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/BrownianMotionPose.cpp
         src/DrawParticlesImportanceThreshold.cpp
         src/KinPoseModel.cpp
+        src/KinPoseModelAxisAngle.cpp
         src/GatePose.cpp
         src/iCubArmModel.cpp
         src/iCubCamera.cpp
