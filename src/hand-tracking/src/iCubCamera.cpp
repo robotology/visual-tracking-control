@@ -4,6 +4,7 @@
 
 #include <iCub/ctrl/math.h>
 #include <opencv2/core/core_c.h>
+#include <yarp/cv/Cv.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Property.h>
@@ -144,7 +145,7 @@ bool iCubCamera::bufferData()
     if (tmp_imgin != YARP_NULLPTR)
     {
         init_img_in_ = true;
-        image_ = cv::cvarrToMat(tmp_imgin->getIplImage()).clone();
+        image_ = yarp::cv::toCvMat(*tmp_imgin).clone();
     }
 
     if (init_img_in_)
