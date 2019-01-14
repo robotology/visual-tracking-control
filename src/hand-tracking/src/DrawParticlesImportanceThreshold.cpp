@@ -51,32 +51,32 @@ void DrawParticlesImportanceThreshold::setExogenousModel(std::unique_ptr<Exogeno
 }
 
 
-void DrawParticlesImportanceThreshold::predictStep(const Ref<const MatrixXf>& prev_states, const Ref<const VectorXf>& prev_weights,
-                                                   Ref<MatrixXf> pred_states, Ref<VectorXf> pred_weights)
+void DrawParticlesImportanceThreshold::predictStep(const ParticleSet& prev_particles, ParticleSet& pred_particles)
 {
-    VectorXf sorted_cor = prev_weights;
+    VectorXd sorted_cor = prev_particles.weight().array().exp();
+
     std::sort(sorted_cor.data(), sorted_cor.data() + sorted_cor.size());
-    float threshold = sorted_cor.tail(6)(0);
+    double threshold = sorted_cor.tail(6)(0);
 
     /* FIXME
        There should be no set property method here.
        There is a coupling with the prediction and pose-related exogenous models. */
     exogenous_model_->setProperty("kin_pose_delta");
 
-    for (int j = 0; j < prev_weights.rows(); ++j)
+    for (int j = 0; j < prev_particles.weight().size(); ++j)
     {
-        VectorXf tmp_states = VectorXf::Zero(prev_states.rows());
+        VectorXd tmp_state = VectorXd::Zero(prev_particles.state().rows());
 
         if (!getSkipExogenous())
-            exogenous_model_->propagate(prev_states.col(j), tmp_states);
+            exogenous_model_->propagate(prev_particles.state(j), tmp_state);
         else
-            tmp_states = prev_states.col(j);
+            tmp_state = prev_particles.state(j);
 
-        if (!getSkipState() && prev_weights(j) <= threshold)
-            state_model_->motion(tmp_states, pred_states.col(j));
+        if (!getSkipState() && std::exp(prev_particles.weight(j)) <= threshold)
+            state_model_->motion(tmp_state, pred_particles.state(j));
         else
-            pred_states.col(j) = tmp_states;
+            pred_particles.state(j) = tmp_state;
     }
 
-    pred_weights = prev_weights;
+    pred_particles.weight() = prev_particles.weight();
 }

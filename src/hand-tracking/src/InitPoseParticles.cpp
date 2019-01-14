@@ -2,17 +2,18 @@
 
 #include <iCub/ctrl/math.h>
 
+using namespace bfl;
 using namespace Eigen;
 
 
-bool InitPoseParticles::initialize(Eigen::Ref<Eigen::MatrixXf> state, Eigen::Ref<Eigen::VectorXf> weight)
+bool InitPoseParticles::initialize(ParticleSet& particles)
 {
     VectorXd pose = readPose();
 
-    for (int i = 0; i < state.cols(); ++i)
-        state.col(i) << pose.cast<float>();
+    for (int i = 0; i < particles.state().cols(); ++i)
+        particles.state(i) << pose;
 
-    weight.fill(1.0 / state.cols());
+    particles.weight().fill(-std::log(particles.state().cols()));
 
     return true;
 }

@@ -24,10 +24,10 @@ if(NOT EIGEN3_FOUND)
     find_package(Eigen3 REQUIRED)
 endif()
 
-find_package(BayesFilters 0.7.1.0 QUIET)
+find_package(BayesFilters 0.9.0 QUIET)
 if(NOT BayesFilters_FOUND)
     message(STATUS "Did not found required master release of BayesFilters. Looking for devel version.")
-    find_package(BayesFilters 0.7.101 REQUIRED)
+    find_package(BayesFilters 0.9.100 REQUIRED)
 endif()
 
 find_package(SuperimposeMesh 0.9.4.0 QUIET)
@@ -127,10 +127,11 @@ endif()
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
-		include/Camera.h
+        include/Camera.h
         include/ChiSquare.h
         include/DrawParticlesImportanceThreshold.h
         include/KinPoseModel.h
+        include/KinPoseModelAxisAngle.h
         include/GatePose.h
         include/iCubFwdKinModel.h
         include/iCubArmModel.h
@@ -138,6 +139,7 @@ set(${EXE_TARGET_NAME}_HDR
         include/iCubGatePose.h
         include/InitiCubArm.h
         include/InitPoseParticles.h
+        include/InitPoseParticlesAxisAngle.h
         include/InitWalkmanArm.h
         include/KLD.h
         include/MeshModel.h
@@ -151,8 +153,9 @@ set(${EXE_TARGET_NAME}_HDR
         include/PlayWalkmanPoseModel.h
         include/VisualProprioception.h
         include/VisualSIS.h
-		include/WalkmanArmModel.h
-		include/WalkmanCamera.h
+        include/WalkmanArmModel.h
+        include/WalkmanCamera.h
+        include/utils.h
 )
 
 set(${EXE_TARGET_NAME}_SRC
@@ -160,6 +163,7 @@ set(${EXE_TARGET_NAME}_SRC
         src/BrownianMotionPose.cpp
         src/DrawParticlesImportanceThreshold.cpp
         src/KinPoseModel.cpp
+        src/KinPoseModelAxisAngle.cpp
         src/GatePose.cpp
         src/iCubArmModel.cpp
         src/iCubCamera.cpp
@@ -167,13 +171,15 @@ set(${EXE_TARGET_NAME}_SRC
         src/iCubGatePose.cpp
         src/InitiCubArm.cpp
         src/InitPoseParticles.cpp
+        src/InitPoseParticlesAxisAngle.cpp
         src/InitWalkmanArm.cpp
         src/PlayiCubFwdKinModel.cpp
         src/PlayGatePose.cpp
         src/PlayWalkmanPoseModel.cpp
         src/VisualSIS.cpp
-		src/WalkmanArmModel.cpp
-		src/WalkmanCamera.cpp
+        src/WalkmanArmModel.cpp
+        src/WalkmanCamera.cpp
+        src/utils.cpp
 )
 
 set(${EXE_TARGET_NAME}_CPU_SRC

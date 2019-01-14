@@ -20,7 +20,7 @@ public:
 
     virtual std::tuple<bool, std::string> getShaderPaths() = 0;
 
-    virtual std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> getModelPose(const Eigen::Ref<const Eigen::MatrixXf>& cur_states) = 0;
+    virtual std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> getModelPose(const Eigen::Ref<const Eigen::MatrixXd>& cur_states) = 0;
 };
 
 #endif /* MESHMODEL_H */

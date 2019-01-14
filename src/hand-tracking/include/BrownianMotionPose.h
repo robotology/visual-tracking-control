@@ -10,9 +10,9 @@
 class BrownianMotionPose : public bfl::StateModel
 {
 public:
-    BrownianMotionPose(const float q_xy, const float q_z, const float theta, const float cone_angle, const unsigned int seed) noexcept;
+    BrownianMotionPose(const double q_x, const double q_y, const double q_z, const double q_yaw, const double q_pitch, const double q_roll, const unsigned int seed) noexcept;
 
-    BrownianMotionPose(const float q_xy, const float q_z, const float theta, const float cone_angle) noexcept;
+    BrownianMotionPose(const double q_x, const double q_y, const double q_z, const double q_yaw, const double q_pitch, const double q_roll) noexcept;
 
     BrownianMotionPose() noexcept;
 
@@ -26,35 +26,39 @@ public:
 
     BrownianMotionPose& operator=(BrownianMotionPose&& bm) noexcept;
 
-    void propagate(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> prop_state) override;
+    void propagate(const Eigen::Ref<const Eigen::MatrixXd>& cur_state, Eigen::Ref<Eigen::MatrixXd> prop_state) override;
 
-    void motion(const Eigen::Ref<const Eigen::MatrixXf>& cur_state, Eigen::Ref<Eigen::MatrixXf> mot_state) override;
+    void motion(const Eigen::Ref<const Eigen::MatrixXd>& cur_state, Eigen::Ref<Eigen::MatrixXd> mot_state) override;
 
-    Eigen::MatrixXf getNoiseSample(const int num) override;
+    Eigen::MatrixXd getNoiseSample(const std::size_t num);
 
-    Eigen::MatrixXf getNoiseCovarianceMatrix() override { return Eigen::MatrixXf::Zero(1, 1); };
+    Eigen::MatrixXd getNoiseCovarianceMatrix() override { return Eigen::MatrixXd::Zero(1, 1); };
 
     bool setProperty(const std::string& property) override { return false; };
 
+    std::pair<std::size_t, std::size_t> getOutputSize() const override;
+
 protected:
-    float                                 q_xy_;        /* Noise standard deviation for z   3D position */
-    float                                 q_z_;         /* Noise standard deviation for x-y 3D position */
-    float                                 theta_;       /* Noise standard deviation for axis-angle rotation */
-    float                                 cone_angle_;  /* Noise standard deviation for axis-angle axis cone */
+    double                                 q_x_;         /* Noise standard deviation for x 3D position */
+    double                                 q_y_;         /* Noise standard deviation for y 3D position */
+    double                                 q_z_;         /* Noise standard deviation for z 3D position */
+    double                                 q_yaw_;       /* Noise standard deviation for yaw   Euler angle */
+    double                                 q_pitch_;     /* Noise standard deviation for pitch Euler angle */
+    double                                 q_roll_;      /* Noise standard deviation for roll  Euler angle */
 
-    Eigen::Vector4f                       cone_dir_;    /* Cone direction of rotation. Fixed, left here for future implementation. */
-
-    std::mt19937_64                       generator_;
-    std::normal_distribution<float>       distribution_pos_xy_;
-    std::normal_distribution<float>       distribution_pos_z_;
-    std::normal_distribution<float>       distribution_theta_;
-    std::uniform_real_distribution<float> distribution_cone_;
-    std::function<float()>                gaussian_random_pos_xy_;
-    std::function<float()>                gaussian_random_pos_z_;
-    std::function<float()>                gaussian_random_theta_;
-    std::function<float()>                gaussian_random_cone_;
-
-    void addAxisangleDisturbance(const Eigen::Ref<const Eigen::MatrixXf>& disturbance_vec, Eigen::Ref<Eigen::MatrixXf> current_vec);
+    std::mt19937_64                        generator_;
+    std::normal_distribution<double>       distribution_pos_x_;
+    std::normal_distribution<double>       distribution_pos_y_;
+    std::normal_distribution<double>       distribution_pos_z_;
+    std::normal_distribution<double>       distribution_yaw_;
+    std::normal_distribution<double>       distribution_pitch_;
+    std::normal_distribution<double>       distribution_roll_;
+    std::function<double()>                gaussian_random_pos_x_;
+    std::function<double()>                gaussian_random_pos_y_;
+    std::function<double()>                gaussian_random_pos_z_;
+    std::function<double()>                gaussian_random_yaw_;
+    std::function<double()>                gaussian_random_pitch_;
+    std::function<double()>                gaussian_random_roll_;
 };
 
 #endif /* BROWNIANMOTIONPOSE_H */

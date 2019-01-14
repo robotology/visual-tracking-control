@@ -44,7 +44,7 @@ bool PlayWalkmanPoseModel::setProperty(const std::string& property)
 }
 
 
-VectorXd PlayWalkmanPoseModel::readPose()
+VectorXd PlayWalkmanPoseModel::readPoseAxisAngle()
 {
     return toEigen(readRootToEE());
 }

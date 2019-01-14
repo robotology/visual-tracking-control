@@ -33,14 +33,14 @@ NormTwo::~NormTwo() noexcept
 { }
 
 
-std::pair<bool, VectorXf> NormTwo::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXf>& pred_states)
+std::pair<bool, VectorXd> NormTwo::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXd>& pred_states)
 {
     bool valid_measurements;
     Data data_measurements;
-    std::tie(valid_measurements, data_measurements) = measurement_model.getAgentMeasurements();
+    std::tie(valid_measurements, data_measurements) = measurement_model.measure();
 
     if (!valid_measurements)
-        return std::make_pair(false, VectorXf::Zero(1));
+        return std::make_pair(false, VectorXd::Zero(1));
 
     MatrixXf& measurements = any::any_cast<MatrixXf&>(data_measurements);
 
@@ -62,10 +62,10 @@ std::pair<bool, VectorXf> NormTwo::likelihood(const MeasurementModel& measuremen
     }
 
     if (!valid_predicted_measurements)
-        return std::make_pair(false, VectorXf::Zero(1));
+        return std::make_pair(false, VectorXd::Zero(1));
 
 
-    VectorXf likelihood(pred_states.cols());
+    VectorXd likelihood(pred_states.cols());
 
     for (int i = 0; i < pred_states.cols(); ++i)
     {
@@ -90,9 +90,9 @@ std::pair<bool, VectorXf> NormTwo::likelihood(const MeasurementModel& measuremen
             }
         }
 
-        likelihood(i) = static_cast<float>(sum_norm_two);
+        likelihood(i) = sum_norm_two;
     }
-    likelihood = (-static_cast<float>(pImpl_->likelihood_gain_) * likelihood).array().exp();
+    likelihood = (-(pImpl_->likelihood_gain_) * likelihood).array().exp();
 
 
     return std::make_pair(true, std::move(likelihood));

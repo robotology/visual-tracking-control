@@ -4,8 +4,9 @@
 #include <memory>
 #include <string>
 
+#include <BayesFilters/BootstrapCorrection.h>
 #include <BayesFilters/ResamplingWithPrior.h>
-#include <BayesFilters/UpdateParticles.h>
+
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
 #include <yarp/os/ResourceFinder.h>
@@ -93,12 +94,12 @@ int main(int argc, char *argv[])
 
     /* Get Brownian Motion parameters */
     yarp::os::Bottle bottle_brownianmotion_params = rf.findGroup("BROWNIANMOTION");
-    paramsd["q_xy"]       = bottle_brownianmotion_params.check("q_xy",       Value(0.005)).asDouble();
+    paramsd["q_x"]        = bottle_brownianmotion_params.check("q_x",        Value(0.005)).asDouble();
+    paramsd["q_y"]        = bottle_brownianmotion_params.check("q_y",        Value(0.005)).asDouble();
     paramsd["q_z"]        = bottle_brownianmotion_params.check("q_z",        Value(0.005)).asDouble();
-    paramsd["theta"]      = bottle_brownianmotion_params.check("theta",      Value(3.0)).asDouble();
-    paramsd["cone_angle"] = bottle_brownianmotion_params.check("cone_angle", Value(2.5)).asDouble();
-    paramsd["seed"]       = bottle_brownianmotion_params.check("seed",       Value(1.0)).asDouble();
-
+    paramsd["q_yaw"]      = bottle_brownianmotion_params.check("q_yaw",      Value(0.001)).asDouble();
+    paramsd["q_pitch"]    = bottle_brownianmotion_params.check("q_pitch",    Value(0.001)).asDouble();
+    paramsd["q_roll"]      = bottle_brownianmotion_params.check("q_roll",      Value(0.001)).asDouble();
 
     /* Get Visual Proprioception parameters */
     yarp::os::Bottle bottle_visualproprioception_params = rf.findGroup("VISUALPROPRIOCEPTION");
@@ -140,11 +141,12 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - play:"           << (paramsd["play"] == 1.0 ? "true" : "false");
 
     yInfo() << log_ID << "Motion modle parameters:";
-    yInfo() << log_ID << " - q_xy:"       << paramsd["q_xy"];
+    yInfo() << log_ID << " - q_x:"        << paramsd["q_x"];
+    yInfo() << log_ID << " - q_y:"        << paramsd["q_y"];
     yInfo() << log_ID << " - q_z:"        << paramsd["q_z"];
-    yInfo() << log_ID << " - theta:"      << paramsd["theta"];
-    yInfo() << log_ID << " - cone_angle:" << paramsd["cone_angle"];
-    yInfo() << log_ID << " - seed:"       << paramsd["seed"];
+    yInfo() << log_ID << " - q_yaw:"      << paramsd["q_yaw"];
+    yInfo() << log_ID << " - q_pitch:"    << paramsd["q_pitch"];
+    yInfo() << log_ID << " - q_roll:"      << paramsd["q_roll"];
 
     yInfo() << log_ID << "Sensor model parameters:";
     yInfo() << log_ID << " - use_thumb:"   << paramsd["use_thumb"];
@@ -177,15 +179,13 @@ int main(int argc, char *argv[])
     /* INITIALIZATION */
     std::unique_ptr<ParticleSetInitialization> init_arm;
     if (paramss["robot"] == "icub")
-        init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["cam_sel"], paramss["laterality"],
-                                                "handTracking/InitiCubArm/" + paramss["cam_sel"]));
+        init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["laterality"], "handTracking/InitiCubArm/" + paramss["cam_sel"]));
     else if (paramss["robot"] == "walkman")
-        init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["cam_sel"], paramss["laterality"],
-                                                   "handTracking/InitWalkmanArm/" + paramss["cam_sel"]));
+        init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/InitWalkmanArm/" + paramss["cam_sel"]));
 
 
     /* MOTION MODEL */
-    std::unique_ptr<StateModel> brown(new BrownianMotionPose(paramsd["q_xy"], paramsd["q_z"], paramsd["theta"], paramsd["cone_angle"], paramsd["seed"]));
+    std::unique_ptr<StateModel> brown(new BrownianMotionPose(paramsd["q_x"], paramsd["q_y"], paramsd["q_z"], paramsd["q_yaw"], paramsd["q_pitch"], paramsd["q_roll"], paramsd["seed"]));
 
     std::unique_ptr<ExogenousModel> robot_motion;
     if (paramss["robot"] == "icub")
@@ -297,7 +297,7 @@ int main(int argc, char *argv[])
     }
 
     /* CORRECTION */
-    std::unique_ptr<PFCorrection> vpf_update_particles(new UpdateParticles());
+    std::unique_ptr<PFCorrection> vpf_update_particles(new BootstrapCorrection());
     vpf_update_particles->setLikelihoodModel(std::move(likelihood));
     vpf_update_particles->setMeasurementModel(std::move(proprio));
 
@@ -334,24 +334,22 @@ int main(int argc, char *argv[])
         std::unique_ptr<ParticleSetInitialization> resample_init_arm;
 
         if (paramss["robot"] == "icub")
-            resample_init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["cam_sel"], paramss["laterality"],
-                                                                             "handTracking/ResamplingWithPrior/InitiCubArm/" + paramss["cam_sel"]));
+            resample_init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitiCubArm/" + paramss["cam_sel"]));
         else if (paramss["robot"] == "walkman")
-            resample_init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["cam_sel"], paramss["laterality"],
-                                                                                   "handTracking/ResamplingWithPrior/InitWalkmanArm/" + paramss["cam_sel"]));
+            resample_init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitWalkmanArm/" + paramss["cam_sel"]));
 
         pf_resampling = std::unique_ptr<Resampling>(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
     }
 
     /* PARTICLE FILTER */
-    VisualSIS vsis_pf(paramss["cam_sel"],
+    VisualSIS vsis_pf(std::move(init_arm),
+                      std::move(pf_prediction),
+                      std::move(vpf_correction),
+                      std::move(pf_resampling),
+                      paramss["cam_sel"],
                       paramsd["num_particles"],
                       paramsd["resample_ratio"],
                       "handTracking/VisualSIS/" + paramss["cam_sel"]);
-    vsis_pf.setInitialization(std::move(init_arm));
-    vsis_pf.setPrediction(std::move(pf_prediction));
-    vsis_pf.setCorrection(std::move(vpf_correction));
-    vsis_pf.setResampling(std::move(pf_resampling));
 
 
     vsis_pf.boot();

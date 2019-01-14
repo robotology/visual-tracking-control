@@ -1,7 +1,7 @@
 #ifndef INITWALKMANBARM_H
 #define INITWALKMANBARM_H
 
-#include <InitPoseParticles.h>
+#include <InitPoseParticlesAxisAngle.h>
 
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
@@ -10,18 +10,17 @@
 #include <string>
 
 
-class InitWalkmanArm : public InitPoseParticles
+class InitWalkmanArm : public InitPoseParticlesAxisAngle
 {
 public:
-    InitWalkmanArm(const std::string& cam_sel, const std::string& laterality,
-                   const std::string& port_prefix) noexcept;
+    InitWalkmanArm(const std::string& laterality, const std::string& port_prefix) noexcept;
 
-    InitWalkmanArm(const std::string& cam_sel, const std::string& laterality) noexcept;
+    InitWalkmanArm(const std::string& laterality) noexcept;
 
     ~InitWalkmanArm() noexcept;
 
 protected:
-    Eigen::VectorXd readPose() override;
+    Eigen::VectorXd readPoseAxisAngle() override;
 
 private:
     const std::string  log_ID_ = "[InitWalkmanArm]";

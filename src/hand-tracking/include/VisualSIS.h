@@ -3,6 +3,11 @@
 
 #include <BayesFilters/EstimatesExtraction.h>
 #include <BayesFilters/ParticleFilter.h>
+#include <BayesFilters/ParticleSet.h>
+#include <BayesFilters/ParticleSetInitialization.h>
+#include <BayesFilters/PFPrediction.h>
+#include <BayesFilters/PFCorrection.h>
+#include <BayesFilters/Resampling.h>
 
 #include <chrono>
 #include <deque>
@@ -26,7 +31,11 @@ class VisualSIS: public bfl::ParticleFilter,
                  public VisualSISParticleFilterIDL
 {
 public:
-    VisualSIS(const std::string& cam_sel,
+    VisualSIS(std::unique_ptr<bfl::ParticleSetInitialization> initialization,
+              std::unique_ptr<bfl::PFPrediction> prediction,
+              std::unique_ptr<bfl::PFCorrection> correction,
+              std::unique_ptr<bfl::Resampling> resampling,
+              const std::string& cam_sel,
               const int num_particles,
               const double resample_ratio,
               const std::string& port_prefix);
@@ -75,15 +84,17 @@ protected:
 private:
     const std::string log_ID_ = "[VisualSIS]";
 
+    const std::size_t state_size_ = 6;
+
+    const std::size_t state_size_linear_ = 3;
+
+    const std::size_t state_size_circular_ = 3;
+
     std::string port_prefix_;
 
-    Eigen::MatrixXf pred_particle_;
+    bfl::ParticleSet pred_particle_;
 
-    Eigen::VectorXf pred_weight_;
-
-    Eigen::MatrixXf cor_particle_;
-
-    Eigen::VectorXf cor_weight_;
+    bfl::ParticleSet cor_particle_;
 
     bfl::EstimatesExtraction estimate_extraction_;
 

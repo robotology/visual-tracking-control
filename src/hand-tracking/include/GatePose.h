@@ -1,6 +1,7 @@
 #ifndef GATEPOSE_H
 #define GATEPOSE_H
 
+#include <BayesFilters/ParticleSet.h>
 #include <BayesFilters/PFCorrectionDecorator.h>
 #include <BayesFilters/StateModel.h>
 
@@ -18,16 +19,15 @@ public:
     ~GatePose() noexcept;
 
 protected:
-    void correctStep(const Eigen::Ref<const Eigen::MatrixXf>& pred_states, const Eigen::Ref<const Eigen::VectorXf>& pred_weights,
-                     Eigen::Ref<Eigen::MatrixXf> cor_states, Eigen::Ref<Eigen::VectorXf> cor_weights) override;
+    void correctStep(const bfl::ParticleSet& pred_particles, bfl::ParticleSet& corr_particles) override;
 
     virtual Eigen::VectorXd readPose() = 0;
 
-    bool isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXf>& state);
+    bool isInsideEllipsoid(const Eigen::Ref<const Eigen::VectorXd>& state);
 
-    bool isWithinRotation(float rot_angle);
+    bool isWithinRotation(double rot_angle);
 
-    bool isInsideCone(const Eigen::Ref<const Eigen::VectorXf>& state);
+    bool isInsideCone(const Eigen::Ref<const Eigen::VectorXd>& state);
 
 private:
     double gate_x_;

@@ -12,8 +12,7 @@ using namespace yarp::sig;
 using namespace yarp::os;
 
 
-InitiCubArm::InitiCubArm(const std::string& cam_sel, const std::string& laterality,
-                         const std::string& port_prefix) noexcept :
+InitiCubArm::InitiCubArm(const std::string& laterality, const std::string& port_prefix) noexcept :
     port_prefix_(port_prefix),
     icub_kin_arm_(iCubArm(laterality + "_v2"))
 {
@@ -27,8 +26,8 @@ InitiCubArm::InitiCubArm(const std::string& cam_sel, const std::string& laterali
 }
 
 
-InitiCubArm::InitiCubArm(const std::string& cam_sel, const std::string& laterality) noexcept :
-    InitiCubArm("InitiCubArm", cam_sel, laterality) { }
+InitiCubArm::InitiCubArm(const std::string& laterality) noexcept :
+    InitiCubArm("InitiCubArm", laterality) { }
 
 
 InitiCubArm::~InitiCubArm() noexcept
@@ -41,7 +40,7 @@ InitiCubArm::~InitiCubArm() noexcept
 }
 
 
-VectorXd InitiCubArm::readPose()
+VectorXd InitiCubArm::readPoseAxisAngle()
 {
     return toEigen(icub_kin_arm_.EndEffPose(readRootToEE() * CTRL_DEG2RAD));
 }

@@ -1,10 +1,11 @@
 #include <GatePose.h>
+#include <utils.h>
 
 #include <cmath>
 
 using namespace bfl;
 using namespace Eigen;
-
+using namespace hand_tracking::utils;
 
 GatePose::GatePose(std::unique_ptr<PFCorrection> visual_correction,
                    const double gate_x, const double gate_y, const double gate_z,
@@ -26,25 +27,30 @@ GatePose::GatePose(std::unique_ptr<PFCorrection> visual_correction) noexcept :
 GatePose::~GatePose() noexcept { }
 
 
-void GatePose::correctStep(const Ref<const MatrixXf>& pred_states, const Ref<const VectorXf>& pred_weights,
-                           Ref<MatrixXf> cor_states, Ref<VectorXf> cor_weights)
+void GatePose::correctStep(const ParticleSet& pred_particles, ParticleSet& corr_particles)
 {
-    PFCorrectionDecorator::correctStep(pred_states, pred_weights,
-                                       cor_states, cor_weights);
+    PFCorrectionDecorator::correctStep(pred_particles, corr_particles);
 
     ee_pose_ = readPose();
 
-    for (int i = 0; i < cor_states.cols(); ++i)
+    for (int i = 0; i < corr_particles.state().cols(); ++i)
     {
-        if (!isInsideEllipsoid(cor_states.col(i).head<3>())        ||
-            !isInsideCone     (cor_states.col(i).middleRows<3>(3)) ||
-            !isWithinRotation (cor_states(6, i))                     )
-            cor_weights(i) = std::numeric_limits<float>::min();
+        /*
+         * Since methods isInsideCone and isWithinRotation
+         * assume that the orientation is represented using axis/angle, the
+         * state stored in corr_particles is converted to axis/angle.
+         */
+        VectorXd axis_angle = euler_to_axis_angle(corr_particles.state(i).topRows<3>(), AxisOfRotation::UnitZ, AxisOfRotation::UnitY, AxisOfRotation::UnitX);
+
+        if (!isInsideEllipsoid(corr_particles.state(i).topRows<3>())     ||
+            !isInsideCone     (axis_angle.head<3>())                     ||
+            !isWithinRotation (axis_angle(3))                              )
+            corr_particles.weight(i) = std::log(std::numeric_limits<double>::min());
     }
 }
 
 
-bool GatePose::isInsideEllipsoid(const Ref<const VectorXf>& state)
+bool GatePose::isInsideEllipsoid(const Ref<const VectorXd>& state)
 {
     return ( (abs(state(0) - ee_pose_(0)) <= gate_x_) &&
              (abs(state(1) - ee_pose_(1)) <= gate_y_) &&
@@ -52,23 +58,21 @@ bool GatePose::isInsideEllipsoid(const Ref<const VectorXf>& state)
 }
 
 
-bool GatePose::isWithinRotation(float rot_angle)
+bool GatePose::isWithinRotation(double rot_angle)
 {
-    float ang_diff = abs(rot_angle - ee_pose_(6));
+    double ang_diff = abs(rot_angle - ee_pose_(6));
 
     return (ang_diff <= gate_rotation_);
 }
 
 
-bool GatePose::isInsideCone(const Ref<const VectorXf>& state)
+bool GatePose::isInsideCone(const Ref<const VectorXd>& state)
 {
     /* See: http://stackoverflow.com/questions/10768142/verify-if-point-is-inside-a-cone-in-3d-space#10772759 */
 
     double   half_aperture    =  gate_aperture_ / 2.0;
 
-    VectorXd test_direction   = -state.cast<double>();
-
     VectorXd fwdkin_direction = -ee_pose_.middleRows<3>(3);
 
-    return ( (test_direction.dot(fwdkin_direction) / test_direction.norm() / fwdkin_direction.norm()) >= cos(half_aperture) );
+    return ( (state.dot(fwdkin_direction) / state.norm() / fwdkin_direction.norm()) >= cos(half_aperture) );
 }
