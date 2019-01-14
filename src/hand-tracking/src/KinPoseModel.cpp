@@ -111,7 +111,7 @@ MatrixXd KinPoseModel::perturbOrientation(const Ref<const MatrixXd>& state, cons
     /*
      * Evaluate rotation matrix due to current pose.
      */
-    for (std::size_t i = 0; i < state.cols(); i++)
+    for (int i = 0; i < state.cols(); i++)
     {
         Matrix3d state_rot = (AngleAxisd(state(0, i), Vector3d::UnitZ())
                             * AngleAxisd(state(1, i), Vector3d::UnitY())
