@@ -1,10 +1,11 @@
 #include <GatePose.h>
+#include <utils.h>
 
 #include <cmath>
 
 using namespace bfl;
 using namespace Eigen;
-
+using namespace hand_tracking::utils;
 
 GatePose::GatePose(std::unique_ptr<PFCorrection> visual_correction,
                    const double gate_x, const double gate_y, const double gate_z,
@@ -34,9 +35,16 @@ void GatePose::correctStep(const ParticleSet& pred_particles, ParticleSet& corr_
 
     for (int i = 0; i < corr_particles.state().cols(); ++i)
     {
+        /*
+         * Since methods isInsideCone and isWithinRotation
+         * assume that the orientation is represented using axis/angle, the
+         * state stored in corr_particles is converted to axis/angle.
+         */
+        VectorXd axis_angle = euler_to_axis_angle(corr_particles.state(i).topRows<3>(), AxisOfRotation::UnitZ, AxisOfRotation::UnitY, AxisOfRotation::UnitX);
+
         if (!isInsideEllipsoid(corr_particles.state(i).topRows<3>())     ||
-            !isInsideCone     (corr_particles.state(i).middleRows<3>(3)) ||
-            !isWithinRotation (corr_particles.state(i, 6))                 )
+            !isInsideCone     (axis_angle.head<3>())                     ||
+            !isWithinRotation (axis_angle(3))                              )
             corr_particles.weight(i) = std::log(std::numeric_limits<double>::min());
     }
 }
