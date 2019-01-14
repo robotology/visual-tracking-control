@@ -127,7 +127,7 @@ endif()
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
-		include/Camera.h
+        include/Camera.h
         include/ChiSquare.h
         include/DrawParticlesImportanceThreshold.h
         include/KinPoseModel.h
@@ -153,8 +153,8 @@ set(${EXE_TARGET_NAME}_HDR
         include/PlayWalkmanPoseModel.h
         include/VisualProprioception.h
         include/VisualSIS.h
-		include/WalkmanArmModel.h
-		include/WalkmanCamera.h
+        include/WalkmanArmModel.h
+        include/WalkmanCamera.h
         include/utils.h
 )
 
@@ -177,8 +177,8 @@ set(${EXE_TARGET_NAME}_SRC
         src/PlayGatePose.cpp
         src/PlayWalkmanPoseModel.cpp
         src/VisualSIS.cpp
-		src/WalkmanArmModel.cpp
-		src/WalkmanCamera.cpp
+        src/WalkmanArmModel.cpp
+        src/WalkmanCamera.cpp
         src/utils.cpp
 )
 
