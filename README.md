@@ -21,7 +21,7 @@ The output of the hand-tracking application can be visualized by means of the [i
 
 # 🎛 Dependencies
 visual-tracking-control suite depends on
- - [BayesFilters](https://github.com/robotology/bayes-filters-lib) - `version >= 0.6`
+ - [BayesFilters](https://github.com/robotology/bayes-filters-lib) - `version >= 0.9`
  - [iCub](https://github.com/robotology/icub-main)
  - [iCubContrib](https://github.com/robotology/icub-contrib-common)
  - [OpenCV](http://opencv.org) - `version >= 3.3`, built with `CUDA >= 8.0`
