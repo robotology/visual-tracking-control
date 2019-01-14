@@ -155,11 +155,11 @@ void BrownianMotionPose::motion(const Eigen::Ref<const Eigen::MatrixXd>& cur_sta
 }
 
 
-Eigen::MatrixXd BrownianMotionPose::getNoiseSample(const int num)
+Eigen::MatrixXd BrownianMotionPose::getNoiseSample(const std::size_t num)
 {
     MatrixXd sample(6, num);
 
-    for (unsigned int i = 0; i < num; ++i)
+    for (std::size_t i = 0; i < num; ++i)
     {
         sample(0, i) = gaussian_random_pos_x_();
         sample(1, i) = gaussian_random_pos_y_();
