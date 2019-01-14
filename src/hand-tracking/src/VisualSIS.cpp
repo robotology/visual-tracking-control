@@ -38,9 +38,9 @@ VisualSIS::VisualSIS(std::unique_ptr<bfl::ParticleSetInitialization> initializat
     num_particles_(num_particles),
     resample_ratio_(resample_ratio),
     port_prefix_(port_prefix),
-    pred_particle_(num_particles_, 7),
-    cor_particle_(num_particles_, 7),
-    estimate_extraction_(7)
+    pred_particle_(num_particles_, state_size_),
+    cor_particle_(num_particles_, state_size_),
+    estimate_extraction_(state_size_linear_, state_size_circular_)
 {
     port_estimates_out_.open("/" + port_prefix_ + "/estimates:o");
 
@@ -98,7 +98,7 @@ void VisualSIS::filteringStep()
     {
         yInfo() << log_ID_ << "Resampling!";
 
-        ParticleSet res_particle(num_particles_, 7);
+        ParticleSet res_particle(num_particles_, state_size_);
         VectorXi res_parent(num_particles_, 1);
 
         resampling_->resample(cor_particle_, res_particle, res_parent);
@@ -159,7 +159,7 @@ void VisualSIS::filteringStep()
     if (valid_estimate)
     {
         Vector& estimates_out = port_estimates_out_.prepare();
-        estimates_out.resize(7);
+        estimates_out.resize(state_size_);
         toEigen(estimates_out) = out_particle;
         port_estimates_out_.write();
     }

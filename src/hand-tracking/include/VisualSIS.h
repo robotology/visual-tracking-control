@@ -84,6 +84,12 @@ protected:
 private:
     const std::string log_ID_ = "[VisualSIS]";
 
+    const std::size_t state_size_ = 6;
+
+    const std::size_t state_size_linear_ = 3;
+
+    const std::size_t state_size_circular_ = 3;
+
     std::string port_prefix_;
 
     bfl::ParticleSet pred_particle_;
