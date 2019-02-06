@@ -352,7 +352,7 @@ bool iCubArmModel::setArmJoints(const Vector& q)
     icub_arm_.setAng(q.subVector(0, 9) * CTRL_DEG2RAD);
 
     Vector chainjoints;
-    for (size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 5; ++i)
     {
         if (!icub_kin_finger_[i].getChainJoints(q.subVector(3, 18), chainjoints))
             return false;
