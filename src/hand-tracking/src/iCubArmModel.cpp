@@ -366,8 +366,8 @@ std::tuple<bool, Vector> iCubArmModel::readRootToFingers()
     Vector root_fingers_enc(19, 0.0);
 
     Bottle* bottle_torso = port_torso_enc_.read(true);
-    Bottle* bottle_head  = port_arm_enc_.read(true);
-    if (!bottle_torso || !bottle_head)
+    Bottle* bottle_arm  = port_arm_enc_.read(true);
+    if (!bottle_torso || !bottle_arm)
         return std::make_tuple(false, root_fingers_enc);
 
     root_fingers_enc(0) = bottle_torso->get(2).asDouble();
@@ -375,7 +375,7 @@ std::tuple<bool, Vector> iCubArmModel::readRootToFingers()
     root_fingers_enc(2) = bottle_torso->get(0).asDouble();
 
     for (size_t i = 0; i < 16; ++i)
-        root_fingers_enc(3 + i) = bottle_torso->get(i).asDouble();
+        root_fingers_enc(3 + i) = bottle_arm->get(i).asDouble();
 
     return std::make_tuple(true, root_fingers_enc);
 }
