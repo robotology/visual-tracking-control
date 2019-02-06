@@ -375,7 +375,7 @@ std::tuple<bool, Vector> iCubArmModel::readRootToFingers()
     root_fingers_enc(2) = bottle_torso->get(0).asDouble();
 
     for (size_t i = 0; i < 16; ++i)
-        root_fingers_enc(3 + i) = bottle_torso->get(i).asDouble();
+        root_fingers_enc(3 + i) = bottle_arm->get(i).asDouble();
 
     return std::make_tuple(true, root_fingers_enc);
 }
