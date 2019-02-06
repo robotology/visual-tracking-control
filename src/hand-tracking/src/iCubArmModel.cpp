@@ -144,6 +144,8 @@ iCubArmModel::iCubArmModel(const bool use_thumb,
     icub_kin_finger_[0].setAllConstraints(false);
     icub_kin_finger_[1].setAllConstraints(false);
     icub_kin_finger_[2].setAllConstraints(false);
+    icub_kin_finger_[3].setAllConstraints(false);
+    icub_kin_finger_[4].setAllConstraints(false);
 
     icub_arm_.setAllConstraints(false);
     icub_arm_.releaseLink(0);
