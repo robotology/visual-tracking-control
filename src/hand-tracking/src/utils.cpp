@@ -1,5 +1,7 @@
 #include <utils.h>
 
+#include <exception>
+
 using namespace Eigen;
 using namespace hand_tracking::utils;
 
@@ -12,6 +14,8 @@ std::size_t hand_tracking::utils::axis_of_rotation_to_index(const AxisOfRotation
        return 1;
    else if (axis == AxisOfRotation::UnitZ)
        return 2;
+
+   throw std::runtime_error("ERROR::UTILS::AXIS_OF_ROTATION_TO_INDEX\nERROR: Wrong input value of enum class type hand_tracking::utils::AxisOfRotation.");
 }
 
 
@@ -23,6 +27,8 @@ Eigen::Vector3d hand_tracking::utils::axis_of_rotation_to_vector(const AxisOfRot
        return Vector3d::UnitY();
    else if (axis == AxisOfRotation::UnitZ)
        return Vector3d::UnitZ();
+
+   throw std::runtime_error("ERROR::UTILS::AXIS_OF_ROTATION_TO_VECTOR\nERROR: Wrong input value of enum class type hand_tracking::utils::AxisOfRotation.");
 }
 
 
