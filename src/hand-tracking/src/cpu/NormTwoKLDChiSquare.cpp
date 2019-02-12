@@ -35,5 +35,5 @@ NormTwoKLDChiSquare::~NormTwoKLDChiSquare() noexcept
 
 std::pair<bool, VectorXd> NormTwoKLDChiSquare::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXd>& pred_states)
 {
-    throw std::runtime_error("[NormTwoKLDChiSquare][CPU] Unimplemented.");
+    throw std::runtime_error("ERROR::NORMTWOKLDCHISQUARE::LIKELIHOOD\nERROR: Unimplemented.");
 }

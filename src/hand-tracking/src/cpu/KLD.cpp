@@ -35,5 +35,5 @@ KLD::~KLD() noexcept
 
 std::pair<bool, VectorXd> KLD::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXd>& pred_states)
 {
-    throw std::runtime_error("[KLD][CPU] Unimplemented.");
+    throw std::runtime_error("ERROR::KLD::LIKELIHOOD\nERROR: Unimplemented.");
 }
