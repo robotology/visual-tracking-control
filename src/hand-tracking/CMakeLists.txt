@@ -15,6 +15,7 @@ find_package(YARP CONFIG REQUIRED
                  sig
                  eigen
                  gsl
+                 cv
 )
 
 find_package(ICUB REQUIRED)
@@ -270,6 +271,7 @@ target_link_libraries(${EXE_TARGET_NAME}
                           YARP::YARP_sig
                           YARP::YARP_eigen
                           YARP::YARP_gsl
+                          YARP::YARP_cv
 )
 
 if(BFL_CUDA)
