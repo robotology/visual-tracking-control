@@ -25,12 +25,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if(WIN32)
-    add_definitions(-D_USE_MATH_DEFINES)
-    if(MSVC)
-        set(CMAKE_DEBUG_POSTFIX "d")
-        set(CMAKE_CXX_FLAGS "/MP /EHsc")
-        set(CMAKE_C_FLAGS "/MP /EHsc")
-    endif()
+  add_definitions(-D_USE_MATH_DEFINES)
+  if(MSVC)
+    set(CMAKE_DEBUG_POSTFIX "d")
+    set(CMAKE_CXX_FLAGS "/MP /EHsc")
+    set(CMAKE_C_FLAGS "/MP /EHsc")
+  endif()
 endif()
 
 ### iCub-contrib project
