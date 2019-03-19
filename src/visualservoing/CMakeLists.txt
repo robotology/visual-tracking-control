@@ -6,21 +6,21 @@ find_package(YARP REQUIRED
 yarp_configure_external_installation(${PLUGIN_NAME} WITH_PLUGINS)
 
 yarp_begin_plugin_library(visualservoingplugin)
-    option(BUILD_VISUAL_SERVOING_CLIENT "Build visualservoing-client YARP plugin" OFF)
-    if(BUILD_VISUAL_SERVOING_CLIENT)
+    option(VTC_BUILD_VISUAL_SERVOING_CLIENT "Build visualservoing-client YARP plugin" OFF)
+    if(VTC_BUILD_VISUAL_SERVOING_CLIENT)
         add_subdirectory(visualservoingclient)
         add_subdirectory(visualservoingclient-app)
     endif()
 
-    option(BUILD_VISUAL_SERVOING_SERVER "Build visualservoing-server YARP plugin" OFF)
-    if(BUILD_VISUAL_SERVOING_SERVER)
+    option(VTC_BUILD_VISUAL_SERVOING_SERVER "Build visualservoing-server YARP plugin" OFF)
+    if(VTC_BUILD_VISUAL_SERVOING_SERVER)
         add_subdirectory(visualservoingserver)
         add_subdirectory(visualservoingserver-app)
     endif()
 
 
     # Application XML app files
-    if(BUILD_VISUAL_SERVOING_CLIENT OR BUILD_VISUAL_SERVOING_SERVER)
+    if(VTC_BUILD_VISUAL_SERVOING_CLIENT OR VTC_BUILD_VISUAL_SERVOING_SERVER)
         set(${PLUGIN_NAME}_APP
                 visualservoingcommon/app/BackgroundApps-SIM.xml
                 visualservoingcommon/app/visualservoing.xml

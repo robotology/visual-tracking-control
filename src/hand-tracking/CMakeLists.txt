@@ -5,8 +5,12 @@ include(AddDependenciesPrintUtils)
 
 # Dependencies
 find_package(CUDA QUIET)
+print_dependency(CUDA)
+
 
 find_package(OpenCV REQUIRED)
+print_dependency(OpenCV)
+
 
 find_package(YARP CONFIG REQUIRED
              COMPONENTS
@@ -17,32 +21,33 @@ find_package(YARP CONFIG REQUIRED
                  gsl
                  cv
 )
+print_dependency(YARP)
+
 
 find_package(ICUB REQUIRED)
+print_dependency(ICUB)
+
 
 find_package(Eigen3 QUIET CONFIG)
 if(NOT EIGEN3_FOUND)
     find_package(Eigen3 REQUIRED)
 endif()
+print_dependency(Eigen3)
+
 
 find_package(BayesFilters 0.9.0 QUIET)
 if(NOT BayesFilters_FOUND)
     message(STATUS "Did not found required master release of BayesFilters. Looking for devel version.")
     find_package(BayesFilters 0.9.100 REQUIRED)
 endif()
+print_dependency(BayesFilters)
+
 
 find_package(SuperimposeMesh 0.9.4.0 QUIET)
 if(NOT SuperimposeMesh_FOUND)
     message(STATUS "Did not found required master release of SuperimposeMesh. Looking for devel version.")
     find_package(SuperimposeMesh 0.10.100.0 REQUIRED)
 endif()
-
-print_dependency(CUDA)
-print_dependency(OpenCV)
-print_dependency(YARP)
-print_dependency(ICUB)
-print_dependency(Eigen3)
-print_dependency(BayesFilters)
 print_dependency(SuperimposeMesh)
 
 
@@ -52,9 +57,9 @@ if(DEFINED OpenCV_CUDA_VERSION)
     message(STATUS "Found OpenCV with CUDA compiled modules.")
 
     if(CUDA_FOUND)
-        option(FORCE_NO_OPENCV_CUDA "Force no CUDA compiled modules?" OFF)
+        option(VTC_FORCE_NO_OPENCV_CUDA "Force no CUDA compiled modules?" OFF)
 
-        if(FORCE_NO_OPENCV_CUDA)
+        if(VTC_FORCE_NO_OPENCV_CUDA)
             message(STATUS "Forcing no CUDA compiled modules.")
 
             set(BFL_CUDA OFF)

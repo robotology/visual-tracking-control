@@ -11,6 +11,8 @@ set(CMAKE_CUDA_EXTENSIONS OFF)
 set(CMAKE_CUDA_STANDARD 11)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(GNUInstallDirs)
@@ -40,13 +42,10 @@ icubcontrib_set_default_prefix()
 icubcontrib_add_uninstall_target()
 
 # Support RPATH?
-option(ENABLE_RPATH "Enable RPATH for this library" ON)
-mark_as_advanced(ENABLE_RPATH)
 include(AddInstallRPATHSupport)
-add_install_rpath_support(BIN_DIRS "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
-                          LIB_DIRS "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
-                          INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}"
-                          DEPENDS ENABLE_RPATH
+add_install_rpath_support(BIN_DIRS "${CMAKE_INSTALL_FULL_BINDIR}"
+                          LIB_DIRS "${CMAKE_INSTALL_FULL_LIBDIR}"
+                          INSTALL_NAME_DIR "${CMAKE_INSTALL_FULL_LIBDIR}"
                           USE_LINK_PATH)
 
 add_subdirectory(src)
