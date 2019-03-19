@@ -18,9 +18,9 @@ BrownianMotionPose::BrownianMotionPose(const double q_x, const double q_y, const
     q_pitch_(q_pitch),
     q_roll_(q_roll),
     generator_(std::mt19937_64(seed)),
-    distribution_pos_x_(std::normal_distribution<double>(0.0, q_x)),
-    distribution_pos_y_(std::normal_distribution<double>(0.0, q_y)),
-    distribution_pos_z_(std::normal_distribution<double>(0.0, q_z)),
+    distribution_pos_x_(std::normal_distribution<double>(0.0, q_x_)),
+    distribution_pos_y_(std::normal_distribution<double>(0.0, q_y_)),
+    distribution_pos_z_(std::normal_distribution<double>(0.0, q_z_)),
     distribution_yaw_(std::normal_distribution<double>(0.0, q_yaw_)),
     distribution_pitch_(std::normal_distribution<double>(0.0, q_pitch_)),
     distribution_roll_(std::normal_distribution<double>(0.0, q_roll_)),
@@ -29,15 +29,18 @@ BrownianMotionPose::BrownianMotionPose(const double q_x, const double q_y, const
     gaussian_random_pos_z_([&] { return (distribution_pos_z_)(generator_); }),
     gaussian_random_yaw_([&] { return (distribution_yaw_)(generator_); }),
     gaussian_random_pitch_([&] { return (distribution_pitch_)(generator_); }),
-    gaussian_random_roll_([&] { return (distribution_roll_)(generator_); }) { }
+    gaussian_random_roll_([&] { return (distribution_roll_)(generator_); })
+{ }
 
 
 BrownianMotionPose::BrownianMotionPose(const double q_x, const double q_y, const double q_z, const double q_yaw, const double q_pitch, const double q_roll) noexcept :
-    BrownianMotionPose(q_x, q_y, q_z, q_yaw, q_pitch, q_roll, 1) { }
+    BrownianMotionPose(q_x, q_y, q_z, q_yaw, q_pitch, q_roll, 1)
+{ }
 
 
 BrownianMotionPose::BrownianMotionPose() noexcept :
-    BrownianMotionPose(0.005, 0.005, 0.005, 0.1, 0.1, 0.1, 1) { }
+    BrownianMotionPose(0.005, 0.005, 0.005, 0.1, 0.1, 0.1, 1)
+{ }
 
 
 BrownianMotionPose::BrownianMotionPose(const BrownianMotionPose& brown) :
@@ -105,33 +108,33 @@ BrownianMotionPose& BrownianMotionPose::operator=(const BrownianMotionPose& brow
 
 BrownianMotionPose& BrownianMotionPose::operator=(BrownianMotionPose&& brown) noexcept
 {
-    q_x_        = brown.q_x_;
-    q_y_        = brown.q_y_;
-    q_z_        = brown.q_z_;
-    q_yaw_      = brown.q_yaw_;
-    q_pitch_    = brown.q_pitch_;
-    q_roll_     = brown.q_roll_;
+    q_x_     = brown.q_x_;
+    q_y_     = brown.q_y_;
+    q_z_     = brown.q_z_;
+    q_yaw_   = brown.q_yaw_;
+    q_pitch_ = brown.q_pitch_;
+    q_roll_  = brown.q_roll_;
 
-    generator_              = std::move(brown.generator_);
-    distribution_pos_x_     = std::move(brown.distribution_pos_x_);
-    distribution_pos_y_     = std::move(brown.distribution_pos_y_);
-    distribution_pos_z_     = std::move(brown.distribution_pos_z_);
-    distribution_yaw_       = std::move(brown.distribution_yaw_);
-    distribution_pitch_     = std::move(brown.distribution_pitch_);
-    distribution_roll_       = std::move(brown.distribution_roll_);
-    gaussian_random_pos_x_  = std::move(brown.gaussian_random_pos_x_);
-    gaussian_random_pos_y_  = std::move(brown.gaussian_random_pos_y_);
-    gaussian_random_pos_z_  = std::move(brown.gaussian_random_pos_z_);
-    gaussian_random_yaw_  = std::move(brown.gaussian_random_yaw_);
-    gaussian_random_pitch_  = std::move(brown.gaussian_random_pitch_);
+    generator_             = std::move(brown.generator_);
+    distribution_pos_x_    = std::move(brown.distribution_pos_x_);
+    distribution_pos_y_    = std::move(brown.distribution_pos_y_);
+    distribution_pos_z_    = std::move(brown.distribution_pos_z_);
+    distribution_yaw_      = std::move(brown.distribution_yaw_);
+    distribution_pitch_    = std::move(brown.distribution_pitch_);
+    distribution_roll_     = std::move(brown.distribution_roll_);
+    gaussian_random_pos_x_ = std::move(brown.gaussian_random_pos_x_);
+    gaussian_random_pos_y_ = std::move(brown.gaussian_random_pos_y_);
+    gaussian_random_pos_z_ = std::move(brown.gaussian_random_pos_z_);
+    gaussian_random_yaw_   = std::move(brown.gaussian_random_yaw_);
+    gaussian_random_pitch_ = std::move(brown.gaussian_random_pitch_);
     gaussian_random_roll_  = std::move(brown.gaussian_random_roll_);
 
-    brown.q_x_        = 0.0;
-    brown.q_y_        = 0.0;
-    brown.q_z_        = 0.0;
-    brown.q_yaw_      = 0.0;
-    brown.q_pitch_    = 0.0;
-    brown.q_roll_     = 0.0;
+    brown.q_x_     = 0.0;
+    brown.q_y_     = 0.0;
+    brown.q_z_     = 0.0;
+    brown.q_yaw_   = 0.0;
+    brown.q_pitch_ = 0.0;
+    brown.q_roll_  = 0.0;
 
     return *this;
 }
