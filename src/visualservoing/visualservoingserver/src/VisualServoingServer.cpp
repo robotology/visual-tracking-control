@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2016-2019 Istituto Italiano di Tecnologia (IIT)
+ *
+ * This software may be modified and distributed under the terms of the
+ * BSD 3-Clause license. See the accompanying LICENSE file for details.
+ */
+
 #include "VisualServoingServer.h"
 
 #include <iCub/ctrl/minJerkCtrl.h>
@@ -1450,7 +1457,7 @@ void VisualServoingServer::decoupledImageBasedVisualServoControl()
 
         cv::circle(l_img, cv::Point(l_cur_px_g[0], l_cur_px_g[1]), 4, color[0], 4);
         cv::circle(r_img, cv::Point(r_cur_px_g[0], r_cur_px_g[1]), 4, color[0], 4);
-        
+
         port_image_left_out_.write();
         port_image_right_out_.write();
         /* *** *** ***  *** *** *** *** *** *** *** *** *** *** */
@@ -2202,7 +2209,7 @@ void VisualServoingServer::cartesianPositionBasedVisualServoControl()
         Vector& pose_goal_ = port_pose_goal_.prepare();
         pose_goal_ = goal_pose_;
         port_pose_goal_.write();
-        
+
         /* *** *** *** *** *** *** *** *** *** *** *** */
 
         /* CHECK FOR GOAL */
