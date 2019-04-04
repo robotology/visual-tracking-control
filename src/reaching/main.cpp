@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2016-2019 Istituto Italiano di Tecnologia (IIT)
+ *
+ * This software may be modified and distributed under the terms of the
+ * BSD 3-Clause license. See the accompanying LICENSE file for details.
+ */
+
 #include <cmath>
 #include <iostream>
 
@@ -175,10 +182,10 @@ public:
             yError() << "Cannot set joint bound for index finger.";
             return false;
         }
-        
+
         handler_port_.open("/reaching/cmd:i");
         attach(handler_port_);
-        
+
         return true;
     }
 
@@ -755,9 +762,9 @@ public:
                 location_[2] =  0.0524;
 
                 yInfo() << "location: " << location_.toString();
-                
+
                 reply = command;
-                
+
                 break;
             }
             /* Get 3D point from Structure From Motion clicking on the left camera image */
@@ -887,7 +894,7 @@ public:
                 {
                     reply.addString("nack");
                 }
-                
+
                 break;
             }
             /* Stop the Cartesian controller */
@@ -1045,7 +1052,7 @@ private:
             return false;
         }
         yInfo() << "Succesfully set ICartesianControl target tolerance!";
-        
+
         return true;
     }
 
@@ -1071,7 +1078,7 @@ private:
             yError() << "Gaze control device not available.";
             return false;
         }
-        
+
         return true;
     }
 
@@ -1106,7 +1113,7 @@ private:
             yError() << "Error opening right arm remote_controlboard device.";
             return false;
         }
-        
+
         return true;
     }
 
@@ -1199,7 +1206,7 @@ private:
         root_fingers_enc.setSubvector(0, readTorso());
 
         root_fingers_enc.setSubvector(3, rightarm_encoder);
-        
+
         return root_fingers_enc;
     }
 };
