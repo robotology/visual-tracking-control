@@ -11,6 +11,7 @@
 #include <functional>
 
 #include <iCub/ctrl/math.h>
+
 #include <yarp/math/Math.h>
 #include <yarp/eigen/Eigen.h>
 #include <yarp/os/Bottle.h>
@@ -20,14 +21,18 @@
 using namespace bfl;
 using namespace Eigen;
 using namespace iCub::ctrl;
-using namespace iCub::iKin;
 using namespace yarp::eigen;
 using namespace yarp::math;
 using namespace yarp::os;
 using namespace yarp::sig;
 
 
-PlayWalkmanPoseModel::PlayWalkmanPoseModel(const std::string& robot, const std::string& laterality, const std::string& port_prefix) noexcept :
+PlayWalkmanPoseModel::PlayWalkmanPoseModel
+(
+    const std::string& robot,
+    const std::string& laterality,
+    const std::string& port_prefix
+) noexcept :
     port_prefix_(port_prefix),
     robot_(robot),
     laterality_(laterality)

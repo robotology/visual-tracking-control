@@ -21,10 +21,7 @@
 class WalkmanCamera : public bfl::Camera
 {
 public:
-    WalkmanCamera(const std::string& cam_sel,
-                  const double resolution_ratio,
-                  const std::string& context,
-                  const std::string& port_prefix);
+    WalkmanCamera(const std::string& cam_sel, const double resolution_ratio, const std::string& context, const std::string& port_prefix);
 
     virtual ~WalkmanCamera() noexcept;
 
@@ -33,7 +30,7 @@ public:
     bfl::Data getData() const override;
 
     CameraIntrinsics getCameraParameters() const override;
-    
+
 protected:
     CameraIntrinsics params_;
 

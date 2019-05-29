@@ -8,8 +8,10 @@
 #include "VisualServoingClient.h"
 
 #include <iCub/ctrl/minJerkCtrl.h>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+
 #include <yarp/math/Math.h>
 #include <yarp/math/SVD.h>
 #include <yarp/os/Network.h>
@@ -17,11 +19,11 @@
 #include <yarp/os/RpcClient.h>
 #include <yarp/os/Time.h>
 
+using namespace iCub::ctrl;
 using namespace yarp::dev;
 using namespace yarp::math;
 using namespace yarp::os;
 using namespace yarp::sig;
-using namespace iCub::ctrl;
 
 
 /* Ctors and Dtors */

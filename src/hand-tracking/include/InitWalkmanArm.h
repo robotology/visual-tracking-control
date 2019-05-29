@@ -30,7 +30,7 @@ protected:
     Eigen::VectorXd readPoseAxisAngle() override;
 
 private:
-    const std::string  log_ID_ = "[InitWalkmanArm]";
+    const std::string log_ID_ = "[InitWalkmanArm]";
 
     const std::string port_prefix_;
 

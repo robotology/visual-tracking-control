@@ -11,6 +11,7 @@
 #include <GatePose.h>
 
 #include <iCub/iKin/iKinFwd.h>
+
 #include <yarp/dev/IEncoders.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/sig/Vector.h>
@@ -21,21 +22,14 @@
 class iCubGatePose : public GatePose
 {
 public:
-    iCubGatePose(std::unique_ptr<PFCorrection> visual_correction,
-                 const double gate_x, const double gate_y, const double gate_z,
-                 const double gate_aperture,
-                 const double gate_rotation,
-                 const std::string& robot, const std::string& laterality,
-                 const std::string& port_prefix);
+    iCubGatePose(std::unique_ptr<PFCorrection> visual_correction, const double gate_x, const double gate_y, const double gate_z, const double gate_aperture, const double gate_rotation, const std::string& robot, const std::string& laterality, const std::string& port_prefix);
 
-    iCubGatePose(std::unique_ptr<PFCorrection> visual_correction,
-                 const std::string& robot, const std::string& laterality,
-                 const std::string& port_prefix);
+    iCubGatePose(std::unique_ptr<PFCorrection> visual_correction, const std::string& robot, const std::string& laterality, const std::string& port_prefix);
 
     ~iCubGatePose() noexcept override;
 
 protected:
-    yarp::dev::PolyDriver  drv_arm_enc_;
+    yarp::dev::PolyDriver drv_arm_enc_;
 
     yarp::dev::IEncoders* itf_arm_enc_;
 

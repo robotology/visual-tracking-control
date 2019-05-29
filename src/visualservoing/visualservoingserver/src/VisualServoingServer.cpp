@@ -8,8 +8,10 @@
 #include "VisualServoingServer.h"
 
 #include <iCub/ctrl/minJerkCtrl.h>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+
 #include <yarp/math/Math.h>
 #include <yarp/math/SVD.h>
 #include <yarp/os/Network.h>

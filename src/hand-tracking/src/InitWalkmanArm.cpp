@@ -11,7 +11,6 @@
 #include <yarp/eigen/Eigen.h>
 
 using namespace Eigen;
-using namespace iCub::iKin;
 using namespace iCub::ctrl;
 using namespace yarp::eigen;
 using namespace yarp::math;

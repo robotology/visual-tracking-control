@@ -12,6 +12,7 @@
 
 #include <Eigen/Dense>
 
+
 class KinPoseModelAxisAngle : public KinPoseModel
 {
 public:

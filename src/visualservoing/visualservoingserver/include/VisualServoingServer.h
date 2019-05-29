@@ -45,7 +45,7 @@ public:
     /* Ctors and Dtors */
     VisualServoingServer();
 
-    ~VisualServoingServer();
+    virtual ~VisualServoingServer();
 
 
     /* DeviceDriver overrides */

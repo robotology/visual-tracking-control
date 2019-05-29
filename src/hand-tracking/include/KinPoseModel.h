@@ -9,7 +9,7 @@
 #define FWDPOSEMODEL_H
 
 #include <BayesFilters/ExogenousModel.h>
-#include <iCub/iKin/iKinFwd.h>
+
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IEncoders.h>
 #include <yarp/sig/Vector.h>
@@ -42,7 +42,7 @@ protected:
     Eigen::MatrixXd perturbOrientation(const Eigen::Ref<const Eigen::MatrixXd>& state, const Eigen::Ref<const Eigen::MatrixXd>& perturbation);
 
 private:
-    Eigen::VectorXd prev_ee_pose_   = Eigen::VectorXd::Zero(6);
+    Eigen::VectorXd prev_ee_pose_ = Eigen::VectorXd::Zero(6);
 
     Eigen::Vector3d delta_hand_pos_ = Eigen::Vector3d::Zero();
 

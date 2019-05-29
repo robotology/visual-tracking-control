@@ -11,6 +11,7 @@
 #include <tuple>
 
 #include <Eigen/Dense>
+
 #include <SuperimposeMesh/SICAD.h>
 
 namespace bfl {

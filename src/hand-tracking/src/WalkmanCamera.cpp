@@ -8,6 +8,7 @@
 #include <WalkmanCamera.h>
 
 #include <opencv2/core/core_c.h>
+
 #include <yarp/cv/Cv.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/LogStream.h>

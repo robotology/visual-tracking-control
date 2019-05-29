@@ -13,6 +13,7 @@
 #include <string>
 
 #include <iCub/iKin/iKinFwd.h>
+
 #include <yarp/dev/GazeControl.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/os/Bottle.h>
@@ -24,10 +25,7 @@
 class iCubCamera : public bfl::Camera
 {
 public:
-    iCubCamera(const std::string& cam_sel,
-               const double resolution_ratio,
-               const std::string& context,
-               const std::string& port_prefix);
+    iCubCamera(const std::string& cam_sel, const double resolution_ratio, const std::string& context, const std::string& port_prefix);
 
     virtual ~iCubCamera() noexcept;
 
@@ -63,7 +61,7 @@ private:
 
     yarp::dev::PolyDriver drv_gaze_;
 
-    yarp::dev::IGazeControl* itf_gaze_ = YARP_NULLPTR;
+    yarp::dev::IGazeControl* itf_gaze_ = nullptr;
 
     iCub::iKin::iCubEye icub_kin_eye_;
 

@@ -12,6 +12,7 @@
 #include <functional>
 
 #include <iCub/ctrl/math.h>
+
 #include <yarp/math/Math.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Property.h>
@@ -20,16 +21,17 @@
 using namespace bfl;
 using namespace Eigen;
 using namespace iCub::ctrl;
-using namespace iCub::iKin;
 using namespace yarp::math;
 using namespace yarp::os;
 using namespace yarp::sig;
 
 
-KinPoseModel::KinPoseModel() noexcept { }
+KinPoseModel::KinPoseModel() noexcept
+{ }
 
 
-KinPoseModel::~KinPoseModel() noexcept { }
+KinPoseModel::~KinPoseModel() noexcept
+{ }
 
 
 void KinPoseModel::propagate(const Ref<const MatrixXd>& cur_state, Ref<MatrixXd> prop_state)

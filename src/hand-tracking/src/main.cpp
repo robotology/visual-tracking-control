@@ -18,6 +18,7 @@
 #include <yarp/os/Network.h>
 #include <yarp/os/ResourceFinder.h>
 #include <yarp/os/Value.h>
+
 #include <opencv2/core/core.hpp>
 
 #include <BrownianMotionPose.h>
@@ -40,7 +41,6 @@
 #include <PlayGatePose.h>
 #include <VisualProprioception.h>
 #include <VisualSIS.h>
-
 #include <WalkmanArmModel.h>
 #include <WalkmanCamera.h>
 
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     paramsd["resample_prior"]   = bottle_pf_params.check("resample_prior",   Value(1.0)).asInt();
     paramsd["gate_pose"]        = bottle_pf_params.check("gate_pose",        Value(0.0)).asInt();
     paramsd["resolution_ratio"] = bottle_pf_params.check("resolution_ratio", Value(1.0)).asInt();
-    paramss["laterality"]       = bottle_pf_params.check("laterality", Value("right")).asString();
+    paramss["laterality"]       = bottle_pf_params.check("laterality",       Value("right")).asString();
 
     paramsd["num_images"]       = paramsd["num_particles"] / paramsd["gpu_count"];
 
@@ -101,12 +101,12 @@ int main(int argc, char *argv[])
 
     /* Get Brownian Motion parameters */
     yarp::os::Bottle bottle_brownianmotion_params = rf.findGroup("BROWNIANMOTION");
-    paramsd["q_x"]        = bottle_brownianmotion_params.check("q_x",        Value(0.005)).asDouble();
-    paramsd["q_y"]        = bottle_brownianmotion_params.check("q_y",        Value(0.005)).asDouble();
-    paramsd["q_z"]        = bottle_brownianmotion_params.check("q_z",        Value(0.005)).asDouble();
-    paramsd["q_yaw"]      = bottle_brownianmotion_params.check("q_yaw",      Value(0.001)).asDouble();
-    paramsd["q_pitch"]    = bottle_brownianmotion_params.check("q_pitch",    Value(0.001)).asDouble();
-    paramsd["q_roll"]      = bottle_brownianmotion_params.check("q_roll",      Value(0.001)).asDouble();
+    paramsd["q_x"]     = bottle_brownianmotion_params.check("q_x",     Value(0.005)).asDouble();
+    paramsd["q_y"]     = bottle_brownianmotion_params.check("q_y",     Value(0.005)).asDouble();
+    paramsd["q_z"]     = bottle_brownianmotion_params.check("q_z",     Value(0.005)).asDouble();
+    paramsd["q_yaw"]   = bottle_brownianmotion_params.check("q_yaw",   Value(0.001)).asDouble();
+    paramsd["q_pitch"] = bottle_brownianmotion_params.check("q_pitch", Value(0.001)).asDouble();
+    paramsd["q_roll"]  = bottle_brownianmotion_params.check("q_roll",  Value(0.001)).asDouble();
 
     /* Get Visual Proprioception parameters */
     yarp::os::Bottle bottle_visualproprioception_params = rf.findGroup("VISUALPROPRIOCEPTION");

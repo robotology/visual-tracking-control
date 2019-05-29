@@ -11,6 +11,7 @@
 #include <MeshModel.h>
 
 #include <iCub/iKin/iKinFwd.h>
+
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
 #include <yarp/os/ConstString.h>
@@ -20,11 +21,7 @@
 class iCubArmModel : public bfl::MeshModel
 {
 public:
-    iCubArmModel(const bool use_thumb,
-                 const bool use_forearm,
-                 const std::string& laterality,
-                 const std::string& context,
-                 const std::string& port_prefix);
+    iCubArmModel(const bool use_thumb, const bool use_forearm, const std::string& laterality, const std::string& context, const std::string& port_prefix);
 
     virtual ~iCubArmModel() noexcept;
 

@@ -8,6 +8,7 @@
 #include <InitiCubArm.h>
 
 #include <iCub/ctrl/math.h>
+
 #include <yarp/eigen/Eigen.h>
 
 using namespace Eigen;

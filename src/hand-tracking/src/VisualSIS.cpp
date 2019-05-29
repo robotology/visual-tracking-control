@@ -35,14 +35,17 @@ using yarp::sig::Vector;
 using namespace hand_tracking::utils;
 
 
-VisualSIS::VisualSIS(std::unique_ptr<bfl::ParticleSetInitialization> initialization,
-                     std::unique_ptr<bfl::PFPrediction> prediction,
-                     std::unique_ptr<bfl::PFCorrection> correction,
-                     std::unique_ptr<bfl::Resampling> resampling,
-                     const std::string& cam_sel,
-                     const int num_particles,
-                     const double resample_ratio,
-                     const std::string& port_prefix) :
+VisualSIS::VisualSIS
+(
+    std::unique_ptr<bfl::ParticleSetInitialization> initialization,
+    std::unique_ptr<bfl::PFPrediction> prediction,
+    std::unique_ptr<bfl::PFCorrection> correction,
+    std::unique_ptr<bfl::Resampling> resampling,
+    const std::string& cam_sel,
+    const int num_particles,
+    const double resample_ratio,
+    const std::string& port_prefix
+) :
     ParticleFilter(std::move(initialization), std::move(prediction), std::move(correction), std::move(resampling)),
     num_particles_(num_particles),
     resample_ratio_(resample_ratio),

@@ -11,6 +11,7 @@
 #include <functional>
 
 #include <iCub/ctrl/math.h>
+
 #include <yarp/eigen/Eigen.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/Bottle.h>
@@ -27,7 +28,12 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-iCubFwdKinModel::iCubFwdKinModel(const std::string& robot, const std::string& laterality, const std::string& port_prefix) :
+iCubFwdKinModel::iCubFwdKinModel
+(
+    const std::string& robot,
+    const std::string& laterality,
+    const std::string& port_prefix
+) :
     icub_kin_arm_(iCubArm(laterality+"_v2")),
     port_prefix_(port_prefix),
     robot_(robot),

@@ -30,7 +30,7 @@ public:
     /* Ctors and Dtors */
     VisualServoingClient();
 
-    ~VisualServoingClient();
+    virtual ~VisualServoingClient();
 
 
     /* DeviceDriver overrides */
@@ -90,16 +90,21 @@ public:
 
 
 private:
-    bool                  verbosity_ = false;
-    yarp::os::ConstString local_     = "";
-    yarp::os::ConstString remote_    = "";
+    bool verbosity_ = false;
 
-    VisualServoingIDL     visualservoing_control;
-    yarp::os::Port        port_rpc_command_;
+    yarp::os::ConstString local_ = "";
 
-    void yInfoVerbose   (const yarp::os::ConstString& str) const { if(verbosity_) yInfo()    << str; };
+    yarp::os::ConstString remote_ = "";
+
+    VisualServoingIDL visualservoing_control;
+
+    yarp::os::Port port_rpc_command_;
+
+    void yInfoVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yInfo() << str; };
+
     void yWarningVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yWarning() << str; };
-    void yErrorVerbose  (const yarp::os::ConstString& str) const { if(verbosity_) yError()   << str; };
+
+    void yErrorVerbose(const yarp::os::ConstString& str) const { if(verbosity_) yError() << str; };
 };
 
 #endif /* VISUALSERVOINGCLIENT_H */

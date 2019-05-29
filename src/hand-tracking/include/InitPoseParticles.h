@@ -12,6 +12,7 @@
 #include <BayesFilters/ParticleSetInitialization.h>
 
 #include <iCub/iKin/iKinFwd.h>
+
 #include <yarp/os/Bottle.h>
 #include <yarp/os/BufferedPort.h>
 #include <yarp/sig/Vector.h>

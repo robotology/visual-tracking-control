@@ -8,6 +8,7 @@
 #include <PlayGatePose.h>
 
 #include <iCub/ctrl/math.h>
+
 #include <yarp/eigen/Eigen.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Property.h>
@@ -22,16 +23,19 @@ using namespace yarp::os;
 using namespace yarp::sig;
 
 
-PlayGatePose::PlayGatePose(std::unique_ptr<PFCorrection> visual_correction,
-                           const double gate_x, const double gate_y, const double gate_z,
-                           const double gate_rotation,
-                           const double gate_aperture,
-                           const std::string& robot, const std::string& laterality,
-                           const std::string& port_prefix) noexcept :
-    GatePose(std::move(visual_correction),
-             gate_x, gate_y, gate_z,
-             gate_rotation,
-             gate_aperture),
+PlayGatePose::PlayGatePose
+(
+    std::unique_ptr<PFCorrection> visual_correction,
+    const double gate_x,
+    const double gate_y,
+    const double gate_z,
+    const double gate_rotation,
+    const double gate_aperture,
+    const std::string& robot,
+    const std::string& laterality,
+    const std::string& port_prefix
+) noexcept :
+    GatePose(std::move(visual_correction), gate_x, gate_y, gate_z, gate_rotation, gate_aperture),
     icub_kin_arm_(iCubArm(laterality + "_v2")),
     port_prefix_(port_prefix),
     robot_(robot),
@@ -51,10 +55,15 @@ PlayGatePose::PlayGatePose(std::unique_ptr<PFCorrection> visual_correction,
 }
 
 
-PlayGatePose::PlayGatePose(std::unique_ptr<PFCorrection> visual_correction,
-                           const std::string& robot, const std::string& laterality,
-                           const std::string& port_prefix) noexcept :
-    PlayGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30, robot, laterality, port_prefix) { }
+PlayGatePose::PlayGatePose
+(
+    std::unique_ptr<PFCorrection> visual_correction,
+    const std::string& robot,
+    const std::string& laterality,
+    const std::string& port_prefix
+) noexcept :
+    PlayGatePose(std::move(visual_correction), 0.1, 0.1, 0.1, 5, 30, robot, laterality, port_prefix)
+{ }
 
 
 PlayGatePose::~PlayGatePose() noexcept { }

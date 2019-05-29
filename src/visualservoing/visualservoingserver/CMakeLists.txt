@@ -21,6 +21,7 @@ yarp_prepare_plugin(${PLUGIN_TARGET_NAME}
                     ADVANCED
                     INTERNAL)
 
+
 find_package(ICUB   REQUIRED)
 find_package(OpenCV REQUIRED)
 

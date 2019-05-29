@@ -175,7 +175,7 @@ bool VisualProprioception::freezeMeasurements()
 
     /*
      * cv::HOGDescriptor::compute requires a std::vector<float>.
-     */    
+     */
     std::vector<float> descriptors_cpu;
     rImpl.hog_cpu_->compute(camera_image, descriptors_cpu, cv::Size(rImpl.cam_params_.width, rImpl.cam_params_.height));
 

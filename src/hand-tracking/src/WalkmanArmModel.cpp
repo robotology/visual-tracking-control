@@ -22,9 +22,13 @@ using namespace yarp::os;
 using namespace yarp::sig;
 using namespace hand_tracking::utils;
 
-WalkmanArmModel::WalkmanArmModel(const std::string& laterality,
-                                 const std::string& context,
-                                 const std::string& port_prefix) :
+
+WalkmanArmModel::WalkmanArmModel
+(
+    const std::string& laterality,
+    const std::string& context,
+    const std::string& port_prefix
+) :
     port_prefix_(port_prefix),
     laterality_(laterality),
     context_(context)

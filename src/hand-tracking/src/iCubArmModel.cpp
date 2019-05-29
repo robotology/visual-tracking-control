@@ -24,11 +24,14 @@ using namespace yarp::sig;
 using namespace hand_tracking::utils;
 
 
-iCubArmModel::iCubArmModel(const bool use_thumb,
-                           const bool use_forearm,
-                           const std::string& laterality,
-                           const std::string& context,
-                           const std::string& port_prefix) :
+iCubArmModel::iCubArmModel
+(
+    const bool use_thumb,
+    const bool use_forearm,
+    const std::string& laterality,
+    const std::string& context,
+    const std::string& port_prefix
+) :
     port_prefix_(port_prefix),
     use_thumb_(use_thumb),
     use_forearm_(use_forearm),
@@ -221,7 +224,7 @@ std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> iCubArmModel::get
             ee_t(2) = cur_states(2, i);
             ee_t(3) = 1.0;
 
-            /* 
+            /*
              * SuperimposeMeshLib requires axis-angle representation,
              * hence the Euler ZYX representation stored in cur_states is converted to axis-angle.
              */
@@ -309,18 +312,18 @@ bool iCubArmModel::file_found(const std::string& file)
 Matrix iCubArmModel::getInvertedH(const double a, const double d, const double alpha, const double offset, const double q)
 {
     /** Table of the DH parameters for the right arm V2.
-    *  Link i  Ai (mm)     d_i (mm)    alpha_i (rad)   theta_i (deg)
-    *  i = 0	32          0           pi/2               0 + (-22 ->    84)
-    *  i = 1	0           -5.5        pi/2             -90 + (-39 ->    39)
-    *  i = 2	-23.3647	-143.3      pi/2            -105 + (-59 ->    59)
-    *  i = 3	0           -107.74     pi/2             -90 + (  5 ->   -95)
-    *  i = 4	0           0           -pi/2            -90 + (  0 -> 160.8)
-    *  i = 5	-15.0       -152.28     -pi/2           -105 + (-37 ->   100)
-    *  i = 6	15.0        0           pi/2               0 + (5.5 ->   106)
-    *  i = 7	0           -141.3      pi/2             -90 + (-50 ->    50)
-    *  i = 8	0           0           pi/2              90 + ( 10 ->   -65)
-    *  i = 9	62.5        25.98       0                180 + (-25 ->    25)
-    **/
+     *  Link i  Ai (mm)     d_i (mm)    alpha_i (rad)   theta_i (deg)
+     *  i = 0	32          0           pi/2               0 + (-22 ->    84)
+     *  i = 1	0           -5.5        pi/2             -90 + (-39 ->    39)
+     *  i = 2	-23.3647	-143.3      pi/2            -105 + (-59 ->    59)
+     *  i = 3	0           -107.74     pi/2             -90 + (  5 ->   -95)
+     *  i = 4	0           0           -pi/2            -90 + (  0 -> 160.8)
+     *  i = 5	-15.0       -152.28     -pi/2           -105 + (-37 ->   100)
+     *  i = 6	15.0        0           pi/2               0 + (5.5 ->   106)
+     *  i = 7	0           -141.3      pi/2             -90 + (-50 ->    50)
+     *  i = 8	0           0           pi/2              90 + ( 10 ->   -65)
+     *  i = 9	62.5        25.98       0                180 + (-25 ->    25)
+     **/
 
     yarp::sig::Matrix H(4, 4);
 

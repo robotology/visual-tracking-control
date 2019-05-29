@@ -20,9 +20,7 @@
 class WalkmanArmModel : public bfl::MeshModel
 {
 public:
-    WalkmanArmModel(const std::string& laterality,
-                    const std::string& context,
-                    const std::string& port_prefix);
+    WalkmanArmModel(const std::string& laterality, const std::string& context, const std::string& port_prefix);
 
     virtual ~WalkmanArmModel() noexcept { };
 
