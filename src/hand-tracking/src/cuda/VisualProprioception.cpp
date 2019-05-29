@@ -134,7 +134,7 @@ VisualProprioception::~VisualProprioception() noexcept
 }
 
 
-std::pair<bool, bfl::Data> VisualProprioception::measure() const
+std::pair<bool, bfl::Data> VisualProprioception::measure(const bfl::Data& data) const
 {
     //return std::make_pair(true, std::move(rImpl.cuda_descriptors_));
     return std::make_pair(true, pImpl_->cuda_descriptors_);
@@ -202,7 +202,7 @@ std::pair<bool, bfl::Data> VisualProprioception::innovation(const bfl::Data& pre
 }
 
 
-bool VisualProprioception::freezeMeasurements()
+bool VisualProprioception::freeze()
 {
     ImplData& rImpl = *pImpl_;
 
