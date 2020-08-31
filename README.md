@@ -53,7 +53,7 @@ $ cmake --build . --target ALL_BUILD --config Release
 $ cmake --build . --target INSTALL --config Release
 ```
 
-# 📝 API documentaion and example code
+# 📝 API documentation and example code
 Doxygen-generated documentation is available [here](https://robotology.github.io/visual-tracking-control/doxygen/doc/html/index.html).
 
 
